@@ -1,11 +1,11 @@
 import sys
-
 import os
+from urllib import parse
+
+from traitlets import Instance
 from sqlalchemy.orm.exc import MultipleResultsFound
 from tornado import web, gen
-from urllib import parse
 import tornado.ioloop
-
 from jinja2 import Environment, FileSystemLoader
 from jupyterhub import orm as jupyterhub_orm
 
@@ -19,6 +19,10 @@ from remoteappmanager.jinja2_adapters import Jinja2LoaderAdapter
 
 class Application(web.Application, LoggingMixin):
     """Tornado main application"""
+
+    user = Instance(orm.User, allow_none=True)
+
+    db = Instance(orm.Database, allow_none=True)
 
     def __init__(self, config):
         """Initializes the application
@@ -196,7 +200,7 @@ class Application(web.Application, LoggingMixin):
 
         session = Session()
         try:
-            user = session.query(orm.User).filter(
+            user = session.query(orm.User).filter_by(
                 name=self.config.user).one_or_none()
         except MultipleResultsFound:
             self.log.error("Multiple results found when "
@@ -208,14 +212,13 @@ class Application(web.Application, LoggingMixin):
 
         if user is None:
             user = orm.User(name=self.config.user)
-            user.teams.append(user)
-            session.add(self.user)
+            # user.teams.append(user)
+            session.add(user)
 
         # make sure that the user always has at least one team: his own.
-
         if len(user.teams) == 0:
             team = orm.Team(name=self.config.user)
-            self.user.teams.append(team)
+            # self.user.teams.append(team)
             session.add(team)
 
         session.commit()
@@ -226,7 +229,7 @@ class Application(web.Application, LoggingMixin):
 def _server_from_url(url):
     """Creates a orm.Server from a given url"""
     parsed = parse.urlparse(url)
-    return jupyterhub_orm.server(
+    return jupyterhub_orm.Server(
         proto=parsed.scheme,
         ip=parsed.hostname,
         port=parsed.port,

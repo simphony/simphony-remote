@@ -26,9 +26,6 @@ class User(Base):
     #: a primary key.
     name = Column(Unicode, index=True, unique=True)
 
-    #: The teams this user belongs to (n <-> n)
-    teams = relationship("Team", secondary="user_team", back_populates="users")
-
 
 class Team(Base):
     """ Teams of users. """
@@ -43,7 +40,7 @@ class Team(Base):
     name = Column(Unicode)
 
     #: The users parts of this team (n <-> n)
-    users = relationship("User", secondary="user_team", back_populates="teams")
+    users = relationship("User", secondary="user_team", backref="teams")
 
 
 class Application(Base):

@@ -1,8 +1,11 @@
 import contextlib
 import sys
 from unittest import mock
+import tempfile
 
 import docker
+from remoteappmanager.application_config import ApplicationConfig
+from remoteappmanager.db.orm import Database
 from tests import fixtures
 
 
@@ -146,7 +149,7 @@ arguments = {
     "user": "username",
     "port": 57022,
     "cookie-name": "jupyter-hub-token-username",
-    "base-url": "/user/username",
+    "base-url": "/user/username/",
     "hub-host": "",
     "hub-prefix": "/hub/",
     "hub-api-url": "http://172.17.5.167:8081/hub/api",
@@ -154,6 +157,25 @@ arguments = {
     "ip": "127.0.0.1",
     "config-file": fixtures.get("remoteappmanager_config.py")
 }
+
+
+def init_sqlite_db(path):
+    """Initializes the sqlite database at a given path.
+    """
+    db = Database("sqlite:///"+path)
+    db.reset()
+
+
+def basic_application_config():
+    """Returns a basic application config for testing purposes.
+    The database is in memory.
+    """
+    options = {k.replace("-", "_"): v for k, v in arguments.items()}
+
+    # Go in memory with the db
+    options["db_url"] = "sqlite://"
+
+    return ApplicationConfig(**options)
 
 
 @contextlib.contextmanager
