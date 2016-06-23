@@ -174,7 +174,7 @@ class ContainerManager(LoggingMixin):
         volume_targets = [binding['bind']
                           for binding in filtered_volumes.values()]
 
-        # Log the paths that are being mounted
+        # Log the paths that are not being mounted
         if volumes.keys() - filtered_volumes.keys():
             self.log.error('Path(s) does not exist, not mounting:\n%s',
                            '\n'.join(volumes.keys() - filtered_volumes.keys()))

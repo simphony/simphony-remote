@@ -100,7 +100,7 @@ class TestContainerManager(AsyncTestCase):
 
         yield self.manager.start_container("username", "imageid", volumes)
 
-        # Call args and keyword args that craete_container receives
+        # Call args and keyword args that create_container receives
         args = self.manager.docker_client.client.create_container.call_args
         actual_volume_targets = args[1]['volumes']
 
