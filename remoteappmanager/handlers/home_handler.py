@@ -1,3 +1,4 @@
+from collections import namedtuple
 import socket
 import os
 from datetime import timedelta
@@ -9,6 +10,12 @@ from tornado.httpclient import AsyncHTTPClient, HTTPError
 from tornado.log import app_log
 
 from remoteappmanager.handlers.base_handler import BaseHandler
+
+
+# FIXME: replace these with ORM objects
+# Assumed one volume per application
+Volume = namedtuple('Volume', ('target', 'source', 'mode'))
+Application = namedtuple('Application', ('image_name', 'volume'))
 
 
 class HomeHandler(BaseHandler):
@@ -142,23 +149,37 @@ class HomeHandler(BaseHandler):
         """Start the container"""
         manager = self.application.container_manager
 
-        # FIXME: Should retrieve this info from the database
-        allow_home = True
+        # Volumes to be mounted
         volumes = {}
 
-        if allow_home:
-            tilde_user = '~'+user_name
-            home_path = os.path.expanduser(tilde_user)
+        # FIXME: Should retrieve this info from the database
+        allow_home = True
 
-            if home_path != tilde_user and os.path.exists(home_path):
+        if allow_home:
+            home_path = os.path.expanduser('~'+user_name)
+
+            if os.path.exists(home_path):
                 volumes[home_path] = {'bind': '/workspace', 'mode': 'rw'}
 
             else:
-                message = ('Failed to mount {home_path}. '
-                           '{user_name} is either not a user on the system or '
-                           '{home_path} is not available.')
-                self.log.error(message.format(user_name=user_name,
-                                              home_path=home_path))
+                message = ('{home_path} is not available. Not mounting it.')
+                self.log.error(message.format(home_path=home_path))
+
+        # FIXME: Should retrieve allow_common and app from the database
+        allow_common = True
+        app = Application(image_name=image_name,
+                          # Made-up for now
+                          volume=Volume(source='/appdata/image_name/common',
+                                        target='/appdata',
+                                        mode='ro'))
+
+        if allow_common:
+            if os.path.exists(app.volume.source):
+                volumes[app.volume.source] = {'bind': app.volume.target,
+                                              'mode': app.volume.mode}
+            else:
+                self.log.error('%s does not exist, not mounting it',
+                               app.volume.source)
 
         try:
             f = manager.start_container(user_name, image_name, volumes)
