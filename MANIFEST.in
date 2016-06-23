@@ -1,0 +1,2 @@
+recursive-include remoteappmanager/templates *
+recursive-include remoteappmanager/static *

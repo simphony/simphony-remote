@@ -1,0 +1,45 @@
+@startuml
+left to right direction
+
+actor scientist
+actor viewer
+actor admin
+actor docker
+actor authenticator
+
+scientist <|. admin : extends
+
+rectangle remote_app {
+rectangle  WebUI {
+(Login) as (login)
+(View available applications) as (list apps)
+(Start an application session) as (run app)
+(Stop an application session) as (stop app)
+(Share an application session) as (share app)
+}
+
+rectangle unix_tools {
+(Upload an application docker container) as (upload app)
+(Build compatible docker container) as (build app)
+}
+}
+
+scientist -- (login)
+scientist -- (list apps)
+scientist -- (run app)
+scientist -- (share app)
+scientist -- (stop app)
+
+viewer -- (share app)
+
+admin -- (upload app)
+admin -- (build app)
+
+(run app) -- docker
+(stop app) -- docker
+(share app) -- docker
+(list apps) -- docker
+
+(login) -- authenticator
+
+@enduml

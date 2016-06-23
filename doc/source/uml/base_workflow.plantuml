@@ -1,0 +1,62 @@
+@startuml
+
+actor Scientist
+participant "Reverse\nProxy" as Proxy
+box "Jupyter Hub process"
+participant "Jupyter\nHub" as Hub
+participant "PAM\nAuthenticator" as Authenticator
+end box
+participant "User Session\nManager" as UserManager
+participant "Docker\nEngine" as Docker
+participant "Simphony\nContainer" as Container
+
+...
+
+Scientist -> Hub : login request
+activate Hub
+
+Hub -> Authenticator: authenticate user
+activate Authenticator
+
+Authenticator --> Hub: authenticated
+deactivate Authenticator
+
+create UserManager
+Hub -> UserManager: create session
+deactivate Hub
+
+activate UserManager
+UserManager -> Docker: retrieve image list
+
+activate Docker
+Docker --> UserManager: image list
+deactivate Docker
+
+UserManager -> Hub: user page port
+deactivate UserManager
+
+activate Hub
+Hub -> Proxy : map user page
+deactivate Hub
+
+...
+
+Scientist -> UserManager : start container
+activate UserManager
+
+UserManager -> Docker: start image
+deactivate UserManager
+activate Docker
+
+create Container
+Docker -> Container : create
+deactivate Docker
+
+...
+
+Container --> UserManager : NoVNC port
+activate UserManager
+UserManager -> Proxy: map container page port
+deactivate UserManager
+
+@enduml

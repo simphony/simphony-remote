@@ -1,0 +1,9 @@
+venv
+*.egg-info
+*.pyc
+jupyterhub.sqlite
+jupyterhub_cookie_secret
+*.csr
+*.crt
+*.key
+doc/build

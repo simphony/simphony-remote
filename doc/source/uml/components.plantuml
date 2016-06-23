@@ -1,0 +1,27 @@
+@startuml
+left to right direction
+skinparam componentStyle uml2
+
+actor User
+
+frame "Remot App Server" {
+[Jupyter Hub]
+"Single user \n manager" as [SingleUser]
+[Reverse Proxy]
+[Docker]
+"Simphony \n container" as [Simphony]
+}
+
+User -> [Reverse Proxy] : HTTPS
+[Jupyter Hub] - [Reverse Proxy]
+[Jupyter Hub] -- [SingleUser]  : 1..n (one per user)
+[SingleUser] -- [Docker]
+[SingleUser] -- [Reverse Proxy]
+[Reverse Proxy] .. [Simphony] : mapped to
+[Docker] -- [Simphony] : 1..n (TLS)
+
+note bottom of [Jupyter Hub]
+Using default PAM authetnication.
+end note
+
+@enduml
