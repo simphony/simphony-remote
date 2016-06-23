@@ -108,5 +108,5 @@ class TestContainerManager(AsyncTestCase):
         self.assertNotIn('/target_vol1', actual_volume_targets)
         self.assertNotIn('/target_vol2', actual_volume_targets)
 
-        # Home directory is valid, should stay
+        # The current directory is valid, should stay
         self.assertIn('/target_vol3', actual_volume_targets)
