@@ -1,12 +1,15 @@
+import sys
+
 import os
-from remoteappmanager.db.orm import Database
+from sqlalchemy.orm.exc import MultipleResultsFound
 from tornado import web, gen
 from urllib import parse
 import tornado.ioloop
 
 from jinja2 import Environment, FileSystemLoader
-from jupyterhub import orm
+from jupyterhub import orm as jupyterhub_orm
 
+from remoteappmanager.db import orm
 from remoteappmanager.handlers.api import HomeHandler
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.docker.container_manager import ContainerManager
@@ -39,6 +42,7 @@ class Application(web.Application, LoggingMixin):
         self._jinja_init(settings)
         self._container_manager_init()
         self._reverse_proxy_init()
+        self._user_init()
 
         handlers = self._get_handlers()
 
@@ -174,7 +178,7 @@ class Application(web.Application, LoggingMixin):
 
         # Note, we use jupyterhub orm Proxy, but not for database access,
         # just for interface convenience.
-        self.reverse_proxy = orm.Proxy(
+        self.reverse_proxy = jupyterhub_orm.Proxy(
             auth_token=auth_token,
             api_server=_server_from_url(self._config.proxy_api_url)
         )
@@ -185,13 +189,44 @@ class Application(web.Application, LoggingMixin):
 
     def _db_init(self):
         """Initializes the database connection."""
-        self.db = Database(self.config.db_url)
+        self.db = orm.Database(self.config.db_url)
+
+    def _user_init(self):
+        Session = self.db.create_session_factory()
+
+        session = Session()
+        try:
+            user = session.query(orm.User).filter(
+                name=self.config.user).one_or_none()
+        except MultipleResultsFound:
+            self.log.error("Multiple results found when "
+                           "querying for username {}. This is supposedly "
+                           "impossible because the username should be a "
+                           "unique key by design.".format(self.config.user))
+            # This is pretty much an unrecoverable error and we should give up
+            sys.exit(1)
+
+        if user is None:
+            user = orm.User(name=self.config.user)
+            user.teams.append(user)
+            session.add(self.user)
+
+        # make sure that the user always has at least one team: his own.
+
+        if len(user.teams) == 0:
+            team = orm.Team(name=self.config.user)
+            self.user.teams.append(team)
+            session.add(team)
+
+        session.commit()
+
+        self.user = user
 
 
 def _server_from_url(url):
     """Creates a orm.Server from a given url"""
     parsed = parse.urlparse(url)
-    return orm.Server(
+    return jupyterhub_orm.server(
         proto=parsed.scheme,
         ip=parsed.hostname,
         port=parsed.port,
