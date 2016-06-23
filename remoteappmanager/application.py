@@ -1,4 +1,5 @@
 import os
+from remoteappmanager.db.orm import Database
 from tornado import web, gen
 from urllib import parse
 import tornado.ioloop
@@ -184,7 +185,7 @@ class Application(web.Application, LoggingMixin):
 
     def _db_init(self):
         """Initializes the database connection."""
-        self.db = None
+        self.db = Database(self.config.db_url)
 
 
 def _server_from_url(url):
