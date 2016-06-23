@@ -8,6 +8,7 @@ import errno
 from tornado import gen, ioloop
 from tornado.httpclient import AsyncHTTPClient, HTTPError
 from tornado.log import app_log
+from traitlets import List, Unicode
 
 from remoteappmanager.handlers.base_handler import BaseHandler
 
@@ -22,7 +23,7 @@ class HomeHandler(BaseHandler):
     """Render the user's home page"""
 
     @gen.coroutine
-    def get(self):
+    def _get_images_info(self):
         container_manager = self.application.container_manager
 
         images_info = []
@@ -37,10 +38,12 @@ class HomeHandler(BaseHandler):
                 "image": image,
                 "container": container
             })
+        return images_info
 
-        self.render('home.html',
-                    images_info=images_info,
-                    )
+    @gen.coroutine
+    def get(self):
+        images_info = yield self._get_images_info()
+        self.render('home.html', images_info=images_info)
 
     @gen.coroutine
     def post(self):
@@ -76,13 +79,27 @@ class HomeHandler(BaseHandler):
             image_name = options["image_name"][0]
             container = yield self._start_container(user_name, image_name)
         except Exception as e:
-            self.log.exception("Failed to spawn docker image.")
-            self.finish("Unable to spawn docker image: {}".format(e))
-            return
+            self.log.exception("Failed to spawn docker image. %s",
+                               str(e))
 
-        url = self.application.container_url_abspath(container)
-        self.log.info('Redirecting to ' + url)
-        self.redirect(url)
+            images_info = yield self._get_images_info()
+
+            # Render the home page again with the error message
+            # User-facing error message (less info)
+            message = 'Failed to start "{image_name}". Reason: {error_type}'
+            self.render('home.html', images_info=images_info,
+                        error_message=message.format(
+                            image_name=image_name,
+                            error_type=type(e).__name__))
+        else:
+            # The server is up and running. Now contact the proxy and add
+            # the container url to it.
+            self.application.reverse_proxy_add_container(container)
+
+            # Redirect the user
+            url = self.application.container_url_abspath(container)
+            self.log.info('Redirecting to ' + url)
+            self.redirect(url)
 
     @gen.coroutine
     def _actionhandler_view(self, user, options):
@@ -238,10 +255,6 @@ class HomeHandler(BaseHandler):
             )
             e.reason = 'error'
             raise e
-
-        # The server is up and running. Now contact the proxy and add
-        # the container url to it.
-        self.application.reverse_proxy_add_container(container)
 
         return container
 
