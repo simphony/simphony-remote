@@ -24,7 +24,7 @@ def main():
         print_help()
         sys.exit(0)
 
-    db = Database(url=db_url, echo=True, )
+    db = Database(url=db_url, echo=True)
     db.reset()
 
 if __name__ == '__main__':
