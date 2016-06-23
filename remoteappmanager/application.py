@@ -212,13 +212,12 @@ class Application(web.Application, LoggingMixin):
 
         if user is None:
             user = orm.User(name=self.config.user)
-            # user.teams.append(user)
             session.add(user)
 
         # make sure that the user always has at least one team: his own.
         if len(user.teams) == 0:
             team = orm.Team(name=self.config.user)
-            # self.user.teams.append(team)
+            user.teams.append(team)
             session.add(team)
 
         session.commit()

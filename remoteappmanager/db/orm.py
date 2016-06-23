@@ -44,20 +44,30 @@ class Team(Base):
 
 
 class Application(Base):
+    """ Describes an application that should be available for startup """
     __tablename__ = "application"
     id = Column(Integer, primary_key=True)
+
+    #: The docker image name where the application can be found
     image = Column(Unicode)
 
 
 class ApplicationPolicy(Base):
     __tablename__ = "application_policy"
     id = Column(Integer, primary_key=True)
+
+    #: If the home directory should be mounted in the container
     allow_home = Column(Boolean)
+
+    #: If a common workarea should be mounted in the container
     allow_common = Column(Boolean)
+
+    #: If the container should be accessible from other members of the team
     allow_team_view = Column(Boolean)
 
 
 class Accounting(Base):
+    """Holds the information about who is allowed to run what."""
     __tablename__ = "accounting"
     id = Column(Integer, primary_key=True)
 

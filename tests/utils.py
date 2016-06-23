@@ -1,7 +1,6 @@
 import contextlib
 import sys
 from unittest import mock
-import tempfile
 
 import docker
 from remoteappmanager.application_config import ApplicationConfig
