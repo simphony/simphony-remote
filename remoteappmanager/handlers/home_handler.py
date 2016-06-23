@@ -157,13 +157,7 @@ class HomeHandler(BaseHandler):
 
         if allow_home:
             home_path = os.path.expanduser('~'+user_name)
-
-            if os.path.exists(home_path):
-                volumes[home_path] = {'bind': '/workspace', 'mode': 'rw'}
-
-            else:
-                message = ('{home_path} is not available. Not mounting it.')
-                self.log.error(message.format(home_path=home_path))
+            volumes[home_path] = {'bind': '/workspace', 'mode': 'rw'}
 
         # FIXME: Should retrieve allow_common and app from the database
         allow_common = True
@@ -174,12 +168,8 @@ class HomeHandler(BaseHandler):
                                         mode='ro'))
 
         if allow_common:
-            if os.path.exists(app.volume.source):
-                volumes[app.volume.source] = {'bind': app.volume.target,
-                                              'mode': app.volume.mode}
-            else:
-                self.log.error('%s does not exist, not mounting it',
-                               app.volume.source)
+            volumes[app.volume.source] = {'bind': app.volume.target,
+                                          'mode': app.volume.mode}
 
         try:
             f = manager.start_container(user_name, image_name, volumes)
