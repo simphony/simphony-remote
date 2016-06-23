@@ -34,6 +34,7 @@ class Application(web.Application, LoggingMixin):
         settings.update(config.as_dict())
         settings["static_url_prefix"] = self._config.base_url+"static/"
 
+        self._db_init()
         self._jinja_init(settings)
         self._container_manager_init()
         self._reverse_proxy_init()
@@ -180,6 +181,10 @@ class Application(web.Application, LoggingMixin):
         self.log.info("Reverse proxy setup on {}".format(
             self._config.proxy_api_url
         ))
+
+    def _db_init(self):
+        """Initializes the database connection."""
+        self.db = None
 
 
 def _server_from_url(url):
