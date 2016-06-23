@@ -162,6 +162,8 @@ class ContainerManager(LoggingMixin):
         # Data volume binding to be used with Docker Client
         # volumes = {volume_source: {'bind': volume_target,
         #                            'mode': volume_mode}
+        volumes = volumes if volumes else {}
+
         # Filter away the volume sources that do not exist,
         # otherwise Docker would create non-existing host directory
         # See Docker PR #21666
