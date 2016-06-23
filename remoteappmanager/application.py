@@ -196,6 +196,7 @@ class Application(web.Application, LoggingMixin):
         self.db = orm.Database(self.config.db_url)
 
     def _user_init(self):
+        """Initializes the user at the database level."""
         Session = self.db.create_session_factory()
 
         session = Session()
