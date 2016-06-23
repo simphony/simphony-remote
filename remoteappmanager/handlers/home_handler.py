@@ -8,7 +8,6 @@ import errno
 from tornado import gen, ioloop
 from tornado.httpclient import AsyncHTTPClient, HTTPError
 from tornado.log import app_log
-from traitlets import List, Unicode
 
 from remoteappmanager.handlers.base_handler import BaseHandler
 
