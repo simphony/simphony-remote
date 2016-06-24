@@ -76,8 +76,7 @@ def list(db):
                     ))
 
 
-
-@team.command()
+@team.command()  # noqa
 @click.argument("team")
 @click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
 def create(team, db):
@@ -90,7 +89,7 @@ def create(team, db):
     print(orm_team.id)
 
 
-@team.command()
+@team.command()  # noqa
 @click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
 def list(db):
     db_obj = database(db)
@@ -115,7 +114,7 @@ def adduser(user, team, db):
         orm_team.users.append(orm_user)
 
 
-@app.command()
+@app.command()  # noqa
 @click.argument("image")
 @click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
 def create(image, db):
@@ -128,7 +127,7 @@ def create(image, db):
     print(orm_app.id)
 
 
-@app.command()
+@app.command()  # noqa
 @click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
 def list(db):
     db_obj = database(db)
