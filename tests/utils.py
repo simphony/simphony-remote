@@ -47,6 +47,45 @@ def mock_docker_client():
     return docker_client
 
 
+def mock_docker_client_with_running_containers():
+    """Same as above, but it behaves as if one of the containers is already
+    started."""
+    client = mock_docker_client()
+    client.containers.return_value = [
+        # user
+        {'Command': '/sbin/init -D',
+         'Created': 1466766499,
+         'HostConfig': {'NetworkMode': 'default'},
+         'Id': 'someid',
+         'Image': 'quay.io/travisci/travis-python:latest',
+         'ImageID': 'imageid',
+         'Labels': {'eu.simphony-project.docker.user': 'user'},
+         'Names': ['/remoteexec-image_3Alatest_user'],
+         'Ports': [{'IP': '0.0.0.0',
+                    'PublicIP': 34567,
+                    'PrivatePort': 22,
+                    'Type': 'tcp'}],
+         'State': 'running',
+         'Status': 'Up About an hour'},
+        # user2
+        {'Command': '/sbin/init -D',
+         'Created': 1466766499,
+         'HostConfig': {'NetworkMode': 'default'},
+         'Id': 'someid',
+         'Image': 'quay.io/travisci/travis-python:latest',
+         'ImageID': 'imageid',
+         'Labels': {'eu.simphony-project.docker.user': 'user2'},
+         'Names': ['/remoteexec-image_3Alatest_user2'],
+         'Ports': [{'IP': '0.0.0.0',
+                    'PublicIP': 34567,
+                    'PrivatePort': 22,
+                    'Type': 'tcp'}],
+         'State': 'running',
+         'Status': 'Up About an hour'}]
+
+    return client
+
+
 def mock_docker_client_with_existing_stopped_container():
     """Same as above, but it behaves as if one of the containers is already
     started."""
@@ -167,3 +206,14 @@ def invocation_argv():
     yield
 
     sys.argv[:] = saved_argv
+
+
+def assert_containers_equal(test_case, actual, expected):
+    if (expected.docker_id != actual.docker_id or
+            expected.name != actual.name or
+            expected.image_name != actual.image_name or
+            expected.image_id != actual.image_id or
+            expected.ip != actual.ip or
+            expected.port != actual.port):
+        message = '{!r} is not identical to the expected {!r}'
+        test_case.fail(message.format(actual, expected))
