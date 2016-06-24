@@ -208,7 +208,7 @@ class Application(web.Application, LoggingMixin):
                                "querying for username {}. This is supposedly "
                                "impossible because the username should be a "
                                "unique key by design.".format(
-                    self.config.user))
+                                   self.config.user))
                 raise
 
             if user is None:
