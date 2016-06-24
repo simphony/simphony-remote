@@ -1,9 +1,12 @@
-from remoteappmanager.logging.logging_mixin import LoggingMixin
+import contextlib
+
 from sqlalchemy import Column, Integer, Boolean, Unicode, ForeignKey
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import create_engine
+
+from remoteappmanager.logging.logging_mixin import LoggingMixin
 
 Base = declarative_base()
 
@@ -71,6 +74,19 @@ class Accounting(Base):
     __tablename__ = "accounting"
     id = Column(Integer, primary_key=True)
 
+    team_id = Column(Integer, ForeignKey("team.id"))
+
+    application_id = Column(Integer, ForeignKey("application.id"))
+
+    application_policy_id = Column(Integer,
+                                   ForeignKey("application_policy.id"))
+
+    team = relationship("Team")
+
+    application = relationship("Application")
+
+    application_policy = relationship("ApplicationPolicy")
+
 
 class Database(LoggingMixin):
     def __init__(self, url, **kwargs):
@@ -86,20 +102,22 @@ class Database(LoggingMixin):
         super().__init__()
 
         self.url = url
-        self.engine = create_engine(self.url, **kwargs)
 
-    def create_session_factory(self):
-        """Create a new session class at the database url with the current
-        engine.
-        """
         self.log.info("Creating session to db: {}".format(self.url))
+        self.engine = create_engine(self.url, **kwargs)
         try:
-            return sessionmaker(bind=self.engine)
+            self.session_class = sessionmaker(bind=self.engine)
         except OperationalError:
             self.log.exception(
                 "Failed to connect db session: {}".format(self.url)
             )
             raise
+
+    def create_session(self):
+        """Create a new session class at the database url with the current
+        engine.
+        """
+        return self.session_class()
 
     def reset(self):
         """Completely resets the content of the database, removing
@@ -108,3 +126,17 @@ class Database(LoggingMixin):
         """
         Base.metadata.drop_all(self.engine)
         Base.metadata.create_all(self.engine)
+
+
+@contextlib.contextmanager
+def transaction(session):
+    """handles a transaction in a session."""
+    # Note that we don't need to explicitly start the session
+    # transaction. we are not using autocommit.
+    try:
+        yield
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.commit()

@@ -2,6 +2,7 @@ import sys
 import os
 from urllib import parse
 
+from remoteappmanager.db.orm import transaction
 from traitlets import Instance
 from sqlalchemy.orm.exc import MultipleResultsFound
 from tornado import web, gen
@@ -197,31 +198,29 @@ class Application(web.Application, LoggingMixin):
 
     def _user_init(self):
         """Initializes the user at the database level."""
-        Session = self.db.create_session_factory()
+        session = self.db.create_session()
 
-        session = Session()
-        try:
-            user = session.query(orm.User).filter_by(
-                name=self.config.user).one_or_none()
-        except MultipleResultsFound:
-            self.log.error("Multiple results found when "
-                           "querying for username {}. This is supposedly "
-                           "impossible because the username should be a "
-                           "unique key by design.".format(self.config.user))
-            # This is pretty much an unrecoverable error and we should give up
-            sys.exit(1)
+        with transaction(session):
+            try:
+                user = session.query(orm.User).filter_by(
+                    name=self.config.user).one_or_none()
+            except MultipleResultsFound:
+                self.log.error("Multiple results found when "
+                               "querying for username {}. This is supposedly "
+                               "impossible because the username should be a "
+                               "unique key by design.".format(self.config.user))
+                # This is pretty much an unrecoverable error and we should give up
+                raise
 
-        if user is None:
-            user = orm.User(name=self.config.user)
-            session.add(user)
+            if user is None:
+                user = orm.User(name=self.config.user)
+                session.add(user)
 
-        # make sure that the user always has at least one team: his own.
-        if len(user.teams) == 0:
-            team = orm.Team(name=self.config.user)
-            user.teams.append(team)
-            session.add(team)
-
-        session.commit()
+            # make sure that the user always has at least one team: his own.
+            if len(user.teams) == 0:
+                team = orm.Team(name=self.config.user)
+                user.teams.append(team)
+                session.add(team)
 
         self.user = user
 

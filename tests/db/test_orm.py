@@ -1,0 +1,116 @@
+import os
+import unittest
+
+from remoteappmanager.db import orm
+from remoteappmanager.db.orm import Database, transaction, Accounting
+from tests.temp_mixin import TempMixin
+from tests import utils
+
+
+class TestOrm(TempMixin, unittest.TestCase):
+    def setUp(self):
+        super().setUp()
+        self.sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
+        utils.init_sqlite_db(self.sqlite_file_path)
+
+        self.config = utils.basic_application_config()
+
+    def test_database_init_and_session(self):
+        db = Database(url="sqlite:///"+self.sqlite_file_path)
+        session = db.create_session()
+        self.assertIsNotNone(session)
+
+    def test_orm_objects(self):
+        db = Database(url="sqlite:///"+self.sqlite_file_path)
+        session = db.create_session()
+        with transaction(session):
+
+            users = [orm.User(name="user"+str(i)) for i in range(5)]
+            session.add_all(users)
+
+            teams = [orm.Team(name="team"+str(i)) for i in range(5)]
+            company_team = orm.Team(name='company_team')
+            teams.append(company_team)
+            session.add_all(teams)
+
+            for user, team in zip(users, teams):
+                user.teams.append(team)
+
+            # make users 1 3 and 4 part of the company team
+            users[1].teams.append(company_team)
+            users[3].teams.append(company_team)
+            users[4].teams.append(company_team)
+
+            # verify back population
+            self.assertEqual(teams[0].users[0], users[0])
+            self.assertEqual(len(company_team.users), 3)
+
+            # Create a few applications
+
+            apps = [orm.Application(image="docker/image"+str(i))
+                    for i in range(3)]
+            session.add_all(apps)
+
+            policy = orm.ApplicationPolicy(allow_home=False,
+                                           allow_common=False,
+                                           allow_team_view=False)
+            session.add(policy)
+
+            # We want app 0 to be available only to company team
+            # app 1 to be available only to user 0
+            # and app 2 to be available to user 1
+
+            accountings = [
+                orm.Accounting(team=company_team,
+                               application=apps[0],
+                               application_policy=policy),
+                orm.Accounting(team=teams[0],
+                               application=apps[1],
+                               application_policy=policy),
+                orm.Accounting(team=teams[1],
+                               application=apps[2],
+                               application_policy=policy),
+            ]
+            session.add_all(accountings)
+
+        with transaction(session):
+            # now check if user 1 has access to two applications:
+            # app[0] via the company team and app[2] via its own team.
+            teams = users[1].teams
+
+            res = session.query(Accounting).filter(Accounting.team_id.in_([
+                team.id for team in teams])).all()
+
+            self.assertEqual(len(res), 2)
+            self.assertIn("docker/image0",
+                          [acc.application.image for acc in res])
+            self.assertIn("docker/image2",
+                          [acc.application.image for acc in res])
+
+            # User 2 should have access to apps
+            teams = users[2].teams
+
+            res = session.query(Accounting).filter(Accounting.team_id.in_([
+                  team.id for team in teams])).all()
+
+            self.assertEqual(len(res), 0)
+
+            # User 0 should have access to app 1
+            teams = users[0].teams
+
+            res = session.query(Accounting).filter(Accounting.team_id.in_([
+                team.id for team in teams])).all()
+
+            self.assertEqual(len(res), 1)
+            self.assertIn("docker/image1",
+                          [acc.application.image for acc in res])
+
+            # User 3 should have access to app 0 only
+            teams = users[3].teams
+
+            res = session.query(Accounting).filter(Accounting.team_id.in_([
+                team.id for team in teams])).all()
+
+            self.assertEqual(len(res), 1)
+            self.assertIn("docker/image0",
+                          [acc.application.image for acc in res])
