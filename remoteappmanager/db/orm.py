@@ -142,3 +142,15 @@ def transaction(session):
         raise
     finally:
         session.commit()
+
+
+def apps_for_user(session, user):
+    with transaction(session):
+        # now check if user 1 has access to two applications:
+        # app[0] via the company team and app[2] via its own team.
+        teams = user.teams
+
+        res = session.query(Accounting).filter(
+            Accounting.team_id.in_([team.id for team in teams])).all()
+
+        return res

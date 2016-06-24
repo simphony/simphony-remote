@@ -1,6 +1,6 @@
 from traitlets import HasTraits, Unicode, Instance
 
-from remoteappmanager.dm import orm
+from remoteappmanager.db import orm
 
 
 class User(HasTraits):
