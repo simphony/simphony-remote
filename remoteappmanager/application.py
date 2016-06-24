@@ -1,7 +1,6 @@
 import os
 from urllib import parse
 
-from remoteappmanager.db.orm import transaction
 from traitlets import Instance
 from sqlalchemy.orm.exc import MultipleResultsFound
 from tornado import web, gen
@@ -15,12 +14,13 @@ from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.docker.container_manager import ContainerManager
 from remoteappmanager.docker.docker_client_config import DockerClientConfig
 from remoteappmanager.jinja2_adapters import Jinja2LoaderAdapter
+from remoteappmanager.user import User
 
 
 class Application(web.Application, LoggingMixin):
     """Tornado main application"""
 
-    user = Instance(orm.User, allow_none=True)
+    user = Instance(User, allow_none=True)
 
     db = Instance(orm.Database, allow_none=True)
 
@@ -199,10 +199,11 @@ class Application(web.Application, LoggingMixin):
         """Initializes the user at the database level."""
         session = self.db.create_session()
 
-        with transaction(session):
+        user = User(name=self.config.user)
+        with orm.transaction(session):
             try:
-                user = session.query(orm.User).filter_by(
-                    name=self.config.user).one_or_none()
+                user.orm_user = session.query(orm.User).filter_by(
+                                    name=self.config.user).one_or_none()
             except MultipleResultsFound:
                 self.log.error("Multiple results found when "
                                "querying for username {}. This is supposedly "
@@ -210,16 +211,6 @@ class Application(web.Application, LoggingMixin):
                                "unique key by design.".format(
                                    self.config.user))
                 raise
-
-            if user is None:
-                user = orm.User(name=self.config.user)
-                session.add(user)
-
-            # make sure that the user always has at least one team: his own.
-            if len(user.teams) == 0:
-                team = orm.Team(name=self.config.user)
-                user.teams.append(team)
-                session.add(team)
 
         self.user = user
 

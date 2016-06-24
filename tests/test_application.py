@@ -81,7 +81,4 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
         self.assertIsNotNone(app.user)
 
         self.assertEqual(app.user.name, "username")
-        self.assertEqual(len(app.user.teams), 1)
-        self.assertEqual(len(app.user.teams[0].users), 1)
-        self.assertEqual(app.user.teams[0].users[0], app.user)
-        self.assertEqual(app.user.teams[0].name, app.user.name)
+        self.assertEqual(app.user.orm_user, None)
