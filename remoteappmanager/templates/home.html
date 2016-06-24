@@ -15,9 +15,9 @@
   </div>
   <div class="row col-sm-offset-2 col-sm-8">
       {% if error_message %}
-        <p class="spawn-error-msg text-danger">
-          Error: {{error_message}}
-        </p>
+          <p class="spawn-error-msg text-danger">
+              {{error_message}}
+          </p>
       {% endif %}
       {% for info in images_info %}
       <form enctype="multipart/form-data" action="{{base_url}}" method="post" role="form">
