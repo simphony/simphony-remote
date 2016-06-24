@@ -1,10 +1,10 @@
 import contextlib
 
-from sqlalchemy import Column, Integer, Boolean, Unicode, ForeignKey
+from sqlalchemy import (
+    Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum)
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-from sqlalchemy import create_engine
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 
@@ -66,6 +66,15 @@ class ApplicationPolicy(Base):
 
     #: If the container should be accessible from other members of the team
     allow_team_view = Column(Boolean)
+
+    # Which volume to mount
+    volume_source = Column(Unicode, nullable=True)
+
+    # Where to mount it in the container
+    volume_target = Column(Unicode, nullable=True)
+
+    # In which mode
+    volume_mode = Column(Enum("ro", "rw"), nullable=True)
 
 
 class Accounting(Base):
