@@ -32,23 +32,21 @@ class TestContainerManager(AsyncTestCase):
 
     @gen_test
     def test_container_for_image(self):
-        result = yield self.manager.containers_for_image("imageid")
-        self.assertEqual(len(result), 0)
+        mock_docker_client = utils.mock_docker_client_with_running_containers()  # noqa
+        self.mock_docker_client = mock_docker_client
+        self.manager.docker_client.client = mock_docker_client
 
-        yield self.manager.start_container("username", "imageid")
-
-        result = yield self.manager.containers_for_image("imageid")
-        self.assertEqual(len(result), 1)
-
-        expected = {'name': 'remoteexec-username-imageid',
-                    'image_id': 'imageid',
-                    'image_name': 'imageid',
-                    'ip': '127.0.0.1',
-                    'port': 666,
-                    'docker_id': 'containerid'}
-
-        for key, value in expected.items():
-            self.assertEqual(getattr(result[0], key), value)
+        results = yield self.manager.containers_for_image("imageid")
+        expected = [Container(docker_id='someid',
+                              name='/remoteexec-image_3Alatest_user',
+                              image_name='quay.io/travisci/travis-python:latest',  # noqa
+                              image_id='imageid', ip='0.0.0.0', port=None),
+                    Container(docker_id='someid',
+                              name='/remoteexec-image_3Alatest_user2',
+                              image_name='quay.io/travisci/travis-python:latest',  # noqa
+                              image_id='imageid', ip='0.0.0.0', port=None)]
+        for result, expected_container in zip(results, expected):
+            utils.assert_containers_equal(self, result, expected_container)
 
     @gen_test
     def test_race_condition_spawning(self):
