@@ -10,6 +10,7 @@ from tornado.httpclient import AsyncHTTPClient, HTTPError
 from tornado.log import app_log
 
 from remoteappmanager.handlers.base_handler import BaseHandler
+from remoteappmanager.docker.container import Container
 
 
 # FIXME: replace these with ORM objects
@@ -30,7 +31,7 @@ class HomeHandler(BaseHandler):
 
         for image in all_images:
             containers = yield container_manager.containers_for_image(
-                image.docker_id)
+                image.docker_id, self.current_user)
             container = (containers[0] if len(containers) > 0 else None)
             # For now we assume we have only one.
             images_info.append({
@@ -78,6 +79,9 @@ class HomeHandler(BaseHandler):
         except Exception as e:
             self.log.exception("Failed to spawn docker image.")
             self.finish("Unable to spawn docker image: {}".format(e))
+
+            # Clean up
+            self._stop_and_remove_container(user_name, image_name)
             return
 
         url = self.application.container_url_abspath(container)
@@ -90,9 +94,13 @@ class HomeHandler(BaseHandler):
         It is not different from pasting the appropriate URL in the
         web browser, but we validate the container id first.
         """
-        container = self._container_from_options(options)
+        container = yield self._container_from_options(options)
         if not container:
+            self.finish("Unable to view the application")
             return
+
+        # in case the reverse proxy is not already set up
+        yield self.application.reverse_proxy_add_container(container)
 
         url = self.application.container_url_abspath(container)
         self.log.info('Redirecting to ' + url)
@@ -105,11 +113,18 @@ class HomeHandler(BaseHandler):
         app = self.application
         container_manager = app.container_manager
 
-        container = self._container_from_options(options)
+        container = yield self._container_from_options(options)
         if not container:
+            self.finish("Unable to view the application")
             return
 
-        yield app.reverse_proxy_remove_container(container)
+        try:
+            yield app.reverse_proxy_remove_container(container)
+        except HTTPError as http_error:
+            # The reverse proxy may be absent to start with
+            if http_error.code != 404:
+                raise http_error
+
         yield container_manager.stop_and_remove_container(container.docker_id)
 
         # We don't have fancy stuff at the moment to change the button, so
@@ -118,31 +133,35 @@ class HomeHandler(BaseHandler):
 
     # private
 
+    @gen.coroutine
     def _container_from_options(self, options):
         """Support routine to reduce duplication.
         Retrieves and returns the container if valid and present.
-        If not present, performs the http response and returns None.
+
+        If not present, returns None
         """
 
         container_manager = self.application.container_manager
+
         try:
             container_id = options["container_id"][0]
         except (KeyError, IndexError):
             self.log.exception(
                 "Failed to retrieve valid container_id from form"
             )
-            self.finish("Unable to retrieve valid container_id value")
             return None
 
-        try:
-            container = container_manager.containers[container_id]
-        except KeyError:
-            self.log.error("Unable to find container_id {} in manager".format(
-                container_id))
-            self.finish("Unable to find specified container_id")
-            return None
+        container_dict = yield container_manager.docker_client.containers(
+            filters={'id': container_id})
 
-        return container
+        if container_dict:
+            return Container.from_docker_dict(container_dict[0])
+        else:
+            self.log.exception(
+                "Failed to retrieve valid container from container id: %s",
+                container_id
+            )
+            return None
 
     @gen.coroutine
     def _start_container(self, user_name, image_name):
@@ -210,40 +229,29 @@ class HomeHandler(BaseHandler):
             container.port,
             self.application.container_url_abspath(container))
 
-        try:
-            yield _wait_for_http_server_2xx(
-                server_url,
-                self.application.config.network_timeout)
-        except TimeoutError as e:
-            # Note: Using TimeoutError instead of gen.TimeoutError as above
-            # is not a mistake.
-            self.log.warning(
-                "{user}'s container never showed up at {url} "
-                "after {http_timeout} seconds. Giving up.".format(
-                    user=user_name,
-                    url=server_url,
-                    http_timeout=self.application.config.network_timeout,
-                )
-            )
-            e.reason = 'timeout'
-            raise e
-        except Exception as e:
-            self.log.exception(
-                "Unhandled error waiting for {user}'s server "
-                "to show up at {url}: {error}".format(
-                    user=user_name,
-                    url=server_url,
-                    error=e,
-                )
-            )
-            e.reason = 'error'
-            raise e
+        yield _wait_for_http_server_2xx(
+            server_url,
+            self.application.config.network_timeout)
 
         # The server is up and running. Now contact the proxy and add
         # the container url to it.
         self.application.reverse_proxy_add_container(container)
 
         return container
+
+    @gen.coroutine
+    def _stop_and_remove_container(self, user_name, image_name):
+        """ Stop and remove the container associated with the given
+        user name and image name, if exists.
+        """
+        container_manager = self.application.container_manager
+        containers = yield container_manager.containers_for_image(
+            image_name, user_name)
+
+        # Assume only one container per image
+        if containers:
+            container_id = containers[0].docker_id
+            yield container_manager.stop_and_remove_container(container_id)
 
     def _parse_form(self):
         """Extract the form options from the form and return them
