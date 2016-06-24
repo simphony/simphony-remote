@@ -29,4 +29,4 @@ else:
 # Define the sqlalchemy url for the database.
 # Note that this database is shared among all instances of the
 # remoteappmanager.
-db_url="sqlite:///remoteappmanager.db"
+db_url = "sqlite:///remoteappmanager.db"

@@ -1,4 +1,3 @@
-import sys
 import os
 from urllib import parse
 
@@ -208,8 +207,8 @@ class Application(web.Application, LoggingMixin):
                 self.log.error("Multiple results found when "
                                "querying for username {}. This is supposedly "
                                "impossible because the username should be a "
-                               "unique key by design.".format(self.config.user))
-                # This is pretty much an unrecoverable error and we should give up
+                               "unique key by design.".format(
+                    self.config.user))
                 raise
 
             if user is None:

@@ -7,4 +7,3 @@ tls_cert = '~/.docker/machine/machines/default/cert.pem'
 tls_key = '~/.docker/machine/machines/default/key.pem'
 docker_host = "tcp://192.168.99.100:2376"
 db_url = "sqlite:///"+fixtures.get("remoteappmanager.db")
-
