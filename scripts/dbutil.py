@@ -62,7 +62,19 @@ def list(db):
     with orm.transaction(session):
         for user in session.query(orm.User).all():
             teams = ["{}:{}".format(t.id, t.name) for t in user.teams]
-            print("{}:{} | {}".format(user.id, user.name, ",".join(teams)))
+            apps = orm.apps_for_user(session, user)
+            for app, policy in apps:
+                appstring = "{} {} {} {}".format(app.image,
+                                                 policy.volume_source,
+                                                 policy.volume_target,
+                                                 policy.volume_mode)
+                print("{}:{} | {} | {}".format(
+                    user.id,
+                    user.name,
+                    ",".join(teams),
+                    appstring
+                    ))
+
 
 
 @team.command()
@@ -130,7 +142,18 @@ def list(db):
 @click.argument("image")
 @click.argument("team")
 @click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
-def expose(image, team, db):
+@click.option("--allow-home", type=click.BOOL, default=False)
+@click.option("--allow-team-view", type=click.BOOL, default=False)
+@click.option("--volume", type=click.STRING)
+def expose(image, team, db, allow_home, allow_team_view, volume):
+
+    allow_common = False
+    source = target = mode = None
+
+    if volume is not None:
+        allow_common = True
+        source, target, mode = volume.split(":")
+
     db_obj = database(db)
     session = db_obj.create_session()
     with orm.transaction(session):
@@ -139,17 +162,16 @@ def expose(image, team, db):
         orm_team = session.query(orm.Team).filter(
             orm.Team.name == team).first()
 
-        orm_policy = session.query(orm.ApplicationPolicy).filter(
-            orm.ApplicationPolicy.allow_home == False,
-            orm.ApplicationPolicy.allow_common == False,
-            orm.ApplicationPolicy.allow_team_view == False).one_or_none()
+        orm_policy = orm.ApplicationPolicy(
+            allow_home=allow_home,
+            allow_common=allow_common,
+            allow_team_view=allow_team_view,
+            volume_source=source,
+            volume_target=target,
+            volume_mode=mode,
+        )
 
-        if orm_policy is None:
-            orm_policy = orm.ApplicationPolicy(
-                allow_home=False,
-                allow_common=False,
-                allow_team_view=False)
-            session.add(orm_policy)
+        session.add(orm_policy)
 
         accounting = orm.Accounting(
             team=orm_team,
