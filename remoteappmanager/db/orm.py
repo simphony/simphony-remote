@@ -14,9 +14,8 @@ Base = declarative_base()
 class UserTeam(Base):
     """ The user (n <-> n) team association table """
     __tablename__ = "user_team"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'))
-    team_id = Column(Integer, ForeignKey('team.id'))
+    user_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
+    team_id = Column(Integer, ForeignKey('team.id'), primary_key=True)
 
 
 class User(Base):
@@ -72,14 +71,17 @@ class ApplicationPolicy(Base):
 class Accounting(Base):
     """Holds the information about who is allowed to run what."""
     __tablename__ = "accounting"
-    id = Column(Integer, primary_key=True)
+    team_id = Column(Integer,
+                     ForeignKey("team.id"),
+                     primary_key=True)
 
-    team_id = Column(Integer, ForeignKey("team.id"))
-
-    application_id = Column(Integer, ForeignKey("application.id"))
+    application_id = Column(Integer,
+                            ForeignKey("application.id"),
+                            primary_key=True)
 
     application_policy_id = Column(Integer,
-                                   ForeignKey("application_policy.id"))
+                                   ForeignKey("application_policy.id"),
+                                   primary_key=True)
 
     team = relationship("Team")
 

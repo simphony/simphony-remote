@@ -30,23 +30,30 @@ class TestOrm(TempMixin, unittest.TestCase):
 
             teams = [orm.Team(name="team"+str(i)) for i in range(5)]
             company_team = orm.Team(name='company_team')
+            company2_team = orm.Team(name='company2_team')
             teams.append(company_team)
+            teams.append(company2_team)
             session.add_all(teams)
 
             for user, team in zip(users, teams):
                 user.teams.append(team)
 
             # make users 1 3 and 4 part of the company team
-            users[1].teams.append(company_team)
-            users[3].teams.append(company_team)
-            users[4].teams.append(company_team)
+            for i in (1,3,4):
+                users[i].teams.append(company_team)
+
+            # Also check the reverse behavior
+            company2_team.users.extend([users[i] for i in (1,3,4)])
 
             # verify back population
             self.assertEqual(teams[0].users[0], users[0])
             self.assertEqual(len(company_team.users), 3)
 
-            # Create a few applications
+            # Also check the reverse behavior
+            for i in (1,3,4):
+                self.assertIn(company2_team, users[i].teams)
 
+            # Create a few applications
             apps = [orm.Application(image="docker/image"+str(i))
                     for i in range(3)]
             session.add_all(apps)
