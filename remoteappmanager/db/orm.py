@@ -145,12 +145,25 @@ def transaction(session):
 
 
 def apps_for_user(session, user):
+    """Returns a list of tuples, each containing an application and the
+    associated policy that the specified orm user is allowed to run.
+
+    Parameters
+    ----------
+    session : Session
+        The current session
+    user : User
+        the orm User.
+
+    Returns
+    -------
+    A list of tuples (orm.Application, orm.ApplicationPolicy)
+    """
+
     with transaction(session):
-        # now check if user 1 has access to two applications:
-        # app[0] via the company team and app[2] via its own team.
         teams = user.teams
 
         res = session.query(Accounting).filter(
             Accounting.team_id.in_([team.id for team in teams])).all()
 
-        return res
+        return [(acc.application, acc.application_policy) for acc in res]

@@ -23,11 +23,11 @@ def fill_db(session):
             user.teams.append(team)
 
         # make users 1 3 and 4 part of the company team
-        for i in (1,3,4):
+        for i in (1, 3, 4):
             users[i].teams.append(company_team)
 
         # Also check the reverse behavior
-        company2_team.users.extend([users[i] for i in (1,3,4)])
+        company2_team.users.extend([users[i] for i in (1, 3, 4)])
 
         # Create a few applications
         apps = [orm.Application(image="docker/image"+str(i))
@@ -129,7 +129,6 @@ class TestOrm(TempMixin, unittest.TestCase):
             self.assertIn("docker/image0",
                           [acc.application.image for acc in res])
 
-
     def test_apps_for_user(self):
         db = Database(url="sqlite:///"+self.sqlite_file_path)
         session = db.create_session()
@@ -140,9 +139,9 @@ class TestOrm(TempMixin, unittest.TestCase):
             res = orm.apps_for_user(session, users[1])
             self.assertEqual(len(res), 2)
             self.assertIn("docker/image0",
-                          [acc.application.image for acc in res])
+                          [acc[0].image for acc in res])
             self.assertIn("docker/image2",
-                          [acc.application.image for acc in res])
+                          [acc[0].image for acc in res])
 
             res = orm.apps_for_user(session, users[2])
             self.assertEqual(len(res), 0)
@@ -151,9 +150,9 @@ class TestOrm(TempMixin, unittest.TestCase):
             res = orm.apps_for_user(session, users[0])
             self.assertEqual(len(res), 1)
             self.assertIn("docker/image1",
-                          [acc.application.image for acc in res])
+                          [acc[0].image for acc in res])
 
             res = orm.apps_for_user(session, users[3])
             self.assertEqual(len(res), 1)
             self.assertIn("docker/image0",
-                          [acc.application.image for acc in res])
+                          [acc[0].image for acc in res])

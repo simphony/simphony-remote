@@ -12,5 +12,3 @@ class User(HasTraits):
 
     #: Can be none if the username cannot be found in the database.
     orm_user = Instance(orm.User, allow_none=True)
-
-
