@@ -156,18 +156,22 @@ def transaction(session):
 def apps_for_user(session, user):
     """Returns a list of tuples, each containing an application and the
     associated policy that the specified orm user is allowed to run.
+    If the user is None, the default is to return an empty list.
 
     Parameters
     ----------
     session : Session
         The current session
     user : User
-        the orm User.
+        the orm User, or None.
 
     Returns
     -------
     A list of tuples (orm.Application, orm.ApplicationPolicy)
     """
+
+    if user is None:
+        return []
 
     with transaction(session):
         teams = user.teams

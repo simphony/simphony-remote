@@ -147,6 +147,11 @@ class ContainerManager(LoggingMixin):
 
         return images
 
+    @gen.coroutine
+    def image(self, image_id_or_name):
+        image_dict = yield self.docker_client.inspect_image(image_id_or_name)
+        return Image.from_docker_dict(image_dict)
+
     # Private
 
     @gen.coroutine

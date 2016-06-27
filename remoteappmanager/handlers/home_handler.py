@@ -1,4 +1,3 @@
-from collections import namedtuple
 import socket
 import os
 import uuid
@@ -12,35 +11,11 @@ from tornado.log import app_log
 
 from remoteappmanager.handlers.base_handler import BaseHandler
 from remoteappmanager.docker.container import Container
-
-
-# FIXME: replace these with ORM objects
-# Assumed one volume per application
-Volume = namedtuple('Volume', ('target', 'source', 'mode'))
-Application = namedtuple('Application', ('image_name', 'volume'))
+from remoteappmanager.db import orm
 
 
 class HomeHandler(BaseHandler):
     """Render the user's home page"""
-
-    @gen.coroutine
-    def _get_images_info(self):
-        container_manager = self.application.container_manager
-
-        images_info = []
-        all_images = yield container_manager.all_images()
-
-        for image in all_images:
-            containers = yield container_manager.containers_for_image(
-                image.docker_id, self.current_user)
-            container = (containers[0] if len(containers) > 0 else None)
-            # For now we assume we have only one.
-            images_info.append({
-                "image": image,
-                "container": container
-            })
-        return images_info
-
     @gen.coroutine
     def get(self):
         images_info = yield self._get_images_info()
@@ -67,7 +42,7 @@ class HomeHandler(BaseHandler):
             return
 
         try:
-            yield handler(self.current_user, options)
+            yield handler(options)
         except Exception as e:
             # Create a random reference number for support
             ref = str(uuid.uuid1())
@@ -82,7 +57,8 @@ class HomeHandler(BaseHandler):
             message = ('Failed to {action} "{image_name}". '
                        'Reason: {error_type} '
                        '(Ref: {ref})')
-            self.render('home.html', images_info=images_info,
+            self.render('home.html',
+                        images_info=images_info,
                         error_message=message.format(
                             action=action,
                             image_name=options["image_name"][0],
@@ -92,10 +68,10 @@ class HomeHandler(BaseHandler):
     # Subhandling after post
 
     @gen.coroutine
-    def _actionhandler_start(self, user_name, options):
+    def _actionhandler_start(self, options):
         """Sub handling. Acts in response to a "start" request from
         the user."""
-        # Start the single-user server
+        user_name = self.current_user.name
 
         try:
             # FIXME: too many operations in one try block, should be separated
@@ -118,7 +94,7 @@ class HomeHandler(BaseHandler):
             self.redirect(url)
 
     @gen.coroutine
-    def _actionhandler_view(self, user, options):
+    def _actionhandler_view(self, options):
         """Redirects to an already started container.
         It is not different from pasting the appropriate URL in the
         web browser, but we validate the container id first.
@@ -138,7 +114,7 @@ class HomeHandler(BaseHandler):
         self.redirect(url)
 
     @gen.coroutine
-    def _actionhandler_stop(self, user, options):
+    def _actionhandler_stop(self, options):
         """Stops a running container.
         """
         app = self.application
@@ -163,6 +139,31 @@ class HomeHandler(BaseHandler):
         self.redirect(self.application.config.base_url)
 
     # private
+
+    @gen.coroutine
+    def _get_images_info(self):
+        """Retrieves a dictionary containing the image and the associated
+        container, if active, as values."""
+        container_manager = self.application.container_manager
+
+        session = self.application.db.create_session()
+
+        with orm.transaction(session):
+            apps = orm.apps_for_user(session, self.current_user.orm_user)
+
+        images_info = []
+
+        for app in apps:
+            image = container_manager.image(app.image)
+            containers = yield container_manager.containers_for_image(
+                image.docker_id, self.current_user.name)
+            container = (containers[0] if len(containers) > 0 else None)
+            # For now we assume we have only one.
+            images_info.append({
+                "image": image,
+                "container": container
+            })
+        return images_info
 
     @gen.coroutine
     def _container_from_options(self, options):
