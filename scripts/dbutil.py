@@ -1,87 +1,115 @@
+#!/usr/bin/env python
+"""Script to perform operations on the database of our application."""
 import click
 from remoteappmanager.db import orm
 
 
-def database(db):
-    if ":" not in db:
-        db_url = "sqlite:///"+db
+def database(db_url):
+    """Retrieves the orm.Database object from the
+       passed db url. It also accepts absolute or relative disk paths.
+       In that case, the database will be assumed to be a sqlite one.
+
+    Parameters
+    ----------
+    db_url : str
+        A string containing a db sqlalchemy url, or a disk path.
+
+    Returns
+    -------
+    orm.Database instance.
+    """
+    if ":" not in db_url:
+        db_url = "sqlite:///"+db_url
     else:
-        db_url = db
+        db_url = db_url
 
     return orm.Database(url=db_url)
 
 
 @click.group()
-def cli():
-    pass
+@click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
+@click.pass_context
+def cli(ctx, db):
+    """Main click group placeholder."""
+    ctx.obj["db"] = database(db)
 
 
 @cli.command()
-@click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
-def init(db):
-    db_obj = database(db)
-    db_obj.reset()
+@click.pass_context
+def init(ctx):
+    """Initializes the database."""
+    db = ctx.obj["db"]
+    db.reset()
+
+# -------------------------------------------------------------------------
+# User commands
 
 
 @cli.group()
 def user():
+    """Subcommand to manage users."""
     pass
-
-
-@cli.group()
-def team():
-    pass
-
-
-@cli.group()
-def app():
-    pass
-
 
 @user.command()
 @click.argument("user")
-@click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
-def create(user, db):
-    db_obj = database(db)
-    session = db_obj.create_session()
+@click.pass_context
+def create(ctx, user):
+    """Creates a user USER and its associated team in the database."""
+    db = ctx.obj["db"]
+    session = db.create_session()
     orm_user = orm.User(name=user)
     orm_team = orm.Team(name=user)
     orm_user.teams.append(orm_team)
+
     with orm.transaction(session):
         session.add(orm_user)
         session.add(orm_team)
 
+    # Print out the id, so that we can use it if desired.
     print(orm_user.id)
 
 
 @user.command()
-@click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
-def list(db):
-    db_obj = database(db)
-    session = db_obj.create_session()
+@click.pass_context
+def list(ctx):
+    """Show a list of the available users."""
+    db = ctx.obj["db"]
+    session = db.create_session()
     with orm.transaction(session):
         for user in session.query(orm.User).all():
             teams = ["{}:{}".format(t.id, t.name) for t in user.teams]
-            apps = orm.apps_for_user(session, user)
-            for app, policy in apps:
-                appstring = "{} {} {} {}".format(app.image,
-                                                 policy.volume_source,
-                                                 policy.volume_target,
-                                                 policy.volume_mode)
-                print("{}:{} | {} | {}".format(
-                    user.id,
-                    user.name,
-                    ",".join(teams),
-                    appstring
-                    ))
+            apps = ["{} {} {} {}".format(app.image,
+                                         policy.volume_source,
+                                         policy.volume_target,
+                                         policy.volume_mode)
+                    for app, policy in orm.apps_for_user(session, user)
+            ]
+
+            print("{}:{} | {} | {}".format(
+                user.id,
+                user.name,
+                ",".join(teams),
+                ",".join(apps)
+            ))
+
+
+# -------------------------------------------------------------------------
+# Team commands
+
+
+@cli.group()
+def team():
+    """Subcommand to manage teams."""
+    pass
 
 
 @team.command()  # noqa
 @click.argument("team")
-@click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
-def create(team, db):
-    db_obj = database(db)
-    session = db_obj.create_session()
+@click.pass_context
+def create(ctx, team):
+    """Creates a new team TEAM."""
+    db = ctx.obj["db"]
+    session = db.create_session()
     orm_team = orm.Team(name=team)
     with orm.transaction(session):
         session.add(orm_team)
@@ -90,10 +118,11 @@ def create(team, db):
 
 
 @team.command()  # noqa
-@click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
-def list(db):
-    db_obj = database(db)
-    session = db_obj.create_session()
+@click.pass_context
+def list(ctx):
+    """Show the current teams."""
+    db = ctx.obj["db"]
+    session = db.create_session()
     with orm.transaction(session):
         for team in session.query(orm.Team).all():
             print("{}:{}".format(team.id, team.name))
@@ -102,10 +131,11 @@ def list(db):
 @team.command()
 @click.argument("user")
 @click.argument("team")
-@click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
-def adduser(user, team, db):
-    db_obj = database(db)
-    session = db_obj.create_session()
+@click.pass_context
+def adduser(ctx, user, team):
+    """Add a user USER to a team TEAM."""
+    db = ctx.obj["db"]
+    session = db.create_session()
     with orm.transaction(session):
         orm_team = session.query(orm.Team).filter(
             orm.Team.name == team).first()
@@ -113,13 +143,23 @@ def adduser(user, team, db):
             orm.User.name == user).first()
         orm_team.users.append(orm_user)
 
+# -------------------------------------------------------------------------
+# App commands
+
+
+@cli.group()
+def app():
+    """Subcommand to manage applications."""
+    pass
+
 
 @app.command()  # noqa
 @click.argument("image")
-@click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
-def create(image, db):
-    db_obj = database(db)
-    session = db_obj.create_session()
+@click.pass_context
+def create(ctx, image):
+    """Creates a new application for image IMAGE."""
+    db = ctx.obj["db"]
+    session = db.create_session()
     with orm.transaction(session):
         orm_app = orm.Application(image=image)
         session.add(orm_app)
@@ -128,10 +168,11 @@ def create(image, db):
 
 
 @app.command()  # noqa
-@click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
-def list(db):
-    db_obj = database(db)
-    session = db_obj.create_session()
+@click.pass_context
+def list(ctx):
+    """List all registered applications."""
+    db = ctx.obj["db"]
+    session = db.create_session()
     with orm.transaction(session):
         for orm_app in session.query(orm.Application).all():
             print("{}:{}".format(orm_app.id, orm_app.image))
@@ -140,21 +181,32 @@ def list(db):
 @app.command()
 @click.argument("image")
 @click.argument("team")
-@click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
 @click.option("--allow-home", type=click.BOOL, default=False)
 @click.option("--allow-team-view", type=click.BOOL, default=False)
 @click.option("--volume", type=click.STRING)
-def expose(image, team, db, allow_home, allow_team_view, volume):
-
+@click.pass_context
+def expose(ctx, image, team, db, allow_home, allow_team_view, volume):
+    """Exposes a given application identified by IMAGE to a specific
+    team TEAM."""
+    db = ctx.obj["db"]
     allow_common = False
     source = target = mode = None
 
     if volume is not None:
         allow_common = True
-        source, target, mode = volume.split(":")
+        try:
+            source, target, mode = volume.split(":")
+        except ValueError:
+            raise click.BadOptionUsage(
+                "volume",
+                "Volume string must be in the form source:target:mode")
 
-    db_obj = database(db)
-    session = db_obj.create_session()
+        if mode not in ('rw', 'ro'):
+            raise click.BadOptionUsage(
+                "volume",
+                "Volume mode must be either 'ro' or 'rw'")
+
+    session = db.create_session()
     with orm.transaction(session):
         orm_app = session.query(orm.Application).filter(
             orm.Application.image == image).first()
@@ -182,4 +234,4 @@ def expose(image, team, db, allow_home, allow_team_view, volume):
 
 
 if __name__ == '__main__':
-    cli()
+    cli(obj={})
