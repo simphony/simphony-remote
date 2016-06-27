@@ -38,7 +38,8 @@ Deployment of the complete system in a single machine/VM.
 
 #. Generate the SSL certificates if you do not already have them. The
    resulting certificates will have names test.* because they are
-   self-signed and are not supposed to be used for production.
+   self-signed and **are not supposed to be used for production**.
+   A CA-signed certificate should be obtained instead.
    You must choose and set a password of your liking, and use it when prompted.
    Additional information will also be requested, but are not strictly required
    and can be left as defaults.
@@ -51,7 +52,7 @@ Deployment of the complete system in a single machine/VM.
 
 #. Create the database. By default, this is a sqlite file::
 
-     python dbutil.py --db=~/remoteappmanager.db init
+     remoteappdb --db=~/remoteappmanager.db init
 
 #. Change dir into jupyterhub::
 

@@ -145,8 +145,16 @@ def adduser(ctx, user, team):
     with orm.transaction(session):
         orm_team = session.query(orm.Team).filter(
             orm.Team.name == team).first()
+        if orm_team is None:
+            raise click.BadParameter("Unknown team {}".format(team),
+                                     param="team")
+
         orm_user = session.query(orm.User).filter(
             orm.User.name == user).first()
+        if orm_user is None:
+            raise click.BadParameter("Unknown user {}".format(user),
+                                     param="user")
+
         orm_team.users.append(orm_user)
 
 # -------------------------------------------------------------------------
@@ -187,11 +195,19 @@ def list(ctx):
 @app.command()
 @click.argument("image")
 @click.argument("team")
-@click.option("--allow-home", type=click.BOOL, default=False)
-@click.option("--allow-team-view", type=click.BOOL, default=False)
-@click.option("--volume", type=click.STRING)
+@click.option("--allow-home",
+              type=click.BOOL,
+              default=False,
+              is_flag=True)
+@click.option("--allow-team-view",
+              type=click.BOOL,
+              default=False,
+              is_flag=True)
+@click.option("--volume", type=click.STRING,
+              help="Application data volume, format=SOURCE:TARGET:MODE, "
+                   "where mode is 'ro' or 'rw'.")
 @click.pass_context
-def expose(ctx, image, team, db, allow_home, allow_team_view, volume):
+def expose(ctx, image, team, allow_home, allow_team_view, volume):
     """Exposes a given application identified by IMAGE to a specific
     team TEAM."""
     db = ctx.obj["db"]
@@ -216,8 +232,17 @@ def expose(ctx, image, team, db, allow_home, allow_team_view, volume):
     with orm.transaction(session):
         orm_app = session.query(orm.Application).filter(
             orm.Application.image == image).first()
+
+        if orm_app is None:
+            raise click.BadParameter("Unknown application image {}".format(
+                image), param="image")
+
         orm_team = session.query(orm.Team).filter(
             orm.Team.name == team).first()
+
+        if orm_team is None:
+            raise click.BadParameter("Unknown team {}".format(team),
+                                     param="team")
 
         orm_policy = orm.ApplicationPolicy(
             allow_home=allow_home,
