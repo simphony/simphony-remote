@@ -49,7 +49,11 @@ class TestContainerManager(AsyncTestCase):
                     Container(docker_id='someid',
                               name='/remoteexec-image_3Alatest_user2',
                               image_name='simphony/mayavi-4.4.4:latest',  # noqa
-                              image_id='imageid', ip='0.0.0.0', port=None)]
+                              image_id='imageid', ip='0.0.0.0', port=None),
+                    Container(docker_id='someid',
+                              name='/remoteexec-image_3Alatest_user3',
+                              image_name='simphony/mayavi-4.4.4:latest',  # noqa
+                              image_id='imageid', ip='', port=None)]
 
         for result, expected_container in zip(results, expected):
             utils.assert_containers_equal(self, result, expected_container)
