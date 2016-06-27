@@ -33,24 +33,63 @@ class TestContainerManager(AsyncTestCase):
         self.assertTrue(mock_client.remove_container.called)
 
     @gen_test
-    def test_container_for_image(self):
-        result = yield self.manager.containers_for_image("imageid")
-        self.assertEqual(len(result), 0)
+    def test_containers_for_image_results(self):
+        ''' Test containers_for_image returns a list of Container '''
+        # The mock client mocks the output of docker Client.containers
+        docker_client = utils.mock_docker_client_with_running_containers()
+        self.mock_docker_client = docker_client
+        self.manager.docker_client.client = docker_client
 
-        yield self.manager.start_container("username", "imageid")
+        # The output should be a list of Container
+        results = yield self.manager.containers_for_image("imageid")
+        expected = [Container(docker_id='someid',
+                              name='/remoteexec-image_3Alatest_user',
+                              image_name='simphony/mayavi-4.4.4:latest',  # noqa
+                              image_id='imageid', ip='0.0.0.0', port=None),
+                    Container(docker_id='someid',
+                              name='/remoteexec-image_3Alatest_user2',
+                              image_name='simphony/mayavi-4.4.4:latest',  # noqa
+                              image_id='imageid', ip='0.0.0.0', port=None),
+                    Container(docker_id='someid',
+                              name='/remoteexec-image_3Alatest_user3',
+                              image_name='simphony/mayavi-4.4.4:latest',  # noqa
+                              image_id='imageid', ip='', port=None)]
 
-        result = yield self.manager.containers_for_image("imageid")
-        self.assertEqual(len(result), 1)
+        for result, expected_container in zip(results, expected):
+            utils.assert_containers_equal(self, result, expected_container)
 
-        expected = {'name': 'remoteexec-username-imageid',
-                    'image_id': 'imageid',
-                    'image_name': 'imageid',
-                    'ip': '127.0.0.1',
-                    'port': 666,
-                    'docker_id': 'containerid'}
+    @gen_test
+    def test_containers_for_image_client_api_without_user(self):
+        ''' Test containers_for_images(image_id) use of Client API'''
+        # The mock client mocks the output of docker Client.containers
+        docker_client = utils.mock_docker_client_with_running_containers()
+        self.manager.docker_client.client = docker_client
 
-        for key, value in expected.items():
-            self.assertEqual(getattr(result[0], key), value)
+        # We assume the client.containers(filters=...) is tested by docker-py
+        # Instead we test if the correct arguments are passed to the Client API
+        yield self.manager.containers_for_image("imageid")
+        call_args = self.manager.docker_client.client.containers.call_args
+
+        # filters is one of the keyword argument
+        self.assertIn('filters', call_args[1])
+        self.assertEqual(call_args[1]['filters']['ancestor'], "imageid")
+
+    @gen_test
+    def test_containers_for_image_client_api_with_user(self):
+        ''' Test containers_for_images(image_id, user) use of Client API'''
+        # The mock client mocks the output of docker Client.containers
+        docker_client = utils.mock_docker_client_with_running_containers()
+        self.manager.docker_client.client = docker_client
+
+        # We assume the client.containers(filters=...) is tested by docker-py
+        # Instead we test if the correct arguments are passed to the Client API
+        yield self.manager.containers_for_image("imageid", "userABC")
+        call_args = self.manager.docker_client.client.containers.call_args
+
+        # filters is one of the keyword argument
+        self.assertIn('filters', call_args[1])
+        self.assertEqual(call_args[1]['filters']['ancestor'], "imageid")
+        self.assertIn("userABC", call_args[1]['filters']['label'])
 
     @gen_test
     def test_race_condition_spawning(self):

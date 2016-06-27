@@ -94,26 +94,44 @@ class ContainerManager(LoggingMixin):
             self._stop_pending.remove(container_id)
 
     @gen.coroutine
-    def containers_for_image(self, image_id):
-        """Returns the containers for a given image that are managed
-        by this object.
+    def containers_for_image(self, image_id_or_name, user_name=None):
+        """Returns the currently running containers for a given image.
+
+        If `user_name` is given, only returns containers started by the
+        given user name.
 
         It is a coroutine because we might want to run an inquire to the docker
         service if not present.
 
         Parameters
         ----------
-        image_id: str
-            The image id
+        image_id_or_name: str
+            The image id or name
+
+        Optional parameters
+        -------------------
+        user_name : str
+            Name of the user who started the container
 
         Return
         ------
         A list of container objects, or an empty list if not present.
         """
-        try:
-            return self._containers_for_image[image_id]
-        except KeyError:
-            return []
+        if user_name:
+            user_labels = _get_container_labels(user_name)
+            if user_labels:
+                filters = {'label': '{0}={1}'.format(*user_labels.popitem())}
+        else:
+            filters = {}
+
+        filters['ancestor'] = image_id_or_name
+
+        containers = yield self.docker_client.containers(filters=filters)
+        return [Container.from_docker_dict(container)
+                for container in containers
+                # Require further filtering as ancestor include grandparents
+                if (container.get('Image') == image_id_or_name or
+                    container.get('ImageID') == image_id_or_name)]
 
     @gen.coroutine
     def all_images(self):
