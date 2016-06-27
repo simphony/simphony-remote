@@ -31,19 +31,22 @@ class TestContainerManager(AsyncTestCase):
         self.assertTrue(mock_client.remove_container.called)
 
     @gen_test
-    def test_container_for_image(self):
-        mock_docker_client = utils.mock_docker_client_with_running_containers()  # noqa
-        self.mock_docker_client = mock_docker_client
-        self.manager.docker_client.client = mock_docker_client
+    def test_containers_for_image_results(self):
+        ''' Test containers_for_image returns a list of Container '''
+        # The mock client mocks the output of docker Client.containers
+        docker_client = utils.mock_docker_client_with_running_containers()
+        self.mock_docker_client = docker_client
+        self.manager.docker_client.client = docker_client
 
+        # The output should be a list of Container
         results = yield self.manager.containers_for_image("imageid")
         expected = [Container(docker_id='someid',
                               name='/remoteexec-image_3Alatest_user',
-                              image_name='quay.io/travisci/travis-python:latest',  # noqa
+                              image_name='simphony/mayavi-4.4.4:latest',  # noqa
                               image_id='imageid', ip='0.0.0.0', port=None),
                     Container(docker_id='someid',
                               name='/remoteexec-image_3Alatest_user2',
-                              image_name='quay.io/travisci/travis-python:latest',  # noqa
+                              image_name='simphony/mayavi-4.4.4:latest',  # noqa
                               image_id='imageid', ip='0.0.0.0', port=None)]
         for result, expected_container in zip(results, expected):
             utils.assert_containers_equal(self, result, expected_container)

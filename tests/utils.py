@@ -48,8 +48,8 @@ def mock_docker_client():
 
 
 def mock_docker_client_with_running_containers():
-    """Same as above, but it behaves as if one of the containers is already
-    started."""
+    """Same as above, but it behaves as if one of the images have two
+    containers running for different users."""
     client = mock_docker_client()
     client.containers.return_value = [
         # user
@@ -57,7 +57,7 @@ def mock_docker_client_with_running_containers():
          'Created': 1466766499,
          'HostConfig': {'NetworkMode': 'default'},
          'Id': 'someid',
-         'Image': 'quay.io/travisci/travis-python:latest',
+         'Image': 'simphony/mayavi-4.4.4:latest',
          'ImageID': 'imageid',
          'Labels': {'eu.simphony-project.docker.user': 'user'},
          'Names': ['/remoteexec-image_3Alatest_user'],
@@ -72,7 +72,7 @@ def mock_docker_client_with_running_containers():
          'Created': 1466766499,
          'HostConfig': {'NetworkMode': 'default'},
          'Id': 'someid',
-         'Image': 'quay.io/travisci/travis-python:latest',
+         'Image': 'simphony/mayavi-4.4.4:latest',
          'ImageID': 'imageid',
          'Labels': {'eu.simphony-project.docker.user': 'user2'},
          'Names': ['/remoteexec-image_3Alatest_user2'],
