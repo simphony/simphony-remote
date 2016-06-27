@@ -31,7 +31,6 @@ def database(db_url):
               type=click.STRING,
               help='The database sqlalchemy string to connect to, '
                    'or an absolute or relative disk path.',
-
               default="sqlite:///sqlite.db")
 @click.pass_context
 def cli(ctx, db):
