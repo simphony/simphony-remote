@@ -239,5 +239,9 @@ def expose(ctx, image, team, db, allow_home, allow_team_view, volume):
         session.add(accounting)
 
 
-if __name__ == '__main__':
+def main():
     cli(obj={})
+
+
+if __name__ == '__main__':
+    main()
