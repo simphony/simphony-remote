@@ -75,12 +75,21 @@ class HomeHandler(BaseHandler):
         the user."""
         # Start the single-user server
 
+        ref = str(uuid.uuid1())
+
         try:
             image_name = options["image_name"][0]
+        except (IndexError, KeyError):
+            message = ('Failed to start image. Reason: Failed to '
+                       'retrieve image name from options.'
+                       '(Ref: {ref})')
+            self.render('home.html', error_message=message.format(ref=ref))
+            return
+
+        try:
             container = yield self._start_container(user_name, image_name)
         except Exception as e:
             # Create a random reference number for support
-            ref = str(uuid.uuid1())
             self.log.exception("Failed to spawn docker image. %s "
                                "Ref: %s",
                                str(e), ref)
