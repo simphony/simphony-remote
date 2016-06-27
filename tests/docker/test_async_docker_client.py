@@ -1,4 +1,5 @@
 import os
+import sys
 import warnings
 from tornado.testing import AsyncTestCase, gen_test
 
@@ -36,7 +37,8 @@ class TestAsyncDockerClient(AsyncTestCase):
     @gen_test
     def test_real_connection(self):
         config = None
-        if "DOCKER_HOST" not in os.environ:
+
+        if "DOCKER_HOST" not in os.environ and sys.platform != 'linux':
             config = nonlinux_config()
 
             if not os.path.exists(config.tls_cert):
