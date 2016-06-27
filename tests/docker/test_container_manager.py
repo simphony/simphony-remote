@@ -48,8 +48,42 @@ class TestContainerManager(AsyncTestCase):
                               name='/remoteexec-image_3Alatest_user2',
                               image_name='simphony/mayavi-4.4.4:latest',  # noqa
                               image_id='imageid', ip='0.0.0.0', port=None)]
+
         for result, expected_container in zip(results, expected):
             utils.assert_containers_equal(self, result, expected_container)
+
+    @gen_test
+    def test_containers_for_image_client_api_without_user(self):
+        ''' Test containers_for_images(image_id) use of Client API'''
+        # The mock client mocks the output of docker Client.containers
+        docker_client = utils.mock_docker_client_with_running_containers()
+        self.manager.docker_client.client = docker_client
+
+        # We assume the client.containers(filters=...) is tested by docker-py
+        # Instead we test if the correct arguments are passed to the Client API
+        yield self.manager.containers_for_image("imageid")
+        call_args = self.manager.docker_client.client.containers.call_args
+
+        # filters is one of the keyword argument
+        self.assertIn('filters', call_args[1])
+        self.assertEqual(call_args[1]['filters']['ancestor'], "imageid")
+
+    @gen_test
+    def test_containers_for_image_client_api_with_user(self):
+        ''' Test containers_for_images(image_id, user) use of Client API'''
+        # The mock client mocks the output of docker Client.containers
+        docker_client = utils.mock_docker_client_with_running_containers()
+        self.manager.docker_client.client = docker_client
+
+        # We assume the client.containers(filters=...) is tested by docker-py
+        # Instead we test if the correct arguments are passed to the Client API
+        yield self.manager.containers_for_image("imageid", "userABC")
+        call_args = self.manager.docker_client.client.containers.call_args
+
+        # filters is one of the keyword argument
+        self.assertIn('filters', call_args[1])
+        self.assertEqual(call_args[1]['filters']['ancestor'], "imageid")
+        self.assertIn("userABC", call_args[1]['filters']['label'])
 
     @gen_test
     def test_race_condition_spawning(self):
