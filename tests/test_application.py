@@ -47,7 +47,7 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
 
     def test_container_url_abspath(self):
         app = self.app
-        container = Container(docker_id="12345")
+        container = Container(url_id="12345")
         abspath = app.container_url_abspath(container)
         self.assertEqual(abspath, "/user/username/containers/12345")
 

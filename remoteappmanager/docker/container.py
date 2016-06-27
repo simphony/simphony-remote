@@ -25,10 +25,13 @@ class Container(HasTraits):
     #: ...and port where the container service will be listening
     port = Int()
 
+    #: the id that will go in the URL of the container
+    url_id = Unicode()
+
     @property
     def url(self):
         """Returns the relative url of the Container."""
-        return "containers/{}".format(self.docker_id)
+        return "containers/{}".format(self.url_id)
 
     @property
     def host_url(self):
