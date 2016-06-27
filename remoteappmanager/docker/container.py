@@ -70,6 +70,9 @@ class Container(HasTraits):
         if docker_dict.get('Ports'):
             ip = docker_dict['Ports'][0].get('IP', "")
             port = docker_dict['Ports'][0].get('PublicPort')
+        else:
+            ip = ""
+            port = None
 
         return cls(docker_id=docker_dict.get('Id', ''),
                    name=docker_dict.get('Names', ('',))[0],
