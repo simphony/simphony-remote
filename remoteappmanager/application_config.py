@@ -86,6 +86,10 @@ class ApplicationConfig(HasTraits):
                           help="The docker host to connect to",
                           config_file=True)
 
+    db_url = Unicode(default_value="sqlite:///remoteappmanager.db",
+                     help="The url of the database, in sqlalchemy format.",
+                     config_file=True)
+
     # The network timeout for any async operation we have to perform,
     # in seconds. 30 seconds is plenty enough.
     network_timeout = Int(default_value=30,
@@ -163,11 +167,3 @@ class ApplicationConfig(HasTraits):
         for traitlet_name, traitlet in self.traits().items():
             if traitlet.metadata.get(metadata_identifier, False):
                 self.set_trait(traitlet_name, options_object[traitlet_name])
-
-
-_global_config = ApplicationConfig()
-
-
-def instance():
-    """Returns the single instance of the configuration"""
-    return _global_config

@@ -8,7 +8,7 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
     """Base class for the request handler."""
 
     def get_current_user(self):
-        return self.settings["user"]
+        return self.application.user.name
 
     def render(self, template_name, **kwargs):
         """Reimplements render to pass well known information to the rendering
