@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 """Script to perform operations on the database of our application."""
+import os
+
 import click
 from remoteappmanager.db import orm
 
@@ -19,7 +21,7 @@ def database(db_url):
     orm.Database instance.
     """
     if ":" not in db_url:
-        db_url = "sqlite:///"+db_url
+        db_url = "sqlite:///"+os.path.expanduser(db_url)
     else:
         db_url = db_url
 
