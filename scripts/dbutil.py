@@ -27,7 +27,12 @@ def database(db_url):
 
 
 @click.group()
-@click.option("--db", type=click.STRING, default="sqlite:///sqlite.db")
+@click.option("--db",
+              type=click.STRING,
+              help='The database sqlalchemy string to connect to, '
+                   'or an absolute or relative disk path.',
+
+              default="sqlite:///sqlite.db")
 @click.pass_context
 def cli(ctx, db):
     """Main click group placeholder."""
@@ -49,6 +54,7 @@ def init(ctx):
 def user():
     """Subcommand to manage users."""
     pass
+
 
 @user.command()
 @click.argument("user")
@@ -82,8 +88,7 @@ def list(ctx):
                                          policy.volume_source,
                                          policy.volume_target,
                                          policy.volume_mode)
-                    for app, policy in orm.apps_for_user(session, user)
-            ]
+                    for app, policy in orm.apps_for_user(session, user)]
 
             print("{}:{} | {} | {}".format(
                 user.id,
