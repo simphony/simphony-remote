@@ -42,7 +42,7 @@ class TestApplication(testing.AsyncTestCase):
 
     def test_container_url_abspath(self):
         app = self.app
-        container = Container(docker_id="12345")
+        container = Container(url_id="12345")
         abspath = app.container_url_abspath(container)
         self.assertEqual(abspath, "/testing/containers/12345")
 

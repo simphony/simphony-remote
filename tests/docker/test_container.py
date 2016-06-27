@@ -6,7 +6,7 @@ from remoteappmanager.docker.container import Container
 class TestContainer(TestCase):
     def test_url(self):
         container = Container(
-            docker_id="12345"
+            url_id="12345"
         )
 
         self.assertEqual(container.url, "containers/12345")
