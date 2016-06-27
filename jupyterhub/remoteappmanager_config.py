@@ -27,6 +27,9 @@ else:
 
 
 # Define the sqlalchemy url for the database.
-# Note that this database is shared among all instances of the
-# remoteappmanager.
-db_url = "sqlite:///remoteappmanager.db"
+# Notes:
+# 1. this database is shared among all instances of the remoteappmanager.
+# 2. if a relative path is specified, it will be relative to the working
+#    directory specified at startup, if specified, otherwise to the cwd
+#    at startup. Note that jupyterhub spawners spawn in the home directory.
+db_url = "sqlite:///"+os.path.expanduser("~/remoteappmanager.db")
