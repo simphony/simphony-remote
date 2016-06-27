@@ -79,7 +79,8 @@ class HomeHandler(BaseHandler):
 
             # Render the home page again with the error message
             # User-facing error message (less info)
-            message = ('Failed to {action} "{image_name}". Reason: {error_type} '
+            message = ('Failed to {action} "{image_name}". '
+                       'Reason: {error_type} '
                        '(Ref: {ref})')
             self.render('home.html', images_info=images_info,
                         error_message=message.format(
