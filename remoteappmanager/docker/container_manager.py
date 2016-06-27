@@ -456,6 +456,7 @@ def _generate_container_name(prefix, user_name, image_name):
 
 
 def _generate_container_url_id():
+    """Generates a unique string to identify the container through a url"""
     return uuid.uuid4().hex
 
 
