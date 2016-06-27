@@ -1,20 +1,28 @@
 import os
-from tornado import web, gen
 from urllib import parse
+
+from traitlets import Instance
+from sqlalchemy.orm.exc import MultipleResultsFound
+from tornado import web, gen
 import tornado.ioloop
-
 from jinja2 import Environment, FileSystemLoader
-from jupyterhub import orm
+from jupyterhub import orm as jupyterhub_orm
 
+from remoteappmanager.db import orm
 from remoteappmanager.handlers.api import HomeHandler
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.docker.container_manager import ContainerManager
 from remoteappmanager.docker.docker_client_config import DockerClientConfig
 from remoteappmanager.jinja2_adapters import Jinja2LoaderAdapter
+from remoteappmanager.user import User
 
 
 class Application(web.Application, LoggingMixin):
     """Tornado main application"""
+
+    user = Instance(User, allow_none=True)
+
+    db = Instance(orm.Database, allow_none=True)
 
     def __init__(self, config):
         """Initializes the application
@@ -34,9 +42,11 @@ class Application(web.Application, LoggingMixin):
         settings.update(config.as_dict())
         settings["static_url_prefix"] = self._config.base_url+"static/"
 
+        self._db_init()
         self._jinja_init(settings)
         self._container_manager_init()
         self._reverse_proxy_init()
+        self._user_init()
 
         handlers = self._get_handlers()
 
@@ -172,7 +182,7 @@ class Application(web.Application, LoggingMixin):
 
         # Note, we use jupyterhub orm Proxy, but not for database access,
         # just for interface convenience.
-        self.reverse_proxy = orm.Proxy(
+        self.reverse_proxy = jupyterhub_orm.Proxy(
             auth_token=auth_token,
             api_server=_server_from_url(self._config.proxy_api_url)
         )
@@ -181,11 +191,34 @@ class Application(web.Application, LoggingMixin):
             self._config.proxy_api_url
         ))
 
+    def _db_init(self):
+        """Initializes the database connection."""
+        self.db = orm.Database(self.config.db_url)
+
+    def _user_init(self):
+        """Initializes the user at the database level."""
+        session = self.db.create_session()
+
+        user = User(name=self.config.user)
+        with orm.transaction(session):
+            try:
+                user.orm_user = session.query(orm.User).filter_by(
+                                    name=self.config.user).one_or_none()
+            except MultipleResultsFound:
+                self.log.error("Multiple results found when "
+                               "querying for username {}. This is supposedly "
+                               "impossible because the username should be a "
+                               "unique key by design.".format(
+                                   self.config.user))
+                raise
+
+        self.user = user
+
 
 def _server_from_url(url):
     """Creates a orm.Server from a given url"""
     parsed = parse.urlparse(url)
-    return orm.Server(
+    return jupyterhub_orm.Server(
         proto=parsed.scheme,
         ip=parsed.hostname,
         port=parsed.port,

@@ -24,3 +24,9 @@ elif _platform == 'Linux':
     tls = False
 else:
     raise RuntimeError("Unknown platform {}".format(_platform))
+
+
+# Define the sqlalchemy url for the database.
+# Note that this database is shared among all instances of the
+# remoteappmanager.
+db_url = "sqlite:///remoteappmanager.db"
