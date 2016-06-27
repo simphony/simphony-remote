@@ -3,6 +3,8 @@ import sys
 from unittest import mock
 
 import docker
+from remoteappmanager.application_config import ApplicationConfig
+from remoteappmanager.db.orm import Database
 from tests import fixtures
 
 
@@ -45,6 +47,56 @@ def mock_docker_client():
     docker_client.remove_container = mock.Mock()
 
     return docker_client
+
+
+def mock_docker_client_with_running_containers():
+    """Same as above, but it behaves as if one of the images have two
+    containers running for different users."""
+    client = mock_docker_client()
+    client.containers.return_value = [
+        # user
+        {'Command': '/sbin/init -D',
+         'Created': 1466766499,
+         'HostConfig': {'NetworkMode': 'default'},
+         'Id': 'someid',
+         'Image': 'simphony/mayavi-4.4.4:latest',
+         'ImageID': 'imageid',
+         'Labels': {'eu.simphony-project.docker.user': 'user'},
+         'Names': ['/remoteexec-image_3Alatest_user'],
+         'Ports': [{'IP': '0.0.0.0',
+                    'PublicIP': 34567,
+                    'PrivatePort': 22,
+                    'Type': 'tcp'}],
+         'State': 'running',
+         'Status': 'Up About an hour'},
+        # user2
+        {'Command': '/sbin/init -D',
+         'Created': 1466766499,
+         'HostConfig': {'NetworkMode': 'default'},
+         'Id': 'someid',
+         'Image': 'simphony/mayavi-4.4.4:latest',
+         'ImageID': 'imageid',
+         'Labels': {'eu.simphony-project.docker.user': 'user2'},
+         'Names': ['/remoteexec-image_3Alatest_user2'],
+         'Ports': [{'IP': '0.0.0.0',
+                    'PublicIP': 34567,
+                    'PrivatePort': 22,
+                    'Type': 'tcp'}],
+         'State': 'running',
+         'Status': 'Up About an hour'},
+        # user3 (somehow there is no port
+        {'Command': '/sbin/init -D',
+         'Created': 1466766499,
+         'HostConfig': {'NetworkMode': 'default'},
+         'Id': 'someid',
+         'Image': 'simphony/mayavi-4.4.4:latest',
+         'ImageID': 'imageid',
+         'Labels': {'eu.simphony-project.docker.user': 'user3'},
+         'Names': ['/remoteexec-image_3Alatest_user3'],
+         'State': 'running',
+         'Status': 'Up About an hour'}]
+
+    return client
 
 
 def mock_docker_client_with_existing_stopped_container():
@@ -146,7 +198,7 @@ arguments = {
     "user": "username",
     "port": 57022,
     "cookie-name": "jupyter-hub-token-username",
-    "base-url": "/user/username",
+    "base-url": "/user/username/",
     "hub-host": "",
     "hub-prefix": "/hub/",
     "hub-api-url": "http://172.17.5.167:8081/hub/api",
@@ -154,6 +206,25 @@ arguments = {
     "ip": "127.0.0.1",
     "config-file": fixtures.get("remoteappmanager_config.py")
 }
+
+
+def init_sqlite_db(path):
+    """Initializes the sqlite database at a given path.
+    """
+    db = Database("sqlite:///"+path)
+    db.reset()
+
+
+def basic_application_config():
+    """Returns a basic application config for testing purposes.
+    The database is in memory.
+    """
+    options = {k.replace("-", "_"): v for k, v in arguments.items()}
+
+    # Go in memory with the db
+    options["db_url"] = "sqlite://"
+
+    return ApplicationConfig(**options)
 
 
 @contextlib.contextmanager
@@ -167,3 +238,14 @@ def invocation_argv():
     yield
 
     sys.argv[:] = saved_argv
+
+
+def assert_containers_equal(test_case, actual, expected):
+    if (expected.docker_id != actual.docker_id or
+            expected.name != actual.name or
+            expected.image_name != actual.image_name or
+            expected.image_id != actual.image_id or
+            expected.ip != actual.ip or
+            expected.port != actual.port):
+        message = '{!r} is not identical to the expected {!r}'
+        test_case.fail(message.format(actual, expected))

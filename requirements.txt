@@ -6,3 +6,4 @@ escapism>=0.0.1
 jinja2>=2.8
 jupyterhub>=0.6.1
 jupyter_client>=4.3.0
+click>=6.6

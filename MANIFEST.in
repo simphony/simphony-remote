@@ -1,2 +1,3 @@
+include tests/fixtures/remoteappmanager.db
 recursive-include remoteappmanager/templates *
 recursive-include remoteappmanager/static *

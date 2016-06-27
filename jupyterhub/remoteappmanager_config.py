@@ -24,3 +24,12 @@ elif _platform == 'Linux':
     tls = False
 else:
     raise RuntimeError("Unknown platform {}".format(_platform))
+
+
+# Define the sqlalchemy url for the database.
+# Notes:
+# 1. this database is shared among all instances of the remoteappmanager.
+# 2. if a relative path is specified, it will be relative to the working
+#    directory specified at startup, if specified, otherwise to the cwd
+#    at startup. Note that jupyterhub spawners spawn in the home directory.
+db_url = "sqlite:///"+os.path.expanduser("~/remoteappmanager.db")

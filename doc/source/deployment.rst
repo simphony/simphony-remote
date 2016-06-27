@@ -38,12 +38,21 @@ Deployment of the complete system in a single machine/VM.
 
 #. Generate the SSL certificates if you do not already have them. The
    resulting certificates will have names test.* because they are
-   self-signed and are not supposed to be used for production.  Once
-   created, copy them to the jupyterhub directory::
+   self-signed and **are not supposed to be used for production**.
+   A CA-signed certificate should be obtained instead.
+   You must choose and set a password of your liking, and use it when prompted.
+   Additional information will also be requested, but are not strictly required
+   and can be left as defaults.
+
+   Once created the certificates, copy them to the jupyterhub directory::
 
      cd ../scripts
      sh generate_certificate.sh
      cp test.* ../jupyterhub/
+
+#. Create the database. By default, this is a sqlite file::
+
+     remoteappdb --db=~/remoteappmanager.db init
 
 #. Change dir into jupyterhub::
 

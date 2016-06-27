@@ -1,3 +1,4 @@
+import sys
 import subprocess
 
 import os
@@ -77,9 +78,14 @@ class TestSpawner(unittest.TestCase):
 
         args = self.spawner.get_args()
 
-        with self.assertRaises(subprocess.TimeoutExpired):
-            subprocess.check_output(
-                self.spawner.cmd + args,
-                timeout=2,
-                env=env,
-                stderr=subprocess.STDOUT)
+        try:
+            with self.assertRaises(subprocess.TimeoutExpired):
+                subprocess.check_output(
+                    self.spawner.cmd + args,
+                    timeout=2,
+                    env=env,
+                    stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as exc:
+            print("Output of the command:\n\n{}".format(
+                exc.output.decode(sys.getdefaultencoding())))
+            raise
