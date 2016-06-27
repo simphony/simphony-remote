@@ -1,6 +1,7 @@
 from collections import namedtuple
 import socket
 import os
+import uuid
 from datetime import timedelta
 
 import errno
@@ -23,7 +24,7 @@ class HomeHandler(BaseHandler):
     """Render the user's home page"""
 
     @gen.coroutine
-    def get(self):
+    def _get_images_info(self):
         container_manager = self.application.container_manager
 
         images_info = []
@@ -38,10 +39,12 @@ class HomeHandler(BaseHandler):
                 "image": image,
                 "container": container
             })
+        return images_info
 
-        self.render('home.html',
-                    images_info=images_info,
-                    )
+    @gen.coroutine
+    def get(self):
+        images_info = yield self._get_images_info()
+        self.render('home.html', images_info=images_info)
 
     @gen.coroutine
     def post(self):
@@ -63,7 +66,27 @@ class HomeHandler(BaseHandler):
                            exc_info=True)
             return
 
-        yield handler(self.current_user, options)
+        try:
+            yield handler(self.current_user, options)
+        except Exception as e:
+            # Create a random reference number for support
+            ref = str(uuid.uuid1())
+            self.log.exception("Failed with POST action: {0}. {1} "
+                               "Ref: {2}".format(
+                                   action, str(e), ref))
+
+            images_info = yield self._get_images_info()
+
+            # Render the home page again with the error message
+            # User-facing error message (less info)
+            message = ('Failed to {action} "{image_name}". Reason: {error_type} '
+                       '(Ref: {ref})')
+            self.render('home.html', images_info=images_info,
+                        error_message=message.format(
+                            action=action,
+                            image_name=options["image_name"][0],
+                            error_type=type(e).__name__,
+                            ref=ref))
 
     # Subhandling after post
 
@@ -74,19 +97,24 @@ class HomeHandler(BaseHandler):
         # Start the single-user server
 
         try:
+            # FIXME: too many operations in one try block, should be separated
+            # for better error handling
             image_name = options["image_name"][0]
             container = yield self._start_container(user_name, image_name)
+            yield self._wait_for_container_ready(container)
         except Exception as e:
-            self.log.exception("Failed to spawn docker image.")
-            self.finish("Unable to spawn docker image: {}".format(e))
+            # Clean up, if the container is running
+            yield self._stop_and_remove_container(user_name, image_name)
+            raise e
+        else:
+            # The server is up and running. Now contact the proxy and add
+            # the container url to it.
+            self.application.reverse_proxy_add_container(container)
 
-            # Clean up
-            self._stop_and_remove_container(user_name, image_name)
-            return
-
-        url = self.application.container_url_abspath(container)
-        self.log.info('Redirecting to ' + url)
-        self.redirect(url)
+            # Redirect the user
+            url = self.application.container_url_abspath(container)
+            self.log.info('Redirecting to ' + url)
+            self.redirect(url)
 
     @gen.coroutine
     def _actionhandler_view(self, user, options):
@@ -98,6 +126,8 @@ class HomeHandler(BaseHandler):
         if not container:
             self.finish("Unable to view the application")
             return
+
+        yield self._wait_for_container_ready(container)
 
         # in case the reverse proxy is not already set up
         yield self.application.reverse_proxy_add_container(container)
@@ -176,13 +206,7 @@ class HomeHandler(BaseHandler):
 
         if allow_home:
             home_path = os.path.expanduser('~'+user_name)
-
-            if os.path.exists(home_path):
-                volumes[home_path] = {'bind': '/workspace', 'mode': 'rw'}
-
-            else:
-                message = ('{home_path} is not available. Not mounting it.')
-                self.log.error(message.format(home_path=home_path))
+            volumes[home_path] = {'bind': '/workspace', 'mode': 'rw'}
 
         # FIXME: Should retrieve allow_common and app from the database
         allow_common = True
@@ -193,12 +217,8 @@ class HomeHandler(BaseHandler):
                                         mode='ro'))
 
         if allow_common:
-            if os.path.exists(app.volume.source):
-                volumes[app.volume.source] = {'bind': app.volume.target,
-                                              'mode': app.volume.mode}
-            else:
-                self.log.error('%s does not exist, not mounting it',
-                               app.volume.source)
+            volumes[app.volume.source] = {'bind': app.volume.target,
+                                          'mode': app.volume.mode}
 
         try:
             f = manager.start_container(user_name, image_name, volumes)
@@ -218,24 +238,6 @@ class HomeHandler(BaseHandler):
             )
             e.reason = 'error'
             raise e
-
-        # Note, we use the jupyterhub ORM server, but we don't use it for
-        # any database activity.
-        # Note: the end / is important. We want to get a 200 from the actual
-        # websockify server, not the nginx (which presents the redirection
-        # page).
-        server_url = "http://{}:{}{}/".format(
-            container.ip,
-            container.port,
-            self.application.container_url_abspath(container))
-
-        yield _wait_for_http_server_2xx(
-            server_url,
-            self.application.config.network_timeout)
-
-        # The server is up and running. Now contact the proxy and add
-        # the container url to it.
-        self.application.reverse_proxy_add_container(container)
 
         return container
 
@@ -261,6 +263,29 @@ class HomeHandler(BaseHandler):
             form_options[key] = [bs.decode('utf8') for bs in byte_list]
 
         return form_options
+
+    @gen.coroutine
+    def _wait_for_container_ready(self, container):
+        """ Wait until the container is ready to be connected
+
+        Parameters
+        ----------
+        container: Container
+           The container to be connected
+        """
+        # Note, we use the jupyterhub ORM server, but we don't use it for
+        # any database activity.
+        # Note: the end / is important. We want to get a 200 from the actual
+        # websockify server, not the nginx (which presents the redirection
+        # page).
+        server_url = "http://{}:{}{}/".format(
+            container.ip,
+            container.port,
+            self.application.container_url_abspath(container))
+
+        yield _wait_for_http_server_2xx(
+            server_url,
+            self.application.config.network_timeout)
 
 
 @gen.coroutine

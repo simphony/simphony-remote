@@ -1,3 +1,4 @@
+import os
 import string
 from urllib.parse import urlparse
 
@@ -180,8 +181,21 @@ class ContainerManager(LoggingMixin):
         # volumes = {volume_source: {'bind': volume_target,
         #                            'mode': volume_mode}
         volumes = volumes if volumes else {}
+
+        # Filter away the volume sources that do not exist,
+        # otherwise Docker would create non-existing host directory
+        # See Docker PR #21666
+        filtered_volumes = {source: volumes[source]
+                            for source in volumes
+                            if os.path.exists(source)}
+
         volume_targets = [binding['bind']
-                          for binding in volumes.values()]
+                          for binding in filtered_volumes.values()]
+
+        # Log the paths that are not being mounted
+        if volumes.keys() - filtered_volumes.keys():
+            self.log.error('Path(s) does not exist, not mounting:\n%s',
+                           '\n'.join(volumes.keys() - filtered_volumes.keys()))
 
         create_kwargs = dict(
             image=image_name,
@@ -195,7 +209,7 @@ class ContainerManager(LoggingMixin):
             port_bindings={
                 self.container_port: None
             },
-            binds=volumes
+            binds=filtered_volumes
         )
 
         self.log.debug("Starting host with config: %s", host_config)
