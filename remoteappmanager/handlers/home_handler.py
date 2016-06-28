@@ -180,7 +180,7 @@ class HomeHandler(BaseHandler):
                 continue
 
             containers = yield container_manager.containers_for_image(
-                image.docker_id, self.current_user.name)
+                image.docker_id, self.current_user.name, policy.id)
             container = (containers[0] if len(containers) > 0 else None)
             # For now we assume we have only one.
             images_info.append({

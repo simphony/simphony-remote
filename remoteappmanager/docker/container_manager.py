@@ -42,10 +42,6 @@ class ContainerManager(LoggingMixin):
     #: refer to it.
     container_port = Int(8888)
 
-    #: Keeps association of the containers for each image that this manager
-    #: has started.
-    _containers_for_image = Dict()
-
     #: Tracks if a given container is starting up.
     _start_pending = Set()
 
@@ -53,7 +49,7 @@ class ContainerManager(LoggingMixin):
     _stop_pending = Set()
 
     @gen.coroutine
-    def start_container(self, user_name, image_name, volumes=None):
+    def start_container(self, user_name, image_name, policy_id, volumes=None):
         """Starts a container using the given image name.
 
         Parameters
@@ -62,6 +58,8 @@ class ContainerManager(LoggingMixin):
             The name of the user
         image_name: string
             A string identifying the image name.
+        policy_id: int
+            The policy identifier for the application.
         volumes: dict
             {volume_source: {'bind': volume_target, 'mode': volume_mode}
 
@@ -75,7 +73,9 @@ class ContainerManager(LoggingMixin):
 
         try:
             self._start_pending.add(image_name)
-            result = yield self._start_container(user_name, image_name,
+            result = yield self._start_container(user_name,
+                                                 image_name,
+                                                 policy_id,
                                                  volumes)
         finally:
             self._start_pending.remove(image_name)
@@ -94,22 +94,21 @@ class ContainerManager(LoggingMixin):
             self._stop_pending.remove(container_id)
 
     @gen.coroutine
-    def containers_for_image(self, image_id_or_name, user_name=None):
+    def containers_for_image(self,
+                             image_id_or_name,
+                             policy_id,
+                             user_name):
         """Returns the currently running containers for a given image.
 
         If `user_name` is given, only returns containers started by the
         given user name.
 
-        It is a coroutine because we might want to run an inquire to the docker
-        service if not present.
-
         Parameters
         ----------
         image_id_or_name: str
             The image id or name
-
-        Optional parameters
-        -------------------
+        policy_id : int
+            The policy id
         user_name : str
             Name of the user who started the container
 
@@ -118,9 +117,10 @@ class ContainerManager(LoggingMixin):
         A list of container objects, or an empty list if not present.
         """
         if user_name:
-            user_labels = _get_container_labels(user_name)
-            if user_labels:
-                filters = {'label': '{0}={1}'.format(*user_labels.popitem())}
+            labels = _get_container_labels(user_name, policy_id)
+            filters = {'label': [
+                '{0}={1}'.format(k, v) for k, v in labels.items()]
+            }
         else:
             filters = {}
 
@@ -150,7 +150,7 @@ class ContainerManager(LoggingMixin):
     @gen.coroutine
     def image(self, image_id_or_name):
         """Returns the Image object associated to a given id
-        or name. If the image is not found, it returns None."""
+        """
         try:
             image_dict = yield self.docker_client.inspect_image(
                 image_id_or_name)
@@ -162,7 +162,7 @@ class ContainerManager(LoggingMixin):
     # Private
 
     @gen.coroutine
-    def _start_container(self, user_name, image_name, volumes):
+    def _start_container(self, user_name, image_name, policy_id, volumes):
         """Helper method that performs the physical operation of starting
         the container."""
 
@@ -177,7 +177,8 @@ class ContainerManager(LoggingMixin):
         # build the dictionary of keyword arguments for create_container
         container_name = _generate_container_name("remoteexec",
                                                   user_name,
-                                                  image_name)
+                                                  image_name,
+                                                  str(policy_id))
         container_url_id = _generate_container_url_id()
 
         # Check if the container is present. If not, create it
@@ -216,7 +217,7 @@ class ContainerManager(LoggingMixin):
             name=container_name,
             environment=_get_container_env(user_name, container_url_id),
             volumes=volume_targets,
-            labels=_get_container_labels(user_name))
+            labels=_get_container_labels(user_name, policy_id))
 
         # build the dictionary of keyword arguments for host_config
         host_config = dict(
@@ -252,6 +253,7 @@ class ContainerManager(LoggingMixin):
             name=container_name,
             image_name=image_name,
             image_id=image_id,
+            policy_id=policy_id,
             ip=ip,
             port=port,
             url_id=container_url_id,
@@ -271,7 +273,6 @@ class ContainerManager(LoggingMixin):
         # For now we can only have one container per image, but the interface
         # allows us to extend it.
         self.containers[container_id] = container
-        self._containers_for_image[image_id] = [container]
 
         return container
 
@@ -301,13 +302,6 @@ class ContainerManager(LoggingMixin):
 
         # Remove the container from the internal pool
         image_id = container.image_id
-        try:
-            self._containers_for_image[image_id].clear()
-        except KeyError:
-            self.log.error(
-                "Image '{}' was not found in the "
-                "internal container_for_image pool.".format(
-                    container.name))
 
     def _get_ip_and_port(self, container_id):
         """Returns the ip and port where the container service can be
@@ -448,17 +442,18 @@ def _get_container_env(user_name, url_id):
     )
 
 
-def _get_container_labels(user_name):
+def _get_container_labels(user_name, policy_id):
     """Returns a dictionary that will become container run-time labels.
     Each of these labels must be namespaced in reverse DNS style, in agreement
     to docker guidelines."""
 
     return {
         "eu.simphony-project.docker.user": user_name,
+        "eu.simphony-project.docker.policy_id": str(policy_id),
     }
 
 
-def _generate_container_name(prefix, user_name, image_name):
+def _generate_container_name(prefix, user_name, image_name, policy_id):
     """Generates a proper name for the container.
     It combines the prefix, username and image name after escaping.
 
@@ -470,6 +465,8 @@ def _generate_container_name(prefix, user_name, image_name):
         the user name
     image_name: string
         The image name
+    policy_id:
+        the policy id
 
     Return
     ------
@@ -482,7 +479,10 @@ def _generate_container_name(prefix, user_name, image_name):
                                 safe=_CONTAINER_SAFE_CHARS,
                                 escape_char=_CONTAINER_ESCAPE_CHAR)
 
-    return "{}-{}-{}".format(prefix, escaped_user_name, escaped_image_name)
+    return "{}-{}-{}-{}".format(prefix,
+                                escaped_user_name,
+                                escaped_image_name,
+                                str(policy_id))
 
 
 def _generate_container_url_id():
