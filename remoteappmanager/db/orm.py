@@ -192,6 +192,26 @@ def apps_for_user(session, user):
 
 
 def user_can_run(session, user, application, policy):
+    """Returns True if the user can run a given application with a specific
+    policy. False otherwise. Note that the user can be None.
+    In that case, returns False.
+
+    Parameters
+    ----------
+    session : Session
+        The current session
+    user : User
+        the orm User, or None.
+    application : Application
+        The application object
+    policy : ApplicationPolicy
+        The application policy
+
+    Returns
+    -------
+    boolean
+
+    """
     if user is None:
         return False
 
