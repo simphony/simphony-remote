@@ -90,6 +90,7 @@ class ApplicationPolicy(IdMixin, Base):
 class Accounting(Base):
     """Holds the information about who is allowed to run what."""
     __tablename__ = "accounting"
+
     team_id = Column(Integer,
                      ForeignKey("team.id"),
                      primary_key=True)
@@ -177,7 +178,7 @@ def apps_for_user(session, user):
 
     Returns
     -------
-    A list of tuples (orm.Application, orm.ApplicationPolicy)
+    A list of tuples (mapping_id, orm.Application, orm.ApplicationPolicy)
     """
 
     if user is None:
@@ -188,7 +189,9 @@ def apps_for_user(session, user):
     res = session.query(Accounting).filter(
         Accounting.team_id.in_([team.id for team in teams])).all()
 
-    return [(acc.application, acc.application_policy) for acc in res]
+    return [(acc.application.image + "_" + str(acc.application_policy.id),
+             acc.application,
+             acc.application_policy) for acc in res]
 
 
 def user_can_run(session, user, application, policy):

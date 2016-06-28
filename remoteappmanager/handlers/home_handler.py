@@ -73,19 +73,24 @@ class HomeHandler(BaseHandler):
         container_manager = self.application.container_manager
         orm_user = self.current_user.orm_user
 
-        app_id = options["app_id"][0]
-        policy_id = options["policy_id"][0]
+        mapping_id = options["mapping_id"][0]
 
         session = self.application.db.create_session()
 
         with orm.transaction(session):
-            app = orm.Application.from_id(session, app_id)
-            policy = orm.ApplicationPolicy.from_id(session, policy_id)
+            choice = [(m_id, app, policy)
+                      for m_id, app, policy in orm.apps_for_user(session, orm_user)
+                      if m_id == mapping_id]
 
-            if not orm.user_can_run(session, orm_user, app, policy):
+            if len(choice) == 0:
                 raise ValueError("User is not allowed to run the application.")
 
-        container = yield self._start_container(orm_user, app, policy)
+        _, app, policy = choice[0]
+
+        container = yield self._start_container(orm_user,
+                                                app,
+                                                policy,
+                                                mapping_id)
 
         try:
             yield self._wait_for_container_ready(container)
@@ -171,7 +176,7 @@ class HomeHandler(BaseHandler):
 
         images_info = []
 
-        for app, policy in apps:
+        for mapping_id, app, policy in apps:
             image = yield container_manager.image(app.image)
 
             if image is None:
@@ -179,14 +184,13 @@ class HomeHandler(BaseHandler):
                 # available in docker. We just move on.
                 continue
 
-            containers = yield container_manager.containers_for_image(
-                image.docker_id, self.current_user.name, policy.id)
-            container = (containers[0] if len(containers) > 0 else None)
-            # For now we assume we have only one.
+            container = yield container_manager.container_from_mapping_id(
+                self.current_user.name,
+                mapping_id)
+
             images_info.append({
-                "app": app,
                 "image": image,
-                "policy": policy,
+                "mapping_id": mapping_id,
                 "container": container
             })
         return images_info
@@ -222,7 +226,7 @@ class HomeHandler(BaseHandler):
             return None
 
     @gen.coroutine
-    def _start_container(self, orm_user, app, policy):
+    def _start_container(self, orm_user, app, policy, mapping_id):
         """Start the container. This method is a helper method that
         works with low level data and helps in issuing the request to the
         data container.
@@ -259,7 +263,8 @@ class HomeHandler(BaseHandler):
                                       'mode': volume_mode}
 
         try:
-            f = manager.start_container(user_name, image_name, volumes)
+            f = manager.start_container(user_name, image_name,
+                                        mapping_id, volumes)
             container = yield gen.with_timeout(
                 timedelta(seconds=self.application.config.network_timeout), f)
         except gen.TimeoutError as e:

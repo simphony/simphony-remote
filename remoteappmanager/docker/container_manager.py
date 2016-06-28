@@ -49,7 +49,7 @@ class ContainerManager(LoggingMixin):
     _stop_pending = Set()
 
     @gen.coroutine
-    def start_container(self, user_name, image_name, policy_id, volumes=None):
+    def start_container(self, user_name, image_name, mapping_id, volumes=None):
         """Starts a container using the given image name.
 
         Parameters
@@ -58,8 +58,8 @@ class ContainerManager(LoggingMixin):
             The name of the user
         image_name: string
             A string identifying the image name.
-        policy_id: int
-            The policy identifier for the application.
+        mapping_id: str
+            A generic id used to recognize the container.
         volumes: dict
             {volume_source: {'bind': volume_target, 'mode': volume_mode}
 
@@ -75,7 +75,7 @@ class ContainerManager(LoggingMixin):
             self._start_pending.add(image_name)
             result = yield self._start_container(user_name,
                                                  image_name,
-                                                 policy_id,
+                                                 mapping_id,
                                                  volumes)
         finally:
             self._start_pending.remove(image_name)
@@ -94,44 +94,29 @@ class ContainerManager(LoggingMixin):
             self._stop_pending.remove(container_id)
 
     @gen.coroutine
-    def containers_for_image(self,
-                             image_id_or_name,
-                             policy_id,
-                             user_name):
-        """Returns the currently running containers for a given image.
-
-        If `user_name` is given, only returns containers started by the
-        given user name.
+    def container_from_mapping_id(self, user_name, mapping_id):
+        """Returns the currently running container for a given user and
+        mapping_id.
 
         Parameters
         ----------
-        image_id_or_name: str
-            The image id or name
-        policy_id : int
-            The policy id
-        user_name : str
-            Name of the user who started the container
+        user_name: str
+            The username
+        mapping_id : str
+            The unique id to identify the container
 
         Return
         ------
-        A list of container objects, or an empty list if not present.
+        A container objects, or None if not present.
         """
-        if user_name:
-            labels = _get_container_labels(user_name, policy_id)
-            filters = {'label': [
-                '{0}={1}'.format(k, v) for k, v in labels.items()]
-            }
-        else:
-            filters = {}
-
-        filters['ancestor'] = image_id_or_name
+        labels = _get_container_labels(user_name, mapping_id)
+        filters = {'label': [
+            '{0}={1}'.format(k, v) for k, v in labels.items()]
+        }
 
         containers = yield self.docker_client.containers(filters=filters)
-        return [Container.from_docker_dict(container)
-                for container in containers
-                # Require further filtering as ancestor include grandparents
-                if (container.get('Image') == image_id_or_name or
-                    container.get('ImageID') == image_id_or_name)]
+        if len(containers) != 0:
+            return Container.from_docker_dict(containers[0])
 
     @gen.coroutine
     def all_images(self):
@@ -162,7 +147,7 @@ class ContainerManager(LoggingMixin):
     # Private
 
     @gen.coroutine
-    def _start_container(self, user_name, image_name, policy_id, volumes):
+    def _start_container(self, user_name, image_name, mapping_id, volumes):
         """Helper method that performs the physical operation of starting
         the container."""
 
@@ -177,8 +162,7 @@ class ContainerManager(LoggingMixin):
         # build the dictionary of keyword arguments for create_container
         container_name = _generate_container_name("remoteexec",
                                                   user_name,
-                                                  image_name,
-                                                  str(policy_id))
+                                                  mapping_id)
         container_url_id = _generate_container_url_id()
 
         # Check if the container is present. If not, create it
@@ -217,7 +201,7 @@ class ContainerManager(LoggingMixin):
             name=container_name,
             environment=_get_container_env(user_name, container_url_id),
             volumes=volume_targets,
-            labels=_get_container_labels(user_name, policy_id))
+            labels=_get_container_labels(user_name, mapping_id))
 
         # build the dictionary of keyword arguments for host_config
         host_config = dict(
@@ -253,7 +237,7 @@ class ContainerManager(LoggingMixin):
             name=container_name,
             image_name=image_name,
             image_id=image_id,
-            policy_id=policy_id,
+            mapping_id=mapping_id,
             ip=ip,
             port=port,
             url_id=container_url_id,
@@ -442,31 +426,29 @@ def _get_container_env(user_name, url_id):
     )
 
 
-def _get_container_labels(user_name, policy_id):
+def _get_container_labels(user_name, mapping_id):
     """Returns a dictionary that will become container run-time labels.
     Each of these labels must be namespaced in reverse DNS style, in agreement
     to docker guidelines."""
 
     return {
         "eu.simphony-project.docker.user": user_name,
-        "eu.simphony-project.docker.policy_id": str(policy_id),
+        "eu.simphony-project.docker.mapping_id": str(mapping_id),
     }
 
 
-def _generate_container_name(prefix, user_name, image_name, policy_id):
+def _generate_container_name(prefix, user_name, mapping_id):
     """Generates a proper name for the container.
     It combines the prefix, username and image name after escaping.
 
     Parameters
     ----------
-    prefix : string
+    prefix : str
         An arbitrary prefix for the container name.
-    user_name: string
+    user_name: str
         the user name
-    image_name: string
-        The image name
-    policy_id:
-        the policy id
+    mapping_id: str
+        the mapping id
 
     Return
     ------
@@ -475,14 +457,13 @@ def _generate_container_name(prefix, user_name, image_name, policy_id):
     escaped_user_name = escape(user_name,
                                safe=_CONTAINER_SAFE_CHARS,
                                escape_char=_CONTAINER_ESCAPE_CHAR)
-    escaped_image_name = escape(image_name,
+    escaped_mapping_id = escape(mapping_id,
                                 safe=_CONTAINER_SAFE_CHARS,
                                 escape_char=_CONTAINER_ESCAPE_CHAR)
 
-    return "{}-{}-{}-{}".format(prefix,
+    return "{}-{}-{}".format(prefix,
                                 escaped_user_name,
-                                escaped_image_name,
-                                str(policy_id))
+                                escaped_mapping_id)
 
 
 def _generate_container_url_id():
