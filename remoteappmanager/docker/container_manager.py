@@ -277,15 +277,12 @@ class ContainerManager(LoggingMixin):
         # The container is gone from docker.
         # Do the ordinary internal bookkeeping.
         try:
-            container = self.containers.pop(container_id)
+            self.containers.pop(container_id)
         except KeyError:
             self.log.error(
                 "Container id {} was not found in the "
                 "container registry.".format(container_id))
             return
-
-        # Remove the container from the internal pool
-        image_id = container.image_id
 
     def _get_ip_and_port(self, container_id):
         """Returns the ip and port where the container service can be
@@ -462,8 +459,8 @@ def _generate_container_name(prefix, user_name, mapping_id):
                                 escape_char=_CONTAINER_ESCAPE_CHAR)
 
     return "{}-{}-{}".format(prefix,
-                                escaped_user_name,
-                                escaped_mapping_id)
+                             escaped_user_name,
+                             escaped_mapping_id)
 
 
 def _generate_container_url_id():

@@ -79,7 +79,8 @@ class HomeHandler(BaseHandler):
 
         with orm.transaction(session):
             choice = [(m_id, app, policy)
-                      for m_id, app, policy in orm.apps_for_user(session, orm_user)
+                      for m_id, app, policy in orm.apps_for_user(session,
+                                                                 orm_user)
                       if m_id == mapping_id]
 
             if len(choice) == 0:

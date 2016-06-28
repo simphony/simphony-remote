@@ -219,10 +219,9 @@ def user_can_run(session, user, application, policy):
         return False
 
     team_ids = [team.id for team in user.teams]
-    res = session.query(Accounting) \
+    return session.query(Accounting) \
         .filter(Accounting.team_id.in_(team_ids)) \
         .filter(Accounting.application == application) \
-        .filter(Accounting.application_policy == policy).count()
-
-    return res > 0
+        .filter(Accounting.application_policy == policy) \
+        .exists()
 
