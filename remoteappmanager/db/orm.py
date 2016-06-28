@@ -11,7 +11,7 @@ from remoteappmanager.logging.logging_mixin import LoggingMixin
 Base = declarative_base()
 
 
-class BaseWithId(Base):
+class IdMixin(object):
     """Base class to provide an id"""
     id = Column(Integer, primary_key=True)
 
@@ -27,7 +27,7 @@ class UserTeam(Base):
     team_id = Column(Integer, ForeignKey('team.id'), primary_key=True)
 
 
-class User(BaseWithId):
+class User(IdMixin, Base):
     """ Table for users. """
     __tablename__ = "user"
 
@@ -37,7 +37,7 @@ class User(BaseWithId):
     name = Column(Unicode, index=True, unique=True)
 
 
-class Team(BaseWithId):
+class Team(IdMixin, Base):
     """ Teams of users. """
     __tablename__ = "team"
 
@@ -52,7 +52,7 @@ class Team(BaseWithId):
     users = relationship("User", secondary="user_team", backref="teams")
 
 
-class Application(BaseWithId):
+class Application(IdMixin, Base):
     """ Describes an application that should be available for startup """
     __tablename__ = "application"
 
@@ -66,7 +66,7 @@ class Application(BaseWithId):
         ).one()
 
 
-class ApplicationPolicy(BaseWithId):
+class ApplicationPolicy(IdMixin, Base):
     __tablename__ = "application_policy"
     #: If the home directory should be mounted in the container
     allow_home = Column(Boolean)
