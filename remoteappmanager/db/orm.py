@@ -11,6 +11,15 @@ from remoteappmanager.logging.logging_mixin import LoggingMixin
 Base = declarative_base()
 
 
+class BaseWithId(Base):
+    """Base class to provide an id"""
+    id = Column(Integer, primary_key=True)
+
+    @classmethod
+    def from_id(cls, session, id):
+        return session.query(cls).filter(cls.id == id).one()
+
+
 class UserTeam(Base):
     """ The user (n <-> n) team association table """
     __tablename__ = "user_team"
@@ -18,10 +27,9 @@ class UserTeam(Base):
     team_id = Column(Integer, ForeignKey('team.id'), primary_key=True)
 
 
-class User(Base):
+class User(BaseWithId):
     """ Table for users. """
     __tablename__ = "user"
-    id = Column(Integer, primary_key=True)
 
     #: The name of the user as specified by jupyterhub.
     #: This entry must be unique and is, for all practical purposes,
@@ -29,10 +37,9 @@ class User(Base):
     name = Column(Unicode, index=True, unique=True)
 
 
-class Team(Base):
+class Team(BaseWithId):
     """ Teams of users. """
     __tablename__ = "team"
-    id = Column(Integer, primary_key=True)
 
     #: The name of the group. Note that, differently from users, we can have
     #: multiple teams with the same name. The reason is that we would obtain
@@ -45,19 +52,22 @@ class Team(Base):
     users = relationship("User", secondary="user_team", backref="teams")
 
 
-class Application(Base):
+class Application(BaseWithId):
     """ Describes an application that should be available for startup """
     __tablename__ = "application"
-    id = Column(Integer, primary_key=True)
 
     #: The docker image name where the application can be found
-    image = Column(Unicode)
+    image = Column(Unicode, unique=True)
+
+    @staticmethod
+    def from_image_name(session, image_name):
+        return session.query(Application).filter(
+            Application.image == image_name
+        ).one()
 
 
-class ApplicationPolicy(Base):
+class ApplicationPolicy(BaseWithId):
     __tablename__ = "application_policy"
-    id = Column(Integer, primary_key=True)
-
     #: If the home directory should be mounted in the container
     allow_home = Column(Boolean)
 
@@ -173,10 +183,23 @@ def apps_for_user(session, user):
     if user is None:
         return []
 
-    with transaction(session):
-        teams = user.teams
+    teams = user.teams
 
-        res = session.query(Accounting).filter(
-            Accounting.team_id.in_([team.id for team in teams])).all()
+    res = session.query(Accounting).filter(
+        Accounting.team_id.in_([team.id for team in teams])).all()
 
-        return [(acc.application, acc.application_policy) for acc in res]
+    return [(acc.application, acc.application_policy) for acc in res]
+
+
+def user_can_run(session, user, application, policy):
+    if user is None:
+        return False
+
+    team_ids = [team.id for team in user.teams]
+    res = session.query(Accounting) \
+        .filter(Accounting.team_id.in_(team_ids)) \
+        .filter(Accounting.application == application) \
+        .filter(Accounting.application_policy == policy).count()
+
+    return res > 0
+
