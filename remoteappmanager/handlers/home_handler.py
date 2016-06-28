@@ -137,13 +137,6 @@ class HomeHandler(BaseHandler):
         """
         app = self.application
         container_manager = app.container_manager
-        user = self.current_user
-
-        session = self.application.db.create_session()
-        with orm.transaction(session):
-            application = orm.Application.from_image_name(session, image_name)
-            if not orm.user_can_run(session, user.orm_user, application):
-                raise ValueError("Invalid image name")
 
         container = yield self._container_from_options(options)
         if not container:
