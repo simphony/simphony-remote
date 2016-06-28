@@ -13,7 +13,6 @@ from remoteappmanager.docker.image import Image
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from tornado import gen
 from traitlets import (
-    Dict,
     Int,
     Set,
     Instance,

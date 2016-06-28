@@ -43,12 +43,11 @@ class TestContainerManager(AsyncTestCase):
         self.manager.docker_client.client = docker_client
 
         result = yield self.manager.container_from_mapping_id("imageid",
-                                                               "mapping")
+                                                              "mapping")
         expected = Container(docker_id='someid',
                              name='/remoteexec-image_3Alatest_user',
                              image_name='simphony/mayavi-4.4.4:latest',  # noqa
                              image_id='imageid', ip='0.0.0.0', port=None)
-
 
         utils.assert_containers_equal(self, result, expected)
 

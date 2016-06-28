@@ -224,4 +224,3 @@ def user_can_run(session, user, application, policy):
         .filter(Accounting.application == application) \
         .filter(Accounting.application_policy == policy) \
         .exists()
-
