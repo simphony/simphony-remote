@@ -14,14 +14,16 @@ class TestContainerManager(AsyncTestCase):
         self.manager.docker_client.client = self.mock_docker_client
 
     def test_instantiation(self):
-        self.assertEqual(self.manager.containers, {})
         self.assertIsNotNone(self.manager.docker_client)
 
     @gen_test
     def test_start_stop(self):
         mock_client = self.mock_docker_client
 
-        result = yield self.manager.start_container("username", "imageid")
+        result = yield self.manager.start_container("username",
+                                                    "imageid",
+                                                    "mapping_id",
+                                                    None)
         self.assertTrue(mock_client.start.called)
         self.assertIsInstance(result, Container)
         self.assertFalse(mock_client.stop.called)
@@ -33,30 +35,22 @@ class TestContainerManager(AsyncTestCase):
         self.assertTrue(mock_client.remove_container.called)
 
     @gen_test
-    def test_containers_for_image_results(self):
-        ''' Test containers_for_image returns a list of Container '''
+    def test_containers_for_mapping_id(self):
+        ''' Test containers_for_mapping_id returns a list of Container '''
         # The mock client mocks the output of docker Client.containers
         docker_client = utils.mock_docker_client_with_running_containers()
         self.mock_docker_client = docker_client
         self.manager.docker_client.client = docker_client
 
-        # The output should be a list of Container
-        results = yield self.manager.containers_for_image("imageid")
-        expected = [Container(docker_id='someid',
-                              name='/remoteexec-image_3Alatest_user',
-                              image_name='simphony/mayavi-4.4.4:latest',  # noqa
-                              image_id='imageid', ip='0.0.0.0', port=None),
-                    Container(docker_id='someid',
-                              name='/remoteexec-image_3Alatest_user2',
-                              image_name='simphony/mayavi-4.4.4:latest',  # noqa
-                              image_id='imageid', ip='0.0.0.0', port=None),
-                    Container(docker_id='someid',
-                              name='/remoteexec-image_3Alatest_user3',
-                              image_name='simphony/mayavi-4.4.4:latest',  # noqa
-                              image_id='imageid', ip='', port=None)]
+        result = yield self.manager.container_from_mapping_id("imageid",
+                                                               "mapping")
+        expected = Container(docker_id='someid',
+                             name='/remoteexec-image_3Alatest_user',
+                             image_name='simphony/mayavi-4.4.4:latest',  # noqa
+                             image_id='imageid', ip='0.0.0.0', port=None)
 
-        for result, expected_container in zip(results, expected):
-            utils.assert_containers_equal(self, result, expected_container)
+
+        utils.assert_containers_equal(self, result, expected)
 
     @gen_test
     def test_containers_for_image_client_api_without_user(self):
@@ -67,12 +61,11 @@ class TestContainerManager(AsyncTestCase):
 
         # We assume the client.containers(filters=...) is tested by docker-py
         # Instead we test if the correct arguments are passed to the Client API
-        yield self.manager.containers_for_image("imageid")
+        yield self.manager.container_from_mapping_id("user", "mapping")
         call_args = self.manager.docker_client.client.containers.call_args
 
         # filters is one of the keyword argument
         self.assertIn('filters', call_args[1])
-        self.assertEqual(call_args[1]['filters']['ancestor'], "imageid")
 
     @gen_test
     def test_containers_for_image_client_api_with_user(self):
@@ -83,13 +76,11 @@ class TestContainerManager(AsyncTestCase):
 
         # We assume the client.containers(filters=...) is tested by docker-py
         # Instead we test if the correct arguments are passed to the Client API
-        yield self.manager.containers_for_image("imageid", "userABC")
+        yield self.manager.container_from_mapping_id("user", "mapping")
         call_args = self.manager.docker_client.client.containers.call_args
 
         # filters is one of the keyword argument
         self.assertIn('filters', call_args[1])
-        self.assertEqual(call_args[1]['filters']['ancestor'], "imageid")
-        self.assertIn("userABC", call_args[1]['filters']['label'])
 
     @gen_test
     def test_race_condition_spawning(self):
@@ -97,8 +88,15 @@ class TestContainerManager(AsyncTestCase):
         # Start the operations, and retrieve the future.
         # they will stop at the first yield and not go further until
         # we yield them
-        f1 = self.manager.start_container("username", "imageid")
-        f2 = self.manager.start_container("username", "imageid")
+        f1 = self.manager.start_container("username",
+                                          "imageid",
+                                          "mapping_id",
+                                          None)
+
+        f2 = self.manager.start_container("username",
+                                          "imageid",
+                                          "mapping_id",
+                                          None)
 
         # If these yielding raise a KeyError, it is because the second
         # one tries to remove the same key from the list, but it has been
@@ -116,7 +114,9 @@ class TestContainerManager(AsyncTestCase):
 
         result = yield self.manager.start_container(
             "vagrant",
-            "simphony/simphony-remote-docker:simphony-framework-paraview")
+            "simphony/simphony-remote-docker:simphony-framework-paraview",
+            "mapping",
+            None)
         self.assertTrue(mock_client.start.called)
         self.assertIsInstance(result, Container)
 
@@ -137,7 +137,10 @@ class TestContainerManager(AsyncTestCase):
         volumes[good_path] = {'bind': '/target_vol3',
                               'mode': 'ro'}
 
-        yield self.manager.start_container("username", "imageid", volumes)
+        yield self.manager.start_container("username",
+                                           "imageid",
+                                           "mapping_id",
+                                           volumes)
 
         # Call args and keyword args that create_container receives
         args = self.manager.docker_client.client.create_container.call_args

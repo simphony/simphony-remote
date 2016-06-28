@@ -8,6 +8,7 @@ from escapism import escape
 from remoteappmanager.docker.async_docker_client import AsyncDockerClient
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.docker_client_config import DockerClientConfig
+from remoteappmanager.docker.docker_labels import SIMPHONY_NS
 from remoteappmanager.docker.image import Image
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from tornado import gen
@@ -30,10 +31,6 @@ class ContainerManager(LoggingMixin):
     docker_config = Instance(DockerClientConfig,
                              allow_none=True)
 
-    #: Mapping of container_id to containers that are started by this
-    #: manager (they may or may not be still running)
-    containers = Dict()
-
     #: The asynchronous docker client.
     docker_client = Instance(AsyncDockerClient)
 
@@ -49,7 +46,7 @@ class ContainerManager(LoggingMixin):
     _stop_pending = Set()
 
     @gen.coroutine
-    def start_container(self, user_name, image_name, mapping_id, volumes=None):
+    def start_container(self, user_name, image_name, mapping_id, volumes):
         """Starts a container using the given image name.
 
         Parameters
@@ -60,7 +57,7 @@ class ContainerManager(LoggingMixin):
             A string identifying the image name.
         mapping_id: str
             A generic id used to recognize the container.
-        volumes: dict
+        volumes: dict or None
             {volume_source: {'bind': volume_target, 'mode': volume_mode}
 
         Return
@@ -110,8 +107,8 @@ class ContainerManager(LoggingMixin):
         A container objects, or None if not present.
         """
         labels = _get_container_labels(user_name, mapping_id)
-        filters = {'label': [
-            '{0}={1}'.format(k, v) for k, v in labels.items()]
+        filters = {
+            'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]
         }
 
         containers = yield self.docker_client.containers(filters=filters)
@@ -253,11 +250,6 @@ class ContainerManager(LoggingMixin):
             )
         )
 
-        # Do the bookkeeping. Add the information to the internal data structs.
-        # For now we can only have one container per image, but the interface
-        # allows us to extend it.
-        self.containers[container_id] = container
-
         return container
 
     @gen.coroutine
@@ -273,16 +265,6 @@ class ContainerManager(LoggingMixin):
         self.log.info("Stopping container {}".format(container_id))
 
         yield self._remove_container(container_id)
-
-        # The container is gone from docker.
-        # Do the ordinary internal bookkeeping.
-        try:
-            self.containers.pop(container_id)
-        except KeyError:
-            self.log.error(
-                "Container id {} was not found in the "
-                "container registry.".format(container_id))
-            return
 
     def _get_ip_and_port(self, container_id):
         """Returns the ip and port where the container service can be
@@ -429,8 +411,8 @@ def _get_container_labels(user_name, mapping_id):
     to docker guidelines."""
 
     return {
-        "eu.simphony-project.docker.user": user_name,
-        "eu.simphony-project.docker.mapping_id": str(mapping_id),
+        SIMPHONY_NS+"user": user_name,
+        SIMPHONY_NS+"mapping_id": mapping_id,
     }
 
 

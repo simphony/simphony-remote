@@ -139,9 +139,9 @@ class TestOrm(TempMixin, unittest.TestCase):
             res = orm.apps_for_user(session, users[1])
             self.assertEqual(len(res), 2)
             self.assertIn("docker/image0",
-                          [acc[0].image for acc in res])
+                          [acc[1].image for acc in res])
             self.assertIn("docker/image2",
-                          [acc[0].image for acc in res])
+                          [acc[1].image for acc in res])
 
             res = orm.apps_for_user(session, users[2])
             self.assertEqual(len(res), 0)
@@ -150,9 +150,9 @@ class TestOrm(TempMixin, unittest.TestCase):
             res = orm.apps_for_user(session, users[0])
             self.assertEqual(len(res), 1)
             self.assertIn("docker/image1",
-                          [acc[0].image for acc in res])
+                          [acc[1].image for acc in res])
 
             res = orm.apps_for_user(session, users[3])
             self.assertEqual(len(res), 1)
             self.assertIn("docker/image0",
-                          [acc[0].image for acc in res])
+                          [acc[1].image for acc in res])
