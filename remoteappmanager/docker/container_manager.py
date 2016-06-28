@@ -149,7 +149,14 @@ class ContainerManager(LoggingMixin):
 
     @gen.coroutine
     def image(self, image_id_or_name):
-        image_dict = yield self.docker_client.inspect_image(image_id_or_name)
+        """Returns the Image object associated to a given id
+        or name. If the image is not found, it returns None."""
+        try:
+            image_dict = yield self.docker_client.inspect_image(
+                image_id_or_name)
+        except NotFound:
+            return None
+
         return Image.from_docker_dict(image_dict)
 
     # Private
