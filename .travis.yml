@@ -22,7 +22,7 @@ script:
     - sphinx-build -W doc/source doc/build/sphinx
 
 after_success:
-    - coverage run -m tornado.testing discover -p test*
+    - coverage run -m tornado.testing discover -p 
     - pip install codecov
     - codecov
     - bash <(curl -s https://codecov.io/bash)
