@@ -88,24 +88,27 @@ class HomeHandler(BaseHandler):
 
         _, app, policy = choice[0]
 
-        container = yield self._start_container(orm_user,
-                                                app,
-                                                policy,
-                                                mapping_id)
+        container = None
 
         try:
+            container = yield self._start_container(orm_user,
+                                                    app,
+                                                    policy,
+                                                    mapping_id)
+
             yield self._wait_for_container_ready(container)
         except Exception as e:
             # Clean up, if the container is running
-            try:
-                yield container_manager.stop_and_remove_container(
-                    container.docker_id)
-            except Exception:
-                self.log.exception(
-                    "Unable to stop container {} after failure"
-                    " to obtain a ready container".format(
+            if container is not None:
+                try:
+                    yield container_manager.stop_and_remove_container(
                         container.docker_id)
-                )
+                except Exception:
+                    self.log.exception(
+                        "Unable to stop container {} after failure"
+                        " to obtain a ready container".format(
+                            container.docker_id)
+                    )
             raise e
 
         # The server is up and running. Now contact the proxy and add

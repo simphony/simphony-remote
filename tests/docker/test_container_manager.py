@@ -35,14 +35,14 @@ class TestContainerManager(AsyncTestCase):
         self.assertTrue(mock_client.remove_container.called)
 
     @gen_test
-    def test_containers_for_mapping_id(self):
+    def test_containers_from_mapping_id(self):
         ''' Test containers_for_mapping_id returns a list of Container '''
         # The mock client mocks the output of docker Client.containers
         docker_client = utils.mock_docker_client_with_running_containers()
         self.mock_docker_client = docker_client
         self.manager.docker_client.client = docker_client
 
-        result = yield self.manager.container_from_mapping_id("imageid",
+        result = yield self.manager.container_from_mapping_id("user",
                                                               "mapping")
         expected = Container(docker_id='someid',
                              name='/remoteexec-image_3Alatest_user',
@@ -50,36 +50,6 @@ class TestContainerManager(AsyncTestCase):
                              image_id='imageid', ip='0.0.0.0', port=None)
 
         utils.assert_containers_equal(self, result, expected)
-
-    @gen_test
-    def test_containers_for_image_client_api_without_user(self):
-        ''' Test containers_for_images(image_id) use of Client API'''
-        # The mock client mocks the output of docker Client.containers
-        docker_client = utils.mock_docker_client_with_running_containers()
-        self.manager.docker_client.client = docker_client
-
-        # We assume the client.containers(filters=...) is tested by docker-py
-        # Instead we test if the correct arguments are passed to the Client API
-        yield self.manager.container_from_mapping_id("user", "mapping")
-        call_args = self.manager.docker_client.client.containers.call_args
-
-        # filters is one of the keyword argument
-        self.assertIn('filters', call_args[1])
-
-    @gen_test
-    def test_containers_for_image_client_api_with_user(self):
-        ''' Test containers_for_images(image_id, user) use of Client API'''
-        # The mock client mocks the output of docker Client.containers
-        docker_client = utils.mock_docker_client_with_running_containers()
-        self.manager.docker_client.client = docker_client
-
-        # We assume the client.containers(filters=...) is tested by docker-py
-        # Instead we test if the correct arguments are passed to the Client API
-        yield self.manager.container_from_mapping_id("user", "mapping")
-        call_args = self.manager.docker_client.client.containers.call_args
-
-        # filters is one of the keyword argument
-        self.assertIn('filters', call_args[1])
 
     @gen_test
     def test_race_condition_spawning(self):
