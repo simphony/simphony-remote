@@ -8,11 +8,11 @@ from escapism import escape
 from remoteappmanager.docker.async_docker_client import AsyncDockerClient
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.docker_client_config import DockerClientConfig
+from remoteappmanager.docker.docker_labels import SIMPHONY_NS
 from remoteappmanager.docker.image import Image
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from tornado import gen
 from traitlets import (
-    Dict,
     Int,
     Set,
     Instance,
@@ -30,10 +30,6 @@ class ContainerManager(LoggingMixin):
     docker_config = Instance(DockerClientConfig,
                              allow_none=True)
 
-    #: Mapping of container_id to containers that are started by this
-    #: manager (they may or may not be still running)
-    containers = Dict()
-
     #: The asynchronous docker client.
     docker_client = Instance(AsyncDockerClient)
 
@@ -42,10 +38,6 @@ class ContainerManager(LoggingMixin):
     #: refer to it.
     container_port = Int(8888)
 
-    #: Keeps association of the containers for each image that this manager
-    #: has started.
-    _containers_for_image = Dict()
-
     #: Tracks if a given container is starting up.
     _start_pending = Set()
 
@@ -53,7 +45,7 @@ class ContainerManager(LoggingMixin):
     _stop_pending = Set()
 
     @gen.coroutine
-    def start_container(self, user_name, image_name, volumes=None):
+    def start_container(self, user_name, image_name, mapping_id, volumes):
         """Starts a container using the given image name.
 
         Parameters
@@ -62,7 +54,12 @@ class ContainerManager(LoggingMixin):
             The name of the user
         image_name: string
             A string identifying the image name.
-        volumes: dict
+        mapping_id: str
+            A generic id used to recognize the container.
+            it is expected to be unique (and persistent) for a specific
+            combination of docker image (i.e. application) and setup
+            (i.e. configuration).
+        volumes: dict or None
             {volume_source: {'bind': volume_target, 'mode': volume_mode}
 
         Return
@@ -75,7 +72,9 @@ class ContainerManager(LoggingMixin):
 
         try:
             self._start_pending.add(image_name)
-            result = yield self._start_container(user_name, image_name,
+            result = yield self._start_container(user_name,
+                                                 image_name,
+                                                 mapping_id,
                                                  volumes)
         finally:
             self._start_pending.remove(image_name)
@@ -84,6 +83,16 @@ class ContainerManager(LoggingMixin):
 
     @gen.coroutine
     def stop_and_remove_container(self, container_id):
+        """Idempotent removal of a container by id.
+        If the container is there, it will be removed. If it's not
+        there, the unexpected conditions will be logged.
+
+        Parameters
+        ----------
+        container_id : str
+            A string containing the container identifier.
+        """
+
         if container_id in self._stop_pending:
             return
 
@@ -94,78 +103,70 @@ class ContainerManager(LoggingMixin):
             self._stop_pending.remove(container_id)
 
     @gen.coroutine
-    def containers_for_image(self, image_id_or_name, user_name=None):
-        """Returns the currently running containers for a given image.
-
-        If `user_name` is given, only returns containers started by the
-        given user name.
-
-        It is a coroutine because we might want to run an inquire to the docker
-        service if not present.
+    def containers_from_mapping_id(self, user_name, mapping_id):
+        """Returns the currently running containers for a given user and
+        mapping_id.
 
         Parameters
         ----------
-        image_id_or_name: str
-            The image id or name
-
-        Optional parameters
-        -------------------
-        user_name : str
-            Name of the user who started the container
+        user_name: str
+            The username
+        mapping_id : str
+            The unique id to identify the container
 
         Return
         ------
-        A list of container objects, or an empty list if not present.
+        A list of Container objects, or an empty list if nothing is found.
         """
-        if user_name:
-            user_labels = _get_container_labels(user_name)
-            if user_labels:
-                filters = {'label': '{0}={1}'.format(*user_labels.popitem())}
-        else:
-            filters = {}
+        labels = _get_container_labels(user_name, mapping_id)
+        filters = {
+            'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]
+        }
 
-        filters['ancestor'] = image_id_or_name
-
-        containers = yield self.docker_client.containers(filters=filters)
-        return [Container.from_docker_dict(container)
-                for container in containers
-                # Require further filtering as ancestor include grandparents
-                if (container.get('Image') == image_id_or_name or
-                    container.get('ImageID') == image_id_or_name)]
+        infos = yield self.docker_client.containers(filters=filters)
+        return [Container.from_docker_dict(info) for info in infos]
 
     @gen.coroutine
-    def all_images(self):
-        """Inquires all available images. Returns a list of Image objects.
+    def image(self, image_id_or_name):
+        """Returns the Image object associated to a given id
         """
-        image_dicts = yield self.docker_client.images(
-            filters=dict(dangling=False))
+        try:
+            image_dict = yield self.docker_client.inspect_image(
+                image_id_or_name)
+        except NotFound:
+            return None
 
-        images = []
-        for image_dict in image_dicts:
-            image = Image.from_docker_dict(image_dict)
-            images.append(image)
-
-        return images
+        return Image.from_docker_dict(image_dict)
 
     # Private
 
     @gen.coroutine
-    def _start_container(self, user_name, image_name, volumes):
+    def _start_container(self, user_name, image_name, mapping_id, volumes):
         """Helper method that performs the physical operation of starting
-        the container."""
+        the container.
+
+        If successful, returns a Container object.
+        If any exception occurs, it logs it and re-raises an exception.
+        """
 
         try:
             image_info = yield self.docker_client.inspect_image(image_name)
-        except NotFound:
+            image_id = image_info["Id"]
+        except NotFound as e:
             self.log.error('Could not find requested image {}'.format(
                 image_name))
-            return None
+            raise e
+        except Exception as e:
+            self.log.exception("Could not inspect image {}".format(
+                image_name
+            ))
+            raise e
 
         self.log.info('Got container image: {}'.format(image_name))
         # build the dictionary of keyword arguments for create_container
         container_name = _generate_container_name("remoteexec",
                                                   user_name,
-                                                  image_name)
+                                                  mapping_id)
         container_url_id = _generate_container_url_id()
 
         # Check if the container is present. If not, create it
@@ -177,7 +178,7 @@ class ContainerManager(LoggingMixin):
             self.log.info('Container for image {} '
                           'already present. Stopping.'.format(image_name))
             container_id = container_info["Id"]
-            self.stop_and_remove_container(container_id)
+            yield self.stop_and_remove_container(container_id)
 
         # Data volume binding to be used with Docker Client
         # volumes = {volume_source: {'bind': volume_target,
@@ -204,7 +205,7 @@ class ContainerManager(LoggingMixin):
             name=container_name,
             environment=_get_container_env(user_name, container_url_id),
             volumes=volume_targets,
-            labels=_get_container_labels(user_name))
+            labels=_get_container_labels(user_name, mapping_id))
 
         # build the dictionary of keyword arguments for host_config
         host_config = dict(
@@ -231,15 +232,29 @@ class ContainerManager(LoggingMixin):
                       container_name, container_id, image_name)
 
         # start the container
-        yield self.docker_client.start(container_id)
+        try:
+            yield self.docker_client.start(container_id)
+        except Exception as e:
+            self.log.exception("Could not start container {}".format(
+                container_id))
+            yield self.stop_and_remove_container(container_id)
+            raise e
 
-        ip, port = yield from self._get_ip_and_port(container_id)
-        image_id = image_info["Id"]
+        try:
+            ip, port = yield from self._get_ip_and_port(container_id)
+        except Exception as e:
+            self.log.exception(
+                "Could not retrieve ip/port information "
+                "for container {}".format(container_id))
+            yield self.stop_and_remove_container(container_id)
+            raise e
+
         container = Container(
             docker_id=container_id,
             name=container_name,
             image_name=image_name,
             image_id=image_id,
+            mapping_id=mapping_id,
             ip=ip,
             port=port,
             url_id=container_url_id,
@@ -255,47 +270,7 @@ class ContainerManager(LoggingMixin):
             )
         )
 
-        # Do the bookkeeping. Add the information to the internal data structs.
-        # For now we can only have one container per image, but the interface
-        # allows us to extend it.
-        self.containers[container_id] = container
-        self._containers_for_image[image_id] = [container]
-
         return container
-
-    @gen.coroutine
-    def _stop_and_remove_container(self, container_id):
-        """Stops and removes the container identified by container_id.
-
-        Parameters
-        ----------
-        container_id : string
-            The unique identifier string identifying the container.
-        """
-
-        self.log.info("Stopping container {}".format(container_id))
-
-        yield self._remove_container(container_id)
-
-        # The container is gone from docker.
-        # Do the ordinary internal bookkeeping.
-        try:
-            container = self.containers.pop(container_id)
-        except KeyError:
-            self.log.error(
-                "Container id {} was not found in the "
-                "container registry.".format(container_id))
-            return
-
-        # Remove the container from the internal pool
-        image_id = container.image_id
-        try:
-            self._containers_for_image[image_id].clear()
-        except KeyError:
-            self.log.error(
-                "Image '{}' was not found in the "
-                "internal container_for_image pool.".format(
-                    container.name))
 
     def _get_ip_and_port(self, container_id):
         """Returns the ip and port where the container service can be
@@ -371,10 +346,13 @@ class ContainerManager(LoggingMixin):
         return container_info
 
     @gen.coroutine
-    def _remove_container(self, container_id):
+    def _stop_and_remove_container(self, container_id):
         """Idempotent removal of a container by id.
         If the container is there, it will be removed. If it's not
         there, the unexpected conditions will be logged."""
+
+        self.log.info("Stopping container {}".format(container_id))
+
         # Stop the container
         try:
             yield self.docker_client.stop(container_id)
@@ -436,28 +414,29 @@ def _get_container_env(user_name, url_id):
     )
 
 
-def _get_container_labels(user_name):
+def _get_container_labels(user_name, mapping_id):
     """Returns a dictionary that will become container run-time labels.
     Each of these labels must be namespaced in reverse DNS style, in agreement
     to docker guidelines."""
 
     return {
-        "eu.simphony-project.docker.user": user_name,
+        SIMPHONY_NS+"user": user_name,
+        SIMPHONY_NS+"mapping_id": mapping_id,
     }
 
 
-def _generate_container_name(prefix, user_name, image_name):
+def _generate_container_name(prefix, user_name, mapping_id):
     """Generates a proper name for the container.
     It combines the prefix, username and image name after escaping.
 
     Parameters
     ----------
-    prefix : string
+    prefix : str
         An arbitrary prefix for the container name.
-    user_name: string
+    user_name: str
         the user name
-    image_name: string
-        The image name
+    mapping_id: str
+        the mapping id
 
     Return
     ------
@@ -466,11 +445,13 @@ def _generate_container_name(prefix, user_name, image_name):
     escaped_user_name = escape(user_name,
                                safe=_CONTAINER_SAFE_CHARS,
                                escape_char=_CONTAINER_ESCAPE_CHAR)
-    escaped_image_name = escape(image_name,
+    escaped_mapping_id = escape(mapping_id,
                                 safe=_CONTAINER_SAFE_CHARS,
                                 escape_char=_CONTAINER_ESCAPE_CHAR)
 
-    return "{}-{}-{}".format(prefix, escaped_user_name, escaped_image_name)
+    return "{}-{}-{}".format(prefix,
+                             escaped_user_name,
+                             escaped_mapping_id)
 
 
 def _generate_container_url_id():

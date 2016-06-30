@@ -1,3 +1,4 @@
+from remoteappmanager.docker.docker_labels import SIMPHONY_NS
 from traitlets import Unicode, HasTraits, Int
 
 
@@ -18,6 +19,9 @@ class Container(HasTraits):
 
     #: And the image docker id
     image_id = Unicode()
+
+    #: Mapping identifier
+    mapping_id = Unicode()
 
     #: The ip address...
     ip = Unicode()
@@ -77,8 +81,13 @@ class Container(HasTraits):
             ip = ""
             port = None
 
+        labels = docker_dict.get("Config", {}).get("Labels", {})
+        mapping_id = labels.get(SIMPHONY_NS+"mapping_id", "")
+
         return cls(docker_id=docker_dict.get('Id', ''),
                    name=docker_dict.get('Names', ('',))[0],
                    image_name=docker_dict.get('Image', ''),
                    image_id=docker_dict.get('ImageID', ''),
-                   ip=ip, port=port)
+                   mapping_id=mapping_id,
+                   ip=ip,
+                   port=port)

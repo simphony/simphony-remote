@@ -89,7 +89,7 @@ def list(ctx):
                                          policy.volume_source,
                                          policy.volume_target,
                                          policy.volume_mode)
-                    for app, policy in orm.apps_for_user(session, user)]
+                    for _, app, policy in orm.apps_for_user(session, user)]
 
             print("{}:{} | {} | {}".format(
                 user.id,
