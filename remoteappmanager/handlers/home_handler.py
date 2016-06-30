@@ -188,9 +188,13 @@ class HomeHandler(BaseHandler):
                 # available in docker. We just move on.
                 continue
 
-            container = yield container_manager.container_from_mapping_id(
+            containers = yield container_manager.containers_from_mapping_id(
                 self.current_user.name,
                 mapping_id)
+
+            # We assume that we can only run one container only (although the
+            # API considers a broader possibility for future extension.
+            container = containers[0] if len(containers) else None
 
             images_info.append({
                 "image": image,

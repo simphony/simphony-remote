@@ -55,7 +55,9 @@ class ContainerManager(LoggingMixin):
         image_name: string
             A string identifying the image name.
         mapping_id: str
-            A generic id used to recognize the container.
+            A generic id used to recognize the container. It is not unique
+            per user, and it depends exclusively on the combination of
+            an application and its chosen configuration.
         volumes: dict or None
             {volume_source: {'bind': volume_target, 'mode': volume_mode}
 
@@ -80,6 +82,16 @@ class ContainerManager(LoggingMixin):
 
     @gen.coroutine
     def stop_and_remove_container(self, container_id):
+        """Idempotent removal of a container by id.
+        If the container is there, it will be removed. If it's not
+        there, the unexpected conditions will be logged.
+
+        Parameters
+        ----------
+        container_id : str
+            A string containing the container identifier.
+        """
+
         if container_id in self._stop_pending:
             return
 
@@ -90,8 +102,8 @@ class ContainerManager(LoggingMixin):
             self._stop_pending.remove(container_id)
 
     @gen.coroutine
-    def container_from_mapping_id(self, user_name, mapping_id):
-        """Returns the currently running container for a given user and
+    def containers_from_mapping_id(self, user_name, mapping_id):
+        """Returns the currently running containers for a given user and
         mapping_id.
 
         Parameters
@@ -103,16 +115,15 @@ class ContainerManager(LoggingMixin):
 
         Return
         ------
-        A container objects, or None if not present.
+        A list of Container objects, or an empty list if nothing is found.
         """
         labels = _get_container_labels(user_name, mapping_id)
         filters = {
             'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]
         }
 
-        containers = yield self.docker_client.containers(filters=filters)
-        if len(containers) != 0:
-            return Container.from_docker_dict(containers[0])
+        infos = yield self.docker_client.containers(filters=filters)
+        return [Container.from_docker_dict(info) for info in infos]
 
     @gen.coroutine
     def all_images(self):
@@ -145,14 +156,24 @@ class ContainerManager(LoggingMixin):
     @gen.coroutine
     def _start_container(self, user_name, image_name, mapping_id, volumes):
         """Helper method that performs the physical operation of starting
-        the container."""
+        the container.
+
+        If successful, returns a Container object.
+        If any exception occurs, it logs it and re-raises an exception.
+        """
 
         try:
             image_info = yield self.docker_client.inspect_image(image_name)
-        except NotFound:
+            image_id = image_info["Id"]
+        except NotFound as e:
             self.log.error('Could not find requested image {}'.format(
                 image_name))
-            return None
+            raise e
+        except Exception as e:
+            self.log.exception("Could not inspect image {}".format(
+                image_name
+            ))
+            raise e
 
         self.log.info('Got container image: {}'.format(image_name))
         # build the dictionary of keyword arguments for create_container
@@ -170,7 +191,7 @@ class ContainerManager(LoggingMixin):
             self.log.info('Container for image {} '
                           'already present. Stopping.'.format(image_name))
             container_id = container_info["Id"]
-            self.stop_and_remove_container(container_id)
+            yield self.stop_and_remove_container(container_id)
 
         # Data volume binding to be used with Docker Client
         # volumes = {volume_source: {'bind': volume_target,
@@ -224,10 +245,23 @@ class ContainerManager(LoggingMixin):
                       container_name, container_id, image_name)
 
         # start the container
-        yield self.docker_client.start(container_id)
+        try:
+            yield self.docker_client.start(container_id)
+        except Exception as e:
+            self.log.exception("Could not start container {}".format(
+                container_id))
+            yield self.stop_and_remove_container(container_id)
+            raise e
 
-        ip, port = yield from self._get_ip_and_port(container_id)
-        image_id = image_info["Id"]
+        try:
+            ip, port = yield from self._get_ip_and_port(container_id)
+        except Exception as e:
+            self.log.exception(
+                "Could not retrieve ip/port information "
+                "for container {}".format(container_id))
+            yield self.stop_and_remove_container(container_id)
+            raise e
+
         container = Container(
             docker_id=container_id,
             name=container_name,
@@ -250,20 +284,6 @@ class ContainerManager(LoggingMixin):
         )
 
         return container
-
-    @gen.coroutine
-    def _stop_and_remove_container(self, container_id):
-        """Stops and removes the container identified by container_id.
-
-        Parameters
-        ----------
-        container_id : string
-            The unique identifier string identifying the container.
-        """
-
-        self.log.info("Stopping container {}".format(container_id))
-
-        yield self._remove_container(container_id)
 
     def _get_ip_and_port(self, container_id):
         """Returns the ip and port where the container service can be
@@ -339,10 +359,13 @@ class ContainerManager(LoggingMixin):
         return container_info
 
     @gen.coroutine
-    def _remove_container(self, container_id):
+    def _stop_and_remove_container(self, container_id):
         """Idempotent removal of a container by id.
         If the container is there, it will be removed. If it's not
         there, the unexpected conditions will be logged."""
+
+        self.log.info("Stopping container {}".format(container_id))
+
         # Stop the container
         try:
             yield self.docker_client.stop(container_id)

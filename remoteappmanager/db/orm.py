@@ -168,6 +168,8 @@ def apps_for_user(session, user):
     """Returns a list of tuples, each containing an application and the
     associated policy that the specified orm user is allowed to run.
     If the user is None, the default is to return an empty list.
+    The mapping_id is a unique string identifying the combination of
+    application and policy. It is not unique per user.
 
     Parameters
     ----------

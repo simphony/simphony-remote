@@ -42,7 +42,7 @@ class TestContainerManager(AsyncTestCase):
         self.mock_docker_client = docker_client
         self.manager.docker_client.client = docker_client
 
-        result = yield self.manager.container_from_mapping_id("user",
+        result = yield self.manager.containers_from_mapping_id("user",
                                                               "mapping")
         expected = Container(docker_id='someid',
                              name='/remoteexec-image_3Alatest_user',
