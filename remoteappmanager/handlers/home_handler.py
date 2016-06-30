@@ -113,7 +113,7 @@ class HomeHandler(BaseHandler):
 
         # The server is up and running. Now contact the proxy and add
         # the container url to it.
-        self.application.reverse_proxy_add_container(container)
+        yield self.application.reverse_proxy_add_container(container)
 
         # Redirect the user
         url = self.application.container_url_abspath(container)
