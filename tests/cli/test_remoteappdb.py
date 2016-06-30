@@ -62,7 +62,7 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         self._remoteappdb("user create user")
 
         out = self._remoteappdb("user list")
-        self.assertNotIn(out, "myapp")
+        self.assertNotIn("myapp", out)
         self._remoteappdb("app expose myapp user")
         out = self._remoteappdb("user list")
-        self.assertIn(out, "myapp")
+        self.assertIn("myapp", out)
