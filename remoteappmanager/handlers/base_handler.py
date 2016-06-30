@@ -3,9 +3,9 @@ from urllib.parse import urljoin, quote
 
 from tornado import web
 from tornado.httpclient import HTTPError
-from notebook.utils import url_path_join
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
+from remoteappmanager.utils import url_path_join
 
 
 class BaseHandler(web.RequestHandler, LoggingMixin):
@@ -40,10 +40,13 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
         hub_api_url = self.settings['hub_api_url']
         hub_api_key = self.settings['hub_api_key']
 
-        r = requests.get(url_path_join(hub_api_url,
-                                       "authorizations/cookie",
-                                       cookie_name,
-                                       quote(encrypted_cookie, safe='')),
+        # URL for the authorization requiest
+        request_url = url_path_join(hub_api_url,
+                                    "authorizations/cookie",
+                                    cookie_name,
+                                    quote(encrypted_cookie, safe=''))
+
+        r = requests.get(request_url,
                          headers={'Authorization': 'token %s' % hub_api_key})
 
         if r.status_code == 403:
