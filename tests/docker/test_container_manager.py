@@ -164,7 +164,8 @@ class TestContainerManager(AsyncTestCase):
         self.assertTrue(self.mock_docker_client.remove_container.called)
 
     @gen_test
-    def test_start_container_exception_cleanup(self):
+    def test_start_container_exception_cleanup_2(self):
+        # Same test as above, but checks after the start (at ip and port)
         self.assertFalse(self.mock_docker_client.stop.called)
         self.assertFalse(self.mock_docker_client.remove_container.called)
 
