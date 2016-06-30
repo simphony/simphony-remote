@@ -49,11 +49,6 @@ class ApplicationConfig(HasTraits):
         help="The url of the jupyterhub REST API",
         command_line=True)
 
-    # Authentication token for the hub api (e.g. for authentication check)
-    # Should be passed as environment variable JPY_API_TOKEN
-    hub_api_key = Unicode(
-        help="The token for the jupyterhub REST API")
-
     # The full URL where to access the reverse proxy API.
     proxy_api_url = Unicode(
         help="The url of the reverse proxy API",
