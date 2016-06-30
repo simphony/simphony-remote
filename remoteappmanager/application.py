@@ -41,7 +41,7 @@ class Application(web.Application, LoggingMixin):
         settings = {}
         settings.update(config.as_dict())
         settings["static_url_prefix"] = self._config.base_url+"static/"
-        settings["hub_api_key"] = os.environ.pop('JPY_API_TOKEN')
+        settings["hub_api_key"] = os.environ.get('JPY_API_TOKEN', "")
 
         self._db_init()
         self._jinja_init(settings)
