@@ -43,17 +43,17 @@ class TestContainerManager(AsyncTestCase):
         self.manager.docker_client.client = docker_client
 
         result = yield self.manager.containers_from_mapping_id("user",
-                                                              "mapping")
+                                                               "mapping")
         expected = Container(docker_id='someid',
                              name='/remoteexec-image_3Alatest_user',
                              image_name='simphony/mayavi-4.4.4:latest',  # noqa
                              image_id='imageid', ip='0.0.0.0', port=None)
 
-        utils.assert_containers_equal(self, result, expected)
+        self.assertEqual(len(result), 1)
+        utils.assert_containers_equal(self, result[0], expected)
 
     @gen_test
     def test_race_condition_spawning(self):
-
         # Start the operations, and retrieve the future.
         # they will stop at the first yield and not go further until
         # we yield them
