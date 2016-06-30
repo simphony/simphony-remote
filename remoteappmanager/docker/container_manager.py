@@ -55,9 +55,10 @@ class ContainerManager(LoggingMixin):
         image_name: string
             A string identifying the image name.
         mapping_id: str
-            A generic id used to recognize the container. It is not unique
-            per user, and it depends exclusively on the combination of
-            an application and its chosen configuration.
+            A generic id used to recognize the container.
+            it is expected to be unique (and persistent) for a specific
+            combination of docker image (i.e. application) and setup
+            (i.e. configuration).
         volumes: dict or None
             {volume_source: {'bind': volume_target, 'mode': volume_mode}
 
