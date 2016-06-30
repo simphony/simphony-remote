@@ -1,0 +1,6 @@
+name: simphony-remote
+type: sphinx
+requirements_file: requirements.txt
+python:
+  version: 3.4
+  setup_py_install: true
