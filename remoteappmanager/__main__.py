@@ -1,3 +1,4 @@
+import os
 import sys
 
 from tornado.options import print_help
@@ -16,5 +17,6 @@ def main():
         print_help()
         sys.exit(1)
 
+    config.hub_api_key = os.environ.pop('JPY_API_TOKEN')
     app = Application(config)
     app.start()
