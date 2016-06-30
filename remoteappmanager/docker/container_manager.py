@@ -126,20 +126,6 @@ class ContainerManager(LoggingMixin):
         return [Container.from_docker_dict(info) for info in infos]
 
     @gen.coroutine
-    def all_images(self):
-        """Inquires all available images. Returns a list of Image objects.
-        """
-        image_dicts = yield self.docker_client.images(
-            filters=dict(dangling=False))
-
-        images = []
-        for image_dict in image_dicts:
-            image = Image.from_docker_dict(image_dict)
-            images.append(image)
-
-        return images
-
-    @gen.coroutine
     def image(self, image_id_or_name):
         """Returns the Image object associated to a given id
         """
