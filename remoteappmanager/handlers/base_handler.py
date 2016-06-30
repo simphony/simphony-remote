@@ -17,7 +17,7 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
             verified = self.verify_token(self.settings['cookie_name'],
                                          user_cookie)
             if verified:
-                return self.application.user.name
+                return self.application.user
 
         return None
 

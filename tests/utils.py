@@ -12,7 +12,19 @@ def mock_docker_client():
     """Returns a mock synchronous docker client to return canned
     responses."""
     docker_client = mock.Mock(spec=docker.Client)
-    docker_client.inspect_image = mock.Mock(return_value={"Id": "imageid"})
+    docker_client.inspect_image = mock.Mock(
+        return_value={'Created': 1463662803,
+                      'Id':
+                          'sha256:e54d71dde57576e9d2a4c77ce0c98501c8aa6268de5b2987e4c80e2e157cffe4',  # noqa
+                      'Labels': {
+                        'eu.simphony-project.docker.description':
+                            'Ubuntu machine with mayavi preinstalled'
+                      },
+                      'ParentId': 'sha256:d2f7240076e135f6aba57185e54ff45cc158781c787897b67994f72fe668ad07',  # noqa
+                      'RepoDigests': None,
+                      'RepoTags': ['simphony/mayavi-4.4.4:latest'],
+                      'Size': 1094833658,
+                      'VirtualSize': 1094833658})
     docker_client.inspect_container = mock.Mock(return_value=None)
     docker_client.create_host_config = mock.Mock(return_value={})
     docker_client.create_container = mock.Mock(
@@ -61,7 +73,10 @@ def mock_docker_client_with_running_containers():
          'Id': 'someid',
          'Image': 'simphony/mayavi-4.4.4:latest',
          'ImageID': 'imageid',
-         'Labels': {'eu.simphony-project.docker.user': 'user'},
+         'Labels': {
+             'eu.simphony-project.docker.user': 'user',
+             'eu.simphony-project.docker.mapping_id': 'mapping'
+         },
          'Names': ['/remoteexec-image_3Alatest_user'],
          'Ports': [{'IP': '0.0.0.0',
                     'PublicIP': 34567,
@@ -69,32 +84,7 @@ def mock_docker_client_with_running_containers():
                     'Type': 'tcp'}],
          'State': 'running',
          'Status': 'Up About an hour'},
-        # user2
-        {'Command': '/sbin/init -D',
-         'Created': 1466766499,
-         'HostConfig': {'NetworkMode': 'default'},
-         'Id': 'someid',
-         'Image': 'simphony/mayavi-4.4.4:latest',
-         'ImageID': 'imageid',
-         'Labels': {'eu.simphony-project.docker.user': 'user2'},
-         'Names': ['/remoteexec-image_3Alatest_user2'],
-         'Ports': [{'IP': '0.0.0.0',
-                    'PublicIP': 34567,
-                    'PrivatePort': 22,
-                    'Type': 'tcp'}],
-         'State': 'running',
-         'Status': 'Up About an hour'},
-        # user3 (somehow there is no port
-        {'Command': '/sbin/init -D',
-         'Created': 1466766499,
-         'HostConfig': {'NetworkMode': 'default'},
-         'Id': 'someid',
-         'Image': 'simphony/mayavi-4.4.4:latest',
-         'ImageID': 'imageid',
-         'Labels': {'eu.simphony-project.docker.user': 'user3'},
-         'Names': ['/remoteexec-image_3Alatest_user3'],
-         'State': 'running',
-         'Status': 'Up About an hour'}]
+    ]
 
     return client
 

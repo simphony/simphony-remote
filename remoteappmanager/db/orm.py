@@ -11,6 +11,15 @@ from remoteappmanager.logging.logging_mixin import LoggingMixin
 Base = declarative_base()
 
 
+class IdMixin(object):
+    """Base class to provide an id"""
+    id = Column(Integer, primary_key=True)
+
+    @classmethod
+    def from_id(cls, session, id):
+        return session.query(cls).filter(cls.id == id).one()
+
+
 class UserTeam(Base):
     """ The user (n <-> n) team association table """
     __tablename__ = "user_team"
@@ -18,10 +27,9 @@ class UserTeam(Base):
     team_id = Column(Integer, ForeignKey('team.id'), primary_key=True)
 
 
-class User(Base):
+class User(IdMixin, Base):
     """ Table for users. """
     __tablename__ = "user"
-    id = Column(Integer, primary_key=True)
 
     #: The name of the user as specified by jupyterhub.
     #: This entry must be unique and is, for all practical purposes,
@@ -29,10 +37,9 @@ class User(Base):
     name = Column(Unicode, index=True, unique=True)
 
 
-class Team(Base):
+class Team(IdMixin, Base):
     """ Teams of users. """
     __tablename__ = "team"
-    id = Column(Integer, primary_key=True)
 
     #: The name of the group. Note that, differently from users, we can have
     #: multiple teams with the same name. The reason is that we would obtain
@@ -45,19 +52,22 @@ class Team(Base):
     users = relationship("User", secondary="user_team", backref="teams")
 
 
-class Application(Base):
+class Application(IdMixin, Base):
     """ Describes an application that should be available for startup """
     __tablename__ = "application"
-    id = Column(Integer, primary_key=True)
 
     #: The docker image name where the application can be found
-    image = Column(Unicode)
+    image = Column(Unicode, unique=True)
+
+    @staticmethod
+    def from_image_name(session, image_name):
+        return session.query(Application).filter(
+            Application.image == image_name
+        ).one()
 
 
-class ApplicationPolicy(Base):
+class ApplicationPolicy(IdMixin, Base):
     __tablename__ = "application_policy"
-    id = Column(Integer, primary_key=True)
-
     #: If the home directory should be mounted in the container
     allow_home = Column(Boolean)
 
@@ -80,6 +90,7 @@ class ApplicationPolicy(Base):
 class Accounting(Base):
     """Holds the information about who is allowed to run what."""
     __tablename__ = "accounting"
+
     team_id = Column(Integer,
                      ForeignKey("team.id"),
                      primary_key=True)
@@ -156,23 +167,62 @@ def transaction(session):
 def apps_for_user(session, user):
     """Returns a list of tuples, each containing an application and the
     associated policy that the specified orm user is allowed to run.
+    If the user is None, the default is to return an empty list.
+    The mapping_id is a unique string identifying the combination of
+    application and policy. It is not unique per user.
 
     Parameters
     ----------
     session : Session
         The current session
     user : User
-        the orm User.
+        the orm User, or None.
 
     Returns
     -------
-    A list of tuples (orm.Application, orm.ApplicationPolicy)
+    A list of tuples (mapping_id, orm.Application, orm.ApplicationPolicy)
     """
 
-    with transaction(session):
-        teams = user.teams
+    if user is None:
+        return []
 
-        res = session.query(Accounting).filter(
-            Accounting.team_id.in_([team.id for team in teams])).all()
+    teams = user.teams
 
-        return [(acc.application, acc.application_policy) for acc in res]
+    res = session.query(Accounting).filter(
+        Accounting.team_id.in_([team.id for team in teams])).all()
+
+    return [(acc.application.image + "_" + str(acc.application_policy.id),
+             acc.application,
+             acc.application_policy) for acc in res]
+
+
+def user_can_run(session, user, application, policy):
+    """Returns True if the user can run a given application with a specific
+    policy. False otherwise. Note that the user can be None.
+    In that case, returns False.
+
+    Parameters
+    ----------
+    session : Session
+        The current session
+    user : User
+        the orm User, or None.
+    application : Application
+        The application object
+    policy : ApplicationPolicy
+        The application policy
+
+    Returns
+    -------
+    boolean
+
+    """
+    if user is None:
+        return False
+
+    team_ids = [team.id for team in user.teams]
+    return session.query(Accounting) \
+        .filter(Accounting.team_id.in_(team_ids)) \
+        .filter(Accounting.application == application) \
+        .filter(Accounting.application_policy == policy) \
+        .exists()
