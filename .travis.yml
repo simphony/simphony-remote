@@ -20,3 +20,9 @@ script:
     - flake8 .
     - python -m tornado.testing discover -v
     - sphinx-build -W doc/source doc/build/sphinx
+
+after_success:
+    - coverage run -m tornado.testing discover
+    - pip install codecov
+    - codecov
+    - bash <(curl -s https://codecov.io/bash)
