@@ -104,13 +104,7 @@ class VirtualUserSpawner(LocalProcessSpawner):
     def user_env(self, env):
         env['USER'] = self.user.name
 
-        if self.workspace_dir:
-            if not self._virtual_workspace:
-                self._virtual_workspace = tempfile.mkdtemp(
-                    dir=self.workspace_dir)
-                self.log.info("Created temporary directory: %s",
-                              self._virtual_workspace)
-
+        if self._virtual_workspace:
             env['HOME'] = self._virtual_workspace
 
         return env
@@ -120,6 +114,17 @@ class VirtualUserSpawner(LocalProcessSpawner):
         env = super().get_env()
         env["PROXY_API_TOKEN"] = self.proxy.auth_token
         return env
+
+    @gen.coroutine
+    def start(self):
+        # Create the temporary directory as the user's workspace
+        if self.workspace_dir and not self._virtual_workspace:
+            self._virtual_workspace = tempfile.mkdtemp(
+                dir=self.workspace_dir)
+            self.log.info("Created temporary directory: %s",
+                          self._virtual_workspace)
+
+        super().start()
 
     @gen.coroutine
     def stop(self, now=False):
