@@ -197,3 +197,32 @@ class TestVirtualUserSpawner(unittest.TestCase):
     def test_home_not_in_env_if_workspace_undefined(self):
         with spawner_start_and_stop(self.spawner):
             self.assertIsNone(self.spawner.get_env().get('HOME'))
+
+    def test_state_if_workspace_defined(self):
+        self.spawner.workspace_dir = self.temp_dir
+
+        with spawner_start_and_stop(self.spawner):
+            state = self.spawner.get_state()
+            self.assertIn('virtual_workspace', state)
+            self.assertIn(state.get('virtual_workspace'), self.temp_dir)
+
+    def test_state_if_workspace_not_defined(self):
+        with spawner_start_and_stop(self.spawner):
+            state = self.spawner.get_state()
+            self.assertNotIn('virtual_workspace', state)
+
+    def test_clean_up_temporary_dir_if_start_fails(self):
+        self.spawner.workspace_dir = self.temp_dir
+
+        # mock LocalProcessSpawner.start to fail
+        def start_fail(instance):
+            raise Exception
+
+        with mock.patch('jupyterhub.spawner.LocalProcessSpawner.start',
+                        start_fail), \
+                self.assertRaises(Exception), \
+                spawner_start_and_stop(self.spawner):
+            pass
+
+        # The temporary directory should be cleaned up
+        self.assertFalse(os.listdir(self.temp_dir))
