@@ -5,7 +5,7 @@ from datetime import timedelta
 
 import errno
 
-from tornado import gen, ioloop
+from tornado import gen, ioloop, web
 from tornado.httpclient import AsyncHTTPClient, HTTPError
 from tornado.log import app_log
 
@@ -16,11 +16,14 @@ from remoteappmanager.db import orm
 
 class HomeHandler(BaseHandler):
     """Render the user's home page"""
+
+    @web.authenticated
     @gen.coroutine
     def get(self):
         images_info = yield self._get_images_info()
         self.render('home.html', images_info=images_info)
 
+    @web.authenticated
     @gen.coroutine
     def post(self):
         """POST spawns with user-specified options"""
