@@ -29,7 +29,13 @@ else:
 # Define the sqlalchemy url for the database.
 # Notes:
 # 1. this database is shared among all instances of the remoteappmanager.
-# 2. if a relative path is specified, it will be relative to the working
-#    directory specified at startup, if specified, otherwise to the cwd
-#    at startup. Note that jupyterhub spawners spawn in the home directory.
+# 2. When running with system-user mode, the jupyterhub spawners spawn in
+#    the user's home directory; when running in virtual-user mode,
+#    the current directory is the directory where jupyterhub is started
+# 3. '~' would be evaluated as the spawned user's home directory
+
+# System-user mode
 db_url = "sqlite:///"+os.path.expanduser("~/remoteappmanager.db")
+
+# Virtual-user mode
+db_url = "sqlite:///"+os.path.abspath("./remoteappmanager.db")

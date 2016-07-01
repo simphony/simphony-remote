@@ -16,9 +16,7 @@ setting_mode = ('system_user', 'virtual_user')[1]
 if setting_mode == 'virtual_user':
     c.JupyterHub.spawner_class = 'remoteappmanager.spawner.VirtualUserSpawner'
 
-    # We use the same configuration file for all the virtual user's app
-    c.Spawner.config_file_path = os.path.abspath(
-        './remoteappmanager_config_virtual_user.py')
+    c.Spawner.config_file_path = os.path.abspath('./remoteappmanager_config.py')
 
     # Parent directory in which temporary directory is created for
     # each virtual user
