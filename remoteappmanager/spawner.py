@@ -79,8 +79,11 @@ class VirtualUserSpawner(LocalProcessSpawner):
     def load_state(self, state):
         super().load_state(state)
         virtual_workspace = state.get('virtual_workspace')
-        if virtual_workspace and os.path.isdir(virtual_workspace):
-            self._virtual_workspace = virtual_workspace
+        if virtual_workspace:
+            if os.path.isdir(virtual_workspace):
+                self._virtual_workspace = virtual_workspace
+            else:
+                self.log.warn('Previous virtual workspace is gone.')
 
     def get_state(self):
         state = super().get_state()
