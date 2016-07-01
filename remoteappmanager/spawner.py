@@ -156,10 +156,10 @@ class VirtualUserSpawner(LocalProcessSpawner):
             self.log.warning("Virtual workspace is '%s'.  Seriously? "
                              "Not removing.", self._virtual_workspace)
         else:
-            self.log.info('Removing %s ...', self._virtual_workspace)
-
             try:
                 shutil.rmtree(self._virtual_workspace)
             except Exception as exception:
                 self.log.error("Failed to remove %s, error %s",
                                self._virtual_workspace, str(exception))
+            else:
+                self.log.info('Removed %s', self._virtual_workspace)
