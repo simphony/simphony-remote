@@ -6,10 +6,10 @@ simphony enabled environments remotely.
 
 Key provided features:
 
-- Isolated working environments using docker containers.
-- No install remote access through a web browser.
-- Sharing of working sessions.
-- Based on community supported open source initiatives (JupyterHub)
+   - Isolated working environments using docker containers.
+   - No install remote access through a web browser.
+   - Sharing of working sessions.
+   - Based on community supported open source initiatives (JupyterHub)
 
 .. note:: More to come...
 
