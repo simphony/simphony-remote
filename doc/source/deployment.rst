@@ -11,7 +11,7 @@ Deployment of the complete system in a single machine/VM.
    The following instructions assume a clean up-to-date ubuntu 14.04
    system.
 
-#. Install dependencies ::
+#. Install dependencies::
 
    sudo apt-get install npm nodejs-legacy python3-pip python3.4-venv
    sudo npm install -g configurable-http-proxy
