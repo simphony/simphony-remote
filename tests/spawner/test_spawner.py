@@ -204,7 +204,7 @@ class TestVirtualUserSpawner(unittest.TestCase):
         with spawner_start_and_stop(self.spawner):
             state = self.spawner.get_state()
             self.assertIn('virtual_workspace', state)
-            self.assertIn(state.get('virtual_workspace'), self.temp_dir)
+            self.assertIn(self.temp_dir, state.get('virtual_workspace'))
 
     def test_state_if_workspace_not_defined(self):
         with spawner_start_and_stop(self.spawner):
