@@ -33,9 +33,4 @@ else:
 #    the user's home directory; when running in virtual-user mode,
 #    the current directory is the directory where jupyterhub is started
 # 3. '~' would be evaluated as the spawned user's home directory
-
-# System-user mode
-db_url = "sqlite:///"+os.path.expanduser("~/remoteappmanager.db")
-
-# Virtual-user mode
 db_url = "sqlite:///"+os.path.abspath("./remoteappmanager.db")
