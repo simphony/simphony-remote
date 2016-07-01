@@ -1,7 +1,9 @@
 [run]
 branch = True
 source = remoteappmanager
-omit = tests
+# We omit the remoteappdb application. 
+# We are testing that through direct invocation, so coverage can't pick that up
+omit = tests remoteappmanager/cli/remoteappdb/*
 
 [report]
 # Regexes for lines to exclude from consideration
