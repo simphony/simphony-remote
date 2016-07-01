@@ -1,3 +1,5 @@
+import os
+
 # Configuration file for jupyterhub.
 from jupyter_client.localinterfaces import public_ips
 
@@ -5,6 +7,26 @@ c = get_config()  # noqa
 
 c.JupyterHub.ssl_key = 'test.key'
 c.JupyterHub.ssl_cert = 'test.crt'
-c.JupyterHub.spawner_class = 'remoteappmanager.spawner.Spawner'
 
 c.JupyterHub.hub_ip = public_ips()[0]
+
+# Choose between system-user mode and virtual-user mode
+setting_mode = ('system_user', 'virtual_user')[1]
+
+if setting_mode == 'virtual_user':
+    c.JupyterHub.spawner_class = 'remoteappmanager.spawner.VirtualUserSpawner'
+
+    # We use the same configuration file for all the virtual user's app
+    c.Spawner.config_file_path = os.path.abspath('./remoteappmanager_config_virtual_user.py')
+
+    # Parent directory in which temporary directory is created for each virtual user
+    # Set this to a drive with well defined capacity quota
+    # If unset, no workspace would be available
+    c.Spawner.workspace_dir = '/tmp/remoteapp'
+
+    # This authenticator authenticates everyone (no password needed)
+    c.JupyterHub.authenticator_class = 'remoteappmanager.auth.WorldAuthenticator'
+
+elif setting_mode == 'system_user':
+    c.JupyterHub.spawner_class = 'remoteappmanager.spawner.Spawner'
+
