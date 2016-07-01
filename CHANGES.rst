@@ -14,7 +14,7 @@ Summary
 - Container URL now contains a base32 encoded unique identifier, 
   instead of the docker container id. (#18)
 - Introduced authentication of the user for the application (#24)
-- Bugfixes (#14, #15)
+- Improved handling of failures in starting containers (#6, #14, #15)
 
 What's new in SimPhoNy Remote 0.1.0
 -----------------------------------
