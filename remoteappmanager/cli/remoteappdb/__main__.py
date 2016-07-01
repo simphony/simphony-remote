@@ -85,10 +85,12 @@ def list(ctx):
     with orm.transaction(session):
         for user in session.query(orm.User).all():
             teams = ["{}:{}".format(t.id, t.name) for t in user.teams]
-            apps = ["{} {} {} {}".format(app.image,
-                                         policy.volume_source,
-                                         policy.volume_target,
-                                         policy.volume_mode)
+            apps = ["{} {} {} {}:{}:{}".format(app.image,
+                                               policy.allow_home,
+                                               policy.allow_common,
+                                               policy.volume_source,
+                                               policy.volume_target,
+                                               policy.volume_mode)
                     for _, app, policy in orm.apps_for_user(session, user)]
 
             print("{}:{} | {} | {}".format(

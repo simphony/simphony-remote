@@ -90,6 +90,11 @@ class ApplicationConfig(HasTraits):
                      help="The url of the database, in sqlalchemy format.",
                      config_file=True)
 
+    login_url = Unicode(default_value="/hub", config_file=True,
+                        help=("The url to be redirected to if the user is not "
+                              "authenticated for pages that require "
+                              "authentication."))
+
     # The network timeout for any async operation we have to perform,
     # in seconds. 30 seconds is plenty enough.
     network_timeout = Int(default_value=30,
