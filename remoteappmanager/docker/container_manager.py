@@ -200,6 +200,12 @@ class ContainerManager(LoggingMixin):
             self.log.error('Path(s) does not exist, not mounting:\n%s',
                            '\n'.join(volumes.keys() - filtered_volumes.keys()))
 
+        # Info for debugging
+        self.log.info(
+            'Mounting these volumes: \n%s',
+            '\n'.join('{0} -> {1}'.format(source, target['bind'])
+                      for source, target in filtered_volumes.items()))
+
         create_kwargs = dict(
             image=image_name,
             name=container_name,
