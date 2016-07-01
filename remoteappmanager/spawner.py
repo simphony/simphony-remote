@@ -129,7 +129,7 @@ class VirtualUserSpawner(LocalProcessSpawner):
 
         # Make sure we clean up in case `start` fails
         try:
-            super().start()
+            yield super().start()
         except Exception as exception:
             self._clean_up_workspace_dir()
             raise exception
@@ -142,7 +142,7 @@ class VirtualUserSpawner(LocalProcessSpawner):
         clean up the directory.
         """
         self._clean_up_workspace_dir()
-        super().stop(now=now)
+        yield super().stop(now=now)
 
     def _clean_up_workspace_dir(self):
         """ Clean up the virtual user's temporary directory, if exists
