@@ -117,6 +117,9 @@ class VirtualUserSpawner(LocalProcessSpawner):
 
     @gen.coroutine
     def start(self):
+        """ Start the process and create the virtual user's
+        temporary home directory if `workspace_dir` is set
+        """
         # Create the temporary directory as the user's workspace
         if self.workspace_dir and not self._virtual_workspace:
             self._virtual_workspace = tempfile.mkdtemp(
@@ -124,7 +127,12 @@ class VirtualUserSpawner(LocalProcessSpawner):
             self.log.info("Created temporary directory: %s",
                           self._virtual_workspace)
 
-        super().start()
+        # Make sure we clean up in case `start` fails
+        try:
+            super().start()
+        except Exception as exception:
+            self._clean_up_workspace_dir()
+            raise exception
 
     @gen.coroutine
     def stop(self, now=False):
@@ -133,19 +141,25 @@ class VirtualUserSpawner(LocalProcessSpawner):
         If virtual user has a temporary home directory,
         clean up the directory.
         """
-        # Clean up the directory
-        if self._virtual_workspace:
-            # Make sure the temporary directory is not /, ./ or ../
-            if self._virtual_workspace.strip('/') in ('', '.', '..'):
-                self.log.warning("Virtual workspace is '%s'.  Seriously? "
-                                 "Not removing.", self._virtual_workspace)
-            else:
-                self.log.info('Removing %s ...', self._virtual_workspace)
-
-                try:
-                    shutil.rmtree(self._virtual_workspace)
-                except Exception as exception:
-                    self.log.error("Failed to remove %s, error %s",
-                                   self._virtual_workspace, str(exception))
-
+        self._clean_up_workspace_dir()
         super().stop(now=now)
+
+    def _clean_up_workspace_dir(self):
+        """ Clean up the virtual user's temporary directory, if exists
+        """
+        if not self._virtual_workspace:
+            return
+
+        # Clean up the directory
+        # Make sure the temporary directory is not /, ./ or ../
+        if self._virtual_workspace.strip('/') in ('', '.', '..'):
+            self.log.warning("Virtual workspace is '%s'.  Seriously? "
+                             "Not removing.", self._virtual_workspace)
+        else:
+            self.log.info('Removing %s ...', self._virtual_workspace)
+
+            try:
+                shutil.rmtree(self._virtual_workspace)
+            except Exception as exception:
+                self.log.error("Failed to remove %s, error %s",
+                               self._virtual_workspace, str(exception))
