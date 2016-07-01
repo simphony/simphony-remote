@@ -11,17 +11,14 @@ Deployment of the complete system in a single machine/VM.
    The following instructions assume a clean up-to-date ubuntu 14.04
    system.
 
-#. Install dependencies
+#. Install dependencies::
 
-::
-  sudo apt-get install npm nodejs-legacy python3-pip python3.4-venv
-  sudo npm install -g configurable-http-proxy
+     sudo apt-get install npm nodejs-legacy python3-pip python3.4-venv
+     sudo npm install -g configurable-http-proxy
 
-#. Install the single user session manager
+#. Install the single user session manager::
 
-::
-
-   git clone https://github.com/simphony/simphony-remote
+     git clone https://github.com/simphony/simphony-remote
 
 #. Create a venv, activate it::
 
@@ -64,10 +61,9 @@ Deployment of the complete system in a single machine/VM.
 Setup docker containers
 -----------------------
 
-Compatible docker containers can be found in DockerHub
-
-.. todo:: To be updated
-
+Compatible docker containers can be found in DockerHub. Refer to the documentation
+of `simphony-remote-docker <https://github.com/simphony/simphony-remote-docker>`_ 
+repository to deploy the images.
 
 Start JupyterHub
 ----------------
