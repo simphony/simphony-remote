@@ -2,7 +2,7 @@ import os
 import shutil
 import tempfile
 
-from traitlets import Any, Unicode, Bool, default
+from traitlets import Any, Unicode, default
 from tornado import gen
 
 from jupyterhub.spawner import LocalProcessSpawner
