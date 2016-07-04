@@ -128,7 +128,7 @@ class ContainerManager(LoggingMixin):
         }
 
         infos = yield self.docker_client.containers(filters=filters)
-        return [Container.from_docker_dict(info) for info in infos]
+        return [Container.from_docker_containers_dict(info) for info in infos]
 
     @gen.coroutine
     def image(self, image_id_or_name):

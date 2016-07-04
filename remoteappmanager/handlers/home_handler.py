@@ -228,7 +228,7 @@ class HomeHandler(BaseHandler):
             filters={'id': container_id})
 
         if container_dict:
-            return Container.from_docker_dict(container_dict[0])
+            return Container.from_docker_containers_dict(container_dict[0])
         else:
             self.log.exception(
                 "Failed to retrieve valid container from container id: %s",
