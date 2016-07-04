@@ -83,6 +83,7 @@ class Container(HasTraits):
 
         labels = docker_dict.get("Config", {}).get("Labels", {})
         mapping_id = labels.get(SIMPHONY_NS+"mapping_id", "")
+        url_id = labels.get(SIMPHONY_NS+"url_id", "")
 
         return cls(docker_id=docker_dict.get('Id', ''),
                    name=docker_dict.get('Names', ('',))[0],
@@ -90,4 +91,5 @@ class Container(HasTraits):
                    image_id=docker_dict.get('ImageID', ''),
                    mapping_id=mapping_id,
                    ip=ip,
-                   port=port)
+                   port=port,
+                   url_id=url_id)

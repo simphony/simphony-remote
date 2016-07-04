@@ -414,7 +414,7 @@ def _get_container_env(user_name, url_id):
     )
 
 
-def _get_container_labels(user_name, mapping_id):
+def _get_container_labels(user_name, mapping_id, url_id):
     """Returns a dictionary that will become container run-time labels.
     Each of these labels must be namespaced in reverse DNS style, in agreement
     to docker guidelines."""
@@ -422,6 +422,7 @@ def _get_container_labels(user_name, mapping_id):
     return {
         SIMPHONY_NS+"user": user_name,
         SIMPHONY_NS+"mapping_id": mapping_id,
+        SIMPHONY_NS+"url_id": url_id,
     }
 
 
