@@ -3,7 +3,7 @@ import sys
 from unittest import mock
 
 import docker
-from remoteappmanager.application_config import ApplicationConfig
+from remoteappmanager.file_config import ApplicationConfig
 from remoteappmanager.db.orm import Database
 from tests import fixtures
 
