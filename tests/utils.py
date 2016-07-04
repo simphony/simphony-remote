@@ -231,11 +231,7 @@ def invocation_argv():
 
 
 def assert_containers_equal(test_case, actual, expected):
-    if (expected.docker_id != actual.docker_id or
-            expected.name != actual.name or
-            expected.image_name != actual.image_name or
-            expected.image_id != actual.image_id or
-            expected.ip != actual.ip or
-            expected.port != actual.port):
-        message = '{!r} is not identical to the expected {!r}'
-        test_case.fail(message.format(actual, expected))
+    for name in expected.trait_names():
+        if getattr(actual, name) != getattr(expected, name):
+            message = '{!r} is not identical to the expected {!r}.'
+            test_case.fail(message.format(actual, expected))

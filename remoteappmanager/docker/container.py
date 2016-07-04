@@ -47,11 +47,13 @@ class Container(HasTraits):
         )
 
     def __repr__(self):
-        return ('<Container(docker_id={0}, name={1}, image_name={2}, '
-                'image_id={3}, ip={4}, port={5}>').format(
-                    self.docker_id, self.name,
-                    self.image_name, self.image_id,
-                    self.ip, self.port)
+        return (
+            '<Container('
+            + ", ".join(
+                ["{}={}".format(name, getattr(self, name))
+                    for name in self.trait_names()
+                 ])
+            + ")>")
 
     @classmethod
     def from_docker_dict(cls, docker_dict):
