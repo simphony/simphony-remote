@@ -20,13 +20,6 @@ class IdMixin(object):
         return session.query(cls).filter(cls.id == id).one()
 
 
-class UserTeam(Base):
-    """ The user (n <-> n) team association table """
-    __tablename__ = "user_team"
-    user_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
-    team_id = Column(Integer, ForeignKey('team.id'), primary_key=True)
-
-
 class User(IdMixin, Base):
     """ Table for users. """
     __tablename__ = "user"
@@ -35,21 +28,6 @@ class User(IdMixin, Base):
     #: This entry must be unique and is, for all practical purposes,
     #: a primary key.
     name = Column(Unicode, index=True, unique=True)
-
-
-class Team(IdMixin, Base):
-    """ Teams of users. """
-    __tablename__ = "team"
-
-    #: The name of the group. Note that, differently from users, we can have
-    #: multiple teams with the same name. The reason is that we would obtain
-    #: unusual behavior if user A creates a group with name B, and then B
-    #: creates a user. Users are automatically assigned a group with their
-    #: own name when first created.
-    name = Column(Unicode)
-
-    #: The users parts of this team (n <-> n)
-    users = relationship("User", secondary="user_team", backref="teams")
 
 
 class Application(IdMixin, Base):
@@ -74,8 +52,8 @@ class ApplicationPolicy(IdMixin, Base):
     #: If a common workarea should be mounted in the container
     allow_common = Column(Boolean)
 
-    #: If the container should be accessible from other members of the team
-    allow_team_view = Column(Boolean)
+    #: If the container should be accessible by other people
+    allow_view = Column(Boolean)
 
     # Which volume to mount
     volume_source = Column(Unicode, nullable=True)
@@ -91,8 +69,8 @@ class Accounting(Base):
     """Holds the information about who is allowed to run what."""
     __tablename__ = "accounting"
 
-    team_id = Column(Integer,
-                     ForeignKey("team.id"),
+    user_id = Column(Integer,
+                     ForeignKey("user.id"),
                      primary_key=True)
 
     application_id = Column(Integer,
@@ -103,7 +81,7 @@ class Accounting(Base):
                                    ForeignKey("application_policy.id"),
                                    primary_key=True)
 
-    team = relationship("Team")
+    user = relationship("User")
 
     application = relationship("Application")
 
@@ -186,10 +164,7 @@ def apps_for_user(session, user):
     if user is None:
         return []
 
-    teams = user.teams
-
-    res = session.query(Accounting).filter(
-        Accounting.team_id.in_([team.id for team in teams])).all()
+    res = session.query(Accounting).filter(Accounting.user == user).all()
 
     return [(acc.application.image + "_" + str(acc.application_policy.id),
              acc.application,
@@ -220,9 +195,8 @@ def user_can_run(session, user, application, policy):
     if user is None:
         return False
 
-    team_ids = [team.id for team in user.teams]
     return session.query(Accounting) \
-        .filter(Accounting.team_id.in_(team_ids)) \
-        .filter(Accounting.application == application) \
-        .filter(Accounting.application_policy == policy) \
+        .filter(Accounting.user == user,
+                Accounting.application == application,
+                Accounting.application_policy == policy) \
         .exists()

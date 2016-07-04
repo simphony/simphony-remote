@@ -61,16 +61,13 @@ def user():
 @click.argument("user")
 @click.pass_context
 def create(ctx, user):
-    """Creates a user USER and its associated team in the database."""
+    """Creates a user USER in the database."""
     db = ctx.obj["db"]
     session = db.create_session()
     orm_user = orm.User(name=user)
-    orm_team = orm.Team(name=user)
-    orm_user.teams.append(orm_team)
 
     with orm.transaction(session):
         session.add(orm_user)
-        session.add(orm_team)
 
     # Print out the id, so that we can use it if desired.
     print(orm_user.id)
@@ -84,7 +81,6 @@ def list(ctx):
     session = db.create_session()
     with orm.transaction(session):
         for user in session.query(orm.User).all():
-            teams = ["{}:{}".format(t.id, t.name) for t in user.teams]
             apps = ["{} {} {} {}:{}:{}".format(app.image,
                                                policy.allow_home,
                                                policy.allow_common,
@@ -93,71 +89,11 @@ def list(ctx):
                                                policy.volume_mode)
                     for _, app, policy in orm.apps_for_user(session, user)]
 
-            print("{}:{} | {} | {}".format(
+            print("{}:{} | {}".format(
                 user.id,
                 user.name,
-                ",".join(teams),
                 ",".join(apps)
             ))
-
-
-# -------------------------------------------------------------------------
-# Team commands
-
-
-@cli.group()
-def team():
-    """Subcommand to manage teams."""
-    pass
-
-
-@team.command()  # noqa
-@click.argument("team")
-@click.pass_context
-def create(ctx, team):
-    """Creates a new team TEAM."""
-    db = ctx.obj["db"]
-    session = db.create_session()
-    orm_team = orm.Team(name=team)
-    with orm.transaction(session):
-        session.add(orm_team)
-
-    print(orm_team.id)
-
-
-@team.command()  # noqa
-@click.pass_context
-def list(ctx):
-    """Show the current teams."""
-    db = ctx.obj["db"]
-    session = db.create_session()
-    with orm.transaction(session):
-        for team in session.query(orm.Team).all():
-            print("{}:{}".format(team.id, team.name))
-
-
-@team.command()
-@click.argument("user")
-@click.argument("team")
-@click.pass_context
-def adduser(ctx, user, team):
-    """Add a user USER to a team TEAM."""
-    db = ctx.obj["db"]
-    session = db.create_session()
-    with orm.transaction(session):
-        orm_team = session.query(orm.Team).filter(
-            orm.Team.name == team).first()
-        if orm_team is None:
-            raise click.BadParameter("Unknown team {}".format(team),
-                                     param="team")
-
-        orm_user = session.query(orm.User).filter(
-            orm.User.name == user).first()
-        if orm_user is None:
-            raise click.BadParameter("Unknown user {}".format(user),
-                                     param="user")
-
-        orm_team.users.append(orm_user)
 
 # -------------------------------------------------------------------------
 # App commands
@@ -196,12 +132,12 @@ def list(ctx):
 
 @app.command()
 @click.argument("image")
-@click.argument("team")
+@click.argument("user")
 @click.option("--allow-home",
               type=click.BOOL,
               default=False,
               is_flag=True)
-@click.option("--allow-team-view",
+@click.option("--allow-view",
               type=click.BOOL,
               default=False,
               is_flag=True)
@@ -209,9 +145,9 @@ def list(ctx):
               help="Application data volume, format=SOURCE:TARGET:MODE, "
                    "where mode is 'ro' or 'rw'.")
 @click.pass_context
-def expose(ctx, image, team, allow_home, allow_team_view, volume):
+def expose(ctx, image, user, allow_home, allow_view, volume):
     """Exposes a given application identified by IMAGE to a specific
-    team TEAM."""
+    user USER."""
     db = ctx.obj["db"]
     allow_common = False
     source = target = mode = None
@@ -239,17 +175,17 @@ def expose(ctx, image, team, allow_home, allow_team_view, volume):
             raise click.BadParameter("Unknown application image {}".format(
                 image), param="image")
 
-        orm_team = session.query(orm.Team).filter(
-            orm.Team.name == team).first()
+        orm_user = session.query(orm.User).filter(
+            orm.User.name == user).first()
 
-        if orm_team is None:
-            raise click.BadParameter("Unknown team {}".format(team),
-                                     param="team")
+        if orm_user is None:
+            raise click.BadParameter("Unknown user {}".format(user),
+                                     param="user")
 
         orm_policy = orm.ApplicationPolicy(
             allow_home=allow_home,
             allow_common=allow_common,
-            allow_team_view=allow_team_view,
+            allow_view=allow_view,
             volume_source=source,
             volume_target=target,
             volume_mode=mode,
@@ -258,7 +194,7 @@ def expose(ctx, image, team, allow_home, allow_team_view, volume):
         session.add(orm_policy)
 
         accounting = orm.Accounting(
-            team=orm_team,
+            user=orm_user,
             application=orm_app,
             application_policy=orm_policy,
         )
