@@ -154,7 +154,7 @@ def apps_for_user(session, user):
     ----------
     session : Session
         The current session
-    user : User
+    user : User or None
         the orm User, or None.
 
     Returns
@@ -182,7 +182,7 @@ def user_can_run(session, user, application, policy):
     ----------
     session : Session
         The current session
-    user : User
+    user : User or None
         the orm User, or None.
     application : Application
         The application object

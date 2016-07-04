@@ -129,6 +129,9 @@ class TestOrm(TempMixin, unittest.TestCase):
             self.assertIn("docker/image0",
                           [acc[1].image for acc in res])
 
+            res = orm.apps_for_user(session, None)
+            self.assertEqual(len(res), 0)
+
     def test_user_can_run(self):
         db = Database(url="sqlite:///"+self.sqlite_file_path)
         session = db.create_session()
