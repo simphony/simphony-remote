@@ -9,14 +9,14 @@ class TempMixin:
     """
 
     def setUp(self):
-        super().setUp()
         self.tempdir = tempfile.mkdtemp()
+        super().setUp()
 
     def tearDown(self):
-        super().tearDown()
         try:
             shutil.rmtree(self.tempdir)
         except OSError:
             logging.exception("Unable to delete temporary directory {}".format(
                 self.tempdir
             ))
+        super().tearDown()
