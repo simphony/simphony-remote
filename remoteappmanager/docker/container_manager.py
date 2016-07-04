@@ -118,7 +118,11 @@ class ContainerManager(LoggingMixin):
         ------
         A list of Container objects, or an empty list if nothing is found.
         """
-        labels = _get_container_labels(user_name, mapping_id)
+        labels = {
+            SIMPHONY_NS+"user": user_name,
+            SIMPHONY_NS+"mapping_id": mapping_id,
+        }
+
         filters = {
             'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]
         }
@@ -205,7 +209,9 @@ class ContainerManager(LoggingMixin):
             name=container_name,
             environment=_get_container_env(user_name, container_url_id),
             volumes=volume_targets,
-            labels=_get_container_labels(user_name, mapping_id))
+            labels=_get_container_labels(user_name,
+                                         mapping_id,
+                                         container_url_id))
 
         # build the dictionary of keyword arguments for host_config
         host_config = dict(
