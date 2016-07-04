@@ -4,7 +4,6 @@ from remoteappmanager.file_config import FileConfig
 
 # The arguments we pass
 from tests import fixtures
-from tests.utils import arguments, invocation_argv
 
 
 class TestFileConfig(unittest.TestCase):

@@ -17,7 +17,8 @@ def main():
         print_help()
         sys.exit(1)
 
-    file_config = FileConfig(command_line_config.config_file)
+    file_config = FileConfig()
+    file_config.parse_config(command_line_config.config_file)
 
     app = Application(command_line_config, file_config)
     app.start()

@@ -66,4 +66,3 @@ class CommandLineConfig(HasTraits):
 
         # Normalize the base_url to end with a slash
         self.base_url = with_end_slash(self.base_url)
-

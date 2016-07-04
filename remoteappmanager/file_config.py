@@ -71,4 +71,3 @@ class FileConfig(HasTraits):
         file_line_parser.parse_config_file(config_file)
 
         set_traits_from_dict(self, file_line_parser)
-
