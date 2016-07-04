@@ -9,7 +9,7 @@ from jinja2 import Environment, FileSystemLoader
 from jupyterhub import orm as jupyterhub_orm
 
 from remoteappmanager.db import orm
-from remoteappmanager.handlers.api import HomeHandler
+from remoteappmanager.handlers.api import HomeHandler, UploadHandler
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.docker.container_manager import ContainerManager
 from remoteappmanager.docker.docker_client_config import DockerClientConfig
@@ -141,6 +141,7 @@ class Application(web.Application, LoggingMixin):
 
         return [
             (self._config.base_url, HomeHandler),
+            (self._config.base_url+'upload', UploadHandler),
             (self._config.base_url.rstrip('/'),
              web.RedirectHandler, {"url": self._config.base_url}),
         ]
