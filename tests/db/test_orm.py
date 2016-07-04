@@ -128,3 +128,22 @@ class TestOrm(TempMixin, unittest.TestCase):
             self.assertEqual(len(res), 1)
             self.assertIn("docker/image0",
                           [acc[1].image for acc in res])
+
+    def test_user_can_run(self):
+        db = Database(url="sqlite:///"+self.sqlite_file_path)
+        session = db.create_session()
+        fill_db(session)
+        with transaction(session):
+            # verify back population
+            users = session.query(orm.User).all()
+            applications = session.query(orm.Application).all()
+            policy = session.query(orm.ApplicationPolicy).first()
+
+            self.assertTrue(orm.user_can_run(session,
+                                             users[0],
+                                             applications[1],
+                                             policy))
+            self.assertFalse(orm.user_can_run(session,
+                                              users[0],
+                                              applications[0],
+                                              policy))

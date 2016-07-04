@@ -1,7 +1,8 @@
 import contextlib
 
 from sqlalchemy import (
-    Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum)
+    Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum,
+    literal)
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -196,8 +197,9 @@ def user_can_run(session, user, application, policy):
     if user is None:
         return False
 
-    return session.query(Accounting) \
+    query = session.query(Accounting) \
         .filter(Accounting.user == user,
                 Accounting.application == application,
-                Accounting.application_policy == policy) \
-        .exists()
+                Accounting.application_policy == policy)
+
+    return session.query(literal(True)).filter(query.exists()).scalar()
