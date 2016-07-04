@@ -3,7 +3,7 @@ branch = True
 source = remoteappmanager
 # We omit the remoteappdb application. 
 # We are testing that through direct invocation, so coverage can't pick that up
-omit = tests remoteappmanager/cli/remoteappdb/*
+omit = tests remoteappmanager/cli/remoteappdb/__main__.py
 
 [report]
 # Regexes for lines to exclude from consideration

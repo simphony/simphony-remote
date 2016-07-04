@@ -147,3 +147,8 @@ class TestOrm(TempMixin, unittest.TestCase):
                                               users[0],
                                               applications[0],
                                               policy))
+
+            self.assertFalse(orm.user_can_run(session,
+                                              None,
+                                              applications[0],
+                                              policy))
