@@ -1,8 +1,8 @@
 from abc import abstractmethod, ABCMeta
 from collections import Iterable
 
-# FIXME: remove these when the dummy test case at the bottom of this
-# file is removed
+# FIXME: remove these imports when the dummy test case at the bottom
+# of this file is removed
 import unittest
 from collections import namedtuple
 from remoteappmanager.db.interfaces import ABCDatabase, ApplicationConfig
@@ -19,7 +19,7 @@ class ABCTestDatabase(metaclass=ABCMeta):
         setUp(('user1', 'user2'),
               ( # user1
                 (ApplicationConfig(...),
-                 ApplicatioNConfig(...)),
+                 ApplicationConfig(...)),
                 # user2
                 (ApplicationConfig(...),) )
         """
