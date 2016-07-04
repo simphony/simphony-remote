@@ -31,7 +31,8 @@ class TestContainer(TestCase):
             'Image': 'empty-ubuntu:latest',
             'ImageID': 'sha256:f4610c7580b8f0a9a25086b6287d0069fb8a',
             'Labels': {'eu.simphony-project.docker.ui_name': 'Empty Ubuntu',
-                       'eu.simphony-project.docker.user': 'user'},
+                       'eu.simphony-project.docker.user': 'user',
+                       'eu.simphony-project.docker.url_id': "8e2fe66d5de74db9bbab50c0d2f92b33"},  # noqa
             'Names': ['/remoteexec-user-empty-ubuntu_3Alatest'],
             'Ports': [{'IP': '0.0.0.0',
                        'PrivatePort': 8888,
@@ -41,13 +42,15 @@ class TestContainer(TestCase):
             'Status': 'Up 56 minutes'}
 
         # Container with public port
-        actual = Container.from_docker_dict(container_dict)
+        actual = Container.from_docker_containers_dict(container_dict)
         expected = Container(
             docker_id='248e45e717cd740ae763a1c565',
             name='/remoteexec-user-empty-ubuntu_3Alatest',
             image_name='empty-ubuntu:latest',
             image_id='sha256:f4610c7580b8f0a9a25086b6287d0069fb8a',
-            ip='0.0.0.0', port=32823)
+            ip='0.0.0.0',
+            port=32823,
+            url_id="8e2fe66d5de74db9bbab50c0d2f92b33")
 
         assert_containers_equal(self, actual, expected)
 
@@ -62,7 +65,8 @@ class TestContainer(TestCase):
             'Image': 'novnc-ubuntu:latest',
             'ImageID': 'sha256:f4610c75d3c0dfa25d3c0dfa25d3c0dfa2',
             'Labels': {'eu.simphony-project.docker.ui_name': 'Empty Ubuntu',
-                       'eu.simphony-project.docker.user': 'user'},
+                       'eu.simphony-project.docker.user': 'user',
+                       'eu.simphony-project.docker.url_id': "8e2fe66d5de74db9bbab50c0d2f92b33"},  # noqa
             'Names': ['/remoteexec-user-empty-ubuntu_3Alatest'],
             'Ports': [{'IP': '0.0.0.0',
                        'PrivatePort': 8888,
@@ -71,12 +75,14 @@ class TestContainer(TestCase):
             'Status': 'Up 56 minutes'}
 
         # Container without public port
-        actual = Container.from_docker_dict(container_dict)
+        actual = Container.from_docker_containers_dict(container_dict)
         expected = Container(
             docker_id='812c765d0549be0ab831ae8348',
             name='/remoteexec-user-empty-ubuntu_3Alatest',
             image_name='novnc-ubuntu:latest',
             image_id='sha256:f4610c75d3c0dfa25d3c0dfa25d3c0dfa2',
-            ip='0.0.0.0', port=None)
+            ip='0.0.0.0',
+            port=None,
+            url_id="8e2fe66d5de74db9bbab50c0d2f92b33")
 
         assert_containers_equal(self, actual, expected)
