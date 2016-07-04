@@ -1,0 +1,38 @@
+{% extends "page.html" %}
+
+{% block main %}
+<style>
+.va {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
+</style>
+
+<div class="container">
+
+  <div class="row text-center">
+    <h1>Upload file to workspace</h1>
+
+  </div>
+  <div>
+    <h4>Select files from your computer</h4>
+          <form action="{{base_url}}upload" method="post" enctype="multipart/form-data" id="js-upload-form">
+            <div class="form-inline">
+              <div class="form-group">
+                <input type="file" name="upload_files" id="js-upload-files" multiple>
+              </div>
+              <button type="submit" class="btn btn-sm btn-primary" id="js-upload-submit">Upload files</button>
+            </div>
+          </form>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+require(["home"]);
+</script>
+{% endblock %}
