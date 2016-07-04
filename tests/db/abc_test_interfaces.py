@@ -1,6 +1,12 @@
 from abc import abstractmethod, ABCMeta
 from collections import Iterable
 
+# FIXME: remove these when the dummy test case at the bottom of this
+# file is removed
+import unittest
+from collections import namedtuple
+from remoteappmanager.db.interfaces import ABCDatabase, ApplicationConfig
+
 
 class ABCTestDatabase(metaclass=ABCMeta):
 
@@ -43,3 +49,37 @@ class ABCTestDatabase(metaclass=ABCMeta):
         for username, expected_configs in self.user_config_mappings.items():
             actual_configs = database.get_apps_for_user(username)
             self.assertSetEqual(set(actual_configs), set(expected_configs))
+
+
+# -------------------------------------------------------------------------
+# FIXME: The following is a dummy test case
+# Remove the following when the ABCDatabase is used and tested by actual
+# database
+# -------------------------------------------------------------------------
+User = namedtuple('User', ('name',))
+
+
+class Database(ABCDatabase):
+
+    def get_user_by_name(self, username):
+        return User(name=username)
+
+    def get_apps_for_user(self, username):
+        return (ApplicationConfig(mapping_id=username+'1'),
+                ApplicationConfig(mapping_id=username+'2'))
+
+
+class TestDatabase(ABCTestDatabase, unittest.TestCase):
+    def setUp(self):
+        super().setUp(['foo', 'bar'],
+                      [(ApplicationConfig(mapping_id='foo1'),
+                        ApplicationConfig(mapping_id='foo2')),
+                       (ApplicationConfig(mapping_id='bar1'),
+                        ApplicationConfig(mapping_id='bar2'))])
+
+    def create_database(self):
+        return Database()
+
+    def test_get_user_by_name(self):
+        database = self.create_database()
+        self.assertEqual(database.get_user_by_name('foo'), User('foo'))
