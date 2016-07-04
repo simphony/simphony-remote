@@ -36,10 +36,10 @@ def fill_db(session):
             orm.Accounting(user=users[4],
                            application=apps[0],
                            application_policy=policy),
-            orm.Accounting(team=users[0],
+            orm.Accounting(user=users[0],
                            application=apps[1],
                            application_policy=policy),
-            orm.Accounting(team=users[1],
+            orm.Accounting(user=users[1],
                            application=apps[2],
                            application_policy=policy),
         ]
