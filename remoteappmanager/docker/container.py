@@ -50,9 +50,9 @@ class Container(HasTraits):
         return (
             '<Container(' +
             ", ".join(
-                ["{}={}".format(name, getattr(self, name))
-                    for name in self.trait_names()
-                 ]) +
+                "{}={}".format(name, getattr(self, name))
+                for name in self.trait_names()
+                ) +
             ")>")
 
     @classmethod
