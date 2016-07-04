@@ -63,8 +63,6 @@ class TestOrm(TempMixin, unittest.TestCase):
         self.sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
         utils.init_sqlite_db(self.sqlite_file_path)
 
-        self.config = utils.basic_application_config()
-
     def test_database_init_and_session(self):
         db = Database(url="sqlite:///"+self.sqlite_file_path)
         session = db.create_session()

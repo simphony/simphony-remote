@@ -1,12 +1,12 @@
 import unittest
-from traitlets import HasTraits, Int, String
+from traitlets import HasTraits, Int, Unicode
 
 from remoteappmanager.traitlets import as_dict, set_traits_from_dict
 
 
 class Classy(HasTraits):
     a = Int()
-    b = String()
+    b = Unicode()
 
 
 class TestTraitlets(unittest.TestCase):

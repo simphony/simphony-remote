@@ -3,7 +3,8 @@ import sys
 from unittest import mock
 
 import docker
-from remoteappmanager.file_config import ApplicationConfig
+from remoteappmanager.command_line_config import CommandLineConfig
+from remoteappmanager.file_config import FileConfig
 from remoteappmanager.db.orm import Database
 from tests import fixtures
 
@@ -205,16 +206,20 @@ def init_sqlite_db(path):
     db.reset()
 
 
-def basic_application_config():
+def basic_command_line_config():
     """Returns a basic application config for testing purposes.
     The database is in memory.
     """
     options = {k.replace("-", "_"): v for k, v in arguments.items()}
 
-    # Go in memory with the db
-    options["db_url"] = "sqlite://"
+    return CommandLineConfig(**options)
 
-    return ApplicationConfig(**options)
+
+def basic_file_config():
+    options = {
+        "db_url": "sqlite://"
+    }
+    return FileConfig(**options)
 
 
 @contextlib.contextmanager

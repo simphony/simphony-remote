@@ -70,5 +70,5 @@ class FileConfig(HasTraits):
         # We always want the config file to be present, even if empty
         file_line_parser.parse_config_file(config_file)
 
-        set_traits_from_dict(file_line_parser, file_line_parser)
+        set_traits_from_dict(self, file_line_parser)
 

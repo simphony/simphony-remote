@@ -1,7 +1,9 @@
 import tornado.options
-from remoteappmanager.utils import with_end_slash
 from tornado.options import define, options
+
 from traitlets import HasTraits, Int, Unicode
+
+from remoteappmanager.utils import with_end_slash
 from remoteappmanager.traitlets import set_traits_from_dict
 
 
