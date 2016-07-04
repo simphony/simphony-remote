@@ -159,7 +159,7 @@ class VirtualUserSpawner(LocalProcessSpawner):
 
         # Clean up the directory
         # Make sure the temporary directory is not /, ./ or ../
-        if self._virtual_workspace.strip('/') in ('', '.', '..'):
+        if os.path.normpath(self._virtual_workspace) in ('/', '.', '..'):
             self.log.warning("Virtual workspace is '%s'.  Seriously? "
                              "Not removing.", self._virtual_workspace)
         else:
