@@ -5,6 +5,18 @@ from collections import Iterable
 class ABCTestDatabase(metaclass=ABCMeta):
 
     def setUp(self, usernames, application_configs):
+        """ Given a list of usernames, associate a list of
+        ApplicationConfig for each user.
+
+        Examples
+        --------
+        setUp(('user1', 'user2'),
+              ( # user1
+                (ApplicationConfig(...),
+                 ApplicatioNConfig(...)),
+                # user2
+                (ApplicationConfig(...),) )
+        """
         if not (usernames and application_configs):
             raise ValueError("usernames and application_configs must not "
                              "be empty")
