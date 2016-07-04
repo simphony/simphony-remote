@@ -125,10 +125,11 @@ class VirtualUserSpawner(LocalProcessSpawner):
             try:
                 self._virtual_workspace = tempfile.mkdtemp(
                     dir=self.workspace_dir)
-            except Exception as exception:
-                self.log.error('Failed to create temporary directory '
-                               'for %s in %s  with error: %s',
-                               self.user.name, self.workspace_dir, exception)
+            except Exception:
+                self.log.exception(
+                    'Failed to create temporary directory '
+                    'for %s in %s',
+                    self.user.name, self.workspace_dir)
             else:
                 self.log.info("Created %s's temporary workspace in: %s",
                               self.user.name, self._virtual_workspace)
@@ -136,9 +137,9 @@ class VirtualUserSpawner(LocalProcessSpawner):
         # Make sure we clean up in case `start` fails
         try:
             yield super().start()
-        except Exception as exception:
+        except Exception:
             self._clean_up_workspace_dir()
-            raise exception
+            raise
 
     @gen.coroutine
     def stop(self, now=False):
