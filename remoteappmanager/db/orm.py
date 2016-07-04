@@ -164,7 +164,8 @@ def apps_for_user(session, user):
     if user is None:
         return []
 
-    res = session.query(Accounting).filter(Accounting.user == user).all()
+    res = session.query(Accounting).filter(
+        Accounting.user == user).all()
 
     return [(acc.application.image + "_" + str(acc.application_policy.id),
              acc.application,
