@@ -31,13 +31,12 @@ class UploadHandler(BaseHandler):
                             "Target directory cannot be found. "
                             "Please notify system admin.")
 
-        # Assume one file
-        file_info = self.request.files['upload_file'][0]
-        target_path = os.path.join(self.upload_target,
-                                   os.path.basename(file_info.filename))
+        for file_info in self.request.files['upload_files']:
+            target_path = os.path.join(self.upload_target,
+                                       os.path.basename(file_info.filename))
 
-        with open(target_path, 'wb') as fh:
-            fh.write(file_info.body)
+            with open(target_path, 'wb') as fh:
+                fh.write(file_info.body)
 
-        self.finish('Uploaded {0} to {1}'.format(file_info.filename,
-                                                 target_path))
+        self.finish('Uploaded {0} files to {1}'.format(
+            len(self.request.files['upload_files']), self.upload_target))
