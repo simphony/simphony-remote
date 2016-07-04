@@ -122,10 +122,16 @@ class VirtualUserSpawner(LocalProcessSpawner):
         """
         # Create the temporary directory as the user's workspace
         if self.workspace_dir and not self._virtual_workspace:
-            self._virtual_workspace = tempfile.mkdtemp(
-                dir=self.workspace_dir)
-            self.log.info("Created temporary directory: %s",
-                          self._virtual_workspace)
+            try:
+                self._virtual_workspace = tempfile.mkdtemp(
+                    dir=self.workspace_dir)
+            except Exception as exception:
+                self.log.error('Failed to create temporary directory '
+                               'for %s in %s  with error: %s',
+                               self.user.name, self.workspace_dir, exception)
+            else:
+                self.log.info("Created %s's temporary workspace in: %s",
+                              self.user.name, self._virtual_workspace)
 
         # Make sure we clean up in case `start` fails
         try:

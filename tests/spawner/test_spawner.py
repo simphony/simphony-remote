@@ -226,3 +226,17 @@ class TestVirtualUserSpawner(unittest.TestCase):
 
         # The temporary directory should be cleaned up
         self.assertFalse(os.listdir(self.temp_dir))
+
+    def test_start_if_workspace_path_not_exists(self):
+        self.spawner.workspace_dir = '/no_way/this_exists'
+
+        io_loop = IOLoop.current()
+
+        with spawner_start_and_stop(self.spawner):
+            # Started running
+            status = io_loop.run_sync(self.spawner.poll)
+            self.assertIsNone(status)
+
+        # Stopped running
+        status = io_loop.run_sync(self.spawner.poll)
+        self.assertEqual(status, 1)
