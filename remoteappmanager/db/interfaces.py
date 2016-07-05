@@ -37,7 +37,8 @@ class ApplicationConfig(HasTraits):
         return True
 
     def __hash__(self):
-        raise TypeError('ApplicationConfig is not hashable')
+        raise TypeError("unhashable type: '{}'".format(
+            self.__class__.__name__))
 
     def __repr__(self):
         return "<{cls}({attrs})>".format(
