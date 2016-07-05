@@ -1,8 +1,6 @@
 from abc import ABCMeta, abstractmethod
 import inspect as _inspect
 
-from traitlets import HasTraits, Unicode, Bool
-
 
 class ABCApplication(metaclass=ABCMeta):
 
