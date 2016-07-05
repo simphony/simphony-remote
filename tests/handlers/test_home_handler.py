@@ -62,11 +62,12 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
                         ".base_handler"
                         ".BaseHandler"
                         ".verify_token") as mock_verify_token:
+            mock_verify_token.return_value = True
             res = self.fetch("/user/username/",
                              headers={
                                  "Cookie": "jupyter-hub-token-username=foo"
                              }
                              )
-            print(mock_verify_token.call_args)
 
         self.assertEqual(res.code, 200)
+        self.assertIn("Available Applications", res.body)
