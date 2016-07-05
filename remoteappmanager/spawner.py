@@ -8,6 +8,11 @@ from tornado import gen
 from jupyterhub.spawner import LocalProcessSpawner
 from jupyterhub import orm
 
+# TODO: Both Spawner and VirtualUserSpawner have `get_args` that
+# are identical and they need to be updated when the remoteappmanager
+# config is updated.  Refactoring would mitigate potential risk
+# of not updating one of them.
+
 
 class Spawner(LocalProcessSpawner):
     #: The instance of the orm Proxy.
