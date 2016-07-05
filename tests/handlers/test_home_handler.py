@@ -25,6 +25,7 @@ def _bind_unused_port(reuse_port=False):
     port = sock.getsockname()[1]
     return sock, port
 
+
 class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
     def setUp(self):
         self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
@@ -65,8 +66,7 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
                              headers={
                                  "Cookie": "jupyter-hub-token-username=foo"
                              }
-            )
+                             )
             print(mock_verify_token.call_args)
 
         self.assertEqual(res.code, 200)
-
