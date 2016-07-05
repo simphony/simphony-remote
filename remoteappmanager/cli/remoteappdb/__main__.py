@@ -3,6 +3,8 @@
 import os
 
 import click
+import tabulate
+
 from remoteappmanager.db import orm
 
 
@@ -74,26 +76,69 @@ def create(ctx, user):
 
 
 @user.command()
+@click.argument("user")
 @click.pass_context
-def list(ctx):
-    """Show a list of the available users."""
+def remove(ctx, name):
     db = ctx.obj["db"]
     session = db.create_session()
+
+    with orm.transaction(session):
+        user = session.query(orm.User).filter(orm.User.name == name).one()
+
+        # Unfortunately sqlite does not support cascading, so we need to
+        # perform the cleanup of the accounting manually.
+        session.query(orm.Accounting).filter(
+            orm.Accounting.user_id == user.id).delete()
+
+        session.delete(user)
+
+
+@user.command()
+@click.option('--no-decoration', is_flag=True,
+              help="Disable table decorations")
+@click.option('--show-apps', is_flag=True,
+              help="For each user, shows the "
+                   "applications he is allowed to run")
+@click.pass_context
+def list(ctx, no_decoration, show_apps):
+    """Show a list of the available users."""
+
+    if no_decoration:
+        format = "plain"
+        headers = []
+    else:
+        format = "simple"
+        headers = ["ID", "Name"]
+        if show_apps:
+            headers += ["App", "Home", "View", "Common", "Vol. Source",
+                        "Vol. Target", "Vol. Mode"]
+
+    db = ctx.obj["db"]
+    session = db.create_session()
+
+    table = []
     with orm.transaction(session):
         for user in session.query(orm.User).all():
-            apps = ["{} {} {} {}:{}:{}".format(app.image,
-                                               policy.allow_home,
-                                               policy.allow_common,
-                                               policy.volume_source,
-                                               policy.volume_target,
-                                               policy.volume_mode)
-                    for _, app, policy in orm.apps_for_user(session, user)]
+            cur = [user.id, user.name]
+            table.append(cur)
+            if show_apps:
+                apps = [[app.image,
+                         policy.allow_home,
+                         policy.allow_view,
+                         policy.allow_common,
+                         policy.volume_source,
+                         policy.volume_target,
+                         policy.volume_mode]
+                        for _, app, policy in orm.apps_for_user(session, user)]
 
-            print("{}:{} | {}".format(
-                user.id,
-                user.name,
-                ",".join(apps)
-            ))
+                if len(apps) == 0:
+                    apps = [['']*7]
+
+                cur.extend(apps[0])
+                for app in apps[1:]:
+                    table.append(['', ''] + app)
+
+    print(tabulate.tabulate(table, headers=headers, tablefmt=format))
 
 # -------------------------------------------------------------------------
 # App commands
@@ -120,33 +165,54 @@ def create(ctx, image):
 
 
 @app.command()  # noqa
+@click.argument("image")
 @click.pass_context
-def list(ctx):
-    """List all registered applications."""
+def remove(ctx, image):
     db = ctx.obj["db"]
     session = db.create_session()
     with orm.transaction(session):
+        app = session.query(orm.Application).filter(
+            orm.Application.image == image).one()
+        session.query(orm.Accounting).filter(
+            orm.Accounting.application_id == app.id).delete()
+        session.delete(app)
+
+
+@app.command()  # noqa
+@click.option('--no-decoration', is_flag=True,
+              help="Disable table decorations")
+@click.pass_context
+def list(ctx, no_decoration):
+    """List all registered applications."""
+    db = ctx.obj["db"]
+
+    if no_decoration:
+        tablefmt = "plain"
+        headers = []
+    else:
+        tablefmt = "simple"
+        headers = ["ID", "Image"]
+
+    table = []
+    session = db.create_session()
+    with orm.transaction(session):
         for orm_app in session.query(orm.Application).all():
-            print("{}:{}".format(orm_app.id, orm_app.image))
+            table.append([orm_app.id, orm_app.image])
+
+    print(tabulate.tabulate(table, headers=headers, tablefmt=tablefmt))
 
 
 @app.command()
 @click.argument("image")
 @click.argument("user")
-@click.option("--allow-home",
-              type=click.BOOL,
-              default=False,
-              is_flag=True)
-@click.option("--allow-view",
-              type=click.BOOL,
-              default=False,
-              is_flag=True)
+@click.option("--allow-home", is_flag=True)
+@click.option("--allow-view", is_flag=True)
 @click.option("--volume", type=click.STRING,
               help="Application data volume, format=SOURCE:TARGET:MODE, "
                    "where mode is 'ro' or 'rw'.")
 @click.pass_context
-def expose(ctx, image, user, allow_home, allow_view, volume):
-    """Exposes a given application identified by IMAGE to a specific
+def grant(ctx, image, user, allow_home, allow_view, volume):
+    """Grants access to application identified by IMAGE to a specific
     user USER."""
     db = ctx.obj["db"]
     allow_common = False
@@ -173,33 +239,78 @@ def expose(ctx, image, user, allow_home, allow_view, volume):
 
         if orm_app is None:
             raise click.BadParameter("Unknown application image {}".format(
-                image), param="image")
+                image), param_hint="image")
 
         orm_user = session.query(orm.User).filter(
             orm.User.name == user).first()
 
         if orm_user is None:
             raise click.BadParameter("Unknown user {}".format(user),
-                                     param="user")
+                                     param_hint="user")
 
-        orm_policy = orm.ApplicationPolicy(
-            allow_home=allow_home,
-            allow_common=allow_common,
-            allow_view=allow_view,
-            volume_source=source,
-            volume_target=target,
-            volume_mode=mode,
-        )
+        orm_policy = session.query(orm.ApplicationPolicy).filter(
+            orm.ApplicationPolicy.allow_home == allow_home,
+            orm.ApplicationPolicy.allow_common == allow_common,
+            orm.ApplicationPolicy.allow_view == allow_view,
+            orm.ApplicationPolicy.volume_source == source,
+            orm.ApplicationPolicy.volume_target == target,
+            orm.ApplicationPolicy.volume_mode == mode).one_or_none()
 
-        session.add(orm_policy)
+        if orm_policy is not None:
+            # Check if we already have the entry
+            acc = session.query(orm.Accounting).filter(
+                orm.Accounting.user == orm_user,
+                orm.Accounting.application == orm_app,
+                orm.Accounting.application_policy == orm_policy
+            ).one_or_none()
 
-        accounting = orm.Accounting(
-            user=orm_user,
-            application=orm_app,
-            application_policy=orm_policy,
-        )
+            if acc is not None:
+                return
+            else:
+                accounting = orm.Accounting(
+                    user=orm_user,
+                    application=orm_app,
+                    application_policy=orm_policy,
+                )
+        else:
+            orm_policy = orm.ApplicationPolicy(
+                allow_home=allow_home,
+                allow_common=allow_common,
+                allow_view=allow_view,
+                volume_source=source,
+                volume_target=target,
+                volume_mode=mode,
+            )
+            session.add(orm_policy)
 
-        session.add(accounting)
+            accounting = orm.Accounting(
+                user=orm_user,
+                application=orm_app,
+                application_policy=orm_policy,
+            )
+
+            session.add(accounting)
+
+
+@app.command()
+@click.argument("image")
+@click.argument("user")
+@click.pass_context
+def revoke(ctx, image, user):
+    """Revokes access to application identified by IMAGE to a specific
+    user USER."""
+    db = ctx.obj["db"]
+    session = db.create_session()
+    with orm.transaction(session):
+        app = session.query(orm.Application).filter(
+            orm.Application.image == image).one()
+        orm_user = session.query(orm.User).filter(
+            orm.User.name == user).one()
+
+        session.query(orm.Accounting).filter(
+            orm.Accounting.application_id == app.id,
+            orm.Accounting.user_id == orm_user.id
+        ).delete()
 
 
 def main():
