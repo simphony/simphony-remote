@@ -26,6 +26,9 @@ class ApplicationConfig(HasTraits):
     #: (For docker, it is either "rw": read-write or "ro": read-only
     volume_mode = Unicode(allow_none=True)
 
+    # Unhashable
+    __hash__ = None
+
     def __eq__(self, other):
         if not isinstance(other, ApplicationConfig):
             return False
@@ -35,10 +38,6 @@ class ApplicationConfig(HasTraits):
                 return False
 
         return True
-
-    def __hash__(self):
-        raise TypeError("unhashable type: '{}'".format(
-            self.__class__.__name__))
 
     def __repr__(self):
         return "<{cls}({attrs})>".format(
