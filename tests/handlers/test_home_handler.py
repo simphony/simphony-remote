@@ -14,7 +14,7 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
     def setUp(self):
         self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
         os.environ["PROXY_API_TOKEN"] = "dummy_token"
-        print "XXXXXXXXXXXXXXXX"
+        print("XXXXXXXXXXXXXXXX")
         print(tornado.netutil.bind_sockets(
             None, 'localhost', family=socket.AF_INET, reuse_port=False))
 
