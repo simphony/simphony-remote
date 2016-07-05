@@ -84,7 +84,7 @@ class ABCAccounting(metaclass=ABCMeta):
         Returns
         -------
         application_spec: tuple
-           tuple of ( mapping_id, ABCApplication, ABCApplicationPolicy )
-           where mapping_id is an ID for identifying the
-           (ABCApplication, ABCApplicationPolicy) pair
+           each item of the tuple should be a tuple of
+           (id, ABCApplication, ABCApplicationPolicy) where id is a string
+           used for identifying (ABCApplication, ABCApplicationPolicy)
         """
