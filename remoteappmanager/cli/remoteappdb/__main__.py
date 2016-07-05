@@ -312,7 +312,8 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
               help="Policy for mounting of home directory")
 @click.option("--allow-view",
               is_flag=True,
-              help="Policy for third-party visibility of the running container.")
+              help="Policy for third-party visibility "
+                   "of the running container.")
 @click.option("--volume", type=click.STRING,
               help="Application data volume, format=SOURCE:TARGET:MODE, "
                    "where mode is 'ro' or 'rw'.")
