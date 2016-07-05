@@ -1,8 +1,5 @@
 import os
 
-from tornado import gen
-from jupyterhub.auth import Authenticator
-
 # Configuration file for jupyterhub.
 from jupyter_client.localinterfaces import public_ips
 
@@ -28,15 +25,9 @@ if setting_mode == 'virtual_user':
     # If unset, no workspace would be available
     c.Spawner.workspace_dir = '/tmp/remoteapp'
 
-    class WorldAuthenticator(Authenticator):
-        ''' This authenticator authenticates everyone '''
-
-        @gen.coroutine
-        def authenticate(self, handler, data):
-            return data['username']
-
     # FIXME: replace me with other authenticator (e.g. GitHub OAuth...)
-    c.JupyterHub.authenticator_class = WorldAuthenticator
+    c.JupyterHub.authenticator_class = (
+        'remoteappmanager.auth.WorldAuthenticator')
 
 elif setting_mode == 'system_user':
     c.JupyterHub.spawner_class = 'remoteappmanager.spawner.Spawner'
