@@ -265,8 +265,12 @@ class HomeHandler(BaseHandler):
         volumes = {}
 
         if mount_home:
-            home_path = os.path.expanduser('~'+user_name)
-            volumes[home_path] = {'bind': '/workspace', 'mode': 'rw'}
+            home_path = os.environ.get('HOME')
+            if home_path:
+                volumes[home_path] = {'bind': '/workspace', 'mode': 'rw'}
+            else:
+                self.log.warning('HOME (%s) is not available for %s',
+                                 home_path, user_name)
 
         if None not in volume_spec:
             volume_source, volume_target, volume_mode = volume_spec
