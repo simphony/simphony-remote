@@ -55,6 +55,10 @@ class FileConfig(HasTraits):
         """Parses the config file, and assign their values to our local traits.
         """
 
+        if config_file.strip() == '':
+            raise tornado.options.Error("Config file must be specified "
+                                        "in command line arguments.")
+
         # Keep the file line parser isolated, but use the global one
         # so that we can get the help of the command line options.
         file_line_parser = tornado.options.OptionParser()
@@ -68,6 +72,11 @@ class FileConfig(HasTraits):
 
         # Let it raise the exception if the file is not there.
         # We always want the config file to be present, even if empty
-        file_line_parser.parse_config_file(config_file)
+        try:
+            file_line_parser.parse_config_file(config_file)
+        except FileNotFoundError:
+            raise tornado.options.Error(
+                'Could not find specified configuration'
+                ' file "{}"'.format(config_file))
 
         set_traits_from_dict(self, file_line_parser)
