@@ -2,8 +2,7 @@ import sys
 
 from remoteappmanager.command_line_config import CommandLineConfig
 from remoteappmanager.file_config import FileConfig
-from tornado.options import print_help, Error
-from traitlets import TraitError
+from tornado.options import print_help
 
 from remoteappmanager.application import Application
 
