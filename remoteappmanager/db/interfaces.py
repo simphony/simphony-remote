@@ -37,8 +37,7 @@ class ApplicationConfig(HasTraits):
         return True
 
     def __hash__(self):
-        return hash(tuple((trait_name, getattr(self, trait_name))
-                          for trait_name in sorted(self.trait_names())))
+        raise TypeError('ApplicationConfig is not hashable')
 
     def __repr__(self):
         return "<{cls}({attrs})>".format(
