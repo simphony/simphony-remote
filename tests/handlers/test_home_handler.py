@@ -1,22 +1,37 @@
 import os
 from unittest import mock
+import socket
 
 import tornado.netutil
+import tornado.testing
 from tornado.testing import AsyncHTTPTestCase
 
 from remoteappmanager.application import Application
 from tests import utils
 from tests.temp_mixin import TempMixin
-import socket
 
+
+# Workaround for tornado bug #1573, already fixed in master, but not yet
+# available. Remove when upgrading tornado.
+def _bind_unused_port(reuse_port=False):
+    """Binds a server socket to an available port on localhost.
+
+    Returns a tuple (socket, port).
+    """
+    sock = tornado.netutil.bind_sockets(None,
+                                        '127.0.0.1',
+                                        family=socket.AF_INET,
+                                        reuse_port=reuse_port)[0]
+    port = sock.getsockname()[1]
+    return sock, port
 
 class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
     def setUp(self):
         self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
         os.environ["PROXY_API_TOKEN"] = "dummy_token"
-        print("XXXXXXXXXXXXXXXX")
-        print(tornado.netutil.bind_sockets(
-            None, 'localhost', family=socket.AF_INET, reuse_port=False))
+
+        self._bind_unused_port_orig = tornado.testing.bind_unused_port
+        tornado.testing.bind_unused_port = _bind_unused_port
 
         super().setUp()
 
@@ -25,6 +40,8 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
             os.environ["PROXY_API_TOKEN"] = self._old_proxy_api_token
         else:
             del os.environ["PROXY_API_TOKEN"]
+
+        tornado.testing.bind_unused_port = self._bind_unused_port_orig
 
         super().tearDown()
 
