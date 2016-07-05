@@ -3,6 +3,7 @@ import inspect as _inspect
 
 
 class ABCApplication(metaclass=ABCMeta):
+    """ Description of an application """
 
     def __init__(self, image):
 
@@ -54,6 +55,8 @@ class ABCApplicationPolicy(metaclass=ABCMeta):
 
 
 class ABCAccounting(metaclass=ABCMeta):
+    """ Main accounting interface required by the single user application.
+    """
 
     @abstractmethod
     def get_user_by_name(self, user_name):
