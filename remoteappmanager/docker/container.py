@@ -47,14 +47,16 @@ class Container(HasTraits):
         )
 
     def __repr__(self):
-        return ('<Container(docker_id={0}, name={1}, image_name={2}, '
-                'image_id={3}, ip={4}, port={5}>').format(
-                    self.docker_id, self.name,
-                    self.image_name, self.image_id,
-                    self.ip, self.port)
+        return (
+            '<Container(' +
+            ", ".join(
+                "{}={}".format(name, getattr(self, name))
+                for name in self.trait_names()
+                ) +
+            ")>")
 
     @classmethod
-    def from_docker_dict(cls, docker_dict):
+    def from_docker_containers_dict(cls, docker_dict):
         """Returns a Container object with the info given by a
         docker Client.
 
@@ -72,7 +74,7 @@ class Container(HasTraits):
         >>> # containers is a list of dict
         >>> containers = docker.Client().containers()
 
-        >>> Container.from_docker_dict(containers[0])
+        >>> Container.from_docker_containers_dict(containers[0])
         """
         if docker_dict.get('Ports'):
             ip = docker_dict['Ports'][0].get('IP', "")
@@ -81,8 +83,9 @@ class Container(HasTraits):
             ip = ""
             port = None
 
-        labels = docker_dict.get("Config", {}).get("Labels", {})
+        labels = docker_dict.get("Labels", {})
         mapping_id = labels.get(SIMPHONY_NS+"mapping_id", "")
+        url_id = labels.get(SIMPHONY_NS+"url_id", "")
 
         return cls(docker_id=docker_dict.get('Id', ''),
                    name=docker_dict.get('Names', ('',))[0],
@@ -90,4 +93,5 @@ class Container(HasTraits):
                    image_id=docker_dict.get('ImageID', ''),
                    mapping_id=mapping_id,
                    ip=ip,
-                   port=port)
+                   port=port,
+                   url_id=url_id)
