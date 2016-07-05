@@ -1,16 +1,22 @@
 import os
 from unittest import mock
+
+import tornado.netutil
 from tornado.testing import AsyncHTTPTestCase
 
 from remoteappmanager.application import Application
 from tests import utils
 from tests.temp_mixin import TempMixin
+import socket
 
 
 class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
     def setUp(self):
         self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
         os.environ["PROXY_API_TOKEN"] = "dummy_token"
+        print "XXXXXXXXXXXXXXXX"
+        print(tornado.netutil.bind_sockets(
+            None, 'localhost', family=socket.AF_INET, reuse_port=False))
 
         super().setUp()
 
