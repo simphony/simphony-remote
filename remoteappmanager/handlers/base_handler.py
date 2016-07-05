@@ -27,8 +27,11 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
         """
         args = dict(
             user=self.current_user,
-            base_url=self.application.config.base_url,
-            logout_url=urljoin(self.application.config.hub_prefix, "logout"))
+            base_url=self.application.command_line_config.base_url,
+            logout_url=urljoin(
+                self.application.command_line_config.hub_prefix,
+                "logout")
+        )
 
         args.update(kwargs)
         super(BaseHandler, self).render(template_name, **args)

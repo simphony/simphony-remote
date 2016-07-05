@@ -166,7 +166,7 @@ class HomeHandler(BaseHandler):
 
         # We don't have fancy stuff at the moment to change the button, so
         # we just reload the page.
-        self.redirect(self.application.config.base_url)
+        self.redirect(self.application.command_line_config.base_url)
 
     # private
 
@@ -281,7 +281,11 @@ class HomeHandler(BaseHandler):
             f = manager.start_container(user_name, image_name,
                                         mapping_id, volumes)
             container = yield gen.with_timeout(
-                timedelta(seconds=self.application.config.network_timeout), f)
+                timedelta(
+                    seconds=self.application.file_config.network_timeout
+                ),
+                f
+            )
         except gen.TimeoutError as e:
             self.log.warning(
                 "{user}'s container failed to start in a reasonable time. "
@@ -329,7 +333,7 @@ class HomeHandler(BaseHandler):
 
         yield _wait_for_http_server_2xx(
             server_url,
-            self.application.config.network_timeout)
+            self.application.file_config.network_timeout)
 
 
 @gen.coroutine
