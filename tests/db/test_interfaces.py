@@ -5,33 +5,54 @@
 
 import unittest
 from collections import namedtuple
-from remoteappmanager.db.interfaces import ABCDatabase, ApplicationConfig
-from .abc_test_interfaces import ABCTestDatabase
+
+from remoteappmanager.db.interfaces import (
+    ABCApplication, ABCApplicationPolicy, ABCAccounting)
+from .abc_test_interfaces import ABCTestDatabaseInterface
 
 User = namedtuple('User', ('name',))
 
 
-class Database(ABCDatabase):
+class Application(ABCApplication):
+    pass
+
+
+class ApplicationPolicy(ABCApplicationPolicy):
+    pass
+
+
+class Accounting(ABCAccounting):
 
     def get_user_by_name(self, username):
         return User(name=username)
 
     def get_apps_for_user(self, username):
-        return (ApplicationConfig(mapping_id=username+'1'),
-                ApplicationConfig(mapping_id=username+'2'))
+        return (('mapping_id1',
+                 Application(image=username+'1'), ApplicationPolicy()),
+                ('mapping_id2',
+                 Application(image=username+'2'), ApplicationPolicy()))
 
 
-class TestDatabase(ABCTestDatabase, unittest.TestCase):
+class TestDatabaseInterface(ABCTestDatabaseInterface, unittest.TestCase):
     def setUp(self):
         super().setUp(['foo', 'bar'],
-                      [(ApplicationConfig(mapping_id='foo1'),
-                        ApplicationConfig(mapping_id='foo2')),
-                       (ApplicationConfig(mapping_id='bar1'),
-                        ApplicationConfig(mapping_id='bar2'))])
+                      [(
+                          (Application(image='foo1'), ApplicationPolicy()),
+                          (Application(image='foo2'), ApplicationPolicy())
+                      ),
+                       (
+                           (Application(image='bar1'), ApplicationPolicy()),
+                           (Application(image='bar2'), ApplicationPolicy())
+                       )])
 
-    def create_database(self):
-        return Database()
+        self.addTypeEqualityFunc(Application,
+                                 self.assertApplicationEqual)
+        self.addTypeEqualityFunc(ApplicationPolicy,
+                                 self.assertApplicationPolicyEqual)
+
+    def create_accounting(self):
+        return Accounting()
 
     def test_get_user_by_name(self):
-        database = self.create_database()
+        database = self.create_accounting()
         self.assertEqual(database.get_user_by_name('foo'), User('foo'))
