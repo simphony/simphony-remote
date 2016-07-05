@@ -70,4 +70,4 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
                              )
 
         self.assertEqual(res.code, 200)
-        self.assertIn("Available Applications", res.body)
+        self.assertIn("Available Applications", str(res.body))
