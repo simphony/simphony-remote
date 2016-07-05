@@ -12,19 +12,19 @@ class ApplicationConfig(HasTraits):
     image = Unicode()
 
     #: Whether user's home directory is mounted
-    allow_home = Bool()
+    allow_home = Bool(False)
 
     #: Source path (on the host machine) for the application specific data
     #: volume
-    volume_source = Unicode()
+    volume_source = Unicode(allow_none=True)
 
     #: Target path (on the container) for the application specific data
     #: volume
-    volume_target = Unicode()
+    volume_target = Unicode(allow_none=True)
 
     #: Read-write access mode for the application specific data volume
     #: (For docker, it is either "rw": read-write or "ro": read-only
-    volume_mode = Unicode()
+    volume_mode = Unicode(allow_none=True)
 
     def __eq__(self, other):
         if not isinstance(other, ApplicationConfig):
@@ -64,6 +64,7 @@ class ABCDatabase(metaclass=ABCMeta):
         Returns
         -------
         user : User
+            a User object that the Database understands
         """
 
     @abstractmethod
