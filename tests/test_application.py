@@ -23,10 +23,11 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
         self.sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
         utils.init_sqlite_db(self.sqlite_file_path)
 
-        self.config = utils.basic_application_config()
-        self.config.db_url = "sqlite:///"+self.sqlite_file_path
+        self.command_line_config = utils.basic_command_line_config()
+        self.file_config = utils.basic_file_config()
+        self.file_config.db_url = "sqlite:///"+self.sqlite_file_path
 
-        self.app = Application(self.config)
+        self.app = Application(self.command_line_config, self.file_config)
 
     def tearDown(self):
         if self._old_proxy_api_token is not None:
@@ -38,10 +39,11 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
 
     def test_initialization(self):
         app = self.app
-        self.assertIsNotNone(app.config)
+        self.assertIsNotNone(app.command_line_config)
+        self.assertIsNotNone(app.file_config)
 
         # Test the configuration options
-        self.assertIsNotNone(app.config.port)
+        self.assertIsNotNone(app.command_line_config.port)
         self.assertIsInstance(app.container_manager, ContainerManager)
         self.assertIsInstance(app.reverse_proxy, orm.Proxy)
 

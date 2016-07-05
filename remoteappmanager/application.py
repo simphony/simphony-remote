@@ -15,6 +15,7 @@ from remoteappmanager.docker.container_manager import ContainerManager
 from remoteappmanager.docker.docker_client_config import DockerClientConfig
 from remoteappmanager.jinja2_adapters import Jinja2LoaderAdapter
 from remoteappmanager.user import User
+from remoteappmanager.traitlets import as_dict
 
 
 class Application(web.Application, LoggingMixin):
@@ -24,14 +25,17 @@ class Application(web.Application, LoggingMixin):
 
     db = Instance(orm.Database, allow_none=True)
 
-    def __init__(self, config):
+    def __init__(self,
+                 command_line_config,
+                 file_config):
         """Initializes the application
 
         config: ApplicationConfiguration
             The application configuration object
         """
 
-        self._config = config
+        self._command_line_config = command_line_config
+        self._file_config = file_config
 
         # Observe that settings and config are different things.
         # Config is the external configuration we can change.
@@ -39,8 +43,10 @@ class Application(web.Application, LoggingMixin):
         # As a result, settings can contain more information than
         # config.
         settings = {}
-        settings.update(config.as_dict())
-        settings["static_url_prefix"] = self._config.base_url+"static/"
+        settings.update(as_dict(command_line_config))
+        settings.update(as_dict(file_config))
+        settings["static_url_prefix"] = (
+            self._command_line_config.base_url + "static/")
         settings["hub_api_key"] = os.environ.get('JPY_API_TOKEN', "")
 
         self._db_init()
@@ -54,24 +60,28 @@ class Application(web.Application, LoggingMixin):
         super().__init__(handlers, **settings)
 
     @property
-    def config(self):
-        return self._config
+    def command_line_config(self):
+        return self._command_line_config
+
+    @property
+    def file_config(self):
+        return self._file_config
 
     def start(self):
         """Start the application and the ioloop"""
 
         self.log.info("Starting server with options:")
-        for trait_name in self._config.trait_names():
+        for trait_name in self._command_line_config.trait_names():
             self.log.info("{}: {}".format(
                 trait_name,
-                getattr(self._config, trait_name)
+                getattr(self._command_line_config, trait_name)
                 )
             )
         self.log.info("Listening for connections on {}:{}".format(
-            self.config.ip,
-            self.config.port))
+            self.command_line_config.ip,
+            self.command_line_config.port))
 
-        self.listen(self.config.port)
+        self.listen(self.command_line_config.port)
 
         tornado.ioloop.IOLoop.current().start()
 
@@ -88,7 +98,7 @@ class Application(web.Application, LoggingMixin):
         -------
         The absolute path part of the url.
         """
-        return self.config.base_url + container.url
+        return self.command_line_config.base_url + container.url
 
     @gen.coroutine
     def reverse_proxy_remove_container(self, container):
@@ -139,10 +149,11 @@ class Application(web.Application, LoggingMixin):
     def _get_handlers(self):
         """Returns the registered handlers"""
 
+        base_url = self.command_line_config.base_url
         return [
-            (self._config.base_url, HomeHandler),
-            (self._config.base_url.rstrip('/'),
-             web.RedirectHandler, {"url": self._config.base_url}),
+            (base_url, HomeHandler),
+            (base_url.rstrip('/'),
+             web.RedirectHandler, {"url": base_url}),
         ]
 
     def _jinja_init(self, settings):
@@ -163,12 +174,12 @@ class Application(web.Application, LoggingMixin):
 
         self.container_manager = ContainerManager(
             docker_config=DockerClientConfig(
-                tls=self._config.tls,
-                tls_verify=self._config.tls_verify,
-                tls_ca=self._config.tls_ca,
-                tls_key=self._config.tls_key,
-                tls_cert=self._config.tls_cert,
-                docker_host=self._config.docker_host,
+                tls=self.file_config.tls,
+                tls_verify=self.file_config.tls_verify,
+                tls_ca=self.file_config.tls_ca,
+                tls_key=self.file_config.tls_key,
+                tls_cert=self.file_config.tls_cert,
+                docker_host=self.file_config.docker_host,
             )
         )
 
@@ -185,32 +196,33 @@ class Application(web.Application, LoggingMixin):
         # just for interface convenience.
         self.reverse_proxy = jupyterhub_orm.Proxy(
             auth_token=auth_token,
-            api_server=_server_from_url(self._config.proxy_api_url)
+            api_server=_server_from_url(self.command_line_config.proxy_api_url)
         )
 
         self.log.info("Reverse proxy setup on {}".format(
-            self._config.proxy_api_url
+            self.command_line_config.proxy_api_url
         ))
 
     def _db_init(self):
         """Initializes the database connection."""
-        self.db = orm.Database(self.config.db_url)
+        self.db = orm.Database(self.file_config.db_url)
 
     def _user_init(self):
         """Initializes the user at the database level."""
         session = self.db.create_session()
 
-        user = User(name=self.config.user)
+        user_name = self.command_line_config.user
+        user = User(name=user_name)
         with orm.transaction(session):
             try:
                 user.orm_user = session.query(orm.User).filter_by(
-                                    name=self.config.user).one_or_none()
+                                    name=user_name).one_or_none()
             except MultipleResultsFound:
                 self.log.error("Multiple results found when "
                                "querying for username {}. This is supposedly "
                                "impossible because the username should be a "
                                "unique key by design.".format(
-                                   self.config.user))
+                                   user_name))
                 raise
 
         self.user = user
