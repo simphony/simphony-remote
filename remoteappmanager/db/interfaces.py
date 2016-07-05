@@ -1,55 +1,61 @@
 from abc import ABCMeta, abstractmethod
+import inspect as _inspect
 
 from traitlets import HasTraits, Unicode, Bool
 
 
-class ApplicationConfig(HasTraits):
+class ABCApplication(metaclass=ABCMeta):
 
-    #: An ID for this configuration
-    mapping_id = Unicode()
+    def __init__(self, image):
 
-    #: Name of the docker image
-    image = Unicode()
-
-    #: Whether user's home directory is mounted
-    allow_home = Bool(False)
-
-    #: Source path (on the host machine) for the application specific data
-    #: volume
-    volume_source = Unicode(allow_none=True)
-
-    #: Target path (on the container) for the application specific data
-    #: volume
-    volume_target = Unicode(allow_none=True)
-
-    #: Read-write access mode for the application specific data volume
-    #: (For docker, it is either "rw": read-write or "ro": read-only
-    volume_mode = Unicode(allow_none=True)
-
-    # Unhashable
-    __hash__ = None
-
-    def __eq__(self, other):
-        if not isinstance(other, ApplicationConfig):
-            return False
-
-        for trait_name in self.trait_names():
-            if getattr(self, trait_name) != getattr(other, trait_name):
-                return False
-
-        return True
+        #: Name of the image
+        self.image = image
 
     def __repr__(self):
-        return "<{cls}({attrs})>".format(
+        args = _inspect.getargs(ABCApplication.__init__.__code__).args[1:]
+
+        return "<{cls}({spec})>".format(
             cls=self.__class__.__name__,
-            attrs=", ".join("{0}={1!r}".format(
-                trait_name, getattr(self, trait_name))
-                            for trait_name in self.trait_names()
-                        )
-        )
+            spec=", ".join("{0}={1!r}".format(arg, getattr(self, arg))
+                           for arg in args))
 
 
-class ABCDatabase(metaclass=ABCMeta):
+class ABCApplicationPolicy(metaclass=ABCMeta):
+    """ Policy for an application
+    """
+
+    def __init__(self, allow_home=False, allow_view=False, allow_common=False,
+                 volume_source=None, volume_target=None, volume_mode=None):
+
+        #: Is the home directory mounted
+        self.allow_home = allow_home
+
+        #: Is the application viewable by others
+        self.allow_view = allow_view
+
+        #: Is the common data volume for the application mounted
+        self.allow_common = allow_common
+
+        #: Source path for the common data volume on the host machine
+        self.volume_source = volume_source
+
+        #: Target mount point of the common data volume in the application
+        self.volume_target = volume_target
+
+        #: Mode for read-write access (ro: Read-only, rw: Read-write)
+        self.volume_mode = volume_mode
+
+    def __repr__(self):
+        args = _inspect.getargs(
+            ABCApplicationPolicy.__init__.__code__).args[1:]
+
+        return "<{cls}({spec})>".format(
+            cls=self.__class__.__name__,
+            spec=", ".join("{0}={1!r}".format(arg, getattr(self, arg))
+                           for arg in args))
+
+
+class ABCAccounting(metaclass=ABCMeta):
 
     @abstractmethod
     def get_user_by_name(self, user_name):
@@ -76,5 +82,8 @@ class ABCDatabase(metaclass=ABCMeta):
 
         Returns
         -------
-        iterable : ApplicationConfig
+        application_spec: tuple
+           tuple of ( mapping_id, ABCApplication, ABCApplicationPolicy )
+           where mapping_id is an ID for identifying the
+           (ABCApplication, ABCApplicationPolicy) pair
         """
