@@ -194,9 +194,11 @@ class HomeHandler(BaseHandler):
 
             # We assume that we can only run one container only (although the
             # API considers a broader possibility for future extension.
-            container = containers[0] if len(containers) else None
-            container.base_urlpath = \
-                self.application.command_line_config.base_url
+            container = None
+            if len(containers):
+                container = containers[0]
+                container.base_urlpath = \
+                    self.application.command_line_config.base_url
 
             images_info.append({
                 "image": image,
