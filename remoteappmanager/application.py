@@ -206,7 +206,7 @@ class Application(web.Application, LoggingMixin):
 
     def _db_init(self):
         """Initializes the database connection."""
-        self.db = orm.Database(self.file_config.db_url)
+        self.db = orm.AccountingInterface(self.file_config.db_url)
 
     def _user_init(self):
         """Initializes the user at the database level."""
