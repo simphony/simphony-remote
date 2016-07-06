@@ -11,7 +11,6 @@ Subpackages
     remoteappmanager.docker
     remoteappmanager.handlers
     remoteappmanager.logging
-    remoteappmanager.services
 
 Submodules
 ----------
