@@ -2,7 +2,6 @@ import os
 from urllib import parse
 
 from traitlets import Instance
-from sqlalchemy.orm.exc import MultipleResultsFound
 from tornado import web, gen
 import tornado.ioloop
 from jinja2 import Environment, FileSystemLoader

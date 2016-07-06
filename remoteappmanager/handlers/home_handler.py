@@ -11,7 +11,6 @@ from tornado.log import app_log
 
 from remoteappmanager.handlers.base_handler import BaseHandler
 from remoteappmanager.docker.container import Container
-from remoteappmanager.db import orm
 
 
 class HomeHandler(BaseHandler):
