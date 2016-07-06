@@ -1,5 +1,5 @@
 import os
-from traitlets import Instance
+from traitlets import Instance, default
 from sqlalchemy.orm.exc import MultipleResultsFound
 from tornado import web
 import tornado.ioloop
@@ -20,13 +20,15 @@ from remoteappmanager.services.reverse_proxy import ReverseProxy
 class Application(web.Application, LoggingMixin):
     """Tornado main application"""
 
-    user = Instance(User, allow_none=True)
+    user = Instance(User)
 
-    db = Instance(orm.Database, allow_none=True)
+    db = Instance(orm.Database)
 
     reverse_proxy = Instance(ReverseProxy)
 
     hub = Instance(Hub)
+
+    container_manager = Instance(ContainerManager)
 
     def __init__(self,
                  command_line_config,
@@ -51,11 +53,7 @@ class Application(web.Application, LoggingMixin):
         settings["static_url_prefix"] = (
             self._command_line_config.base_url + "static/")
 
-        self._db_init()
         self._jinja_init(settings)
-        self._container_manager_init()
-        self._reverse_proxy_init()
-        self._user_init()
 
         handlers = self._get_handlers()
 
@@ -69,6 +67,72 @@ class Application(web.Application, LoggingMixin):
     def file_config(self):
         return self._file_config
 
+    # Initializers
+    @default("container_manager")
+    def _container_manager_default(self):
+        """Initializes the docker container manager."""
+
+        return ContainerManager(
+            docker_config=DockerClientConfig(
+                tls=self.file_config.tls,
+                tls_verify=self.file_config.tls_verify,
+                tls_ca=self.file_config.tls_ca,
+                tls_key=self.file_config.tls_key,
+                tls_cert=self.file_config.tls_cert,
+                docker_host=self.file_config.docker_host,
+            )
+        )
+
+    @default("reverse_proxy")
+    def _reverse_proxy_default(self):
+        """Initializes the reverse proxy connection object."""
+        try:
+            auth_token = os.environ["PROXY_API_TOKEN"]
+        except KeyError:
+            self.log.error("Cannot extract PROXY_API_TOKEN to initialise the "
+                           "reverse proxy connection. Exiting.")
+            raise
+
+        # Note, we use jupyterhub orm Proxy, but not for database access,
+        # just for interface convenience.
+        return ReverseProxy(
+            endpoint_url=self.command_line_config.proxy_api_url,
+            auth_token=auth_token)
+
+    @default("hub")
+    def _hub_default(self):
+        """Initializes the Hub instance."""
+        return Hub(endpoint_url=self.command_line_config.hub_api_url,
+                   api_key=os.environ.get('JPY_API_TOKEN', "")
+                   )
+
+    @default("db")
+    def _db_default(self):
+        """Initializes the database connection."""
+        return orm.Database(self.file_config.db_url)
+
+    @default("user")
+    def _user_default(self):
+        """Initializes the user at the database level."""
+        session = self.db.create_session()
+
+        user_name = self.command_line_config.user
+        user = User(name=user_name)
+        with orm.transaction(session):
+            try:
+                user.orm_user = session.query(orm.User).filter_by(
+                    name=user_name).one_or_none()
+            except MultipleResultsFound:
+                self.log.error("Multiple results found when "
+                               "querying for username {}. This is supposedly "
+                               "impossible because the username should be a "
+                               "unique key by design.".format(
+                    user_name))
+                raise
+
+        return user
+
+    # Public
     def start(self):
         """Start the application and the ioloop"""
 
@@ -110,62 +174,3 @@ class Application(web.Application, LoggingMixin):
         )
 
         settings["template_loader"] = Jinja2LoaderAdapter(jinja_env)
-
-    def _container_manager_init(self):
-        """Initializes the docker container manager."""
-
-        self.container_manager = ContainerManager(
-            docker_config=DockerClientConfig(
-                tls=self.file_config.tls,
-                tls_verify=self.file_config.tls_verify,
-                tls_ca=self.file_config.tls_ca,
-                tls_key=self.file_config.tls_key,
-                tls_cert=self.file_config.tls_cert,
-                docker_host=self.file_config.docker_host,
-            )
-        )
-
-    def _reverse_proxy_init(self):
-        """Initializes the reverse proxy connection object."""
-        try:
-            auth_token = os.environ["PROXY_API_TOKEN"]
-        except KeyError:
-            self.log.error("Cannot extract PROXY_API_TOKEN to initialise the "
-                           "reverse proxy connection. Exiting.")
-            raise
-
-        # Note, we use jupyterhub orm Proxy, but not for database access,
-        # just for interface convenience.
-        self.reverse_proxy = ReverseProxy(
-            endpoint_url=self.command_line_config.proxy_api_url,
-            auth_token=auth_token)
-
-    def _hub_init(self):
-        self.hub = Hub(endpoint_url=self.command_line_config.hub_api_url,
-                       api_key=os.environ.get('JPY_API_TOKEN', "")
-                       )
-
-    def _db_init(self):
-        """Initializes the database connection."""
-        self.db = orm.Database(self.file_config.db_url)
-
-    def _user_init(self):
-        """Initializes the user at the database level."""
-        session = self.db.create_session()
-
-        user_name = self.command_line_config.user
-        user = User(name=user_name)
-        with orm.transaction(session):
-            try:
-                user.orm_user = session.query(orm.User).filter_by(
-                                    name=user_name).one_or_none()
-            except MultipleResultsFound:
-                self.log.error("Multiple results found when "
-                               "querying for username {}. This is supposedly "
-                               "impossible because the username should be a "
-                               "unique key by design.".format(
-                                   user_name))
-                raise
-
-        self.user = user
-
