@@ -231,6 +231,8 @@ class HomeHandler(BaseHandler):
             )
             return None
 
+    # FIXME: The orm_user here requires any database implementation
+    # to provide a user object with a name attribute
     @gen.coroutine
     def _start_container(self, orm_user, app, policy, mapping_id):
         """Start the container. This method is a helper method that
