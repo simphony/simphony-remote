@@ -9,6 +9,7 @@ from jinja2 import Environment, FileSystemLoader
 from jupyterhub import orm as jupyterhub_orm
 
 from remoteappmanager.db import orm
+from remoteappmanager.db.interfaces import ABCAccounting
 from remoteappmanager.handlers.api import HomeHandler
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.docker.container_manager import ContainerManager
@@ -23,7 +24,7 @@ class Application(web.Application, LoggingMixin):
 
     user = Instance(User, allow_none=True)
 
-    db = Instance(orm.Database, allow_none=True)
+    db = Instance(ABCAccounting, allow_none=True)
 
     def __init__(self,
                  command_line_config,
@@ -209,23 +210,9 @@ class Application(web.Application, LoggingMixin):
 
     def _user_init(self):
         """Initializes the user at the database level."""
-        session = self.db.create_session()
-
         user_name = self.command_line_config.user
-        user = User(name=user_name)
-        with orm.transaction(session):
-            try:
-                user.orm_user = session.query(orm.User).filter_by(
-                                    name=user_name).one_or_none()
-            except MultipleResultsFound:
-                self.log.error("Multiple results found when "
-                               "querying for username {}. This is supposedly "
-                               "impossible because the username should be a "
-                               "unique key by design.".format(
-                                   user_name))
-                raise
-
-        self.user = user
+        self.user = User(name=user_name)
+        self.user.orm_user = self.db.get_user_by_name(user_name)
 
 
 def _server_from_url(url):
