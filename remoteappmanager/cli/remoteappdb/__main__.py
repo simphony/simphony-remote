@@ -113,8 +113,8 @@ def remove(ctx, user):
 @click.option('--no-decoration', is_flag=True,
               help="Disable table decorations")
 @click.option('--show-apps', is_flag=True,
-              help="For each user, shows the "
-                   "applications he is allowed to run")
+              help="Shows the applications each user "
+                   "is allowed to run")
 @click.pass_context
 def list(ctx, no_decoration, show_apps):
     """Show a list of the available users."""
