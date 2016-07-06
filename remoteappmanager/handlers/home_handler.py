@@ -240,13 +240,13 @@ class HomeHandler(BaseHandler):
 
         Parameters
         ----------
-        orm_user : orm.User
-            the orm user object
+        orm_user : User
+            database's user object (e.g. current_user.orm_user)
 
-        app : orm.Application
+        app : ABCApplication
             the application to start
 
-        policy : orm.ApplicationPolicy
+        policy : ABCApplicationPolicy
             The startup policy for the application
         """
 
