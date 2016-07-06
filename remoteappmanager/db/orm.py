@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
+from remoteappmanager.db.interfaces import ABCAccounting
 
 Base = declarative_base()
 
@@ -127,6 +128,54 @@ class Database(LoggingMixin):
         """
         Base.metadata.drop_all(self.engine)
         Base.metadata.create_all(self.engine)
+
+
+class AccountingInterface(ABCAccounting):
+
+    def __init__(self, url, **kwargs):
+        self.db = Database(url, **kwargs)
+
+        # We keep the same session for all transactions
+        # so that the session remains on one thread
+        self.session = self.db.create_session()
+
+    def get_user_by_name(self, user_name):
+        """ Return an orm.User given a user name.  Return None
+        if the user name is not found in the database
+        """
+        with transaction(self.session):
+            return self.session.query(User).filter_by(
+                name=user_name).one_or_none()
+
+    def get_apps_for_user(self, user):
+        """ Return a tuple of tuples, each containing an application
+        and the associated policy that a user, defined by the user_name,
+        is allowed to run.  If user is None, an empty tuple is returned.
+
+        Parameters
+        ----------
+        user : orm.User
+
+        Returns
+        -------
+        tuple
+           tuples of tuples
+           (mapping_id, orm.Application, orm.ApplicationPolicy)
+           The mapping_id is a unique string identifying the combination
+           of application and policy. It is not unique per user.
+        """
+        if user is None:
+            return ()
+
+        with transaction(self.session):
+            res = self.session.query(Accounting).join(
+                Accounting.user, aliased=True).filter_by(
+                    name=user.name).all()
+
+        return tuple(("_".join((acc.application.image,
+                                str(acc.application_policy.id))),
+                      acc.application,
+                      acc.application_policy) for acc in res)
 
 
 @contextlib.contextmanager
