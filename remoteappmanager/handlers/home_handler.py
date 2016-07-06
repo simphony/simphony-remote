@@ -98,7 +98,6 @@ class HomeHandler(BaseHandler):
                                                     app,
                                                     policy,
                                                     mapping_id)
-
             yield self._wait_for_container_ready(container)
         except Exception as e:
             # Clean up, if the container is running
@@ -116,12 +115,11 @@ class HomeHandler(BaseHandler):
 
         # The server is up and running. Now contact the proxy and add
         # the container url to it.
-        yield self.application.reverse_proxy_add_container(container)
+        yield self.application.reverse_proxy.add_container(container)
 
         # Redirect the user
-        url = self.application.container_url_abspath(container)
-        self.log.info('Redirecting to ' + url)
-        self.redirect(url)
+        self.log.info('Redirecting to ' + container.absurlpath)
+        self.redirect(container.absurlpath)
 
     @gen.coroutine
     def _actionhandler_view(self, options):
@@ -137,11 +135,10 @@ class HomeHandler(BaseHandler):
         yield self._wait_for_container_ready(container)
 
         # in case the reverse proxy is not already set up
-        yield self.application.reverse_proxy_add_container(container)
+        yield self.application.reverse_proxy.add_container(container)
 
-        url = self.application.container_url_abspath(container)
-        self.log.info('Redirecting to ' + url)
-        self.redirect(url)
+        self.log.info('Redirecting to ' + container.absurlpath)
+        self.redirect(container.absurlpath)
 
     @gen.coroutine
     def _actionhandler_stop(self, options):
@@ -156,7 +153,7 @@ class HomeHandler(BaseHandler):
             return
 
         try:
-            yield app.reverse_proxy_remove_container(container)
+            yield app.reverse_proxy.remove_container(container)
         except HTTPError as http_error:
             # The reverse proxy may be absent to start with
             if http_error.code != 404:
@@ -198,6 +195,8 @@ class HomeHandler(BaseHandler):
             # We assume that we can only run one container only (although the
             # API considers a broader possibility for future extension.
             container = containers[0] if len(containers) else None
+            container.base_urlpath = \
+                self.application.command_line_config.base_url
 
             images_info.append({
                 "image": image,
@@ -228,7 +227,10 @@ class HomeHandler(BaseHandler):
             filters={'id': container_id})
 
         if container_dict:
-            return Container.from_docker_containers_dict(container_dict[0])
+            container = Container.from_docker_containers_dict(
+                container_dict[0])
+            container.base_urlpath = \
+                self.application.command_line_config.base_url
         else:
             self.log.exception(
                 "Failed to retrieve valid container from container id: %s",
@@ -252,6 +254,10 @@ class HomeHandler(BaseHandler):
 
         policy : orm.ApplicationPolicy
             The startup policy for the application
+
+        Returns
+        -------
+        Container
         """
 
         user_name = orm_user.name
@@ -301,6 +307,8 @@ class HomeHandler(BaseHandler):
             e.reason = 'error'
             raise e
 
+        container.base_urlpath = self.application.command_line_config.base_url
+
         return container
 
     def _parse_form(self):
@@ -329,7 +337,7 @@ class HomeHandler(BaseHandler):
         server_url = "http://{}:{}{}/".format(
             container.ip,
             container.port,
-            self.application.container_url_abspath(container))
+            container.absurlpath)
 
         yield _wait_for_http_server_2xx(
             server_url,

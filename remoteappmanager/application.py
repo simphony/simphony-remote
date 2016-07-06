@@ -1,12 +1,9 @@
 import os
-from urllib import parse
-
 from traitlets import Instance
 from sqlalchemy.orm.exc import MultipleResultsFound
-from tornado import web, gen
+from tornado import web
 import tornado.ioloop
 from jinja2 import Environment, FileSystemLoader
-from jupyterhub import orm as jupyterhub_orm
 
 from remoteappmanager.db import orm
 from remoteappmanager.handlers.api import HomeHandler
@@ -16,6 +13,8 @@ from remoteappmanager.docker.docker_client_config import DockerClientConfig
 from remoteappmanager.jinja2_adapters import Jinja2LoaderAdapter
 from remoteappmanager.user import User
 from remoteappmanager.traitlets import as_dict
+from remoteappmanager.services.hub import Hub
+from remoteappmanager.services.reverse_proxy import ReverseProxy
 
 
 class Application(web.Application, LoggingMixin):
@@ -24,6 +23,10 @@ class Application(web.Application, LoggingMixin):
     user = Instance(User, allow_none=True)
 
     db = Instance(orm.Database, allow_none=True)
+
+    reverse_proxy = Instance(ReverseProxy)
+
+    hub = Instance(Hub)
 
     def __init__(self,
                  command_line_config,
@@ -47,7 +50,6 @@ class Application(web.Application, LoggingMixin):
         settings.update(as_dict(file_config))
         settings["static_url_prefix"] = (
             self._command_line_config.base_url + "static/")
-        settings["hub_api_key"] = os.environ.get('JPY_API_TOKEN', "")
 
         self._db_init()
         self._jinja_init(settings)
@@ -84,66 +86,6 @@ class Application(web.Application, LoggingMixin):
         self.listen(self.command_line_config.port)
 
         tornado.ioloop.IOLoop.current().start()
-
-    def container_url_abspath(self, container):
-        """Returns the absolute path of a container, considering the
-        application setup.
-
-        Parameters
-        ----------
-        container : Container
-            A container object.
-
-        Returns
-        -------
-        The absolute path part of the url.
-        """
-        return self.command_line_config.base_url + container.url
-
-    @gen.coroutine
-    def reverse_proxy_remove_container(self, container):
-        """Removes a container from the reverse proxy at the associated url.
-
-        Parameters
-        ----------
-        container : Container
-            A container object.
-        """
-        proxy = self.reverse_proxy
-
-        container_url = self.container_url_abspath(container)
-        self.log.info("Deregistering url {} to {} on reverse proxy.".format(
-            container_url,
-            container.host_url
-        ))
-
-        yield proxy.api_request(container_url, method='DELETE')
-
-    @gen.coroutine
-    def reverse_proxy_add_container(self, container):
-        """Adds the url associated to a given container on the reverse proxy.
-
-        Parameters
-        ----------
-        container : Container
-            A container object.
-        """
-
-        proxy = self.reverse_proxy
-        container_url_path = self.container_url_abspath(container)
-
-        self.log.info("Registering url {} to {} on reverse proxy.".format(
-            container_url_path,
-            container.host_url
-        ))
-
-        yield proxy.api_request(
-            container_url_path,
-            method='POST',
-            body=dict(
-                target=container.host_url,
-            )
-        )
 
     # Private
     def _get_handlers(self):
@@ -194,14 +136,14 @@ class Application(web.Application, LoggingMixin):
 
         # Note, we use jupyterhub orm Proxy, but not for database access,
         # just for interface convenience.
-        self.reverse_proxy = jupyterhub_orm.Proxy(
-            auth_token=auth_token,
-            api_server=_server_from_url(self.command_line_config.proxy_api_url)
-        )
+        self.reverse_proxy = ReverseProxy(
+            endpoint_url=self.command_line_config.proxy_api_url,
+            auth_token=auth_token)
 
-        self.log.info("Reverse proxy setup on {}".format(
-            self.command_line_config.proxy_api_url
-        ))
+    def _hub_init(self):
+        self.hub = Hub(endpoint_url=self.command_line_config.hub_api_url,
+                       api_key=os.environ.get('JPY_API_TOKEN', "")
+                       )
 
     def _db_init(self):
         """Initializes the database connection."""
@@ -227,13 +169,3 @@ class Application(web.Application, LoggingMixin):
 
         self.user = user
 
-
-def _server_from_url(url):
-    """Creates a orm.Server from a given url"""
-    parsed = parse.urlparse(url)
-    return jupyterhub_orm.Server(
-        proto=parsed.scheme,
-        ip=parsed.hostname,
-        port=parsed.port,
-        base_url=parsed.path
-    )
