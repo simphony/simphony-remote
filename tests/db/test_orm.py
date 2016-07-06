@@ -3,7 +3,7 @@ import unittest
 
 from remoteappmanager.db import orm
 from remoteappmanager.db.orm import (Database, transaction, Accounting,
-                                     AccountingInterface)
+                                     AppAccounting)
 from tests.db.abc_test_interfaces import ABCTestDatabaseInterface
 from tests.temp_mixin import TempMixin
 from tests import utils
@@ -157,7 +157,7 @@ class TestOrm(TempMixin, unittest.TestCase):
                                               policy))
 
 
-class TestOrmInterface(TempMixin, ABCTestDatabaseInterface, unittest.TestCase):
+class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface, unittest.TestCase):
     def setUp(self):
         # Setup temporary directory
         super().setUp()
@@ -189,7 +189,7 @@ class TestOrmInterface(TempMixin, ABCTestDatabaseInterface, unittest.TestCase):
         return mappings[user.name]
 
     def create_accounting(self):
-        accounting = AccountingInterface(
+        accounting = AppAccounting(
             url="sqlite:///"+self.sqlite_file_path)
 
         # Fill the database

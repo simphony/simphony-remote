@@ -130,7 +130,7 @@ class Database(LoggingMixin):
         Base.metadata.create_all(self.engine)
 
 
-class AccountingInterface(ABCAccounting):
+class AppAccounting(ABCAccounting):
 
     def __init__(self, url, **kwargs):
         self.db = Database(url, **kwargs)
