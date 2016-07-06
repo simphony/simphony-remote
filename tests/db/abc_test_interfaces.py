@@ -1,5 +1,4 @@
 from abc import abstractmethod, ABCMeta
-from collections import Iterable
 import inspect as _inspect
 
 from remoteappmanager.db.interfaces import ABCApplication, ABCApplicationPolicy
