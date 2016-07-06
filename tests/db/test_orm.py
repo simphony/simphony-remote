@@ -203,3 +203,7 @@ class TestOrmInterface(TempMixin, ABCTestDatabaseInterface, unittest.TestCase):
         user = accounting.get_user_by_name('user1')
         self.assertIsInstance(user, orm.User)
         self.assertEqual(user.name, 'user1')
+
+        # user not found, result should be None
+        user = accounting.get_user_by_name('foo')
+        self.assertIsNone(user)
