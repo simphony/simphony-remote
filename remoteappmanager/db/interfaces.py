@@ -60,8 +60,8 @@ class ABCAccounting(metaclass=ABCMeta):
 
     @abstractmethod
     def get_user_by_name(self, user_name):
-        """ Return a User for a given user_name, or None
-        if the user name is not found.
+        """ Return a User for a given user_name, or return
+        None if the user name is not found.
 
         Parameters
         ----------
@@ -74,12 +74,13 @@ class ABCAccounting(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def get_apps_for_user(self, user_name):
-        """ Return an iterable of ApplicationConfig for a given user name
+    def get_apps_for_user(self, user):
+        """ Return an iterable of ApplicationConfig for a given user
 
         Parameters
         ----------
-        user_name: str
+        user : User
+           Same type as the result of `get_user_by_name`
 
         Returns
         -------

@@ -20,13 +20,13 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
             if getattr(policy1, arg) != getattr(policy2, arg):
                 raise self.failureException(msg)
 
-    def setUp(self, usernames, application_configs):
-        """ Given a list of usernames, associate a list of
+    def setUp(self, users, application_configs):
+        """ Given a list of users, associate a list of
         tuple(Application, ApplicationPolicy) for each user.
 
         Examples
         --------
-        setUp(('user1', 'user2'),
+        setUp((User('user1'), User('user2'),
               ( # user1
                 (
                    (Application(...), ApplicationPolicy(...)),
@@ -38,7 +38,7 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
                 )
               ))
         """
-        if not (usernames and application_configs):
+        if not (users and application_configs):
             raise ValueError("usernames and application_configs must not "
                              "be empty")
 
@@ -46,7 +46,7 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
             if not isinstance(configs, Iterable):
                 raise TypeError("{!0} is not iterable.".format(configs))
 
-        self.user_config_mappings = dict(zip(usernames, application_configs))
+        self.user_config_mappings = dict(zip(users, application_configs))
 
     @abstractmethod
     def create_accounting(self):
@@ -61,10 +61,10 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
         """
         accounting = self.create_accounting()
 
-        for username, expected_configs in self.user_config_mappings.items():
+        for user, expected_configs in self.user_config_mappings.items():
             # should be ((mapping_id, Application, ApplicationPolicy),
             #            (mapping_id, Application, ApplicationPolicy) ... )
-            actual_id_configs = accounting.get_apps_for_user(username)
+            actual_id_configs = accounting.get_apps_for_user(user)
 
             # should be ( (Application, ApplicationPolicy),
             #             (Application, ApplicationPolicy) ... )
