@@ -47,8 +47,14 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         out = self._remoteappdb("user list")
         self.assertNotIn("myapp", out)
         self._remoteappdb("app grant myapp user")
+        self._remoteappdb("app grant myapp user "
+                          "--allow-view "
+                          "--volume=frobniz:froble:ro")
         out = self._remoteappdb("user list --show-apps")
         self.assertIn("myapp", out)
+        self.assertIn("frobniz", out)
+        self.assertIn("froble", out)
+        self.assertIn(" ro\n", out)
 
     def test_app_revoke(self):
         self._remoteappdb("app create myapp")

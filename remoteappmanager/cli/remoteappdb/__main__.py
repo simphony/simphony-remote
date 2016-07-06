@@ -249,7 +249,7 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
 
     if volume is not None:
         allow_common = True
-        source, target, model = _parse_volume_string(volume)
+        source, target, mode = _parse_volume_string(volume)
 
     session = db.create_session()
     with orm.transaction(session):
@@ -330,7 +330,7 @@ def revoke(ctx, image, user, revoke_all, allow_home, allow_view, volume):
 
     if volume is not None:
         allow_common = True
-        source, target, model = _parse_volume_string(volume)
+        source, target, mode = _parse_volume_string(volume)
 
     session = db.create_session()
     with orm.transaction(session):
