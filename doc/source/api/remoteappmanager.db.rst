@@ -4,14 +4,6 @@ remoteappmanager.db package
 Submodules
 ----------
 
-remoteappmanager.db.interfaces module
--------------------------------------
-
-.. automodule:: remoteappmanager.db.interfaces
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 remoteappmanager.db.orm module
 ------------------------------
 
