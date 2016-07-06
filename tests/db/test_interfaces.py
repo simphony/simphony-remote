@@ -26,16 +26,16 @@ class Accounting(ABCAccounting):
     def get_user_by_name(self, username):
         return User(name=username)
 
-    def get_apps_for_user(self, username):
+    def get_apps_for_user(self, user):
         return (('mapping_id1',
-                 Application(image=username+'1'), ApplicationPolicy()),
+                 Application(image=user.name+'1'), ApplicationPolicy()),
                 ('mapping_id2',
-                 Application(image=username+'2'), ApplicationPolicy()))
+                 Application(image=user.name+'2'), ApplicationPolicy()))
 
 
 class TestDatabaseInterface(ABCTestDatabaseInterface, unittest.TestCase):
     def setUp(self):
-        super().setUp(['foo', 'bar'],
+        super().setUp([User('foo'), User('bar')],
                       [(
                           (Application(image='foo1'), ApplicationPolicy()),
                           (Application(image='foo2'), ApplicationPolicy())
