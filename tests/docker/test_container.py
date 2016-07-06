@@ -12,7 +12,7 @@ class TestContainer(TestCase):
 
         self.assertEqual(container.urlpath, "containers/12345")
         with self.assertRaises(ValueError):
-            _ = container.absurlpath
+            _ = container.absurlpath  # noqa
 
         container.base_urlpath = "/foo/"
 

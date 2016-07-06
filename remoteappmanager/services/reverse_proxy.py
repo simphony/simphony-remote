@@ -1,4 +1,3 @@
-import os
 from urllib import parse
 
 from tornado import gen
@@ -17,12 +16,14 @@ class ReverseProxy(LoggingMixin, HasTraits):
     #: The authorization token to authenticate the request
     auth_token = Unicode()
 
-    def __init__(self, endpoint_url, auth_token):
+    def __init__(self, *args, **kwargs):
         """Initializes the reverse proxy connection object."""
+        super().__init__(*args, **kwargs)
+
         # Note, we use jupyterhub orm Proxy, but not for database access,
         # just for interface convenience.
         self._reverse_proxy = jupyterhub_orm.Proxy(
-            auth_token=auth_token,
+            auth_token=self.auth_token,
             api_server=_server_from_url(self.endpoint_url)
         )
 
