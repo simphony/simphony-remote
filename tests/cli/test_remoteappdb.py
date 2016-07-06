@@ -40,12 +40,50 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         out = self._remoteappdb("app list")
         self.assertIn("myapp", out)
 
-    def test_app_expose(self):
+    def test_app_grant(self):
         self._remoteappdb("app create myapp")
         self._remoteappdb("user create user")
 
         out = self._remoteappdb("user list")
         self.assertNotIn("myapp", out)
-        self._remoteappdb("app expose myapp user")
-        out = self._remoteappdb("user list")
+        self._remoteappdb("app grant myapp user")
+        self._remoteappdb("app grant myapp user "
+                          "--allow-view "
+                          "--volume=frobniz:froble:ro")
+        out = self._remoteappdb("user list --show-apps")
         self.assertIn("myapp", out)
+        self.assertIn("frobniz", out)
+        self.assertIn("froble", out)
+        self.assertIn(" ro\n", out)
+
+    def test_app_revoke(self):
+        self._remoteappdb("app create myapp")
+        self._remoteappdb("user create user")
+
+        self._remoteappdb("app grant myapp user")
+        self._remoteappdb("app grant myapp user --allow-view")
+        out = self._remoteappdb("user list --show-apps --no-decoration")
+        self.assertEqual(len(out.split('\n')), 3)
+        self._remoteappdb("app revoke myapp user --revoke-all")
+        out = self._remoteappdb("user list --show-apps --no-decoration")
+        self.assertEqual(len(out.split('\n')), 2)
+        self.assertNotIn("myapp", out)
+
+        self._remoteappdb("app grant myapp user")
+        self._remoteappdb("app grant myapp user "
+                          "--allow-view")
+        self._remoteappdb("app grant myapp user "
+                          "--allow-view "
+                          "--volume=frobniz:froble:ro")
+
+        out = self._remoteappdb("user list --show-apps --no-decoration")
+        self.assertEqual(len(out.split('\n')), 4)
+        self._remoteappdb("app revoke myapp user")
+        out = self._remoteappdb("user list --show-apps --no-decoration")
+        self.assertEqual(len(out.split('\n')), 3)
+
+        self._remoteappdb("app revoke myapp user --allow-view")
+        out = self._remoteappdb("user list --show-apps --no-decoration")
+        self.assertEqual(len(out.split('\n')), 2)
+        self.assertIn("frobniz", out)
+        self.assertIn("froble", out)
