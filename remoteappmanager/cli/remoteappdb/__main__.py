@@ -90,6 +90,7 @@ def create(ctx, user):
 @click.argument("user")
 @click.pass_context
 def remove(ctx, user):
+    """Removes a user."""
     db = ctx.obj["db"]
     session = db.create_session()
 
@@ -186,6 +187,7 @@ def create(ctx, image):
 @click.argument("image")
 @click.pass_context
 def remove(ctx, image):
+    """Removes an application from the list."""
     db = ctx.obj["db"]
     session = db.create_session()
 
