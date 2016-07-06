@@ -127,7 +127,7 @@ class Application(web.Application, LoggingMixin):
                                "querying for username {}. This is supposedly "
                                "impossible because the username should be a "
                                "unique key by design.".format(
-                    user_name))
+                                user_name))
                 raise
 
         return user

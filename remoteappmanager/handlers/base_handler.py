@@ -33,4 +33,3 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
 
         args.update(kwargs)
         super(BaseHandler, self).render(template_name, **args)
-
