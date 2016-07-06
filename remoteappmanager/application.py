@@ -7,7 +7,7 @@ import tornado.ioloop
 from jinja2 import Environment, FileSystemLoader
 from jupyterhub import orm as jupyterhub_orm
 
-from remoteappmanager.db import orm
+from remoteappmanager.db import csv_db, orm
 from remoteappmanager.db.interfaces import ABCAccounting
 from remoteappmanager.handlers.api import HomeHandler
 from remoteappmanager.logging.logging_mixin import LoggingMixin
@@ -205,7 +205,13 @@ class Application(web.Application, LoggingMixin):
 
     def _db_init(self):
         """Initializes the database connection."""
-        self.db = orm.AppAccounting(self.file_config.db_url)
+        if self.file_config.db_url.endswith('.db'):
+            self.db = orm.AppAccounting(self.file_config.db_url)
+        elif self.file_config.db_url.endswith('.csv'):
+            self.db = csv_db.CSVAccounting(self.file_config.db_url)
+        else:
+            raise ValueError("Unsupported database format: {}".format(
+                self.file_config.db_url))
 
     def _user_init(self):
         """Initializes the user at the database level."""
