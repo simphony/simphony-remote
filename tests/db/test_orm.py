@@ -157,7 +157,8 @@ class TestOrm(TempMixin, unittest.TestCase):
                                               policy))
 
 
-class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface, unittest.TestCase):
+class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
+                           unittest.TestCase):
     def setUp(self):
         # Setup temporary directory
         super().setUp()
