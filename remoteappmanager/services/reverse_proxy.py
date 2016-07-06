@@ -9,20 +9,16 @@ from remoteappmanager.logging.logging_mixin import LoggingMixin
 
 
 class ReverseProxy(LoggingMixin, HasTraits):
-
+    """Represents the remote reverse proxy. It is meant to have a high
+    level API."""
+    # The endpoint url at which the reverse proxy has its api
     endpoint_url = Unicode()
 
+    #: The authorization token to authenticate the request
     auth_token = Unicode()
 
     def __init__(self, endpoint_url, auth_token):
         """Initializes the reverse proxy connection object."""
-        try:
-            auth_token = os.environ["PROXY_API_TOKEN"]
-        except KeyError:
-            self.log.error("Cannot extract PROXY_API_TOKEN to initialise the "
-                           "reverse proxy connection. Exiting.")
-            raise
-
         # Note, we use jupyterhub orm Proxy, but not for database access,
         # just for interface convenience.
         self._reverse_proxy = jupyterhub_orm.Proxy(

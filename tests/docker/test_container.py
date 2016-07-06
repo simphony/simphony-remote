@@ -10,7 +10,13 @@ class TestContainer(TestCase):
             url_id="12345"
         )
 
-        self.assertEqual(container.url, "containers/12345")
+        self.assertEqual(container.urlpath, "containers/12345")
+        with self.assertRaises(ValueError):
+            _ = container.absurlpath
+
+        container.base_urlpath = "/foo/"
+
+        self.assertEqual(container.absurlpath, "/foo/containers/12345")
 
     def test_host_url(self):
         container = Container(
