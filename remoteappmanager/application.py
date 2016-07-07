@@ -168,4 +168,3 @@ class Application(web.Application, LoggingMixin):
         )
 
         settings["template_loader"] = Jinja2LoaderAdapter(jinja_env)
-
