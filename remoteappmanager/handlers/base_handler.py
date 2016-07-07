@@ -1,21 +1,19 @@
-import requests
-from urllib.parse import urljoin, quote
+from urllib.parse import urljoin
 
 from tornado import web
-from tornado.httpclient import HTTPError
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
-from remoteappmanager.utils import url_path_join
 
 
 class BaseHandler(web.RequestHandler, LoggingMixin):
     """Base class for the request handler."""
 
     def get_current_user(self):
-        user_cookie = self.get_cookie(self.settings['cookie_name'])
+        hub = self.application.hub
+        cookie_name = self.settings["cookie_name"]
+        user_cookie = self.get_cookie(cookie_name)
         if user_cookie:
-            verified = self.verify_token(self.settings['cookie_name'],
-                                         user_cookie)
+            verified = hub.verify_token(cookie_name, user_cookie)
             if verified:
                 return self.application.user
 
@@ -35,31 +33,3 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
 
         args.update(kwargs)
         super(BaseHandler, self).render(template_name, **args)
-
-    def verify_token(self, cookie_name, encrypted_cookie):
-        """Return True if cookie is verified as valid.
-        Otherwise, raise an HTTPError
-        """
-        hub_api_url = self.settings['hub_api_url']
-        hub_api_key = self.settings['hub_api_key']
-
-        # URL for the authorization requiest
-        request_url = url_path_join(hub_api_url,
-                                    "authorizations/cookie",
-                                    cookie_name,
-                                    quote(encrypted_cookie, safe=''))
-
-        r = requests.get(request_url,
-                         headers={'Authorization': 'token %s' % hub_api_key})
-
-        if r.status_code == 403:
-            self.log.error("Auth token may have expired: [%i] %s",
-                           r.status_code, r.reason)
-            raise HTTPError(500,
-                            "Permission failure checking authorization, "
-                            "please restart.")
-        elif r.status_code >= 400:
-            self.log.warn("Failed to check authorization: [%i] %s",
-                          r.status_code, r.reason)
-            raise HTTPError(500, "Failed to check authorization")
-        return True

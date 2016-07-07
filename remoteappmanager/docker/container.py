@@ -33,7 +33,7 @@ class Container(HasTraits):
     url_id = Unicode()
 
     @property
-    def url(self):
+    def urlpath(self):
         """Returns the relative url of the Container."""
         return "containers/{}".format(self.url_id)
 
