@@ -41,7 +41,7 @@ class ABCApplicationPolicy(metaclass=ABCMeta):
         #: Target mount point of the common data volume in the application
         self.volume_target = volume_target
 
-        #: Mode for read-write access (ro: Read-only, rw: Read-write)
+        #: Mode for read-write access (ro = Read-only. rw = Read-write)
         self.volume_mode = volume_mode
 
     def __repr__(self):
@@ -55,13 +55,13 @@ class ABCApplicationPolicy(metaclass=ABCMeta):
 
 
 class ABCAccounting(metaclass=ABCMeta):
-    """ Main accounting interface required by the single user application.
+    """ Main accounting interface required by the single User application.
     """
 
     @abstractmethod
     def get_user_by_name(self, user_name):
         """ Return a User for a given user_name, or return
-        None if the user name is not found.
+        None if the User name is not found.
 
         Parameters
         ----------
@@ -69,22 +69,21 @@ class ABCAccounting(metaclass=ABCMeta):
 
         Returns
         -------
-        user : User
-            a User object that the Database understands
+        a User-like object that the Database understands
         """
 
     @abstractmethod
     def get_apps_for_user(self, user):
-        """ Return an iterable of ApplicationConfig for a given user
+        """ Return an iterable of ApplicationConfig for a given User
 
         Parameters
         ----------
-        user : User
+        user : User-like
            Same type as the result of `get_user_by_name`
 
         Returns
         -------
-        application_spec: tuple
+        tuple
            each item of the tuple should be a tuple of
            (id, ABCApplication, ABCApplicationPolicy) where id is a string
            used for identifying (ABCApplication, ABCApplicationPolicy)
