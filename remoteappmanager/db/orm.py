@@ -98,7 +98,7 @@ class Database(LoggingMixin):
         ----------
         url : url
             A sqlalchemy url to connect to a specified database.
-        **kwargs : dict
+        kwargs : dict
             Additional keys will be passed at create_engine.
         """
         super().__init__()
@@ -231,11 +231,11 @@ def user_can_run(session, user, application, policy):
     ----------
     session : Session
         The current session
-    user : User or None
+    user : orm.User or None
         the orm User, or None.
-    application : Application
+    application : orm.Application
         The application object
-    policy : ApplicationPolicy
+    policy : orm.ApplicationPolicy
         The application policy
 
     Returns
