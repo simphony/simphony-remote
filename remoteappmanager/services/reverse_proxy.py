@@ -10,7 +10,7 @@ from remoteappmanager.logging.logging_mixin import LoggingMixin
 class ReverseProxy(LoggingMixin, HasTraits):
     """Represents the remote reverse proxy. It is meant to have a high
     level API."""
-    # The endpoint url at which the reverse proxy has its api
+    #: The endpoint url at which the reverse proxy has its api
     endpoint_url = Unicode()
 
     #: The authorization token to authenticate the request

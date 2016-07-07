@@ -9,13 +9,28 @@ from remoteappmanager.utils import url_path_join
 
 
 class Hub(LoggingMixin, HasTraits):
+    """Provides access to JupyterHub authenticator services."""
+
+    #: The url at which the Hub can be reached
     endpoint_url = Unicode()
 
+    #: The api key to authenticate the request
     api_key = Unicode()
 
     def verify_token(self, cookie_name, encrypted_cookie):
-        """Return True if cookie is verified as valid.
-        Otherwise, raise an HTTPError
+        """Verify the authentication token and grants access to the user
+        if verified.
+
+        Parameters
+        ----------
+        cookie_name: str
+            A string containing the conventional name of the cookie.
+        encrypted_cookie: str
+            the cookie content, as received by JupyterHub (encrypted)
+
+        Returns
+        -------
+        True if cookie is verified as valid. Otherwise, raise an HTTPError
         """
 
         # URL for the authorization requiest
