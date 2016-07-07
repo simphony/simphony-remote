@@ -119,11 +119,11 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
                         ".home_handler"
                         "._wait_for_http_server_2xx",
                         new_callable=mock_coro_factory), \
-             mock.patch("remoteappmanager"
-                        ".handlers"
-                        ".home_handler"
-                        ".HomeHandler"
-                        ".redirect") as redirect:
+            mock.patch("remoteappmanager"
+                       ".handlers"
+                       ".home_handler"
+                       ".HomeHandler"
+                       ".redirect") as redirect:
 
             self.assertFalse(self._app.reverse_proxy.add_container.called)
             self.fetch("/user/username/",
@@ -186,7 +186,7 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
                            ".HomeHandler"
                            "._container_from_options",
                            new_callable=mock_coro_factory
-                          ) as mock_container_from_options, \
+                           ) as mock_container_from_options, \
                 mock.patch("remoteappmanager"
                            ".handlers"
                            ".home_handler"
