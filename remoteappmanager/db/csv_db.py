@@ -36,7 +36,7 @@ policy.volume_mode : str
 .. note::
 
 - Additional columns are ignored.
-- This reader does not try to eliminate indentical application and policy
+- This reader does not try to eliminate duplicated application and policy
   record for a given user.  It faithfully reads the CSV file and returns
   what it says.
 
@@ -120,9 +120,9 @@ class CSVAccounting(ABCAccounting):
                     image=record[indices['application.image']])
 
                 application_policy = CSVApplicationPolicy(
-                    allow_home=bool(record[indices['policy.allow_home']]),
-                    allow_view=bool(record[indices['policy.allow_view']]),
-                    allow_common=bool(record[indices['policy.allow_common']]),
+                    allow_home=record[indices['policy.allow_home']] == '1',
+                    allow_view=record[indices['policy.allow_view']] == '1',
+                    allow_common=record[indices['policy.allow_common']] == '1',
                     volume_source=(record[indices['policy.volume_source']] or
                                    None),
                     volume_target=(record[indices['policy.volume_target']] or
