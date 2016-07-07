@@ -110,12 +110,13 @@ class Application(web.Application, LoggingMixin):
     def _db_default(self):
         """Initializes the database connection."""
         if self.file_config.db_url.endswith('.db'):
-            self.db = orm.AppAccounting(self.file_config.db_url)
+            db = orm.AppAccounting(self.file_config.db_url)
         elif self.file_config.db_url.endswith('.csv'):
-            self.db = csv_db.CSVAccounting(self.file_config.db_url)
+            db = csv_db.CSVAccounting(self.file_config.db_url)
         else:
             raise ValueError("Unsupported database format: {}".format(
                 self.file_config.db_url))
+        return db
 
     @default("user")
     def _user_default(self):
