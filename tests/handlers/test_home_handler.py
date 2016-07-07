@@ -55,17 +55,17 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
         self._bind_unused_port_orig = tornado.testing.bind_unused_port
         tornado.testing.bind_unused_port = _bind_unused_port
 
+        def cleanup():
+            if self._old_proxy_api_token is not None:
+                os.environ["PROXY_API_TOKEN"] = self._old_proxy_api_token
+            else:
+                del os.environ["PROXY_API_TOKEN"]
+
+            tornado.testing.bind_unused_port = self._bind_unused_port_orig
+
+        self.addCleanup(cleanup)
+
         super().setUp()
-
-    def tearDown(self):
-        if self._old_proxy_api_token is not None:
-            os.environ["PROXY_API_TOKEN"] = self._old_proxy_api_token
-        else:
-            del os.environ["PROXY_API_TOKEN"]
-
-        tornado.testing.bind_unused_port = self._bind_unused_port_orig
-
-        super().tearDown()
 
     def get_app(self):
         sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
