@@ -41,7 +41,7 @@ class ABCApplicationPolicy(metaclass=ABCMeta):
         #: Target mount point of the common data volume in the application
         self.volume_target = volume_target
 
-        #: Mode for read-write access (ro: Read-only, rw: Read-write)
+        #: Mode for read-write access (ro = Read-only. rw = Read-write)
         self.volume_mode = volume_mode
 
     def __repr__(self):
