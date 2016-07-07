@@ -64,12 +64,6 @@ class CSVUser(object):
     def __init__(self, name):
         self.name = name
 
-    def __eq__(self, other):
-        return self.name == other.name
-
-    def __hash__(self):
-        return hash(self.name)
-
 
 _HEADERS = ('user.name',
             'application.image',
@@ -111,7 +105,8 @@ class CSVAccounting(ABCAccounting):
             headers = next(reader)
             missing_headers = set(_HEADERS) - set(headers)
             if missing_headers:
-                msg = "Expect the first row to contain headers. Missing headers: {}"
+                msg = ("Expect the first row to contain headers. "
+                       "Missing headers: {}")
                 raise ValueError(msg.format(", ".join(missing_headers)))
 
             # Map indices for the columns
@@ -119,7 +114,7 @@ class CSVAccounting(ABCAccounting):
                                (headers.index(header) for header in _HEADERS)))
 
             for count, record in enumerate(reader):
-                user = CSVUser(name=record[indices['user.name']])
+                username = record[indices['user.name']]
 
                 application = CSVApplication(
                     image=record[indices['application.image']])
@@ -128,22 +123,27 @@ class CSVAccounting(ABCAccounting):
                     allow_home=bool(record[indices['policy.allow_home']]),
                     allow_view=bool(record[indices['policy.allow_view']]),
                     allow_common=bool(record[indices['policy.allow_common']]),
-                    volume_source=record[indices['policy.volume_source']] or None,
-                    volume_target=record[indices['policy.volume_target']] or None,
-                    volume_mode=record[indices['policy.volume_mode']] or None)
+                    volume_source=(record[indices['policy.volume_source']] or
+                                   None),
+                    volume_target=(record[indices['policy.volume_target']] or
+                                   None),
+                    volume_mode=(record[indices['policy.volume_mode']] or
+                                 None))
 
                 # Save the configuration
                 # Note that we don't filter existing duplicate entry
-                self.all_records.setdefault(user, []).append(
+                self.all_records.setdefault(username, []).append(
                     ('_'.join((application.image, str(count))),
                      application, application_policy))
 
     def get_user_by_name(self, user_name):
-        user = CSVUser(name=user_name)
-        if user in self.all_records:
-            return user
+        if user_name in self.all_records:
+            return CSVUser(name=user_name)
         else:
             return None
 
     def get_apps_for_user(self, user):
-        return tuple(self.all_records.get(user, ()))
+        if user:
+            return tuple(self.all_records.get(user.name, ()))
+        else:
+            return ()
