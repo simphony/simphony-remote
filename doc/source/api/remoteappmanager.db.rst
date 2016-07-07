@@ -20,6 +20,14 @@ remoteappmanager.db.orm module
     :undoc-members:
     :show-inheritance:
 
+remoteappmanager.db.csv_db module
+---------------------------------
+
+.. automodule:: remoteappmanager.db.csv_db
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

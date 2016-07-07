@@ -1,39 +1,40 @@
 """ This module provides support for using CSV file as the database
 of the remoteappmanager.
 
-Expect the first row of the CSV file to contain headers and
-the headers should contain the followings (not in order):
+Expect the first row of the CSV file to contain headers shown as
+follows.  The types of their values in the tables are shown in parantheses.
 
-user.name : str
-    Name of the user
+user.name (str)
+    Name of the user.
 
-application.image : str
-    Image name of the application
+application.image (str)
+    Image name of the application.
 
-policy.allow_home : int
-    Is home directory mounted (1: true, 0: false)
+policy.allow_home (str)
+    Is home directory mounted (1 - true, 0 - false).
 
-policy.allow_view : int
-    Is the application viewable by others (1: true, 0: false)
+policy.allow_view (int)
+    Is the application viewable by others (1 - true, 0 - false).
 
-policy.allow_common : int
-    Is the common data volume available (1: true, 0: false)
+policy.allow_common (int)
+    Is the common data volume available (1 - true, 0 - false).
     If true, requires definitions of volume_source, volume_target
-    and volume_mode
+    and volume_mode.
 
-policy.volume_source : str
-    Path for the common data volume on the host machine
-    If undefined, common data volume is not available
+policy.volume_source (str)
+    Path for the common data volume on the host machine.
+    If undefined, common data volume is not available.
 
-policy.volume_target : str
-    Target mount point of the common data volue in the application
-    If undefined, common data volume is not available
+policy.volume_target (str)
+    Target mount point of the common data volue in the application.
+    If undefined, common data volume is not available.
 
-policy.volume_mode : str
-   Mode for read/write access ('ro' for read-only, 'rw' for read-write)
+policy.volume_mode (str)
+   Mode for read/write access ('ro' - read-only, 'rw' - read-write).
    If undefined, common data volume is not available
 
-.. note::
+Note
+----
 
 - Additional columns are ignored.
 - This reader does not try to eliminate duplicated application and policy
@@ -157,7 +158,7 @@ class CSVAccounting(ABCAccounting):
 
         Parameters
         ----------
-        user : User
+        user : remoteappmanager.db.csv_db.CSVUser
            Same type as the result of `get_user_by_name`
 
         Returns
