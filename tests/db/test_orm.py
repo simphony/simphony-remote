@@ -2,7 +2,9 @@ import os
 import unittest
 
 from remoteappmanager.db import orm
-from remoteappmanager.db.orm import Database, transaction, Accounting
+from remoteappmanager.db.orm import (Database, transaction, Accounting,
+                                     AppAccounting)
+from tests.db.abc_test_interfaces import ABCTestDatabaseInterface
 from tests.temp_mixin import TempMixin
 from tests import utils
 
@@ -12,23 +14,6 @@ def fill_db(session):
         users = [orm.User(name="user"+str(i)) for i in range(5)]
         session.add_all(users)
 
-        teams = [orm.Team(name="team"+str(i)) for i in range(5)]
-        company_team = orm.Team(name='company_team')
-        company2_team = orm.Team(name='company2_team')
-        teams.append(company_team)
-        teams.append(company2_team)
-        session.add_all(teams)
-
-        for user, team in zip(users, teams):
-            user.teams.append(team)
-
-        # make users 1 3 and 4 part of the company team
-        for i in (1, 3, 4):
-            users[i].teams.append(company_team)
-
-        # Also check the reverse behavior
-        company2_team.users.extend([users[i] for i in (1, 3, 4)])
-
         # Create a few applications
         apps = [orm.Application(image="docker/image"+str(i))
                 for i in range(3)]
@@ -36,21 +21,27 @@ def fill_db(session):
 
         policy = orm.ApplicationPolicy(allow_home=False,
                                        allow_common=False,
-                                       allow_team_view=False)
+                                       allow_view=False)
         session.add(policy)
 
-        # We want app 0 to be available only to company team
+        # We want app 0 to be available only to users 1, 3, and 4
         # app 1 to be available only to user 0
         # and app 2 to be available to user 1
 
         accountings = [
-            orm.Accounting(team=company_team,
+            orm.Accounting(user=users[1],
                            application=apps[0],
                            application_policy=policy),
-            orm.Accounting(team=teams[0],
+            orm.Accounting(user=users[3],
+                           application=apps[0],
+                           application_policy=policy),
+            orm.Accounting(user=users[4],
+                           application=apps[0],
+                           application_policy=policy),
+            orm.Accounting(user=users[0],
                            application=apps[1],
                            application_policy=policy),
-            orm.Accounting(team=teams[1],
+            orm.Accounting(user=users[1],
                            application=apps[2],
                            application_policy=policy),
         ]
@@ -74,24 +65,13 @@ class TestOrm(TempMixin, unittest.TestCase):
         fill_db(session)
         with transaction(session):
             # verify back population
-            teams = session.query(orm.Team).all()
             users = session.query(orm.User).all()
-            company_team = teams[-2]
-            company2_team = teams[-1]
 
-            self.assertEqual(teams[0].users[0], users[0])
-            self.assertEqual(len(company_team.users), 3)
+            # now check if user 1 has access to two accounting entries
+            user = users[1]
 
-            # Also check the reverse behavior
-            for i in (1, 3, 4):
-                self.assertIn(company2_team, users[i].teams)
-
-            # now check if user 1 has access to two applications:
-            # app[0] via the company team and app[2] via its own team.
-            teams = users[1].teams
-
-            res = session.query(Accounting).filter(Accounting.team_id.in_([
-                team.id for team in teams])).all()
+            res = session.query(Accounting).filter(
+                Accounting.user == user).all()
 
             self.assertEqual(len(res), 2)
             self.assertIn("docker/image0",
@@ -99,29 +79,23 @@ class TestOrm(TempMixin, unittest.TestCase):
             self.assertIn("docker/image2",
                           [acc.application.image for acc in res])
 
-            # User 2 should have access to apps
-            teams = users[2].teams
-
-            res = session.query(Accounting).filter(Accounting.team_id.in_([
-                  team.id for team in teams])).all()
+            # User 2 should have no access to apps
+            res = session.query(Accounting).filter(
+                Accounting.user == users[2]).all()
 
             self.assertEqual(len(res), 0)
 
             # User 0 should have access to app 1
-            teams = users[0].teams
-
-            res = session.query(Accounting).filter(Accounting.team_id.in_([
-                team.id for team in teams])).all()
+            res = session.query(Accounting).filter(
+                Accounting.user == users[0]).all()
 
             self.assertEqual(len(res), 1)
             self.assertIn("docker/image1",
                           [acc.application.image for acc in res])
 
             # User 3 should have access to app 0 only
-            teams = users[3].teams
-
-            res = session.query(Accounting).filter(Accounting.team_id.in_([
-                team.id for team in teams])).all()
+            res = session.query(Accounting).filter(
+                Accounting.user == users[3]).all()
 
             self.assertEqual(len(res), 1)
             self.assertIn("docker/image0",
@@ -154,3 +128,83 @@ class TestOrm(TempMixin, unittest.TestCase):
             self.assertEqual(len(res), 1)
             self.assertIn("docker/image0",
                           [acc[1].image for acc in res])
+
+            res = orm.apps_for_user(session, None)
+            self.assertEqual(len(res), 0)
+
+    def test_user_can_run(self):
+        db = Database(url="sqlite:///"+self.sqlite_file_path)
+        session = db.create_session()
+        fill_db(session)
+        with transaction(session):
+            # verify back population
+            users = session.query(orm.User).all()
+            applications = session.query(orm.Application).all()
+            policy = session.query(orm.ApplicationPolicy).first()
+
+            self.assertTrue(orm.user_can_run(session,
+                                             users[0],
+                                             applications[1],
+                                             policy))
+            self.assertFalse(orm.user_can_run(session,
+                                              users[0],
+                                              applications[0],
+                                              policy))
+
+            self.assertFalse(orm.user_can_run(session,
+                                              None,
+                                              applications[0],
+                                              policy))
+
+
+class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
+                           unittest.TestCase):
+    def setUp(self):
+        # Setup temporary directory
+        super().setUp()
+
+        # Setup the database
+        self.sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
+        utils.init_sqlite_db(self.sqlite_file_path)
+
+        self.addTypeEqualityFunc(orm.Application, self.assertApplicationEqual)
+        self.addTypeEqualityFunc(orm.ApplicationPolicy,
+                                 self.assertApplicationPolicyEqual)
+
+    def create_expected_users(self):
+        return tuple(orm.User(name='user'+str(i)) for i in range(5))
+
+    def create_expected_configs(self, user):
+        apps = [orm.Application(image="docker/image"+str(i))
+                for i in range(3)]
+        policy = orm.ApplicationPolicy(allow_home=False,
+                                       allow_common=False,
+                                       allow_view=False)
+        mappings = {
+            'user0': ((apps[1], policy),),
+            'user1': ((apps[0], policy),
+                      (apps[2], policy)),
+            'user2': (()),
+            'user3': ((apps[0], policy),),
+            'user4': ((apps[0], policy),)}
+        return mappings[user.name]
+
+    def create_accounting(self):
+        accounting = AppAccounting(
+            url="sqlite:///"+self.sqlite_file_path)
+
+        # Fill the database
+        fill_db(accounting.session)
+
+        return accounting
+
+    def test_get_user_by_name(self):
+        accounting = self.create_accounting()
+
+        user = accounting.get_user_by_name('user1')
+        self.assertIsInstance(user, orm.User)
+        self.assertEqual(user.name, 'user1')
+
+        # user not found, result should be None
+        user = accounting.get_user_by_name('foo')
+        self.assertIsNone(user)

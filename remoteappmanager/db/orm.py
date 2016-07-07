@@ -1,12 +1,14 @@
 import contextlib
 
 from sqlalchemy import (
-    Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum)
+    Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum,
+    literal)
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
+from remoteappmanager.db.interfaces import ABCAccounting
 
 Base = declarative_base()
 
@@ -20,13 +22,6 @@ class IdMixin(object):
         return session.query(cls).filter(cls.id == id).one()
 
 
-class UserTeam(Base):
-    """ The user (n <-> n) team association table """
-    __tablename__ = "user_team"
-    user_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
-    team_id = Column(Integer, ForeignKey('team.id'), primary_key=True)
-
-
 class User(IdMixin, Base):
     """ Table for users. """
     __tablename__ = "user"
@@ -35,21 +30,6 @@ class User(IdMixin, Base):
     #: This entry must be unique and is, for all practical purposes,
     #: a primary key.
     name = Column(Unicode, index=True, unique=True)
-
-
-class Team(IdMixin, Base):
-    """ Teams of users. """
-    __tablename__ = "team"
-
-    #: The name of the group. Note that, differently from users, we can have
-    #: multiple teams with the same name. The reason is that we would obtain
-    #: unusual behavior if user A creates a group with name B, and then B
-    #: creates a user. Users are automatically assigned a group with their
-    #: own name when first created.
-    name = Column(Unicode)
-
-    #: The users parts of this team (n <-> n)
-    users = relationship("User", secondary="user_team", backref="teams")
 
 
 class Application(IdMixin, Base):
@@ -74,8 +54,8 @@ class ApplicationPolicy(IdMixin, Base):
     #: If a common workarea should be mounted in the container
     allow_common = Column(Boolean)
 
-    #: If the container should be accessible from other members of the team
-    allow_team_view = Column(Boolean)
+    #: If the container should be accessible by other people
+    allow_view = Column(Boolean)
 
     # Which volume to mount
     volume_source = Column(Unicode, nullable=True)
@@ -91,8 +71,8 @@ class Accounting(Base):
     """Holds the information about who is allowed to run what."""
     __tablename__ = "accounting"
 
-    team_id = Column(Integer,
-                     ForeignKey("team.id"),
+    user_id = Column(Integer,
+                     ForeignKey("user.id"),
                      primary_key=True)
 
     application_id = Column(Integer,
@@ -103,7 +83,7 @@ class Accounting(Base):
                                    ForeignKey("application_policy.id"),
                                    primary_key=True)
 
-    team = relationship("Team")
+    user = relationship("User")
 
     application = relationship("Application")
 
@@ -150,6 +130,54 @@ class Database(LoggingMixin):
         Base.metadata.create_all(self.engine)
 
 
+class AppAccounting(ABCAccounting):
+
+    def __init__(self, url, **kwargs):
+        self.db = Database(url, **kwargs)
+
+        # We keep the same session for all transactions
+        # so that the session remains on one thread
+        self.session = self.db.create_session()
+
+    def get_user_by_name(self, user_name):
+        """ Return an orm.User given a user name.  Return None
+        if the user name is not found in the database
+        """
+        with transaction(self.session):
+            return self.session.query(User).filter_by(
+                name=user_name).one_or_none()
+
+    def get_apps_for_user(self, user):
+        """ Return a tuple of tuples, each containing an application
+        and the associated policy that a user, defined by the user_name,
+        is allowed to run.  If user is None, an empty tuple is returned.
+
+        Parameters
+        ----------
+        user : orm.User
+
+        Returns
+        -------
+        tuple
+           tuples of tuples
+           (mapping_id, orm.Application, orm.ApplicationPolicy)
+           The mapping_id is a unique string identifying the combination
+           of application and policy. It is not unique per user.
+        """
+        if user is None:
+            return ()
+
+        with transaction(self.session):
+            res = self.session.query(Accounting).join(
+                Accounting.user, aliased=True).filter_by(
+                    name=user.name).all()
+
+        return tuple(("_".join((acc.application.image,
+                                str(acc.application_policy.id))),
+                      acc.application,
+                      acc.application_policy) for acc in res)
+
+
 @contextlib.contextmanager
 def transaction(session):
     """handles a transaction in a session."""
@@ -175,7 +203,7 @@ def apps_for_user(session, user):
     ----------
     session : Session
         The current session
-    user : User
+    user : User or None
         the orm User, or None.
 
     Returns
@@ -186,10 +214,8 @@ def apps_for_user(session, user):
     if user is None:
         return []
 
-    teams = user.teams
-
     res = session.query(Accounting).filter(
-        Accounting.team_id.in_([team.id for team in teams])).all()
+        Accounting.user == user).all()
 
     return [(acc.application.image + "_" + str(acc.application_policy.id),
              acc.application,
@@ -205,7 +231,7 @@ def user_can_run(session, user, application, policy):
     ----------
     session : Session
         The current session
-    user : User
+    user : User or None
         the orm User, or None.
     application : Application
         The application object
@@ -220,9 +246,9 @@ def user_can_run(session, user, application, policy):
     if user is None:
         return False
 
-    team_ids = [team.id for team in user.teams]
-    return session.query(Accounting) \
-        .filter(Accounting.team_id.in_(team_ids)) \
-        .filter(Accounting.application == application) \
-        .filter(Accounting.application_policy == policy) \
-        .exists()
+    query = session.query(Accounting) \
+        .filter(Accounting.user == user,
+                Accounting.application == application,
+                Accounting.application_policy == policy)
+
+    return session.query(literal(True)).filter(query.exists()).scalar()

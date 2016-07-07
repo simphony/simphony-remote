@@ -76,7 +76,8 @@ def mock_docker_client_with_running_containers():
          'ImageID': 'imageid',
          'Labels': {
              'eu.simphony-project.docker.user': 'user',
-             'eu.simphony-project.docker.mapping_id': 'mapping'
+             'eu.simphony-project.docker.mapping_id': 'mapping',
+             'eu.simphony-project.docker.url_id': 'url_id'
          },
          'Names': ['/remoteexec-image_3Alatest_user'],
          'Ports': [{'IP': '0.0.0.0',
@@ -184,6 +185,45 @@ def mock_docker_client_with_existing_stopped_container():
     return client
 
 
+def containers_dict():
+    """Returns the dictionary that is returned by invoking Client.containers()
+    Note that this is different from Client.inspect_container(), which follows
+    """
+    return {
+        'Command': '/startup.sh',
+        'Created': 1466584191,
+        'HostConfig': {'NetworkMode': 'default'},
+        'Id': '849ac3a16d88fe410ba8396988c27b0dfad49ce3a05fa835b8f301e728640d0a',
+        'Image': 'simphony/app:simphony-framework-mayavi',
+        'ImageID':
+            'sha256:92016cfc2901fc11a39829033c81a1b8ed530d84fd1111e6caaa66c81b7ec1a8',
+        'Labels': {'eu.simphony-project.docker.description': 'Ubuntu machine '
+                                                             'with simphony '
+                                                             'framework '
+                                                             'preinstalled',
+                   'eu.simphony-project.docker.icon_128': '',
+                   'eu.simphony-project.docker.ui_name': 'Simphony Framework ('
+                                                         'w/ '
+                                                         'mayavi)'},
+        'Mounts': [],
+        'Names': ['/cocky_pasteur'],
+        'NetworkSettings': {'Networks': {'bridge': {'Aliases': None,
+                                                    'EndpointID': '',
+                                                    'Gateway': '',
+                                                    'GlobalIPv6Address': '',
+                                                    'GlobalIPv6PrefixLen': 0,
+                                                    'IPAMConfig': None,
+                                                    'IPAddress': '',
+                                                    'IPPrefixLen': 0,
+                                                    'IPv6Gateway': '',
+                                                    'Links': None,
+                                                    'MacAddress': '',
+                                                    'NetworkID': ''}}},
+        'Ports': [],
+        'State': 'exited',
+        'Status': 'Exited (0) 12 days ago'}
+
+
 # A set of viable start arguments
 arguments = {
     "user": "username",
@@ -236,11 +276,7 @@ def invocation_argv():
 
 
 def assert_containers_equal(test_case, actual, expected):
-    if (expected.docker_id != actual.docker_id or
-            expected.name != actual.name or
-            expected.image_name != actual.image_name or
-            expected.image_id != actual.image_id or
-            expected.ip != actual.ip or
-            expected.port != actual.port):
-        message = '{!r} is not identical to the expected {!r}'
-        test_case.fail(message.format(actual, expected))
+    for name in expected.trait_names():
+        if getattr(actual, name) != getattr(expected, name):
+            message = '{!r} is not identical to the expected {!r}.'
+            test_case.fail(message.format(actual, expected))

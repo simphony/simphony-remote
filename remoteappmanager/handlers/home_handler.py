@@ -11,7 +11,6 @@ from tornado.log import app_log
 
 from remoteappmanager.handlers.base_handler import BaseHandler
 from remoteappmanager.docker.container import Container
-from remoteappmanager.db import orm
 
 
 class HomeHandler(BaseHandler):
@@ -74,25 +73,23 @@ class HomeHandler(BaseHandler):
         """Sub handling. Acts in response to a "start" request from
         the user."""
         container_manager = self.application.container_manager
-        orm_user = self.current_user.orm_user
 
         mapping_id = options["mapping_id"][0]
 
-        session = self.application.db.create_session()
+        all_apps = self.application.db.get_apps_for_user(
+            self.current_user.orm_user)
 
-        with orm.transaction(session):
-            choice = [(m_id, app, policy)
-                      for m_id, app, policy in orm.apps_for_user(session,
-                                                                 orm_user)
-                      if m_id == mapping_id]
+        choice = [(m_id, app, policy)
+                  for m_id, app, policy in all_apps
+                  if m_id == mapping_id]
 
-            if len(choice) == 0:
-                raise ValueError("User is not allowed to run the application.")
+        if not choice:
+            raise ValueError("User is not allowed to run the application.")
 
         _, app, policy = choice[0]
 
         container = None
-
+        orm_user = self.current_user.orm_user
         try:
             container = yield self._start_container(orm_user,
                                                     app,
@@ -176,10 +173,8 @@ class HomeHandler(BaseHandler):
         container, if active, as values."""
         container_manager = self.application.container_manager
 
-        session = self.application.db.create_session()
-
-        with orm.transaction(session):
-            apps = orm.apps_for_user(session, self.current_user.orm_user)
+        apps = self.application.db.get_apps_for_user(
+            self.current_user.orm_user)
 
         images_info = []
 
@@ -228,7 +223,7 @@ class HomeHandler(BaseHandler):
             filters={'id': container_id})
 
         if container_dict:
-            return Container.from_docker_dict(container_dict[0])
+            return Container.from_docker_containers_dict(container_dict[0])
         else:
             self.log.exception(
                 "Failed to retrieve valid container from container id: %s",
@@ -236,6 +231,8 @@ class HomeHandler(BaseHandler):
             )
             return None
 
+    # FIXME: The orm_user here requires any database implementation
+    # to provide a user object with a name attribute
     @gen.coroutine
     def _start_container(self, orm_user, app, policy, mapping_id):
         """Start the container. This method is a helper method that
@@ -244,13 +241,13 @@ class HomeHandler(BaseHandler):
 
         Parameters
         ----------
-        orm_user : orm.User
-            the orm user object
+        orm_user : User
+            database's user object (e.g. current_user.orm_user)
 
-        app : orm.Application
+        app : ABCApplication
             the application to start
 
-        policy : orm.ApplicationPolicy
+        policy : ABCApplicationPolicy
             The startup policy for the application
         """
 
@@ -265,8 +262,12 @@ class HomeHandler(BaseHandler):
         volumes = {}
 
         if mount_home:
-            home_path = os.path.expanduser('~'+user_name)
-            volumes[home_path] = {'bind': '/workspace', 'mode': 'rw'}
+            home_path = os.environ.get('HOME')
+            if home_path:
+                volumes[home_path] = {'bind': '/workspace', 'mode': 'rw'}
+            else:
+                self.log.warning('HOME (%s) is not available for %s',
+                                 home_path, user_name)
 
         if None not in volume_spec:
             volume_source, volume_target, volume_mode = volume_spec

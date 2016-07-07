@@ -1,6 +1,4 @@
-from traitlets import HasTraits, Unicode, Instance
-
-from remoteappmanager.db import orm
+from traitlets import HasTraits, Unicode, Any
 
 
 class User(HasTraits):
@@ -10,5 +8,7 @@ class User(HasTraits):
     # The username as passed at the config line
     name = Unicode()
 
+    # FIXME: orm_user is Any to support other database implementation
+
     #: Can be none if the username cannot be found in the database.
-    orm_user = Instance(orm.User, allow_none=True)
+    orm_user = Any()

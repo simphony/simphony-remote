@@ -118,13 +118,17 @@ class ContainerManager(LoggingMixin):
         ------
         A list of Container objects, or an empty list if nothing is found.
         """
-        labels = _get_container_labels(user_name, mapping_id)
+        labels = {
+            SIMPHONY_NS+"user": user_name,
+            SIMPHONY_NS+"mapping_id": mapping_id,
+        }
+
         filters = {
             'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]
         }
 
         infos = yield self.docker_client.containers(filters=filters)
-        return [Container.from_docker_dict(info) for info in infos]
+        return [Container.from_docker_containers_dict(info) for info in infos]
 
     @gen.coroutine
     def image(self, image_id_or_name):
@@ -200,12 +204,20 @@ class ContainerManager(LoggingMixin):
             self.log.error('Path(s) does not exist, not mounting:\n%s',
                            '\n'.join(volumes.keys() - filtered_volumes.keys()))
 
+        # Info for debugging
+        self.log.info(
+            'Mounting these volumes: \n%s',
+            '\n'.join('{0} -> {1}'.format(source, target['bind'])
+                      for source, target in filtered_volumes.items()))
+
         create_kwargs = dict(
             image=image_name,
             name=container_name,
             environment=_get_container_env(user_name, container_url_id),
             volumes=volume_targets,
-            labels=_get_container_labels(user_name, mapping_id))
+            labels=_get_container_labels(user_name,
+                                         mapping_id,
+                                         container_url_id))
 
         # build the dictionary of keyword arguments for host_config
         host_config = dict(
@@ -414,7 +426,7 @@ def _get_container_env(user_name, url_id):
     )
 
 
-def _get_container_labels(user_name, mapping_id):
+def _get_container_labels(user_name, mapping_id, url_id):
     """Returns a dictionary that will become container run-time labels.
     Each of these labels must be namespaced in reverse DNS style, in agreement
     to docker guidelines."""
@@ -422,6 +434,7 @@ def _get_container_labels(user_name, mapping_id):
     return {
         SIMPHONY_NS+"user": user_name,
         SIMPHONY_NS+"mapping_id": mapping_id,
+        SIMPHONY_NS+"url_id": url_id,
     }
 
 
