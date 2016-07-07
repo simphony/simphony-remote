@@ -5,6 +5,7 @@ from datetime import timedelta
 
 import errno
 
+from remoteappmanager.utils import url_path_join
 from tornado import gen, ioloop, web
 from tornado.httpclient import AsyncHTTPClient, HTTPError
 from tornado.log import app_log
@@ -328,7 +329,8 @@ class HomeHandler(BaseHandler):
         server_url = "http://{}:{}{}/".format(
             container.ip,
             container.port,
-            container.absurlpath)
+            url_path_join(self.application.command_line_config.base_url,
+                          container.urlpath))
 
         yield _wait_for_http_server_2xx(
             server_url,
