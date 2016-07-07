@@ -20,3 +20,4 @@ Key provided features:
    configuration
    design
    developer
+   api
