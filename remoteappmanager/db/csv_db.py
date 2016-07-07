@@ -30,7 +30,7 @@ policy.volume_target : str
     If undefined, common data volume is not available
 
 policy.volume_mode : str
-   Mode for read/write access (ro: read-only, rw: read-write)
+   Mode for read/write access ('ro' for read-only, 'rw' for read-write)
    If undefined, common data volume is not available
 
 .. note::
@@ -89,10 +89,8 @@ class CSVAccounting(ABCAccounting):
         csv_file_path : str
             File path for the CSV file
 
-        Optional parameters
-        -------------------
-        kwargs : dict
-            optional parameters for open(csv_file_path, **kwargs)
+        **kwargs
+            optional keyword arguments for open(csv_file_path)
         """
         self.csv_file_path = csv_file_path
 
@@ -138,12 +136,36 @@ class CSVAccounting(ABCAccounting):
                      application, application_policy))
 
     def get_user_by_name(self, user_name):
+        """ Return a CSVUser for a given user_name, or return
+        None if the user name is not found.
+
+        Parameters
+        ----------
+        user_name : str
+
+        Returns
+        -------
+        user : CSVUser
+        """
         if user_name in self.all_records:
             return CSVUser(name=user_name)
         else:
             return None
 
     def get_apps_for_user(self, user):
+        """ Return a tuple of application configurations for a given user
+
+        Parameters
+        ----------
+        user : User
+           Same type as the result of `get_user_by_name`
+
+        Returns
+        -------
+        application_spec: tuple
+           each item of the tuple is a tuple of
+           (id, CSVApplication, CSVApplicationPolicy) where id is a string
+        """
         if user:
             return tuple(self.all_records.get(user.name, ()))
         else:
