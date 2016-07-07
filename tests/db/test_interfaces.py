@@ -35,20 +35,17 @@ class Accounting(ABCAccounting):
 
 class TestDatabaseInterface(ABCTestDatabaseInterface, unittest.TestCase):
     def setUp(self):
-        super().setUp([User('foo'), User('bar')],
-                      [(
-                          (Application(image='foo1'), ApplicationPolicy()),
-                          (Application(image='foo2'), ApplicationPolicy())
-                      ),
-                       (
-                           (Application(image='bar1'), ApplicationPolicy()),
-                           (Application(image='bar2'), ApplicationPolicy())
-                       )])
-
         self.addTypeEqualityFunc(Application,
                                  self.assertApplicationEqual)
         self.addTypeEqualityFunc(ApplicationPolicy,
                                  self.assertApplicationPolicyEqual)
+
+    def create_expected_users(self):
+        return [User('foo'), User('bar')]
+
+    def create_expected_configs(self, user):
+        return [(Application(image=user.name+'1'), ApplicationPolicy()),
+                (Application(image=user.name+'2'), ApplicationPolicy())]
 
     def create_accounting(self):
         return Accounting()
