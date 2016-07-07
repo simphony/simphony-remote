@@ -12,6 +12,7 @@ from remoteappmanager.docker.image import Image
 from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
 from tornado import gen
+from tornado.httpclient import HTTPError
 from tornado.testing import AsyncHTTPTestCase
 
 from remoteappmanager.application import Application
@@ -107,6 +108,17 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
         self.assertEqual(res.code, 200)
         self.assertIn("Available Applications", str(res.body))
 
+    def test_failed_auth(self):
+        self._app.hub.verify_token.side_effect = HTTPError(500, "Unworthy")
+        res = self.fetch("/user/username/",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=foo"
+                         }
+                         )
+
+        self.assertIn(self._app.file_config.login_url, res.effective_url)
+        self.assertNotIn("Available Applications", str(res.body))
+
     def test_post_start(self):
         body = urllib.parse.urlencode(
             {'action': 'start',
@@ -135,6 +147,24 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
 
             self.assertTrue(self._app.reverse_proxy.add_container.called)
             self.assertTrue(redirect.called)
+
+    def test_post_failed_auth(self):
+        body = urllib.parse.urlencode(
+            {'action': 'start',
+             'mapping_id': '12345'
+             }
+        )
+
+        self._app.hub.verify_token.side_effect = HTTPError(500, "Unworthy")
+
+        res = self.fetch("/user/username/",
+                         method="POST",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=foo"
+                         },
+                         body=body)
+
+        self.assertIn(self._app.file_config.login_url, res.effective_url)
 
     def test_post_stop(self):
         body = urllib.parse.urlencode(
