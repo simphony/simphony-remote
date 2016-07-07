@@ -65,6 +65,7 @@ class CSVUser(object):
         self.name = name
 
 
+# Required headers of the CSV files
 _HEADERS = ('user.name',
             'application.image',
             'policy.allow_home',
