@@ -1,14 +1,6 @@
 import os
-<<<<<<< HEAD
 from traitlets import Instance, default
-from sqlalchemy.orm.exc import MultipleResultsFound
 from tornado import web
-=======
-from urllib import parse
-
-from traitlets import Instance
-from tornado import web, gen
->>>>>>> master
 import tornado.ioloop
 from jinja2 import Environment, FileSystemLoader
 
