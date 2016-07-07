@@ -1,5 +1,4 @@
 from abc import abstractmethod, ABCMeta
-from collections import Iterable
 import inspect as _inspect
 
 from remoteappmanager.db.interfaces import ABCApplication, ABCApplicationPolicy
@@ -20,33 +19,15 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
             if getattr(policy1, arg) != getattr(policy2, arg):
                 raise self.failureException(msg)
 
-    def setUp(self, users, application_configs):
-        """ Given a list of users, associate a list of
-        tuple(Application, ApplicationPolicy) for each user.
+    @abstractmethod
+    def create_expected_users(self):
+        """ Return a list of expected users """
 
-        Examples
-        --------
-        setUp((User('user1'), User('user2'),
-              ( # user1
-                (
-                   (Application(...), ApplicationPolicy(...)),
-                   (Application(...), ApplicationPolicy(...))
-                )
-                # user2
-                (
-                   (Application(...), ApplicationPolicy(...)),
-                )
-              ))
+    @abstractmethod
+    def create_expected_configs(self, user):
+        """ Return a list of (Application, ApplicationPolicy) pair for
+        the given user.
         """
-        if not (users and application_configs):
-            raise ValueError("usernames and application_configs must not "
-                             "be empty")
-
-        for configs in application_configs:
-            if not isinstance(configs, Iterable):
-                raise TypeError("{!0} is not iterable.".format(configs))
-
-        self.user_config_mappings = dict(zip(users, application_configs))
 
     @abstractmethod
     def create_accounting(self):
@@ -61,7 +42,9 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
         """
         accounting = self.create_accounting()
 
-        for user, expected_configs in self.user_config_mappings.items():
+        for user in self.create_expected_users():
+            expected_configs = self.create_expected_configs(user)
+
             # should be ((mapping_id, Application, ApplicationPolicy),
             #            (mapping_id, Application, ApplicationPolicy) ... )
             actual_id_configs = accounting.get_apps_for_user(user)
@@ -73,7 +56,9 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
 
             # Compare the content of list of (Application, ApplicationPolicy)
             # Note that their order does not matter
-            self.assertEqual(len(actual_configs), len(expected_configs))
+            self.assertEqual(len(actual_configs), len(expected_configs),
+                             "Expected: {}, Actual: {}".format(
+                                 expected_configs, actual_configs))
 
             temp = list(actual_configs)
             for expected in expected_configs:

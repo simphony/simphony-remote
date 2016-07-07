@@ -1,11 +1,19 @@
 import os
+<<<<<<< HEAD
 from traitlets import Instance, default
 from sqlalchemy.orm.exc import MultipleResultsFound
 from tornado import web
+=======
+from urllib import parse
+
+from traitlets import Instance
+from tornado import web, gen
+>>>>>>> master
 import tornado.ioloop
 from jinja2 import Environment, FileSystemLoader
 
 from remoteappmanager.db import orm
+from remoteappmanager.db.interfaces import ABCAccounting
 from remoteappmanager.handlers.api import HomeHandler
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.docker.container_manager import ContainerManager
@@ -22,7 +30,7 @@ class Application(web.Application, LoggingMixin):
 
     user = Instance(User)
 
-    db = Instance(orm.Database)
+    db = Instance(ABCAccounting, allow_none=True)
 
     reverse_proxy = Instance(ReverseProxy)
 
@@ -109,27 +117,14 @@ class Application(web.Application, LoggingMixin):
     @default("db")
     def _db_default(self):
         """Initializes the database connection."""
-        return orm.Database(self.file_config.db_url)
+        return orm.AppAccounting(self.file_config.db_url)
 
     @default("user")
     def _user_default(self):
         """Initializes the user at the database level."""
-        session = self.db.create_session()
-
         user_name = self.command_line_config.user
         user = User(name=user_name)
-        with orm.transaction(session):
-            try:
-                user.orm_user = session.query(orm.User).filter_by(
-                    name=user_name).one_or_none()
-            except MultipleResultsFound:
-                self.log.error("Multiple results found when "
-                               "querying for username {}. This is supposedly "
-                               "impossible because the username should be a "
-                               "unique key by design.".format(
-                                user_name))
-                raise
-
+        user.orm_user = self.db.get_user_by_name(user_name)
         return user
 
     # Public

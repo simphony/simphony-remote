@@ -2,7 +2,9 @@ import os
 import unittest
 
 from remoteappmanager.db import orm
-from remoteappmanager.db.orm import Database, transaction, Accounting
+from remoteappmanager.db.orm import (Database, transaction, Accounting,
+                                     AppAccounting)
+from tests.db.abc_test_interfaces import ABCTestDatabaseInterface
 from tests.temp_mixin import TempMixin
 from tests import utils
 
@@ -153,3 +155,56 @@ class TestOrm(TempMixin, unittest.TestCase):
                                               None,
                                               applications[0],
                                               policy))
+
+
+class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
+                           unittest.TestCase):
+    def setUp(self):
+        # Setup temporary directory
+        super().setUp()
+
+        # Setup the database
+        self.sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
+        utils.init_sqlite_db(self.sqlite_file_path)
+
+        self.addTypeEqualityFunc(orm.Application, self.assertApplicationEqual)
+        self.addTypeEqualityFunc(orm.ApplicationPolicy,
+                                 self.assertApplicationPolicyEqual)
+
+    def create_expected_users(self):
+        return tuple(orm.User(name='user'+str(i)) for i in range(5))
+
+    def create_expected_configs(self, user):
+        apps = [orm.Application(image="docker/image"+str(i))
+                for i in range(3)]
+        policy = orm.ApplicationPolicy(allow_home=False,
+                                       allow_common=False,
+                                       allow_view=False)
+        mappings = {
+            'user0': ((apps[1], policy),),
+            'user1': ((apps[0], policy),
+                      (apps[2], policy)),
+            'user2': (()),
+            'user3': ((apps[0], policy),),
+            'user4': ((apps[0], policy),)}
+        return mappings[user.name]
+
+    def create_accounting(self):
+        accounting = AppAccounting(
+            url="sqlite:///"+self.sqlite_file_path)
+
+        # Fill the database
+        fill_db(accounting.session)
+
+        return accounting
+
+    def test_get_user_by_name(self):
+        accounting = self.create_accounting()
+
+        user = accounting.get_user_by_name('user1')
+        self.assertIsInstance(user, orm.User)
+        self.assertEqual(user.name, 'user1')
+
+        # user not found, result should be None
+        user = accounting.get_user_by_name('foo')
+        self.assertIsNone(user)
