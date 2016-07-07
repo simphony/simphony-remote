@@ -10,6 +10,7 @@ from remoteappmanager.application import Application
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.container_manager import ContainerManager
 from tests import utils
+from tests.db import test_csv_db
 
 
 class TestApplication(TempMixin, testing.AsyncTestCase):
@@ -84,3 +85,48 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
 
         self.assertEqual(app.user.name, "username")
         self.assertEqual(app.user.orm_user, None)
+
+
+# FIXME: Some of these tests are the same and should be refactored
+# Not doing it now to prevent more merge conflict with PR #52
+class TestApplicationWithCSV(TempMixin, testing.AsyncTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
+
+        os.environ["PROXY_API_TOKEN"] = "dummy_token"
+
+        self.command_line_config = utils.basic_command_line_config()
+        self.file_config = utils.basic_file_config()
+
+        self.csv_file = os.path.join(self.tempdir, 'testing.csv')
+        self.file_config.db_url = self.csv_file
+
+        test_csv_db.write_csv_file(self.csv_file,
+                                   test_csv_db.GoodTable.headers,
+                                   test_csv_db.GoodTable.records)
+
+        self.app = Application(self.command_line_config, self.file_config)
+
+    def tearDown(self):
+        if self._old_proxy_api_token is not None:
+            os.environ["PROXY_API_TOKEN"] = self._old_proxy_api_token
+        else:
+            del os.environ["PROXY_API_TOKEN"]
+
+        super().tearDown()
+
+    def test_initialization(self):
+        app = self.app
+        self.assertIsNotNone(app.command_line_config)
+        self.assertIsNotNone(app.file_config)
+
+    def test_database_initialization(self):
+        app = self.app
+
+        self.assertIsNotNone(app.db)
+        self.assertIsNotNone(app.user)
+
+        self.assertEqual(app.user.name, "username")
+        self.assertIsInstance(app.user.orm_user, test_csv_db.CSVUser)

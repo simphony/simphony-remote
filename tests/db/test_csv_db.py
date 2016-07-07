@@ -18,7 +18,7 @@ class GoodTable:
     records = [
         ('foo', 'image_1', '1', '1', '0', '', '', ''),
         ('foo', 'image_2', '1', '1', '1', '/src', '/target', 'ro'),
-        ('bar', 'image_1', '0', '0', '0', '/src', '/target', 'ro')]
+        ('username', 'image_1', '0', '0', '0', '/src', '/target', 'ro')]
 
 
 class BadTableMissingHeaders:
@@ -31,7 +31,7 @@ class BadTableMissingHeaders:
     records = [
         ('foo', 'image_1', '1', '1', '0', ''),
         ('foo', 'image_2', '1', '1', '1', 'ro'),
-        ('bar', 'image_1', '0', '0', '0', 'ro')]
+        ('username', 'image_1', '0', '0', '0', 'ro')]
 
 
 class GoodTableWithDifferentHeaders:
@@ -47,7 +47,7 @@ class GoodTableWithDifferentHeaders:
     records = [
         ('1', '0', '', '', '', 'foo', 'image_1', '1', 'anything'),
         ('1', '1', '/src', '/target', 'ro', 'foo', 'image_2', '1', 'extra'),
-        ('0', '0', '/src', '/target', 'ro', 'bar', 'image_1', '0', 'whatever')]
+        ('0', '0', '/src', '/target', 'ro', 'username', 'image_1', '0', 'abc')]
 
 
 def write_csv_file(file_name, headers, records):
@@ -72,7 +72,7 @@ class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
                                  self.assertApplicationPolicyEqual)
 
     def create_expected_users(self):
-        return (CSVUser('foo'), CSVUser('bar'))
+        return (CSVUser('foo'), CSVUser('username'))
 
     def create_expected_configs(self, user):
         mappings = {
@@ -92,7 +92,7 @@ class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
                                       volume_target='/target',
                                       volume_mode='ro'))
                 ),
-            'bar': (
+            'username': (
                 (CSVApplication(image='image_1'),
                  CSVApplicationPolicy(allow_home=False,
                                       allow_view=False,
