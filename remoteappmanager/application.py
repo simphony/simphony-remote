@@ -97,7 +97,9 @@ class Application(web.Application, LoggingMixin):
         # just for interface convenience.
         return ReverseProxy(
             endpoint_url=self.command_line_config.proxy_api_url,
-            auth_token=auth_token)
+            auth_token=auth_token,
+            base_urlpath=self.command_line_config.base_url
+        )
 
     @default("hub")
     def _hub_default(self):

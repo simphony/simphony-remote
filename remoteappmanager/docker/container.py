@@ -32,20 +32,10 @@ class Container(HasTraits):
     #: the id that will go in the URL of the container
     url_id = Unicode()
 
-    #: The absolute base prefix path for the container.
-    base_urlpath = Unicode(None, allow_none=True)
-
     @property
     def urlpath(self):
         """Returns the relative url of the Container."""
         return "containers/{}".format(self.url_id)
-
-    @property
-    def absurlpath(self):
-        if self.base_urlpath is None:
-            raise ValueError("Unable to return absolute url for the container."
-                             " base urlpath was not specified.")
-        return self.base_urlpath + self.urlpath
 
     @property
     def host_url(self):

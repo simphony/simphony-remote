@@ -112,11 +112,11 @@ class HomeHandler(BaseHandler):
 
         # The server is up and running. Now contact the proxy and add
         # the container url to it.
-        yield self.application.reverse_proxy.add_container(container)
+        url = yield self.application.reverse_proxy.add_container(container)
 
         # Redirect the user
-        self.log.info('Redirecting to ' + container.absurlpath)
-        self.redirect(container.absurlpath)
+        self.log.info('Redirecting to {}'.format(url))
+        self.redirect(url)
 
     @gen.coroutine
     def _actionhandler_view(self, options):
@@ -132,10 +132,10 @@ class HomeHandler(BaseHandler):
         yield self._wait_for_container_ready(container)
 
         # in case the reverse proxy is not already set up
-        yield self.application.reverse_proxy.add_container(container)
+        url = yield self.application.reverse_proxy.add_container(container)
 
-        self.log.info('Redirecting to ' + container.absurlpath)
-        self.redirect(container.absurlpath)
+        self.log.info('Redirecting to {}'.format(url))
+        self.redirect(url)
 
     @gen.coroutine
     def _actionhandler_stop(self, options):
@@ -192,8 +192,6 @@ class HomeHandler(BaseHandler):
             container = None
             if len(containers):
                 container = containers[0]
-                container.base_urlpath = \
-                    self.application.command_line_config.base_url
 
             images_info.append({
                 "image": image,
@@ -223,17 +221,13 @@ class HomeHandler(BaseHandler):
         container_dict = yield container_manager.docker_client.containers(
             filters={'id': container_id})
 
-        if container_dict:
-            container = Container.from_docker_containers_dict(
-                container_dict[0])
-            container.base_urlpath = \
-                self.application.command_line_config.base_url
-        else:
+        if not container_dict:
             self.log.exception(
-                "Failed to retrieve valid container from container id: %s",
-                container_id
-            )
+                "Failed to retrieve valid "
+                "container from container id: {}".format(container_id))
             return None
+
+        return Container.from_docker_containers_dict(container_dict[0])
 
     # FIXME: The orm_user here requires any database implementation
     # to provide a user object with a name attribute
@@ -305,8 +299,6 @@ class HomeHandler(BaseHandler):
             )
             e.reason = 'error'
             raise e
-
-        container.base_urlpath = self.application.command_line_config.base_url
 
         return container
 

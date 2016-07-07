@@ -11,12 +11,6 @@ class TestContainer(TestCase):
         )
 
         self.assertEqual(container.urlpath, "containers/12345")
-        with self.assertRaises(ValueError):
-            _ = container.absurlpath  # noqa
-
-        container.base_urlpath = "/foo/"
-
-        self.assertEqual(container.absurlpath, "/foo/containers/12345")
 
     def test_host_url(self):
         container = Container(

@@ -5,6 +5,7 @@ from jupyterhub import orm as jupyterhub_orm
 from traitlets import HasTraits, Unicode
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
+from remoteappmanager.utils import url_path_join
 
 
 class ReverseProxy(LoggingMixin, HasTraits):
@@ -15,6 +16,9 @@ class ReverseProxy(LoggingMixin, HasTraits):
 
     #: The authorization token to authenticate the request
     auth_token = Unicode()
+
+    #: The prefix for the url added to the passed object relative .url()
+    base_urlpath = Unicode('/')
 
     def __init__(self, *args, **kwargs):
         """Initializes the reverse proxy connection object."""
@@ -27,8 +31,9 @@ class ReverseProxy(LoggingMixin, HasTraits):
             api_server=_server_from_url(self.endpoint_url)
         )
 
-        self.log.info("Reverse proxy setup on {}".format(
-            self.endpoint_url
+        self.log.info("Reverse proxy setup on {} with base url {}".format(
+            self.endpoint_url,
+            self.base_urlpath
         ))
 
     @gen.coroutine
@@ -42,8 +47,8 @@ class ReverseProxy(LoggingMixin, HasTraits):
         """
         proxy = self._reverse_proxy
 
-        urlpath = container.absurlpath
-        self.log.info("Deregistering url {} to {} on reverse proxy.".format(
+        urlpath = url_path_join(self.base_urlpath, container.urlpath)
+        self.log.info("Unregistering url {} to {} on reverse proxy.".format(
             urlpath,
             container.host_url
         ))
@@ -58,10 +63,16 @@ class ReverseProxy(LoggingMixin, HasTraits):
         ----------
         container : Container
             A container object.
+
+        Returns
+        -------
+        urlpath : str
+            The absolute url path of the container as registered on the reverse
+            proxy.
         """
 
         proxy = self._reverse_proxy
-        urlpath = container.absurlpath
+        urlpath = url_path_join(self.base_urlpath, container.urlpath)
 
         self.log.info("Registering url {} to {} on reverse proxy.".format(
             urlpath,
@@ -75,6 +86,8 @@ class ReverseProxy(LoggingMixin, HasTraits):
                 target=container.host_url,
             )
         )
+
+        return urlpath
 
 
 def _server_from_url(url):
