@@ -164,7 +164,8 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
                          },
                          body=body)
 
-        self.assertIn(self._app.file_config.login_url, res.effective_url)
+        # With POST, we get a 403, not a redirect
+        self.assertEqual(res.code, 403)
 
     def test_post_stop(self):
         body = urllib.parse.urlencode(
