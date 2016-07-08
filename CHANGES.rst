@@ -1,6 +1,24 @@
 SimPhoNy Remote CHANGELOG
 =========================
 
+What's new in SimPhoNy Remote 0.3.0
+-----------------------------------
+
+Summary
+~~~~~~~
+
+- Introduced a more generic configuration of available users and images
+  through a CSV file (#33, #41)
+- Internally refactored configuration handling (#40)
+- Simplified database layout by removing Teams (#32)
+- Added functionality to remove users and applications from database via
+  remoteappdb CLI application (#28)
+- Attaching of workspace (#4)
+- Added API autodoc documentation (#57)
+- Improved testing and coverage (#5)
+- Improved error message when unable to create temporary directory (#53)
+- Fixed regression with View button not working anymore (#43)
+
 What's new in SimPhoNy Remote 0.2.0
 -----------------------------------
 
