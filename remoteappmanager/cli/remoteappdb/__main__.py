@@ -11,25 +11,57 @@ import tabulate
 from remoteappmanager.db import orm
 
 
+def sqlite_url_to_path(url):
+    """Converts a sqlalchemy sqlite url to the disk path.
+
+    Parameters
+    ----------
+    url: str
+        A "sqlite:///" path
+
+    Returns
+    -------
+    str:
+        The disk path.
+    """
+    if not url.startswith("sqlite:///"):
+        raise ValueError("Cannot find sqlite")
+    return url[len("sqlite:///"):]
+
+
+def normalise_to_url(url_or_path):
+    """Normalises a disk path to a sqlalchemy url
+
+    Parameters
+    ----------
+    url_or_path: str
+        a sqlalchemy url or a disk path
+
+    Returns
+    -------
+    str
+        A sqlalchemy url
+    """
+    if ":" not in url_or_path:
+        db_url = "sqlite:///"+os.path.expanduser(url_or_path)
+    else:
+        db_url = url_or_path
+
+    return db_url
+
+
 def database(db_url):
-    """Retrieves the orm.Database object from the
-       passed db url. It also accepts absolute or relative disk paths.
-       In that case, the database will be assumed to be a sqlite one.
+    """Retrieves the orm.Database object from the passed db url.
 
     Parameters
     ----------
     db_url : str
-        A string containing a db sqlalchemy url, or a disk path.
+        A string containing a db sqlalchemy url.
 
     Returns
     -------
     orm.Database instance.
     """
-    if ":" not in db_url:
-        db_url = "sqlite:///"+os.path.expanduser(db_url)
-    else:
-        db_url = db_url
-
     return orm.Database(url=db_url)
 
 
@@ -47,7 +79,14 @@ def print_error(error):
 @click.pass_context
 def cli(ctx, db):
     """Main click group placeholder."""
-    ctx.obj["db"] = database(db)
+    db_url = normalise_to_url(db)
+    if db_url.startswith("sqlite:///"):
+        path = sqlite_url_to_path(db_url)
+        if os.path.exists(path):
+            raise click.UsageError("Refusing to overwrite database "
+                                   "at {}".format(db_url))
+
+    ctx.obj["db"] = database(db_url)
 
 
 @cli.command()

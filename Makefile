@@ -17,34 +17,32 @@ deps:
 	sudo apt-get update
 	sudo apt-get install docker-engine npm nodejs-legacy python3-pip python3.4-venv
 	sudo npm install -g configurable-http-proxy
+	python3 -mvenv venv
+	. venv/bin/activate && pip3 install docker-py
+
+.PHONY: develop
+develop: 
+	@echo "Installing application"
+	@echo "----------------------"
+	. venv/bin/activate && python3 setup.py develop 
 
 .PHONY: install
 install: 
 	@echo "Installing application"
 	@echo "----------------------"
-	python3 -mvenv venv
-	. venv/bin/activate \
-		&& pip3 install docker-py \
-		&& python3 setup.py develop 
+	. venv/bin/activate && python3 setup.py install
 
 .PHONY: certs
-certs: jupyterhub/test.crt
-
-jupyterhub/test.crt:
+certs: 
 	@echo "Creating certificates"
 	@echo "---------------------"
-	pushd scripts \
-		&& sh generate_certificate.sh \
-		&& cp test.* ../jupyterhub/ \
-		&& popd
+	-pushd jupyterhub && sh ../scripts/generate_certificate.sh && popd
 
 .PHONY: db
-db: $(HOME)/remoteappmanager.db
-
-$(HOME)/remoteappmanager.db:
+db: 
 	@echo "Creating database"
 	@echo "-----------------"
-	. venv/bin/activate && remoteappdb --db=~/remoteappmanager.db init
+	-. venv/bin/activate && remoteappdb --db=~/remoteappmanager.db init
 
 .PHONY: images
 images:
@@ -58,4 +56,4 @@ images:
 test:
 	@echo "Running testsuite"
 	@echo "-----------------"
-	. venv/bin/activate && python -m tornado.testing discover
+	-. venv/bin/activate && python -m tornado.testing discover
