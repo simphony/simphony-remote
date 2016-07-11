@@ -53,9 +53,11 @@ def get_docker_client():
     client = docker.from_env()
     try:
         client.info()
-    except ConnectionError:
-        print_error('docker client fails to connect. '
-                    'Is your docker running? Try Docker Toolbox.')
+    except ConnectionError as exception:
+        # ConnectionError occurs, say, if the docker machine is not running
+        # or if the shell is not in a docker VM (for Mac/Windows)
+        print_error('docker client fails to connect. Exception: {}'.format(
+            str(exception)))
         raise
 
     return client
