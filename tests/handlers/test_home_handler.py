@@ -1,7 +1,6 @@
 import os
 import urllib.parse
 from unittest import mock
-import socket
 
 import tornado.netutil
 import tornado.testing
@@ -12,26 +11,10 @@ from remoteappmanager.docker.image import Image
 from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
 from tornado import gen
-from tornado.testing import AsyncHTTPTestCase
 
 from remoteappmanager.application import Application
 from tests import utils
 from tests.temp_mixin import TempMixin
-
-
-# Workaround for tornado bug #1573, already fixed in master, but not yet
-# available. Remove when upgrading tornado.
-def _bind_unused_port(reuse_port=False):
-    """Binds a server socket to an available port on localhost.
-
-    Returns a tuple (socket, port).
-    """
-    sock = tornado.netutil.bind_sockets(None,
-                                        '127.0.0.1',
-                                        family=socket.AF_INET,
-                                        reuse_port=reuse_port)[0]
-    port = sock.getsockname()[1]
-    return sock, port
 
 
 def mock_coro_factory(return_value=None):
@@ -46,13 +29,13 @@ def mock_coro_factory(return_value=None):
     return coro
 
 
-class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
+class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
     def setUp(self):
         self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
         os.environ["PROXY_API_TOKEN"] = "dummy_token"
 
         self._bind_unused_port_orig = tornado.testing.bind_unused_port
-        tornado.testing.bind_unused_port = _bind_unused_port
+        tornado.testing.bind_unused_port = utils.bind_unused_port
 
         def cleanup():
             if self._old_proxy_api_token is not None:
