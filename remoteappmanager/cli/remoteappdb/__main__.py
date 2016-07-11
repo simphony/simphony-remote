@@ -2,6 +2,7 @@
 """Script to perform operations on the database of our application."""
 import os
 import sys
+from requests.exceptions import ConnectionError
 
 import sqlalchemy.exc
 import sqlalchemy.orm.exc
@@ -36,6 +37,28 @@ def database(db_url):
 def print_error(error):
     """Prints an error message to stderr"""
     print("Error: {}".format(error), file=sys.stderr)
+
+
+def get_docker_client():
+    """ Returns docker.client object using the local environment variables
+    """
+    # dependencies of docker-py is optional for this script
+    try:
+        import docker
+    except ImportError:
+        print_error('docker-py is not installed. '
+                    'Try pip install docker-py')
+        raise
+
+    client = docker.from_env()
+    try:
+        client.info()
+    except ConnectionError:
+        print_error('docker client fails to connect. '
+                    'Is your docker running? Try Docker Toolbox.')
+        raise
+
+    return client
 
 
 @click.group()
@@ -168,9 +191,23 @@ def app():
 
 @app.command()  # noqa
 @click.argument("image")
+@click.option('--verify/--no-verify', default=True)
 @click.pass_context
-def create(ctx, image):
+def create(ctx, image, verify):
     """Creates a new application for image IMAGE."""
+
+    # Verify if `image` is an existing docker image
+    # in this machine
+    if verify:
+        msg = ('{error}. You may consider skipping verifying '
+               'image name against docker with --no-verify.')
+        try:
+            client = get_docker_client()
+            client.inspect_image(image)
+        except Exception as exception:
+            raise click.BadParameter(msg.format(error=str(exception)),
+                                     ctx=ctx)
+
     db = ctx.obj["db"]
     session = db.create_session()
     try:
