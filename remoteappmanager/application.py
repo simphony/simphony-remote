@@ -154,10 +154,9 @@ class Application(web.Application, LoggingMixin):
 
         base_url = self.command_line_config.base_url
         rest_api = rest.api_handlers(base_url)
-        return [
+        return rest_api+[
             (base_url, HomeHandler),
-            (base_url.rstrip('/'),
-             web.RedirectHandler, {"url": base_url}),
+            (base_url.rstrip('/'), web.RedirectHandler, {"url": base_url}),
         ]
 
     def _jinja_init(self, settings):
