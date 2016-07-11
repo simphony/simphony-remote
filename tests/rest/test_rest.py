@@ -177,7 +177,7 @@ class TestREST(testing.AsyncHTTPTestCase):
         )
         self.assertEqual(res.code, httpstatus.NOT_FOUND)
 
-    def test_update(self):
+    def test_delete(self):
         res = self.fetch(
             "/api/v1/students/",
             method="POST",
