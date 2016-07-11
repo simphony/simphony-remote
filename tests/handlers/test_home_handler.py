@@ -109,13 +109,14 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
         self.assertIn("Available Applications", str(res.body))
 
     def test_failed_auth(self):
-        self._app.hub.verify_token.side_effect = HTTPError(500, "Unworthy")
+        self._app.hub.verify_token.return_value = {}
         res = self.fetch("/user/username/",
                          headers={
                              "Cookie": "jupyter-hub-token-username=foo"
                          }
                          )
 
+        self.assertGreaterEqual(res.code, 400)
         self.assertIn(self._app.file_config.login_url, res.effective_url)
         self.assertNotIn("Available Applications", str(res.body))
 

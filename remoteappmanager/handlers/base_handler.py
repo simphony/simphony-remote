@@ -3,7 +3,6 @@ from urllib.parse import urljoin
 from tornado import web
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
-from tornado.httpclient import HTTPError
 
 
 class BaseHandler(web.RequestHandler, LoggingMixin):
@@ -14,13 +13,9 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
         cookie_name = self.settings["cookie_name"]
         user_cookie = self.get_cookie(cookie_name)
         if user_cookie:
-            try:
-                verified = hub.verify_token(cookie_name, user_cookie)
-                if verified:
-                    return self.application.user
-            except HTTPError:
-                return None
-
+            user_data = hub.verify_token(cookie_name, user_cookie)
+            if user_data.get('name', '') == self.application.user.name:
+                return self.application.user
         return None
 
     def render(self, template_name, **kwargs):
