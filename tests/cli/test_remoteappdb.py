@@ -6,6 +6,7 @@ from unittest import mock
 from click.testing import CliRunner
 
 from remoteappmanager.cli.remoteappdb import __main__ as remoteappdb
+from remoteappmanager.cli.remoteappdb.__main__ import RemoteAppDBContext
 from tests.temp_mixin import TempMixin
 from tests.utils import mock_docker_client
 
@@ -15,7 +16,7 @@ def _context_factory(*args, **kwargs):
     with the given arguments and keyword arguments
     """
     def main_context(*args, **kwargs):
-        return remoteappdb.RemoteAppDBContext(*args, **kwargs)
+        return RemoteAppDBContext(*args, **kwargs)
     return main_context
 
 
