@@ -44,6 +44,7 @@ class Hub(LoggingMixin, HasTraits):
         r = requests.get(request_url,
                          headers={'Authorization': 'token %s' % self.api_key})
 
+        self.log.info(str(r.__dict__))
         if r.status_code < 400:
             return r.json()
         else:
