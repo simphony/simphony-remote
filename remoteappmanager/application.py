@@ -15,6 +15,7 @@ from remoteappmanager.user import User
 from remoteappmanager.traitlets import as_dict
 from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
+from remoteappmanager import rest
 
 
 class Application(web.Application, LoggingMixin):
@@ -152,6 +153,7 @@ class Application(web.Application, LoggingMixin):
         """Returns the registered handlers"""
 
         base_url = self.command_line_config.base_url
+        rest_api = rest.api_handlers(base_url)
         return [
             (base_url, HomeHandler),
             (base_url.rstrip('/'),
