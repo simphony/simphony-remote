@@ -79,21 +79,22 @@ def print_error(error):
 @click.pass_context
 def cli(ctx, db):
     """Main click group placeholder."""
-    db_url = normalise_to_url(db)
-    if db_url.startswith("sqlite:///"):
-        path = sqlite_url_to_path(db_url)
-        if os.path.exists(path):
-            raise click.UsageError("Refusing to overwrite database "
-                                   "at {}".format(db_url))
-
-    ctx.obj["db"] = database(db_url)
+    ctx.obj["db"] = db
 
 
 @cli.command()
 @click.pass_context
 def init(ctx):
     """Initializes the database."""
-    db = ctx.obj["db"]
+    db_opt = ctx.obj["db"]
+    db_url = normalise_to_url(db_opt)
+    if db_url.startswith("sqlite:///"):
+        path = sqlite_url_to_path(db_url)
+        if os.path.exists(path):
+            raise click.UsageError("Refusing to overwrite database "
+                                   "at {}".format(db_url))
+
+    db = database(db_url)
     db.reset()
 
 # -------------------------------------------------------------------------
@@ -111,7 +112,10 @@ def user():
 @click.pass_context
 def create(ctx, user):
     """Creates a user USER in the database."""
-    db = ctx.obj["db"]
+    db_opt = ctx.obj["db"]
+    db_url = normalise_to_url(db_opt)
+    db = database(db_url)
+
     session = db.create_session()
     orm_user = orm.User(name=user)
 
@@ -130,7 +134,10 @@ def create(ctx, user):
 @click.pass_context
 def remove(ctx, user):
     """Removes a user."""
-    db = ctx.obj["db"]
+    db_opt = ctx.obj["db"]
+    db_url = normalise_to_url(db_opt)
+    db = database(db_url)
+
     session = db.create_session()
 
     try:
@@ -168,7 +175,10 @@ def list(ctx, no_decoration, show_apps):
             headers += ["App", "Home", "View", "Common", "Vol. Source",
                         "Vol. Target", "Vol. Mode"]
 
-    db = ctx.obj["db"]
+    db_opt = ctx.obj["db"]
+    db_url = normalise_to_url(db_opt)
+    db = database(db_url)
+
     session = db.create_session()
 
     table = []
@@ -210,7 +220,9 @@ def app():
 @click.pass_context
 def create(ctx, image):
     """Creates a new application for image IMAGE."""
-    db = ctx.obj["db"]
+    db_opt = ctx.obj["db"]
+    db_url = normalise_to_url(db_opt)
+    db = database(db_url)
     session = db.create_session()
     try:
         with orm.transaction(session):
@@ -227,7 +239,9 @@ def create(ctx, image):
 @click.pass_context
 def remove(ctx, image):
     """Removes an application from the list."""
-    db = ctx.obj["db"]
+    db_opt = ctx.obj["db"]
+    db_url = normalise_to_url(db_opt)
+    db = database(db_url)
     session = db.create_session()
 
     try:
@@ -248,7 +262,9 @@ def remove(ctx, image):
 @click.pass_context
 def list(ctx, no_decoration):
     """List all registered applications."""
-    db = ctx.obj["db"]
+    db_opt = ctx.obj["db"]
+    db_url = normalise_to_url(db_opt)
+    db = database(db_url)
 
     if no_decoration:
         tablefmt = "plain"
@@ -282,7 +298,9 @@ def list(ctx, no_decoration):
 def grant(ctx, image, user, allow_home, allow_view, volume):
     """Grants access to application identified by IMAGE to a specific
     user USER and specified access policy."""
-    db = ctx.obj["db"]
+    db_opt = ctx.obj["db"]
+    db_url = normalise_to_url(db_opt)
+    db = database(db_url)
     allow_common = False
     source = target = mode = None
 
@@ -362,7 +380,9 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
 def revoke(ctx, image, user, revoke_all, allow_home, allow_view, volume):
     """Revokes access to application identified by IMAGE to a specific
     user USER and specified parameters."""
-    db = ctx.obj["db"]
+    db_opt = ctx.obj["db"]
+    db_url = normalise_to_url(db_opt)
+    db = database(db_url)
 
     allow_common = False
     source = target = mode = None
