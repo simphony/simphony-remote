@@ -19,7 +19,9 @@ def mock_docker_client():
                           'sha256:e54d71dde57576e9d2a4c77ce0c98501c8aa6268de5b2987e4c80e2e157cffe4',  # noqa
                       'Labels': {
                         'eu.simphony-project.docker.description':
-                            'Ubuntu machine with mayavi preinstalled'
+                            'Ubuntu machine with mayavi preinstalled',
+                        'eu.simphony-project.docker.ui_name':
+                            'Mayavi 4.4.4'
                       },
                       'ParentId': 'sha256:d2f7240076e135f6aba57185e54ff45cc158781c787897b67994f72fe668ad07',  # noqa
                       'RepoDigests': None,
@@ -41,7 +43,8 @@ def mock_docker_client():
             {'Created': 1463662803,
              'Id': 'sha256:e54d71dde57576e9d2a4c77ce0c98501c8aa6268de5b2987e4c80e2e157cffe4',  # noqa
              'Labels': {
-             'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled'  # noqa
+                 'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled',  # noqa
+                 'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4'  # noqa
              },
             'ParentId': 'sha256:d2f7240076e135f6aba57185e54ff45cc158781c787897b67994f72fe668ad07',  # noqa
             'RepoDigests': None,

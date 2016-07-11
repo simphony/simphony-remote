@@ -33,7 +33,9 @@ class Image(HasTraits):
         except (KeyError, IndexError):
             self.name = ''
 
-        labels = docker_dict.get("Labels")
+        labels = (docker_dict.get("Labels") or
+                  docker_dict.get("Config", {}).get("Labels"))
+
         if labels is not None:
             self.ui_name = labels.get(docker_labels.UI_NAME, '')
             self.icon_128 = labels.get(docker_labels.ICON_128, '')
