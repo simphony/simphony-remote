@@ -1,4 +1,5 @@
-from tornado import gen, web
+from tornado import gen, web, escape
+import json
 
 from remoteappmanager.rest.registry import registry
 from remoteappmanager.utils import url_path_join
@@ -7,13 +8,9 @@ from remoteappmanager.handlers.base_handler import BaseHandler
 
 
 class RESTBaseHandler(BaseHandler):
-    _registry = None
-
     @property
     def registry(self):
-        if self.__class__._registry is None:
-            self.__class__._registry = registry
-        return self._registry
+        return registry
 
     def get_rest_class_or_404(self, collection_name):
         try:
@@ -40,8 +37,10 @@ class RESTCollectionHandler(RESTBaseHandler):
     def post(self, collection_name):
         rest_cls = self.get_rest_class_or_404(collection_name)
 
+        data = escape.json_decode(self.request.body)
+
         try:
-            resource_id = yield rest_cls.create()
+            resource_id = yield rest_cls.create(data)
         except Exception as e:
             raise web.HTTPError(httpstatus.NOT_FOUND, reason=str(e))
 
@@ -73,7 +72,7 @@ class RESTItemHandler(RESTBaseHandler):
     def post(self, collection_name, identifier):
         rest_cls = self.get_rest_class_or_404(collection_name)
 
-        exists = yield rest_cls.exists()
+        exists = yield rest_cls.exists(identifier)
         if exists:
             raise web.HTTPError(httpstatus.CONFLICT)
         else:
@@ -84,18 +83,17 @@ class RESTItemHandler(RESTBaseHandler):
     def put(self, collection_name, identifier):
         rest_cls = self.get_rest_class_or_404(collection_name)
 
-        representation = {}
-        rest_cls.update(identifier, representation)
+        representation = escape.json_decode(self.request.body)
+
+        yield rest_cls.update(identifier, representation)
 
         self.set_status(httpstatus.NO_CONTENT)
-
 
     @web.authenticated
     @gen.coroutine
     def delete(self, collection_name, identifier):
         rest_cls = self.get_rest_class_or_404(collection_name)
 
-        rest_cls.delete(identifier)
+        yield rest_cls.delete(identifier)
 
         self.set_status(httpstatus.NO_CONTENT)
-

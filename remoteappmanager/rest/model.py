@@ -1,7 +1,6 @@
 from tornado import gen
 
 from remoteappmanager.rest.rest_object import RESTObject
-from remoteappmanager.rest.registry import registry
 
 
 class Image(RESTObject):
@@ -16,7 +15,3 @@ class Container(RESTObject):
     @classmethod
     def list(self):
         return []
-
-
-registry.register(Image)
-registry.register(Container)

@@ -16,6 +16,8 @@ from remoteappmanager.traitlets import as_dict
 from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
 from remoteappmanager import rest
+from remoteappmanager.rest import registry
+from remoteappmanager.rest import model
 
 
 class Application(web.Application, LoggingMixin):
@@ -57,6 +59,7 @@ class Application(web.Application, LoggingMixin):
         self._jinja_init(settings)
 
         handlers = self._get_handlers()
+        self._register_rest_models()
 
         super().__init__(handlers, **settings)
 
@@ -158,6 +161,11 @@ class Application(web.Application, LoggingMixin):
             (base_url, HomeHandler),
             (base_url.rstrip('/'), web.RedirectHandler, {"url": base_url}),
         ]
+
+    def _register_rest_models(self):
+        for rest_model_class in [model.Image,
+                                 model.Container]:
+            registry.registry.register(rest_model_class)
 
     def _jinja_init(self, settings):
         """Initializes the jinja template system settings.
