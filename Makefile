@@ -53,3 +53,9 @@ images:
 	docker pull simphonyproject/ubuntu-14.04-remote:latest
 	docker pull simphonyproject/simphonic-mayavi:latest
 	docker pull simphonyproject/simphonic-paraview:latest
+
+.PHONY: test
+test:
+	@echo "Running testsuite"
+	@echo "-----------------"
+	. venv/bin/activate && python -m tornado.testing discover
