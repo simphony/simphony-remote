@@ -79,11 +79,11 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
         app.reverse_proxy.add_container = mock_coro_factory("/")
         app.reverse_proxy.remove_container = mock_coro_factory()
         app.hub = mock.Mock(spec=Hub)
-        app.hub.verify_token.return_value = {
+        app.hub.verify_token = mock_coro_factory({
             'pending': None,
             'name': command_line_config.user,
             'admin': False,
-            'server': command_line_config.base_url}
+            'server': command_line_config.base_url})
         app.db = mock.Mock(spec=ABCAccounting)
         app.container_manager = mock.Mock(spec=ContainerManager)
         app.container_manager.start_container = mock_coro_factory(Container())
