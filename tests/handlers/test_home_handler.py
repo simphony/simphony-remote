@@ -12,7 +12,6 @@ from remoteappmanager.docker.image import Image
 from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
 from tornado import gen
-from tornado.httpclient import HTTPError
 from tornado.testing import AsyncHTTPTestCase
 
 from remoteappmanager.application import Application
@@ -80,7 +79,11 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
         app.reverse_proxy.add_container = mock_coro_factory("/")
         app.reverse_proxy.remove_container = mock_coro_factory()
         app.hub = mock.Mock(spec=Hub)
-        app.hub.verify_token.return_value = True
+        app.hub.verify_token.return_value = {
+            'pending': None,
+            'name': command_line_config.user,
+            'admin': False,
+            'server': command_line_config.base_url}
         app.db = mock.Mock(spec=ABCAccounting)
         app.container_manager = mock.Mock(spec=ContainerManager)
         app.container_manager.start_container = mock_coro_factory(Container())
@@ -156,7 +159,7 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
              }
         )
 
-        self._app.hub.verify_token.side_effect = HTTPError(500, "Unworthy")
+        self._app.hub.verify_token.return_value = {}
 
         res = self.fetch("/user/username/",
                          method="POST",
@@ -165,8 +168,7 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
                          },
                          body=body)
 
-        # With POST, we get a 403, not a redirect
-        self.assertEqual(res.code, 403)
+        self.assertGreaterEqual(res.code, 400)
 
     def test_post_stop(self):
         body = urllib.parse.urlencode(
