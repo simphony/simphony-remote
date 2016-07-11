@@ -24,7 +24,14 @@ class Image(HasTraits):
     @classmethod
     def from_docker_dict(cls, docker_dict):
         """Converts the dict response from the dockerpy library into an
-        instance of this class, extracting the relevant information."""
+        instance of this class, extracting the relevant information.
+
+        Parameters
+        ----------
+        docker_dict : dict
+           Results of `docker.client.inspect_image` or an item of the
+           result of `docker.client.images`
+        """
         self = cls()
         self.docker_id = docker_dict["Id"]
 
