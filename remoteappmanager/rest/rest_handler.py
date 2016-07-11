@@ -1,13 +1,11 @@
 from tornado import gen, web, escape
-import json
 
 from remoteappmanager.rest.registry import registry
 from remoteappmanager.utils import url_path_join
-from remoteappmanager.rest import httpstatus
-from remoteappmanager.handlers.base_handler import BaseHandler
+from remoteappmanager.rest import httpstatus, exceptions
 
 
-class RESTBaseHandler(BaseHandler):
+class RESTBaseHandler(web.RequestHandler):
     @property
     def registry(self):
         return registry
@@ -20,19 +18,17 @@ class RESTBaseHandler(BaseHandler):
 
 
 class RESTCollectionHandler(RESTBaseHandler):
-    @web.authenticated
     @gen.coroutine
     def get(self, collection_name):
         rest_cls = self.get_rest_class_or_404(collection_name)
 
-        items = yield rest_cls.list()
+        items = yield rest_cls.items()
 
         self.set_status(httpstatus.OK)
         # Need to convert into a dict for issue tornado/1009
         self.write({"items": items})
         self.flush()
 
-    @web.authenticated
     @gen.coroutine
     def post(self, collection_name):
         rest_cls = self.get_rest_class_or_404(collection_name)
@@ -44,9 +40,7 @@ class RESTCollectionHandler(RESTBaseHandler):
         except Exception as e:
             raise web.HTTPError(httpstatus.NOT_FOUND, reason=str(e))
 
-        location = url_path_join(
-            self.request.path,
-            resource_id)
+        location = url_path_join(self.request.path, resource_id)+"/"
 
         self.set_status(httpstatus.CREATED)
         self.set_header("Location", location)
@@ -56,18 +50,19 @@ class RESTCollectionHandler(RESTBaseHandler):
 class RESTItemHandler(RESTBaseHandler):
     SUPPORTED_METHODS = ("GET", "POST", "PUT", "DELETE")
 
-    @web.authenticated
     @gen.coroutine
     def get(self, collection_name, identifier):
         rest_cls = self.get_rest_class_or_404(collection_name)
 
-        representation = yield rest_cls.retrieve(identifier)
+        try:
+            representation = yield rest_cls.retrieve(identifier)
+        except exceptions.NotFound:
+            raise web.HTTPError(httpstatus.NOT_FOUND)
 
         self.set_status(httpstatus.OK)
         self.write(representation)
         self.flush()
 
-    @web.authenticated
     @gen.coroutine
     def post(self, collection_name, identifier):
         rest_cls = self.get_rest_class_or_404(collection_name)
@@ -78,22 +73,26 @@ class RESTItemHandler(RESTBaseHandler):
         else:
             raise web.HTTPError(httpstatus.NOT_FOUND)
 
-    @web.authenticated
     @gen.coroutine
     def put(self, collection_name, identifier):
         rest_cls = self.get_rest_class_or_404(collection_name)
 
         representation = escape.json_decode(self.request.body)
 
-        yield rest_cls.update(identifier, representation)
+        try:
+            yield rest_cls.update(identifier, representation)
+        except exceptions.NotFound:
+            raise web.HTTPError(httpstatus.NOT_FOUND)
 
         self.set_status(httpstatus.NO_CONTENT)
 
-    @web.authenticated
     @gen.coroutine
     def delete(self, collection_name, identifier):
         rest_cls = self.get_rest_class_or_404(collection_name)
 
-        yield rest_cls.delete(identifier)
+        try:
+            yield rest_cls.delete(identifier)
+        except exceptions.NotFound:
+            raise web.HTTPError(httpstatus.NOT_FOUND)
 
         self.set_status(httpstatus.NO_CONTENT)
