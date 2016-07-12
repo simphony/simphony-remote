@@ -7,7 +7,7 @@ class Application(Resource):
     @gen.coroutine
     def retrieve(self, identifier):
         apps = self.application.db.get_apps_for_user(
-            self.application.user.orm_user
+            self.current_user.orm_user
         )
 
         # Convert the list of tuples in a dict
@@ -28,6 +28,6 @@ class Application(Resource):
         """Retrieves a dictionary containing the image and the associated
         container, if active, as values."""
         apps = self.application.db.get_apps_for_user(
-            self.application.user.orm_user)
+            self.current_user.orm_user)
 
         return [mapping_id for mapping_id, _, _ in apps]
