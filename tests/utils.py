@@ -13,19 +13,36 @@ def mock_docker_client():
     """Returns a mock synchronous docker client to return canned
     responses."""
     docker_client = mock.Mock(spec=docker.Client)
+
+    # Note that the structure of the returned dictionary is different
+    # for `inspect_image` and for `images`
+    # The return value is simplified...
     docker_client.inspect_image = mock.Mock(
-        return_value={'Created': 1463662803,
-                      'Id':
-                          'sha256:e54d71dde57576e9d2a4c77ce0c98501c8aa6268de5b2987e4c80e2e157cffe4',  # noqa
-                      'Labels': {
-                        'eu.simphony-project.docker.description':
-                            'Ubuntu machine with mayavi preinstalled'
-                      },
-                      'ParentId': 'sha256:d2f7240076e135f6aba57185e54ff45cc158781c787897b67994f72fe668ad07',  # noqa
-                      'RepoDigests': None,
-                      'RepoTags': ['simphony/mayavi-4.4.4:latest'],
-                      'Size': 1094833658,
-                      'VirtualSize': 1094833658})
+        return_value= {
+            'Author': 'SimPhoNy Team',
+            'Comment': '',
+            'Config': {'Cmd': None,
+                       'Domainname': '',
+                       'Entrypoint': ['/startup.sh'],
+                       'Env': ['PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+                               'DEBIAN_FRONTEND=noninteractive',
+                               'HOME=/root'],
+                       'ExposedPorts': {'8888/tcp': {}},
+                       'Hostname': 'dfc2eabdf236',
+                       'Image': 'sha256:912b31a4e4f185b918999540040bb158e208ce0123fde4be07c188b2ab5aa4bb',
+                       'Labels': {'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled',  # noqa
+                                  'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4'},  # noqa
+                       'OnBuild': [],
+                       'OpenStdin': False,
+                       'StdinOnce': False,
+                       'Tty': False,
+                       'User': '',
+                       'Volumes': None,
+                       'WorkingDir': '/root'},
+            'Id': 'sha256:e54d71dde57576e9d2a4c77ce0c98501c8aa6268de5b2987e4c80e2e157cffe4',
+            'RepoTags': ['simphony/mayavi-4.4.4:latest'],
+            'Size': 668483801,
+            'VirtualSize': 668483801})
     docker_client.inspect_container = mock.Mock(return_value=None)
     docker_client.create_host_config = mock.Mock(return_value={})
     docker_client.create_container = mock.Mock(
@@ -41,7 +58,8 @@ def mock_docker_client():
             {'Created': 1463662803,
              'Id': 'sha256:e54d71dde57576e9d2a4c77ce0c98501c8aa6268de5b2987e4c80e2e157cffe4',  # noqa
              'Labels': {
-             'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled'  # noqa
+                 'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled',  # noqa
+                 'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4'  # noqa
              },
             'ParentId': 'sha256:d2f7240076e135f6aba57185e54ff45cc158781c787897b67994f72fe668ad07',  # noqa
             'RepoDigests': None,

@@ -24,7 +24,14 @@ class Image(HasTraits):
     @classmethod
     def from_docker_dict(cls, docker_dict):
         """Converts the dict response from the dockerpy library into an
-        instance of this class, extracting the relevant information."""
+        instance of this class, extracting the relevant information.
+
+        Parameters
+        ----------
+        docker_dict : dict
+           Results of `docker.client.inspect_image` or an item of the
+           result of `docker.client.images`
+        """
         self = cls()
         self.docker_id = docker_dict["Id"]
 
@@ -33,7 +40,9 @@ class Image(HasTraits):
         except (KeyError, IndexError):
             self.name = ''
 
-        labels = docker_dict.get("Labels")
+        labels = (docker_dict.get("Labels") or
+                  docker_dict.get("Config", {}).get("Labels"))
+
         if labels is not None:
             self.ui_name = labels.get(docker_labels.UI_NAME, '')
             self.icon_128 = labels.get(docker_labels.ICON_128, '')
