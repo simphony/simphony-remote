@@ -135,7 +135,7 @@ class Resource:
         bool: True if found, False otherwise.
         """
         try:
-            cls.retrieve(identifier)
+            yield cls.retrieve(identifier)
         except Exception:
             return False
 

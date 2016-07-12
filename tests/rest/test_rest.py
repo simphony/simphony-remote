@@ -53,6 +53,22 @@ class Student(Resource):
         return list(cls.collection.keys())
 
 
+class UnsupportAll(Resource):
+    pass
+
+
+class Unprocessable(Resource):
+    @classmethod
+    @gen.coroutine
+    def create(cls, representation):
+        raise exceptions.UnprocessableRepresentation()
+
+    @classmethod
+    @gen.coroutine
+    def update(self, identifier, representation):
+        raise exceptions.UnprocessableRepresentation()
+
+
 class TestREST(AsyncHTTPTestCase):
     def setUp(self):
         super().setUp()
@@ -62,6 +78,8 @@ class TestREST(AsyncHTTPTestCase):
     def get_app(self):
         handlers = rest.api_handlers('/')
         registry.registry.register(Student)
+        registry.registry.register(UnsupportAll)
+        registry.registry.register(Unprocessable)
         return web.Application(handlers=handlers)
 
     def test_items(self):
@@ -201,6 +219,55 @@ class TestREST(AsyncHTTPTestCase):
 
         res = self.fetch("/api/v1/students/1/", method="DELETE")
         self.assertEqual(res.code, httpstatus.NOT_FOUND)
+
+    def test_unexistent_resource_type(self):
+        res = self.fetch(
+            "/api/v1/teachers/",
+            method="POST",
+            body=escape.json_encode({
+                "foo": "bar"
+            })
+        )
+
+        self.assertEqual(res.code, httpstatus.NOT_FOUND)
+
+        res = self.fetch(
+            "/api/v1/teachers/",
+            method="GET",
+        )
+
+        self.assertEqual(res.code, httpstatus.NOT_FOUND)
+
+    def test_post_non_json(self):
+        res = self.fetch(
+            "/api/v1/students/",
+            method="POST",
+            body="hello"
+        )
+        self.assertEqual(res.code, httpstatus.UNSUPPORTED_MEDIA_TYPE)
+
+    def test_unsupported_methods(self):
+        res = self.fetch(
+            "/api/v1/unsupportalls/",
+            method="POST",
+            body="{}"
+        )
+        self.assertEqual(res.code, httpstatus.METHOD_NOT_ALLOWED)
+
+    def test_unprocessable(self):
+        res = self.fetch(
+            "/api/v1/unprocessables/",
+            method="POST",
+            body="{}"
+        )
+        self.assertEqual(res.code, httpstatus.UNPROCESSABLE_ENTITY)
+
+        res = self.fetch(
+            "/api/v1/unprocessables/0/",
+            method="PUT",
+            body="{}"
+        )
+        self.assertEqual(res.code, httpstatus.UNPROCESSABLE_ENTITY)
 
 
 class TestRESTFunctions(unittest.TestCase):

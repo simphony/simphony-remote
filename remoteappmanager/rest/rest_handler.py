@@ -54,7 +54,10 @@ class RESTCollectionHandler(RESTBaseHandler):
         try:
             resource_id = yield rest_cls.create(data)
         except exceptions.UnprocessableRepresentation:
-            raise web.HTTPError(httpstatus.UNPROCESSABLE_ENTITY)
+            # Need reason for tornado quirk that would raise 500 for
+            # "unknown" status codes. See tornado.web line 1522
+            raise web.HTTPError(httpstatus.UNPROCESSABLE_ENTITY,
+                                reason="Unprocessable entity")
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
 
@@ -81,7 +84,10 @@ class RESTResourceHandler(RESTBaseHandler):
         except exceptions.NotFound:
             raise web.HTTPError(httpstatus.NOT_FOUND)
         except exceptions.UnprocessableRepresentation:
-            raise web.HTTPError(httpstatus.UNPROCESSABLE_ENTITY)
+            # Need reason for tornado quirk that would raise 500 for
+            # "unknown" status codes. See tornado.web line 1522
+            raise web.HTTPError(httpstatus.UNPROCESSABLE_ENTITY,
+                                reason="Unprocessable entity")
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
 
@@ -121,7 +127,10 @@ class RESTResourceHandler(RESTBaseHandler):
         except exceptions.NotFound:
             raise web.HTTPError(httpstatus.NOT_FOUND)
         except exceptions.UnprocessableRepresentation:
-            raise web.HTTPError(httpstatus.UNPROCESSABLE_ENTITY)
+            # Need reason for tornado quirk that would raise 500 for
+            # "unknown" status codes. See tornado.web line 1522
+            raise web.HTTPError(httpstatus.UNPROCESSABLE_ENTITY,
+                                reason="Unprocessable entity")
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
 
