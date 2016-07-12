@@ -6,9 +6,13 @@ class Resource:
     To implement a new Resource class, inherit from this subclass
     and reimplement the CRUD class methods with the appropriate
     logic.
+
+    The Resource exports two member vars: application and current_user.
+    They are equivalent to the members in the tornado web handler.
     """
-    def __init__(self, application):
+    def __init__(self, application, current_user):
         self.application = application
+        self.current_user = current_user
 
     @gen.coroutine
     def create(self, representation):

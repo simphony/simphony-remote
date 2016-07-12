@@ -18,7 +18,9 @@ class RESTBaseHandler(web.RequestHandler):
 
         try:
             resource_class = self.registry[collection_name]
-            return resource_class(application=self.application)
+            return resource_class(
+                application=self.application,
+                current_user=self.current_user)
         except KeyError:
             raise web.HTTPError(httpstatus.NOT_FOUND)
 
