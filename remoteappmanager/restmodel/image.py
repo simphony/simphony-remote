@@ -5,5 +5,5 @@ from tornado import gen
 class Image(Resource):
     @classmethod
     @gen.coroutine
-    def images(self):
+    def items(self):
         return []
