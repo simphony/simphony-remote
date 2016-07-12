@@ -55,7 +55,7 @@ class ABCApplicationPolicy(metaclass=ABCMeta):
 
 
 class ABCAccounting(metaclass=ABCMeta):
-    """ Main accounting interface required by the single User application.
+    """ Main accounting interface required by the single user application.
     """
 
     @abstractmethod
@@ -69,16 +69,17 @@ class ABCAccounting(metaclass=ABCMeta):
 
         Returns
         -------
-        a User-like object that the Database understands
+        account : opaque-type
+           an object that the database understands
         """
 
     @abstractmethod
-    def get_apps_for_user(self, user):
-        """ Return an iterable of ApplicationConfig for a given User
+    def get_apps_for_user(self, account):
+        """ Return an iterable of ApplicationConfig for a given account
 
         Parameters
         ----------
-        user : User-like
+        account : opaque-type
            Same type as the result of `get_user_by_name`
 
         Returns
