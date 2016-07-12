@@ -66,7 +66,7 @@ class RESTCollectionHandler(RESTBaseHandler):
         self.flush()
 
 
-class RESTItemHandler(RESTBaseHandler):
+class RESTResourceHandler(RESTBaseHandler):
     """Handler for URLs addressing a resource.
     """
     SUPPORTED_METHODS = ("GET", "POST", "PUT", "DELETE")

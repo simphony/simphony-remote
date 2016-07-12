@@ -1,8 +1,11 @@
+import unittest
 from tornado import web, gen, escape
 from collections import OrderedDict
 
 from remoteappmanager import rest
 from remoteappmanager.rest.resource import Resource
+from remoteappmanager.rest.rest_handler import RESTResourceHandler, \
+    RESTCollectionHandler
 from remoteappmanager.rest import registry, httpstatus, exceptions
 
 from tests.utils import AsyncHTTPTestCase
@@ -198,3 +201,12 @@ class TestREST(AsyncHTTPTestCase):
 
         res = self.fetch("/api/v1/students/1/", method="DELETE")
         self.assertEqual(res.code, httpstatus.NOT_FOUND)
+
+
+class TestRESTFunctions(unittest.TestCase):
+    def test_api_handlers(self):
+        handlers = rest.api_handlers("/foo")
+        self.assertEqual(handlers[0][0], "/foo/api/v1/(.*)/(.*)/")
+        self.assertEqual(handlers[0][1], RESTResourceHandler)
+        self.assertEqual(handlers[1][0], "/foo/api/v1/(.*)/")
+        self.assertEqual(handlers[1][1], RESTCollectionHandler)
