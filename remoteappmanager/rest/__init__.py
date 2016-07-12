@@ -12,4 +12,3 @@ def api_handlers(base_url, version="v1"):
          RESTCollectionHandler
          ),
         ]
-

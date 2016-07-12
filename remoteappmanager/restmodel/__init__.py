@@ -1,2 +1,2 @@
-from remoteappmanager.restmodel.container import Container
-from remoteappmanager.restmodel.image import Image
+from remoteappmanager.restmodel.container import Container  # noqa
+from remoteappmanager.restmodel.image import Image  # noqa
