@@ -2,11 +2,11 @@ from tornado import testing, web, gen, escape
 from collections import OrderedDict
 
 from remoteappmanager import rest
-from remoteappmanager.rest.rest_object import RESTObject
+from remoteappmanager.rest.resource import Resource
 from remoteappmanager.rest import registry, httpstatus, exceptions
 
 
-class Student(RESTObject):
+class Student(Resource):
     collection = OrderedDict()
     id = 0
 

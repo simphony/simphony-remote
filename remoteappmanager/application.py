@@ -1,4 +1,5 @@
 import os
+
 from traitlets import Instance, default
 from tornado import web
 import tornado.ioloop
@@ -17,7 +18,7 @@ from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
 from remoteappmanager import rest
 from remoteappmanager.rest import registry
-from remoteappmanager.rest import model
+from remoteappmanager import restmodel
 
 
 class Application(web.Application, LoggingMixin):
@@ -163,8 +164,8 @@ class Application(web.Application, LoggingMixin):
         ]
 
     def _register_rest_models(self):
-        for rest_model_class in [model.Image,
-                                 model.Container]:
+        for rest_model_class in [restmodel.Image,
+                                 restmodel.Container]:
             registry.registry.register(rest_model_class)
 
     def _jinja_init(self, settings):
