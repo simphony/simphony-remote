@@ -13,7 +13,8 @@ class Resource:
         """Called to create a resource with a given representation
         The representation is a dictionary containing keys. The
         reimplementing code is responsible for checking the validity
-        of the representation.
+        of the representation. Correspond to a POST operation on the
+        resource collection.
 
         Parameters
         ----------
@@ -41,7 +42,7 @@ class Resource:
     @gen.coroutine
     def retrieve(cls, identifier):
         """Called to retrieve a specific resource given its
-        identifier.
+        identifier. Correspond to a GET operation on the resource URL.
 
         Parameters
         ----------
@@ -69,7 +70,7 @@ class Resource:
         """Called to update a specific resource given its
         identifier with a new representation.
         The method is responsible for validating the representation
-        content.
+        content. Correspond to a PUT operation on the resource URL.
 
         Parameters
         ----------
@@ -97,8 +98,8 @@ class Resource:
 
     @classmethod
     def delete(cls, identifier):
-        """Called to delete a specific resource given its
-        identifier.
+        """Called to delete a specific resource given its identifier.
+        Corresponds to a DELETE operation on the resource URL.
 
         Parameters
         ----------
@@ -146,6 +147,7 @@ class Resource:
     def items(cls):
         """Invoked when a request is performed to the collection
         URL. Returns a list of identifiers available.
+        Corresponds to a GET operation on the collection URL.
 
         Returns
         -------
