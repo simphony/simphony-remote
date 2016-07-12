@@ -11,6 +11,15 @@ class Resource:
     They are equivalent to the members in the tornado web handler.
     """
     def __init__(self, application, current_user):
+        """Initializes the Resource with a given application and user instance
+
+        Parameters
+        ----------
+        application: web.Application
+            The tornado web application
+        current_user:
+            The current user as passed by the underlying RequestHandler.
+        """
         self.application = application
         self.current_user = current_user
 
