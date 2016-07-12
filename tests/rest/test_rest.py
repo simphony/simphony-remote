@@ -1,9 +1,11 @@
-from tornado import testing, web, gen, escape
+from tornado import web, gen, escape
 from collections import OrderedDict
 
 from remoteappmanager import rest
 from remoteappmanager.rest.resource import Resource
 from remoteappmanager.rest import registry, httpstatus, exceptions
+
+from tests.utils import AsyncHTTPTestCase
 
 
 class Student(Resource):
@@ -48,7 +50,7 @@ class Student(Resource):
         return list(cls.collection.keys())
 
 
-class TestREST(testing.AsyncHTTPTestCase):
+class TestREST(AsyncHTTPTestCase):
     def setUp(self):
         super().setUp()
         Student.collection = OrderedDict()
