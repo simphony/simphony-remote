@@ -5,7 +5,7 @@ class Registry:
     def __init__(self):
         self._registered_types = {}
 
-    def register(self, typ):
+    def register(self, typ, collection_name=None):
         """Registers a Resource type with an appropriate
         collection name. A collection name is a pluralized
         version of the resource, created by lowercasing
@@ -17,12 +17,15 @@ class Registry:
         http://example.com/api/v1/images/identifier/
 
         The collection name can always be overridden by specifying
-        __collection_name__ in the resource class.
+        __collection_name__ in the resource class, or by specifying
+        the collection_name parameter.
 
         Parameters
         ----------
         typ: Resource
             A subclass of the rest Resource type
+        collection_name: str or None
+            Overrides the resource collection name.
 
         Raises
         ------
@@ -32,7 +35,9 @@ class Registry:
         if not issubclass(typ, Resource):
             raise TypeError("typ must be a subclass of Resource")
 
-        if hasattr(typ, "__collection_name__"):
+        if collection_name is not None:
+            collection_name = collection_name
+        elif hasattr(typ, "__collection_name__"):
             collection_name = typ.__collection_name__
         else:
             collection_name = typ.__name__.lower() + "s"
