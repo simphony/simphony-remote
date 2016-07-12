@@ -16,13 +16,11 @@ class Container(Resource):
         # with its current status
         pass
 
-
     @gen.coroutine
     def update(self, identifier, representation):
         # Used to change the status. We should be able to say status=stop.
         # and this will stop the container
         pass
-
 
     @gen.coroutine
     def delete(self, identifier):

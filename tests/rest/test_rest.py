@@ -12,40 +12,41 @@ from tests.utils import AsyncHTTPTestCase
 
 
 class Student(Resource):
+
     collection = OrderedDict()
     id = 0
 
     @gen.coroutine
-    def create(cls, representation):
-        id = str(cls.id)
-        cls.collection[id] = representation
-        cls.id += 1
+    def create(self, representation):
+        id = str(type(self).id)
+        self.collection[id] = representation
+        type(self).id += 1
         return id
 
     @gen.coroutine
-    def retrieve(cls, identifier):
-        if identifier not in cls.collection:
+    def retrieve(self, identifier):
+        if identifier not in self.collection:
             raise exceptions.NotFound()
 
-        return cls.collection[identifier]
+        return self.collection[identifier]
 
     @gen.coroutine
-    def update(cls, identifier, representation):
-        if identifier not in cls.collection:
+    def update(self, identifier, representation):
+        if identifier not in self.collection:
             raise exceptions.NotFound()
 
-        cls.collection[identifier] = representation
+        self.collection[identifier] = representation
 
     @gen.coroutine
-    def delete(cls, identifier):
-        if identifier not in cls.collection:
+    def delete(self, identifier):
+        if identifier not in self.collection:
             raise exceptions.NotFound()
 
-        del cls.collection[identifier]
+        del self.collection[identifier]
 
     @gen.coroutine
-    def items(cls):
-        return list(cls.collection.keys())
+    def items(self):
+        return list(self.collection.keys())
 
 
 class UnsupportAll(Resource):
@@ -54,7 +55,7 @@ class UnsupportAll(Resource):
 
 class Unprocessable(Resource):
     @gen.coroutine
-    def create(cls, representation):
+    def create(self, representation):
         raise exceptions.UnprocessableRepresentation()
 
     @gen.coroutine
