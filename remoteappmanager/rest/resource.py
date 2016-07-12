@@ -7,9 +7,11 @@ class Resource:
     and reimplement the CRUD class methods with the appropriate
     logic.
     """
-    @classmethod
+    def __init__(self, application):
+        self.application = application
+
     @gen.coroutine
-    def create(cls, representation):
+    def create(self, representation):
         """Called to create a resource with a given representation
         The representation is a dictionary containing keys. The
         reimplementing code is responsible for checking the validity
@@ -38,9 +40,8 @@ class Resource:
         """
         raise NotImplementedError()
 
-    @classmethod
     @gen.coroutine
-    def retrieve(cls, identifier):
+    def retrieve(self, identifier):
         """Called to retrieve a specific resource given its
         identifier. Correspond to a GET operation on the resource URL.
 
@@ -64,9 +65,8 @@ class Resource:
         """
         raise NotImplementedError()
 
-    @classmethod
     @gen.coroutine
-    def update(cls, identifier, representation):
+    def update(self, identifier, representation):
         """Called to update a specific resource given its
         identifier with a new representation.
         The method is responsible for validating the representation
@@ -97,7 +97,7 @@ class Resource:
         raise NotImplementedError()
 
     @classmethod
-    def delete(cls, identifier):
+    def delete(self, identifier):
         """Called to delete a specific resource given its identifier.
         Corresponds to a DELETE operation on the resource URL.
 
@@ -120,9 +120,8 @@ class Resource:
         """
         raise NotImplementedError()
 
-    @classmethod
     @gen.coroutine
-    def exists(cls, identifier):
+    def exists(self, identifier):
         """Returns True if the resource with a given identifier
         exists. False otherwise.
 
@@ -136,15 +135,14 @@ class Resource:
         bool: True if found, False otherwise.
         """
         try:
-            yield cls.retrieve(identifier)
+            yield self.retrieve(identifier)
         except Exception:
             return False
 
         return True
 
-    @classmethod
     @gen.coroutine
-    def items(cls):
+    def items(self):
         """Invoked when a request is performed to the collection
         URL. Returns a list of identifiers available.
         Corresponds to a GET operation on the collection URL.

@@ -164,7 +164,7 @@ class Application(web.Application, LoggingMixin):
         ]
 
     def _register_rest_models(self):
-        for rest_model_class in [restmodel.Image,
+        for rest_model_class in [restmodel.Application,
                                  restmodel.Container]:
             registry.registry.register(rest_model_class)
 

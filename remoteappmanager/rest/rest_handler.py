@@ -11,13 +11,14 @@ class RESTBaseHandler(web.RequestHandler):
         """Returns the global class vs Resource registry"""
         return registry
 
-    def get_rest_class_or_404(self, collection_name):
+    def get_resource_handler_or_404(self, collection_name):
         """Given a collection name, inquires the registry
         for its associated Resource class. If not found
         raises HTTPError(NOT_FOUND)"""
 
         try:
-            return self.registry[collection_name]
+            resource_class = self.registry[collection_name]
+            return resource_class(application=self.application)
         except KeyError:
             raise web.HTTPError(httpstatus.NOT_FOUND)
 
@@ -29,10 +30,10 @@ class RESTCollectionHandler(RESTBaseHandler):
     @gen.coroutine
     def get(self, collection_name):
         """Returns the collection of avilable items"""
-        rest_cls = self.get_rest_class_or_404(collection_name)
+        res_handler = self.get_resource_handler_or_404(collection_name)
 
         try:
-            items = yield rest_cls.items()
+            items = yield res_handler.items()
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
 
@@ -44,7 +45,7 @@ class RESTCollectionHandler(RESTBaseHandler):
     @gen.coroutine
     def post(self, collection_name):
         """Creates a new resource in the collection."""
-        rest_cls = self.get_rest_class_or_404(collection_name)
+        res_handler = self.get_resource_handler_or_404(collection_name)
 
         try:
             data = escape.json_decode(self.request.body)
@@ -52,7 +53,7 @@ class RESTCollectionHandler(RESTBaseHandler):
             raise web.HTTPError(httpstatus.UNSUPPORTED_MEDIA_TYPE)
 
         try:
-            resource_id = yield rest_cls.create(data)
+            resource_id = yield res_handler.create(data)
         except exceptions.UnprocessableRepresentation:
             # Need reason for tornado quirk that would raise 500 for
             # "unknown" status codes. See tornado.web line 1522
@@ -77,10 +78,10 @@ class RESTResourceHandler(RESTBaseHandler):
     @gen.coroutine
     def get(self, collection_name, identifier):
         """Retrieves the resource representation."""
-        rest_cls = self.get_rest_class_or_404(collection_name)
+        res_handler = self.get_resource_handler_or_404(collection_name)
 
         try:
-            representation = yield rest_cls.retrieve(identifier)
+            representation = yield res_handler.retrieve(identifier)
         except exceptions.NotFound:
             raise web.HTTPError(httpstatus.NOT_FOUND)
         except exceptions.UnprocessableRepresentation:
@@ -100,10 +101,10 @@ class RESTResourceHandler(RESTBaseHandler):
         """This operation is not possible in REST, and results
         in either Conflict or NotFound, depending on the
         presence of a resource at the given URL"""
-        rest_cls = self.get_rest_class_or_404(collection_name)
+        res_handler = self.get_resource_handler_or_404(collection_name)
 
         try:
-            exists = yield rest_cls.exists(identifier)
+            exists = yield res_handler.exists(identifier)
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
 
@@ -115,7 +116,7 @@ class RESTResourceHandler(RESTBaseHandler):
     @gen.coroutine
     def put(self, collection_name, identifier):
         """Replaces the resource with a new representation."""
-        rest_cls = self.get_rest_class_or_404(collection_name)
+        res_handler = self.get_resource_handler_or_404(collection_name)
 
         try:
             representation = escape.json_decode(self.request.body)
@@ -123,7 +124,7 @@ class RESTResourceHandler(RESTBaseHandler):
             raise web.HTTPError(httpstatus.UNSUPPORTED_MEDIA_TYPE)
 
         try:
-            yield rest_cls.update(identifier, representation)
+            yield res_handler.update(identifier, representation)
         except exceptions.NotFound:
             raise web.HTTPError(httpstatus.NOT_FOUND)
         except exceptions.UnprocessableRepresentation:
@@ -139,10 +140,10 @@ class RESTResourceHandler(RESTBaseHandler):
     @gen.coroutine
     def delete(self, collection_name, identifier):
         """Deletes the resource."""
-        rest_cls = self.get_rest_class_or_404(collection_name)
+        res_handler = self.get_resource_handler_or_404(collection_name)
 
         try:
-            yield rest_cls.delete(identifier)
+            yield res_handler.delete(identifier)
         except exceptions.NotFound:
             raise web.HTTPError(httpstatus.NOT_FOUND)
         except NotImplementedError:

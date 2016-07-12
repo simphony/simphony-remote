@@ -15,7 +15,6 @@ class Student(Resource):
     collection = OrderedDict()
     id = 0
 
-    @classmethod
     @gen.coroutine
     def create(cls, representation):
         id = str(cls.id)
@@ -23,7 +22,6 @@ class Student(Resource):
         cls.id += 1
         return id
 
-    @classmethod
     @gen.coroutine
     def retrieve(cls, identifier):
         if identifier not in cls.collection:
@@ -31,7 +29,6 @@ class Student(Resource):
 
         return cls.collection[identifier]
 
-    @classmethod
     @gen.coroutine
     def update(cls, identifier, representation):
         if identifier not in cls.collection:
@@ -39,7 +36,6 @@ class Student(Resource):
 
         cls.collection[identifier] = representation
 
-    @classmethod
     @gen.coroutine
     def delete(cls, identifier):
         if identifier not in cls.collection:
@@ -47,7 +43,6 @@ class Student(Resource):
 
         del cls.collection[identifier]
 
-    @classmethod
     @gen.coroutine
     def items(cls):
         return list(cls.collection.keys())
@@ -58,12 +53,10 @@ class UnsupportAll(Resource):
 
 
 class Unprocessable(Resource):
-    @classmethod
     @gen.coroutine
     def create(cls, representation):
         raise exceptions.UnprocessableRepresentation()
 
-    @classmethod
     @gen.coroutine
     def update(self, identifier, representation):
         raise exceptions.UnprocessableRepresentation()
