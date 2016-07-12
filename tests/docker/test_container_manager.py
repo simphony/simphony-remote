@@ -108,7 +108,7 @@ class TestContainerManager(AsyncTestCase):
         self.assertEqual(image.description,
                          'Ubuntu machine with mayavi preinstalled')
         self.assertEqual(image.icon_128, "")
-        self.assertEqual(image.ui_name, "")
+        self.assertEqual(image.ui_name, "Mayavi 4.4.4")
         self.assertEqual(image.docker_id,
                          'sha256:e54d71dde57576e9d2a4c77ce0c98501c8aa6268de5b2987e4c80e2e157cffe4')  # noqa
 

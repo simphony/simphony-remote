@@ -1,8 +1,12 @@
 import contextlib
 import sys
+import socket
 from unittest import mock
 
+import tornado.netutil
+import tornado.testing
 import docker
+
 from remoteappmanager.command_line_config import CommandLineConfig
 from remoteappmanager.file_config import FileConfig
 from remoteappmanager.db.orm import Database
@@ -13,19 +17,36 @@ def mock_docker_client():
     """Returns a mock synchronous docker client to return canned
     responses."""
     docker_client = mock.Mock(spec=docker.Client)
+
+    # Note that the structure of the returned dictionary is different
+    # for `inspect_image` and for `images`
+    # The return value is simplified...
     docker_client.inspect_image = mock.Mock(
-        return_value={'Created': 1463662803,
-                      'Id':
-                          'sha256:e54d71dde57576e9d2a4c77ce0c98501c8aa6268de5b2987e4c80e2e157cffe4',  # noqa
-                      'Labels': {
-                        'eu.simphony-project.docker.description':
-                            'Ubuntu machine with mayavi preinstalled'
-                      },
-                      'ParentId': 'sha256:d2f7240076e135f6aba57185e54ff45cc158781c787897b67994f72fe668ad07',  # noqa
-                      'RepoDigests': None,
-                      'RepoTags': ['simphony/mayavi-4.4.4:latest'],
-                      'Size': 1094833658,
-                      'VirtualSize': 1094833658})
+        return_value= {
+            'Author': 'SimPhoNy Team',
+            'Comment': '',
+            'Config': {'Cmd': None,
+                       'Domainname': '',
+                       'Entrypoint': ['/startup.sh'],
+                       'Env': ['PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+                               'DEBIAN_FRONTEND=noninteractive',
+                               'HOME=/root'],
+                       'ExposedPorts': {'8888/tcp': {}},
+                       'Hostname': 'dfc2eabdf236',
+                       'Image': 'sha256:912b31a4e4f185b918999540040bb158e208ce0123fde4be07c188b2ab5aa4bb',
+                       'Labels': {'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled',  # noqa
+                                  'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4'},  # noqa
+                       'OnBuild': [],
+                       'OpenStdin': False,
+                       'StdinOnce': False,
+                       'Tty': False,
+                       'User': '',
+                       'Volumes': None,
+                       'WorkingDir': '/root'},
+            'Id': 'sha256:e54d71dde57576e9d2a4c77ce0c98501c8aa6268de5b2987e4c80e2e157cffe4',
+            'RepoTags': ['simphony/mayavi-4.4.4:latest'],
+            'Size': 668483801,
+            'VirtualSize': 668483801})
     docker_client.inspect_container = mock.Mock(return_value=None)
     docker_client.create_host_config = mock.Mock(return_value={})
     docker_client.create_container = mock.Mock(
@@ -41,7 +62,8 @@ def mock_docker_client():
             {'Created': 1463662803,
              'Id': 'sha256:e54d71dde57576e9d2a4c77ce0c98501c8aa6268de5b2987e4c80e2e157cffe4',  # noqa
              'Labels': {
-             'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled'  # noqa
+                 'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled',  # noqa
+                 'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4'  # noqa
              },
             'ParentId': 'sha256:d2f7240076e135f6aba57185e54ff45cc158781c787897b67994f72fe668ad07',  # noqa
             'RepoDigests': None,
@@ -273,6 +295,35 @@ def invocation_argv():
     yield
 
     sys.argv[:] = saved_argv
+
+
+# Workaround for tornado bug #1573, already fixed in master, but not yet
+# available. Remove when upgrading tornado.
+def bind_unused_port(reuse_port=False):
+    """Binds a server socket to an available port on localhost.
+
+    Returns a tuple (socket, port).
+    """
+    sock = tornado.netutil.bind_sockets(None,
+                                        '127.0.0.1',
+                                        family=socket.AF_INET,
+                                        reuse_port=reuse_port)[0]
+    port = sock.getsockname()[1]
+    return sock, port
+
+
+class AsyncHTTPTestCase(tornado.testing.AsyncHTTPTestCase):
+    """Base class workaround for the above condition."""
+    def setUp(self):
+        self._bind_unused_port_orig = tornado.testing.bind_unused_port
+        tornado.testing.bind_unused_port = bind_unused_port
+
+        def cleanup():
+            tornado.testing.bind_unused_port = self._bind_unused_port_orig
+
+        self.addCleanup(cleanup)
+
+        super().setUp()
 
 
 def assert_containers_equal(test_case, actual, expected):

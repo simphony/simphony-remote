@@ -1,7 +1,7 @@
-import requests
 from urllib.parse import quote
 
-from tornado.httpclient import HTTPError
+from tornado import gen, escape
+from tornado.httpclient import AsyncHTTPClient
 from traitlets import HasTraits, Unicode
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
@@ -17,6 +17,7 @@ class Hub(LoggingMixin, HasTraits):
     #: The api key to authenticate the request
     api_key = Unicode()
 
+    @gen.coroutine
     def verify_token(self, cookie_name, encrypted_cookie):
         """Verify the authentication token and grants access to the user
         if verified.
@@ -30,7 +31,10 @@ class Hub(LoggingMixin, HasTraits):
 
         Returns
         -------
-        True if cookie is verified as valid. Otherwise, raise an HTTPError
+        user_data : dict
+            If authentication is successful, user_data contains the user's
+            information from jupyterhub associated with the given encrypted
+            cookie.  Otherwise the dictionary is empty.
         """
 
         # URL for the authorization requiest
@@ -39,18 +43,13 @@ class Hub(LoggingMixin, HasTraits):
                                     cookie_name,
                                     quote(encrypted_cookie, safe=''))
 
-        r = requests.get(request_url,
-                         headers={'Authorization': 'token %s' % self.api_key})
+        client = AsyncHTTPClient()
+        r = yield client.fetch(
+                request_url,
+                headers={'Authorization': 'token %s' % self.api_key},
+                raise_error=False)
 
-        if r.status_code == 403:
-            self.log.error("Auth token may have expired: [%i] %s",
-                           r.status_code, r.reason)
-            raise HTTPError(500,
-                            "Permission failure checking authorization, "
-                            "please restart.")
-        elif r.status_code >= 400:
-            self.log.warn("Failed to check authorization: [%i] %s",
-                          r.status_code, r.reason)
-            raise HTTPError(500, "Failed to check authorization")
-
-        return True
+        if r.code < 400:
+            return escape.json_decode(r.body)
+        else:
+            return {}

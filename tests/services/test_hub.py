@@ -1,12 +1,35 @@
-from unittest import mock
-
-from tornado import testing
-from tornado.httpclient import HTTPError
+from tornado import testing, web, gen
 
 from remoteappmanager.services.hub import Hub
+from tornado.web import HTTPError
+from tests import utils
 
 
-class TestHub(testing.AsyncTestCase):
+class AuthHandler(web.RequestHandler):
+    ret_status = 200
+
+    @gen.coroutine
+    def get(self, url):
+        if self.ret_status != 200:
+            raise HTTPError(self.ret_status)
+
+        self.set_status(self.ret_status)
+        self.write({"server": "/user/username",
+                    "name": "username",
+                    "pending": None,
+                    "admin": False})
+        self.flush()
+
+
+class TestHub(utils.AsyncHTTPTestCase):
+    def get_app(self):
+        self.handler = AuthHandler
+        handlers = [
+            ("/hub/authorizations/cookie/(.*)", self.handler),
+        ]
+        app = web.Application(handlers)
+        return app
+
     def test_initialization(self):
         endpoint_url = "http://example.com/"
         api_key = "whatever"
@@ -14,38 +37,19 @@ class TestHub(testing.AsyncTestCase):
         self.assertEqual(hub.endpoint_url, endpoint_url)
         self.assertEqual(hub.api_key, api_key)
 
+    @testing.gen_test
     def test_requests(self):
-        class Result403:
-            status_code = 403
-            reason = "403"
-
-        class Result500:
-            status_code = 500
-            reason = "500"
-
-        class Result200:
-            status_code = 200
-
-        endpoint_url = "http://example.com/"
+        endpoint_url = self.get_url("/hub")
         api_key = "whatever"
         hub = Hub(endpoint_url=endpoint_url, api_key=api_key)
 
-        with mock.patch("requests.get") as mock_get:
-            mock_get.return_value = Result403
+        self.handler.ret_status = 403
+        self.assertEqual((yield hub.verify_token("foo", "bar")), {})
 
-            with self.assertRaises(HTTPError):
-                hub.verify_token("foo", "bar")
+        self.handler.ret_status = 501
+        self.assertEqual((yield hub.verify_token("foo", "bar")), {})
 
-            mock_get.return_value = Result500
-
-            with self.assertRaises(HTTPError):
-                hub.verify_token("foo", "bar")
-
-        with mock.patch("requests.get") as mock_get:
-            mock_get.return_value = Result200
-
-            self.assertTrue(hub.verify_token("foo", "bar"))
-
-            mock_get.assert_called_once_with(
-                "http://example.com/authorizations/cookie/foo/bar",
-                headers={'Authorization': 'token whatever'})
+        self.handler.ret_status = 200
+        res = yield hub.verify_token("foo", "bar")
+        self.assertNotEqual(res, {})
+        self.assertEqual(res["name"], "username")
