@@ -2,8 +2,6 @@ import os
 import urllib.parse
 from unittest import mock
 
-import tornado.netutil
-import tornado.testing
 from remoteappmanager.db.interfaces import ABCAccounting
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.container_manager import ContainerManager
@@ -34,16 +32,11 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
         self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
         os.environ["PROXY_API_TOKEN"] = "dummy_token"
 
-        self._bind_unused_port_orig = tornado.testing.bind_unused_port
-        tornado.testing.bind_unused_port = utils.bind_unused_port
-
         def cleanup():
             if self._old_proxy_api_token is not None:
                 os.environ["PROXY_API_TOKEN"] = self._old_proxy_api_token
             else:
                 del os.environ["PROXY_API_TOKEN"]
-
-            tornado.testing.bind_unused_port = self._bind_unused_port_orig
 
         self.addCleanup(cleanup)
 
