@@ -1,10 +1,7 @@
 import os
 import urllib.parse
 from unittest import mock
-import socket
 
-import tornado.netutil
-import tornado.testing
 from remoteappmanager.db.interfaces import ABCAccounting
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.container_manager import ContainerManager
@@ -12,26 +9,10 @@ from remoteappmanager.docker.image import Image
 from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
 from tornado import gen
-from tornado.testing import AsyncHTTPTestCase
 
 from remoteappmanager.application import Application
 from tests import utils
 from tests.temp_mixin import TempMixin
-
-
-# Workaround for tornado bug #1573, already fixed in master, but not yet
-# available. Remove when upgrading tornado.
-def _bind_unused_port(reuse_port=False):
-    """Binds a server socket to an available port on localhost.
-
-    Returns a tuple (socket, port).
-    """
-    sock = tornado.netutil.bind_sockets(None,
-                                        '127.0.0.1',
-                                        family=socket.AF_INET,
-                                        reuse_port=reuse_port)[0]
-    port = sock.getsockname()[1]
-    return sock, port
 
 
 def mock_coro_factory(return_value=None):
@@ -46,21 +27,16 @@ def mock_coro_factory(return_value=None):
     return coro
 
 
-class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
+class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
     def setUp(self):
         self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
         os.environ["PROXY_API_TOKEN"] = "dummy_token"
-
-        self._bind_unused_port_orig = tornado.testing.bind_unused_port
-        tornado.testing.bind_unused_port = _bind_unused_port
 
         def cleanup():
             if self._old_proxy_api_token is not None:
                 os.environ["PROXY_API_TOKEN"] = self._old_proxy_api_token
             else:
                 del os.environ["PROXY_API_TOKEN"]
-
-            tornado.testing.bind_unused_port = self._bind_unused_port_orig
 
         self.addCleanup(cleanup)
 
@@ -79,11 +55,11 @@ class TestHomeHandler(TempMixin, AsyncHTTPTestCase):
         app.reverse_proxy.add_container = mock_coro_factory("/")
         app.reverse_proxy.remove_container = mock_coro_factory()
         app.hub = mock.Mock(spec=Hub)
-        app.hub.verify_token.return_value = {
+        app.hub.verify_token = mock_coro_factory({
             'pending': None,
             'name': command_line_config.user,
             'admin': False,
-            'server': command_line_config.base_url}
+            'server': command_line_config.base_url})
         app.db = mock.Mock(spec=ABCAccounting)
         app.container_manager = mock.Mock(spec=ContainerManager)
         app.container_manager.start_container = mock_coro_factory(Container())
