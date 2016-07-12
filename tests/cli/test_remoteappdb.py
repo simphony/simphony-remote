@@ -80,7 +80,7 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
 
         self.assertEqual(result.exit_code, 0)
 
-        # Check that the app is not created
+        # Check that the app is created
         result = runner.invoke(remoteappdb.cli,
                                ['--db='+self.db, 'app', 'list'])
         self.assertIn('wrong2', result.output)
