@@ -26,11 +26,18 @@ else:
     raise RuntimeError("Unknown platform {}".format(_platform))
 
 
-# Define the sqlalchemy url for the database.
-# Notes:
-# 1. this database is shared among all instances of the remoteappmanager.
-# 2. When running with system-user mode, the jupyterhub spawners spawn in
-#    the user's home directory; when running in virtual-user mode,
-#    the current directory is the directory where jupyterhub is started
-# 3. '~' would be evaluated as the spawned user's home directory
-db_url = "sqlite:///"+os.path.abspath("./remoteappmanager.db")
+# -----------------------------
+# Define the accounting class
+# -----------------------------
+# Notes on os.path:
+#  When running with system-user mode, the current directory is the user's home
+#  directory; when running in virtual-user mode, the current directory is the
+#  directory where jupyterhub is started
+
+# CSV database support
+# accounting_class = "remoteappmanager.db.csv_db.CSVAccounting"
+# accounting_kwargs = {"csv_file_path": os.path.abspath("./remoteappmanager.csv")}
+
+# sqlite database support
+# accounting_class = "remoteappmanager.db.orm.AppAccounting"
+# accounting_kwargs = {"url": "sqlite:///"+os.path.abspath('./remoteappmanager.db')}
