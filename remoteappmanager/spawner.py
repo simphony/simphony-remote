@@ -190,6 +190,8 @@ class VirtualUserSpawner(LocalProcessSpawner):
 
 
 def _docker_envvars():
+    """Returns a dictionary containing the docker environment variables, if
+    present. If not present, returns an empty dictionary"""
     env = {}
     for envvar in ["DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME"]:
         env[envvar] = os.environ[envvar]
