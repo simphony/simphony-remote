@@ -194,4 +194,5 @@ def _docker_envvars():
     present. If not present, returns an empty dictionary"""
     env = {}
     for envvar in ["DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME"]:
-        env[envvar] = os.environ[envvar]
+        if envvar in os.environ:
+            env[envvar] = os.environ[envvar]
