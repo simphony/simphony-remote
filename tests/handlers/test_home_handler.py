@@ -8,23 +8,10 @@ from remoteappmanager.docker.container_manager import ContainerManager
 from remoteappmanager.docker.image import Image
 from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
-from tornado import gen
 
 from remoteappmanager.application import Application
 from tests import utils
 from tests.temp_mixin import TempMixin
-
-
-def mock_coro_factory(return_value=None):
-    @gen.coroutine
-    def coro(*args, **kwargs):
-        coro.called = True
-        yield gen.sleep(0.1)
-        return coro.return_value
-
-    coro.called = False
-    coro.return_value = return_value
-    return coro
 
 
 class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
@@ -52,22 +39,23 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
 
         app = Application(command_line_config, file_config)
         app.reverse_proxy = mock.Mock(spec=ReverseProxy)
-        app.reverse_proxy.add_container = mock_coro_factory("/")
-        app.reverse_proxy.remove_container = mock_coro_factory()
+        app.reverse_proxy.add_container = utils.mock_coro_factory("/")
+        app.reverse_proxy.remove_container = utils.mock_coro_factory()
         app.hub = mock.Mock(spec=Hub)
-        app.hub.verify_token = mock_coro_factory({
+        app.hub.verify_token = utils.mock_coro_factory({
             'pending': None,
             'name': command_line_config.user,
             'admin': False,
             'server': command_line_config.base_url})
         app.db = mock.Mock(spec=ABCAccounting)
         app.container_manager = mock.Mock(spec=ContainerManager)
-        app.container_manager.start_container = mock_coro_factory(Container())
-        app.container_manager.image = mock_coro_factory(Image)
-        app.container_manager.containers_from_mapping_id = mock_coro_factory(
-            [Container()]
-        )
-        app.container_manager.stop_and_remove_container = mock_coro_factory()
+        app.container_manager.start_container = \
+            utils.mock_coro_factory(Container())
+        app.container_manager.image = utils.mock_coro_factory(Image)
+        app.container_manager.containers_from_mapping_id = \
+            utils.mock_coro_factory([Container()])
+        app.container_manager.stop_and_remove_container = \
+            utils.mock_coro_factory()
 
         mock_application = mock.Mock()
         mock_policy = mock.Mock()
@@ -110,7 +98,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
                         ".handlers"
                         ".home_handler"
                         "._wait_for_http_server_2xx",
-                        new_callable=mock_coro_factory), \
+                        new_callable=utils.mock_coro_factory), \
             mock.patch("remoteappmanager"
                        ".handlers"
                        ".home_handler"
@@ -158,7 +146,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
                         ".home_handler"
                         ".HomeHandler"
                         "._container_from_options",
-                        new_callable=mock_coro_factory
+                        new_callable=utils.mock_coro_factory
                         ) as mock_container_from_options, \
             mock.patch("remoteappmanager"
                        ".handlers"
@@ -189,13 +177,13 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
                         ".handlers"
                         ".home_handler"
                         "._wait_for_http_server_2xx",
-                        new_callable=mock_coro_factory), \
+                        new_callable=utils.mock_coro_factory), \
                 mock.patch("remoteappmanager"
                            ".handlers"
                            ".home_handler"
                            ".HomeHandler"
                            "._container_from_options",
-                           new_callable=mock_coro_factory
+                           new_callable=utils.mock_coro_factory
                            ) as mock_container_from_options, \
                 mock.patch("remoteappmanager"
                            ".handlers"

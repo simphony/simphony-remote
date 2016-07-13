@@ -5,6 +5,7 @@ from unittest import mock
 
 import tornado.netutil
 import tornado.testing
+from tornado import gen
 import docker
 
 from remoteappmanager.command_line_config import CommandLineConfig
@@ -324,6 +325,33 @@ class AsyncHTTPTestCase(tornado.testing.AsyncHTTPTestCase):
         self.addCleanup(cleanup)
 
         super().setUp()
+
+
+def mock_coro_new_callable(return_value=None, side_effect=None):
+    """Creates a patch suitable callable that returns a coroutine
+    with appropriate return value and side effect."""
+
+    coro = mock_coro_factory(return_value, side_effect)
+
+    def new_callable():
+        return coro
+
+    return new_callable
+
+
+def mock_coro_factory(return_value=None, side_effect=None):
+    """Creates a mock coroutine with a given return value"""
+    @gen.coroutine
+    def coro(*args, **kwargs):
+        coro.called = True
+        yield gen.sleep(0.1)
+        if side_effect:
+            side_effect(*args, **kwargs)
+        return coro.return_value
+
+    coro.called = False
+    coro.return_value = return_value
+    return coro
 
 
 def assert_containers_equal(test_case, actual, expected):

@@ -1,3 +1,4 @@
+from remoteappmanager.handlers.base_handler import BaseHandler
 from tornado import gen, web, escape
 
 from remoteappmanager.rest.registry import registry
@@ -5,7 +6,7 @@ from remoteappmanager.utils import url_path_join, with_end_slash
 from remoteappmanager.rest import httpstatus, exceptions
 
 
-class RESTBaseHandler(web.RequestHandler):
+class RESTBaseHandler(BaseHandler):
     @property
     def registry(self):
         """Returns the global class vs Resource registry"""
