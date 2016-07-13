@@ -109,7 +109,7 @@ class Resource:
         """
         raise NotImplementedError()
 
-    @classmethod
+    @gen.coroutine
     def delete(self, identifier):
         """Called to delete a specific resource given its identifier.
         Corresponds to a DELETE operation on the resource URL.
