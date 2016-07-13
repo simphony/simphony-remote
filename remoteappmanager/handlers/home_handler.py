@@ -78,7 +78,7 @@ class HomeHandler(BaseHandler):
         mapping_id = options["mapping_id"][0]
 
         all_apps = self.application.db.get_apps_for_user(
-            self.current_user.orm_user)
+            self.current_user.account)
 
         choice = [(m_id, app, policy)
                   for m_id, app, policy in all_apps
@@ -90,9 +90,9 @@ class HomeHandler(BaseHandler):
         _, app, policy = choice[0]
 
         container = None
-        orm_user = self.current_user.orm_user
+        user_name = self.current_user.name
         try:
-            container = yield self._start_container(orm_user,
+            container = yield self._start_container(user_name,
                                                     app,
                                                     policy,
                                                     mapping_id)
@@ -172,7 +172,7 @@ class HomeHandler(BaseHandler):
         container_manager = self.application.container_manager
 
         apps = self.application.db.get_apps_for_user(
-            self.current_user.orm_user)
+            self.current_user.account)
 
         images_info = []
 
@@ -230,18 +230,16 @@ class HomeHandler(BaseHandler):
 
         return Container.from_docker_containers_dict(container_dict[0])
 
-    # FIXME: The orm_user here requires any database implementation
-    # to provide a user object with a name attribute
     @gen.coroutine
-    def _start_container(self, orm_user, app, policy, mapping_id):
+    def _start_container(self, user_name, app, policy, mapping_id):
         """Start the container. This method is a helper method that
         works with low level data and helps in issuing the request to the
         data container.
 
         Parameters
         ----------
-        orm_user : User
-            database's user object (e.g. current_user.orm_user)
+        user_name : str
+            the user name to be associated with the container
 
         app : ABCApplication
             the application to start
@@ -254,7 +252,6 @@ class HomeHandler(BaseHandler):
         Container
         """
 
-        user_name = orm_user.name
         image_name = app.image
         mount_home = policy.allow_home
         volume_spec = (policy.volume_source,

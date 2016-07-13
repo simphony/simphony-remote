@@ -158,7 +158,7 @@ class CSVAccounting(ABCAccounting):
 
         Parameters
         ----------
-        user : remoteappmanager.db.csv_db.CSVUser
+        user : CSVUser
            Same type as the result of `get_user_by_name`
 
         Returns
