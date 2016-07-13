@@ -12,6 +12,7 @@ from requests.packages.urllib3 import disable_warnings
 
 disable_warnings(InsecureRequestWarning)
 
+
 @click.group()
 def cli():
     pass
@@ -91,7 +92,8 @@ def start(identifier):
         mapping_id=identifier
     ))
 
-    response = requests.post(request_url, payload, cookies=cookies, verify=False)
+    response = requests.post(request_url, payload, cookies=cookies,
+                             verify=False)
     if response.status_code == 201:
         location = response.headers["Location"]
         print(location)
