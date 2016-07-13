@@ -1,8 +1,13 @@
 import os
 import unittest
 import subprocess
+from unittest import mock
 
+from click.testing import CliRunner
+
+from remoteappmanager.cli.remoteappdb import __main__ as remoteappdb
 from tests.temp_mixin import TempMixin
+from tests.utils import mock_docker_client
 
 
 class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
@@ -33,15 +38,55 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         self.assertIn("foo", out)
         self.assertIn("bar", out)
 
-    def test_app_create(self):
-        out = self._remoteappdb("app create myapp")
-        self.assertEqual(out, "1\n")
+    def test_app_create_with_verify(self):
+        runner = CliRunner()
+        with mock.patch('remoteappmanager.cli.remoteappdb.__main__.get_docker_client',  # noqa
+                        mock_docker_client):
+            # docker.client.inspect_image is mocked to always return
+            # something, so verification would pass
+            result = runner.invoke(remoteappdb.cli,
+                                   ['--db='+self.db,
+                                    'app', 'create', 'anything'])
 
-        out = self._remoteappdb("app list")
-        self.assertIn("myapp", out)
+            self.assertEqual(result.exit_code, 0)
+
+            # Check that the app is created
+            result = runner.invoke(remoteappdb.cli,
+                                   ['--db='+self.db,
+                                    'app', 'list'])
+            self.assertIn('anything', result.output)
+
+    def test_app_create_wrong_name_with_verify(self):
+        runner = CliRunner()
+
+        # create an application with a wrong image name
+        result = runner.invoke(remoteappdb.cli,
+                               ['--db='+self.db, 'app', 'create', 'wrong'])
+
+        self.assertEqual(result.exit_code, 2)
+
+        # Check that the app is not created
+        result = runner.invoke(remoteappdb.cli,
+                               ['--db='+self.db, 'app', 'list'])
+        self.assertNotIn('wrong', result.output)
+
+    def test_app_create_wrong_name_without_verify(self):
+        runner = CliRunner()
+
+        # create an application with a wrong image name
+        result = runner.invoke(remoteappdb.cli,
+                               ['--db='+self.db, 'app', 'create', 'wrong2',
+                                '--no-verify'])
+
+        self.assertEqual(result.exit_code, 0)
+
+        # Check that the app is created
+        result = runner.invoke(remoteappdb.cli,
+                               ['--db='+self.db, 'app', 'list'])
+        self.assertIn('wrong2', result.output)
 
     def test_app_grant(self):
-        self._remoteappdb("app create myapp")
+        self._remoteappdb("app create myapp --no-verify")
         self._remoteappdb("user create user")
 
         out = self._remoteappdb("user list")
@@ -57,7 +102,7 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         self.assertIn(" ro\n", out)
 
     def test_app_revoke(self):
-        self._remoteappdb("app create myapp")
+        self._remoteappdb("app create myapp --no-verify")
         self._remoteappdb("user create user")
 
         self._remoteappdb("app grant myapp user")

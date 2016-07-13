@@ -8,7 +8,5 @@ class User(HasTraits):
     # The username as passed at the config line
     name = Unicode()
 
-    # FIXME: orm_user is Any to support other database implementation
-
     #: Can be none if the username cannot be found in the database.
-    orm_user = Any()
+    account = Any()
