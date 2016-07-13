@@ -16,7 +16,7 @@ if _platform == 'Darwin':
         raise ValueError("Docker environment has not been defined.")
 
     tls = False
-    tls_verify = True
+    tls_verify = bool(int(os.path.expandvars("${DOCKER_TLS_VERIFY}")))
     tls_ca = os.path.expandvars('${DOCKER_CERT_PATH}/ca.pem')
     tls_cert = os.path.expandvars('${DOCKER_CERT_PATH}/cert.pem')
     tls_key = os.path.expandvars('${DOCKER_CERT_PATH}/key.pem')
