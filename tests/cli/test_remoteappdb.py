@@ -87,3 +87,57 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         self.assertEqual(len(out.split('\n')), 2)
         self.assertIn("frobniz", out)
         self.assertIn("froble", out)
+
+    def test_delete_user_cascade(self):
+        """ Test if deleting user cascade to deleting accounting rows
+        """
+        # Given user is created with two accountings (application, policy)
+        self._remoteappdb("app create myapp")
+        out = self._remoteappdb("user create user")
+        self.assertEqual(out, "1\n")
+
+        self._remoteappdb("app grant myapp user")
+        self._remoteappdb("app grant myapp user --allow-view")
+
+        out = self._remoteappdb("user list --show-apps --no-decoration")
+        self.assertEqual(len(out.split('\n')), 3)
+
+        # When the user is deleted, the accounting rows should be deleted
+        # So when you add the user back later, those accountings should
+        # not exist (This test relies on the fact that there is only one
+        # user and so has the same id as before)
+        self._remoteappdb("user remove user")
+        out = self._remoteappdb("user create user")
+        self.assertEqual(out, "1\n")
+
+        out = self._remoteappdb("user list --show-apps --no-decoration")
+        self.assertEqual(len(out.split('\n')), 2)
+        self.assertNotIn("myapp", out)
+
+    def test_delete_application_cascade(self):
+        """ Test if deleting application cascade to deleting accounting rows
+        """
+        # Given user is created with two accountings (application, policy)
+        out = self._remoteappdb("app create myapp")
+        self.assertEqual(out, "1\n")
+        out = self._remoteappdb("user create user")
+        self.assertEqual(out, "1\n")
+
+        self._remoteappdb("app grant myapp user")
+        self._remoteappdb("app grant myapp user --allow-view")
+
+        out = self._remoteappdb("user list --show-apps --no-decoration")
+        self.assertEqual(len(out.split('\n')), 3)
+
+        # When the application is deleted, the associated accounting rows
+        # should be deleted.  So when you add the application back later,
+        # those accountings should not exist
+        # (This test relies on the fact that there is only one app and so
+        # the application row has the same id as before)
+        self._remoteappdb("app remove myapp")
+        out = self._remoteappdb("app create myapp")
+        self.assertEqual(out, "1\n")
+
+        out = self._remoteappdb("user list --show-apps --no-decoration")
+        self.assertEqual(len(out.split('\n')), 2)
+        self.assertNotIn("myapp", out)
