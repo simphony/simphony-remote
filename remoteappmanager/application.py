@@ -116,12 +116,6 @@ class Application(web.Application, LoggingMixin):
         module_path, _, cls_name = class_path.rpartition('.')
         cls = getattr(importlib.import_module(module_path), cls_name)
 
-        # We do not enforce subclass (no exception raise),
-        # but we log an error
-        if not issubclass(cls, ABCAccounting):
-            self.log.error('%s is not a subclass of ABCAccounting',
-                           repr(cls))
-
         return cls(**self.file_config.accounting_kwargs)
 
     @default("user")

@@ -2,11 +2,17 @@ import os
 
 from tests.temp_mixin import TempMixin
 from tornado import testing
+from traitlets.traitlets import TraitError
 
 from remoteappmanager.application import Application
 
 from tests import utils
 from tests.db import test_csv_db
+
+
+class DummyAccounting:
+    def __init__(self, *args, **kwargs):
+        pass
 
 
 class TestApplication(TempMixin, testing.AsyncTestCase):
@@ -57,6 +63,14 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
         app = Application(self.command_line_config, self.file_config)
 
         with self.assertRaises(ImportError):
+            app.db
+
+    def test_db_default_value_with_accounting_wrong_subclass(self):
+        self.file_config.accounting_class = (
+            "tests.test_application.DummyAccounting")
+        app = Application(self.command_line_config, self.file_config)
+
+        with self.assertRaises(TraitError):
             app.db
 
 
