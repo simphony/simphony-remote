@@ -29,6 +29,11 @@ class RESTBaseHandler(BaseHandler):
 class RESTCollectionHandler(RESTBaseHandler):
     """Handler for URLs addressing a collection.
     """
+    @gen.coroutine
+    def prepare(self):
+        print(self.request)
+        yield super().prepare()
+        print(self.request)
 
     @gen.coroutine
     def get(self, collection_name):
@@ -64,6 +69,12 @@ class RESTCollectionHandler(RESTBaseHandler):
                                 reason="Unprocessable entity")
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
+        except Exception as e:
+            print(str(e))
+            raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
+
+        if resource_id is None:
+            raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
 
         location = with_end_slash(
             url_path_join(self.request.path, resource_id))

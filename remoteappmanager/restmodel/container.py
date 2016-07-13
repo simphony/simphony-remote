@@ -1,7 +1,12 @@
+import os
+from datetime import timedelta
+
 from remoteappmanager.docker.docker_labels import SIMPHONY_NS
+from remoteappmanager.handlers.home_handler import _wait_for_http_server_2xx
 from remoteappmanager.rest import exceptions
 from remoteappmanager.rest.resource import Resource
 from remoteappmanager.docker.container import Container as DockerContainer
+from remoteappmanager.utils import url_path_join
 from tornado import gen
 
 
@@ -11,7 +16,28 @@ class Container(Resource):
         # This should create the container.
         # the representation should accept the application mapping id we
         # want to start
-        pass
+        mapping_id = representation["mapping_id"]
+
+        orm_user = self.current_user.orm_user
+        all_apps = self.application.db.get_apps_for_user(orm_user)
+
+        choice = [(m_id, app, policy)
+                  for m_id, app, policy in all_apps
+                  if m_id == mapping_id]
+
+        if not choice:
+            raise exceptions.UnprocessableRepresentation
+
+        _, app, policy = choice[0]
+
+        container = yield self._start_container(orm_user,
+                                                app,
+                                                policy,
+                                                mapping_id)
+        yield self._wait_for_container_ready(container)
+        yield self.application.reverse_proxy.add_container(container)
+
+        return container.url_id
 
     @gen.coroutine
     def retrieve(self, identifier):
@@ -90,3 +116,98 @@ class Container(Resource):
             return None
 
         return DockerContainer.from_docker_containers_dict(container_dict[0])
+
+    @gen.coroutine
+    def _start_container(self, orm_user, app, policy, mapping_id):
+        """Start the container. This method is a helper method that
+        works with low level data and helps in issuing the request to the
+        data container.
+
+        Parameters
+        ----------
+        orm_user : User
+            database's user object (e.g. current_user.orm_user)
+
+        app : ABCApplication
+            the application to start
+
+        policy : ABCApplicationPolicy
+            The startup policy for the application
+
+        Returns
+        -------
+        Container
+        """
+
+        user_name = orm_user.name
+        image_name = app.image
+        mount_home = policy.allow_home
+        volume_spec = (policy.volume_source,
+                       policy.volume_target,
+                       policy.volume_mode)
+
+        manager = self.application.container_manager
+        volumes = {}
+
+        if mount_home:
+            home_path = os.environ.get('HOME')
+            if home_path:
+                volumes[home_path] = {'bind': '/workspace', 'mode': 'rw'}
+            else:
+                self.log.warning('HOME (%s) is not available for %s',
+                                 home_path, user_name)
+
+        if None not in volume_spec:
+            volume_source, volume_target, volume_mode = volume_spec
+            volumes[volume_source] = {'bind': volume_target,
+                                      'mode': volume_mode}
+
+        try:
+            f = manager.start_container(user_name, image_name,
+                                        mapping_id, volumes)
+            container = yield gen.with_timeout(
+                timedelta(
+                    seconds=self.application.file_config.network_timeout
+                ),
+                f
+            )
+        except gen.TimeoutError as e:
+            self.log.warning(
+                "{user}'s container failed to start in a reasonable time. "
+                "giving up".format(user=user_name)
+            )
+            e.reason = 'timeout'
+            raise e
+        except Exception as e:
+            self.log.error(
+                "Unhandled error starting {user}'s "
+                "container: {error}".format(user=user_name, error=e)
+            )
+            e.reason = 'error'
+            raise e
+
+        return container
+
+    @gen.coroutine
+    def _wait_for_container_ready(self, container):
+        """ Wait until the container is ready to be connected
+
+        Parameters
+        ----------
+        container: Container
+           The container to be connected
+        """
+        # Note, we use the jupyterhub ORM server, but we don't use it for
+        # any database activity.
+        # Note: the end / is important. We want to get a 200 from the actual
+        # websockify server, not the nginx (which presents the redirection
+        # page).
+        server_url = "http://{}:{}{}/".format(
+            container.ip,
+            container.port,
+            url_path_join(self.application.command_line_config.base_url,
+                          container.urlpath))
+
+        yield _wait_for_http_server_2xx(
+            server_url,
+            self.application.file_config.network_timeout)

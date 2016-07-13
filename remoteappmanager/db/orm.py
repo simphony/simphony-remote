@@ -1,4 +1,5 @@
 import contextlib
+import hashlib
 
 from sqlalchemy import (
     Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum,
@@ -172,8 +173,12 @@ class AppAccounting(ABCAccounting):
                 Accounting.user, aliased=True).filter_by(
                     name=user.name).all()
 
-        return tuple(("_".join((acc.application.image,
-                                str(acc.application_policy.id))),
+        return tuple((
+                      hashlib.md5(
+                          ("{}_{}".format(
+                           acc.application.image,
+                           acc.application_policy.id)).encode("utf-8")
+                      ).hexdigest(),
                       acc.application,
                       acc.application_policy) for acc in res)
 

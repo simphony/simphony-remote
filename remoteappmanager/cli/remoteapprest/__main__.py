@@ -2,10 +2,15 @@
 import os
 import requests
 import requests.utils
-import pickle
+import json
 from urllib.parse import urljoin
 
 import click
+
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from requests.packages.urllib3 import disable_warnings
+
+disable_warnings(InsecureRequestWarning)
 
 @click.group()
 def cli():
@@ -54,8 +59,42 @@ def app():
 
 
 @app.command()
-def start():
-    pass
+def available():
+    url, username, cookies = _get_auth_info()
+
+    request_url = urljoin(url,
+                          "/user/{}/api/v1/applications/".format(username))
+    response = requests.get(request_url, cookies=cookies, verify=False)
+
+    data = json.loads(response.content.decode("utf-8"))
+    for item_id in data["items"]:
+        request_url = urljoin(url,
+                              "/user/{}/api/v1/applications/{}/".format(
+                                  username,
+                                  item_id))
+        response = requests.get(request_url, cookies=cookies, verify=False)
+        app_data = json.loads(response.content.decode("utf-8"))
+        print("{}: {}".format(
+            item_id, app_data["image"]
+        ))
+
+
+@app.command()
+@click.argument("identifier")
+def start(identifier):
+    url, username, cookies = _get_auth_info()
+
+    request_url = urljoin(url,
+                          "/user/{}/api/v1/containers/".format(username))
+
+    payload = json.dumps(dict(
+        mapping_id=identifier
+    ))
+
+    response = requests.post(request_url, payload, cookies=cookies, verify=False)
+    if response.status_code == 201:
+        location = response.headers["Location"]
+        print(location)
 
 
 @app.command()
