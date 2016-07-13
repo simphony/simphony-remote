@@ -192,9 +192,10 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
         # user is retrieved from one session
         user = accounting.get_user_by_name('user1')
 
-        expected_config = self.create_expected_configs(orm.User(name='user1'))
-
         # apps is retrieved from another sessions
         actual_app, actual_policy = accounting.get_apps_for_user(user)[0][1:]
+
+        expected_config = self.create_expected_configs(orm.User(name='user1'))
+
         self.assertEqual(actual_app, expected_config[0][0])
         self.assertEqual(actual_policy, expected_config[0][1])
