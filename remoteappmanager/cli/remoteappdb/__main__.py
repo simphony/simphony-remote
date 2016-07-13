@@ -2,6 +2,7 @@
 """Script to perform operations on the database of our application."""
 import os
 import sys
+from requests.exceptions import ConnectionError
 
 import sqlalchemy.exc
 import sqlalchemy.orm.exc
@@ -70,6 +71,35 @@ def print_error(error):
     print("Error: {}".format(error), file=sys.stderr)
 
 
+def get_docker_client():
+    """ Returns docker.client object using the local environment variables
+    """
+    # dependencies of docker-py is optional for this script
+    try:
+        import docker
+    except ImportError:
+        print_error('docker-py is not installed. '
+                    'Try pip install docker-py')
+        raise
+
+    client = docker.from_env()
+    try:
+        client.info()
+    except ConnectionError as exception:
+        # ConnectionError occurs, say, if the docker machine is not running
+        # or if the shell is not in a docker VM (for Mac/Windows)
+        print_error('docker client fails to connect.')
+        raise
+
+    return client
+
+
+class RemoteAppDBContext(object):
+    def __init__(self, db_url):
+        db_url = normalise_to_url(db_url)
+        self.db = database(db_url)
+
+
 @click.group()
 @click.option("--db",
               type=click.STRING,
@@ -79,23 +109,24 @@ def print_error(error):
 @click.pass_context
 def cli(ctx, db):
     """Main click group placeholder."""
-    ctx.obj["db"] = db
+    ctx.obj = RemoteAppDBContext(db_url=db)
 
 
 @cli.command()
 @click.pass_context
 def init(ctx):
     """Initializes the database."""
-    db_opt = ctx.obj["db"]
-    db_url = normalise_to_url(db_opt)
+    db = ctx.obj.db
+    db_url = db.url
+
+    # Check if the database already exists
     if db_url.startswith("sqlite:///"):
         path = sqlite_url_to_path(db_url)
         if os.path.exists(path):
             raise click.UsageError("Refusing to overwrite database "
                                    "at {}".format(db_url))
-
-    db = database(db_url)
     db.reset()
+
 
 # -------------------------------------------------------------------------
 # User commands
@@ -112,10 +143,7 @@ def user():
 @click.pass_context
 def create(ctx, user):
     """Creates a user USER in the database."""
-    db_opt = ctx.obj["db"]
-    db_url = normalise_to_url(db_opt)
-    db = database(db_url)
-
+    db = ctx.obj.db
     session = db.create_session()
     orm_user = orm.User(name=user)
 
@@ -134,10 +162,7 @@ def create(ctx, user):
 @click.pass_context
 def remove(ctx, user):
     """Removes a user."""
-    db_opt = ctx.obj["db"]
-    db_url = normalise_to_url(db_opt)
-    db = database(db_url)
-
+    db = ctx.obj.db
     session = db.create_session()
 
     try:
@@ -175,10 +200,7 @@ def list(ctx, no_decoration, show_apps):
             headers += ["App", "Home", "View", "Common", "Vol. Source",
                         "Vol. Target", "Vol. Mode"]
 
-    db_opt = ctx.obj["db"]
-    db_url = normalise_to_url(db_opt)
-    db = database(db_url)
-
+    db = ctx.obj.db
     session = db.create_session()
 
     table = []
@@ -217,12 +239,24 @@ def app():
 
 @app.command()  # noqa
 @click.argument("image")
+@click.option('--verify/--no-verify', default=True)
 @click.pass_context
-def create(ctx, image):
+def create(ctx, image, verify):
     """Creates a new application for image IMAGE."""
-    db_opt = ctx.obj["db"]
-    db_url = normalise_to_url(db_opt)
-    db = database(db_url)
+
+    # Verify if `image` is an existing docker image
+    # in this machine
+    if verify:
+        msg = ('{error}. You may consider skipping verifying '
+               'image name against docker with --no-verify.')
+        try:
+            client = get_docker_client()
+            client.inspect_image(image)
+        except Exception as exception:
+            raise click.BadParameter(msg.format(error=str(exception)),
+                                     ctx=ctx)
+
+    db = ctx.obj.db
     session = db.create_session()
     try:
         with orm.transaction(session):
@@ -239,9 +273,7 @@ def create(ctx, image):
 @click.pass_context
 def remove(ctx, image):
     """Removes an application from the list."""
-    db_opt = ctx.obj["db"]
-    db_url = normalise_to_url(db_opt)
-    db = database(db_url)
+    db = ctx.obj.db
     session = db.create_session()
 
     try:
@@ -262,9 +294,7 @@ def remove(ctx, image):
 @click.pass_context
 def list(ctx, no_decoration):
     """List all registered applications."""
-    db_opt = ctx.obj["db"]
-    db_url = normalise_to_url(db_opt)
-    db = database(db_url)
+    db = ctx.obj.db
 
     if no_decoration:
         tablefmt = "plain"
@@ -298,9 +328,7 @@ def list(ctx, no_decoration):
 def grant(ctx, image, user, allow_home, allow_view, volume):
     """Grants access to application identified by IMAGE to a specific
     user USER and specified access policy."""
-    db_opt = ctx.obj["db"]
-    db_url = normalise_to_url(db_opt)
-    db = database(db_url)
+    db = ctx.obj.db
     allow_common = False
     source = target = mode = None
 
@@ -380,9 +408,7 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
 def revoke(ctx, image, user, revoke_all, allow_home, allow_view, volume):
     """Revokes access to application identified by IMAGE to a specific
     user USER and specified parameters."""
-    db_opt = ctx.obj["db"]
-    db_url = normalise_to_url(db_opt)
-    db = database(db_url)
+    db = ctx.obj.db
 
     allow_common = False
     source = target = mode = None
