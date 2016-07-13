@@ -110,6 +110,27 @@ def stop(identifier):
     print(response.status_code)
 
 
+@app.command()
+def running():
+    url, username, cookies = _get_auth_info()
+
+    request_url = urljoin(url,
+                          "/user/{}/api/v1/containers/".format(
+                              username))
+    response = requests.get(request_url, cookies=cookies, verify=False)
+    data = json.loads(response.content.decode("utf-8"))
+    for item_id in data["items"]:
+        request_url = urljoin(url,
+                              "/user/{}/api/v1/containers/{}/".format(
+                                  username,
+                                  item_id))
+        response = requests.get(request_url, cookies=cookies, verify=False)
+        app_data = json.loads(response.content.decode("utf-8"))
+        print("{}: {}".format(
+            item_id, app_data["image_name"]
+        ))
+
+
 def main():
     cli(obj={})
 
