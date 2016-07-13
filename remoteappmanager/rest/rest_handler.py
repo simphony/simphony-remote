@@ -77,7 +77,7 @@ class RESTCollectionHandler(RESTBaseHandler):
             raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
 
         location = with_end_slash(
-            url_path_join(self.request.path, resource_id))
+            url_path_join(self.request.uri, resource_id))
 
         self.set_status(httpstatus.CREATED)
         self.set_header("Location", location)
