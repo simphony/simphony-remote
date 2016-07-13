@@ -1,8 +1,10 @@
 import contextlib
+import sqlite3
 
 from sqlalchemy import (
     Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum,
-    literal)
+    literal, event)
+from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -72,22 +74,31 @@ class Accounting(Base):
     __tablename__ = "accounting"
 
     user_id = Column(Integer,
-                     ForeignKey("user.id"),
+                     ForeignKey("user.id", ondelete="CASCADE"),
                      primary_key=True)
 
     application_id = Column(Integer,
-                            ForeignKey("application.id"),
+                            ForeignKey("application.id", ondelete="CASCADE"),
                             primary_key=True)
 
-    application_policy_id = Column(Integer,
-                                   ForeignKey("application_policy.id"),
-                                   primary_key=True)
+    application_policy_id = Column(
+        Integer,
+        ForeignKey("application_policy.id", ondelete="CASCADE"),
+        primary_key=True)
 
     user = relationship("User")
 
     application = relationship("Application")
 
     application_policy = relationship("ApplicationPolicy")
+
+
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    if type(dbapi_connection) is sqlite3.Connection:
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
 
 class Database(LoggingMixin):
@@ -107,6 +118,7 @@ class Database(LoggingMixin):
 
         self.log.info("Creating session to db: {}".format(self.url))
         self.engine = create_engine(self.url, **kwargs)
+
         try:
             self.session_class = sessionmaker(bind=self.engine)
         except OperationalError:

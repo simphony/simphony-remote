@@ -145,12 +145,8 @@ def remove(ctx, user):
             orm_user = session.query(orm.User).filter(
                 orm.User.name == user).one()
 
-            # Unfortunately sqlite does not support cascading, so we need to
-            # perform the cleanup of the accounting manually.
-            session.query(orm.Accounting).filter(
-                orm.Accounting.user == orm_user).delete()
-
             session.delete(orm_user)
+
     except sqlalchemy.orm.exc.NoResultFound:
         print_error("Could not find user {}".format(user))
 
@@ -249,8 +245,6 @@ def remove(ctx, image):
             app = session.query(orm.Application).filter(
                 orm.Application.image == image).one()
 
-            session.query(orm.Accounting).filter(
-                orm.Accounting.application_id == app.id).delete()
             session.delete(app)
     except sqlalchemy.orm.exc.NoResultFound:
         print_error("Could not find application for image {}".format(image))
