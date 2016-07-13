@@ -48,7 +48,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
 
         command_line_config = utils.basic_command_line_config()
         file_config = utils.basic_file_config()
-        file_config.db_url = "sqlite:///"+sqlite_file_path
+        file_config.accounting_kwargs = {'url': "sqlite:///"+sqlite_file_path}
 
         app = Application(command_line_config, file_config)
         app.reverse_proxy = mock.Mock(spec=ReverseProxy)
