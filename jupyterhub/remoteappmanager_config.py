@@ -30,9 +30,12 @@ else:
 # Define the accounting class
 # -----------------------------
 # Notes on os.path:
-#  When running with system-user mode, the current directory is the user's home
-#  directory; when running in virtual-user mode, the current directory is the
-#  directory where jupyterhub is started
+#  1. When running with system-user mode, both the current directory and '~'
+#  are the system user's home directory.
+#  2. When running in virtual-user mode, the current directory is the
+#  directory where jupyterhub is started, '~' would be evaluated according to
+#  the spawned process's owner's home directory (not the virtual user's
+#  home directory)
 
 # CSV database support
 # accounting_class = "remoteappmanager.db.csv_db.CSVAccounting"
