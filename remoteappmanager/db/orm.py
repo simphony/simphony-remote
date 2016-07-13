@@ -198,7 +198,7 @@ def transaction(session):
 
 
 def apps_for_user(session, user):
-    """Returns a list of tuples, each containing an application and the
+    """Returns a tuple of tuples, each containing an application and the
     associated policy that the specified orm user is allowed to run.
     If the user is None, the default is to return an empty list.
     The mapping_id is a unique string identifying the combination of
@@ -211,7 +211,7 @@ def apps_for_user(session, user):
         the orm User, or None.
     Returns
     -------
-    A list of tuples (mapping_id, orm.Application, orm.ApplicationPolicy)
+    A tuple of tuples (mapping_id, orm.Application, orm.ApplicationPolicy)
     """
 
     if user is None:
@@ -231,6 +231,6 @@ def apps_for_user(session, user):
         Accounting.user, aliased=True).filter_by(
             name=user_name).all()
 
-    return [(acc.application.image + "_" + str(acc.application_policy.id),
-             acc.application,
-             acc.application_policy) for acc in res]
+    return tuple((acc.application.image + "_" + str(acc.application_policy.id),
+                  acc.application,
+                  acc.application_policy) for acc in res)
