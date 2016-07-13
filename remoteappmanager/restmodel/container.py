@@ -18,8 +18,8 @@ class Container(Resource):
         # want to start
         mapping_id = representation["mapping_id"]
 
-        orm_user = self.current_user.orm_user
-        all_apps = self.application.db.get_apps_for_user(orm_user)
+        account = self.current_user.account
+        all_apps = self.application.db.get_apps_for_user(account)
 
         choice = [(m_id, app, policy)
                   for m_id, app, policy in all_apps
@@ -30,7 +30,7 @@ class Container(Resource):
 
         _, app, policy = choice[0]
 
-        container = yield self._start_container(orm_user,
+        container = yield self._start_container(self.current_user.name,
                                                 app,
                                                 policy,
                                                 mapping_id)
@@ -74,7 +74,7 @@ class Container(Resource):
         container_manager = self.application.container_manager
 
         apps = self.application.db.get_apps_for_user(
-            self.current_user.orm_user)
+            self.current_user.account)
 
         running_containers = []
 
@@ -118,15 +118,15 @@ class Container(Resource):
         return DockerContainer.from_docker_containers_dict(container_dict[0])
 
     @gen.coroutine
-    def _start_container(self, orm_user, app, policy, mapping_id):
+    def _start_container(self, user_name, app, policy, mapping_id):
         """Start the container. This method is a helper method that
         works with low level data and helps in issuing the request to the
         data container.
 
         Parameters
         ----------
-        orm_user : User
-            database's user object (e.g. current_user.orm_user)
+        user_name : str
+            the username
 
         app : ABCApplication
             the application to start
@@ -139,7 +139,6 @@ class Container(Resource):
         Container
         """
 
-        user_name = orm_user.name
         image_name = app.image
         mount_home = policy.allow_home
         volume_spec = (policy.volume_source,
@@ -154,8 +153,9 @@ class Container(Resource):
             if home_path:
                 volumes[home_path] = {'bind': '/workspace', 'mode': 'rw'}
             else:
-                self.log.warning('HOME (%s) is not available for %s',
-                                 home_path, user_name)
+                #self.log.warning('HOME (%s) is not available for %s',
+                #                 home_path, user_name)
+                pass
 
         if None not in volume_spec:
             volume_source, volume_target, volume_mode = volume_spec
@@ -172,18 +172,18 @@ class Container(Resource):
                 f
             )
         except gen.TimeoutError as e:
-            self.log.warning(
-                "{user}'s container failed to start in a reasonable time. "
-                "giving up".format(user=user_name)
-            )
-            e.reason = 'timeout'
+            #self.log.warning(
+            #    "{user}'s container failed to start in a reasonable time. "
+            #    "giving up".format(user=user_name)
+            #)
+            #e.reason = 'timeout'
             raise e
         except Exception as e:
-            self.log.error(
-                "Unhandled error starting {user}'s "
-                "container: {error}".format(user=user_name, error=e)
-            )
-            e.reason = 'error'
+            #self.log.error(
+            #    "Unhandled error starting {user}'s "
+            #    "container: {error}".format(user=user_name, error=e)
+            #)
+            #e.reason = 'error'
             raise e
 
         return container
