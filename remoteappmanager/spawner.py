@@ -196,3 +196,4 @@ def _docker_envvars():
     for envvar in ["DOCKER_HOST", "DOCKER_CERT_PATH", "DOCKER_MACHINE_NAME"]:
         if envvar in os.environ:
             env[envvar] = os.environ[envvar]
+    return env
