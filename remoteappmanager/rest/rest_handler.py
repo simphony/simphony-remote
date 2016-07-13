@@ -29,12 +29,7 @@ class RESTBaseHandler(BaseHandler):
 class RESTCollectionHandler(RESTBaseHandler):
     """Handler for URLs addressing a collection.
     """
-    @gen.coroutine
-    def prepare(self):
-        print(self.request)
-        yield super().prepare()
-        print(self.request)
-
+    @web.authenticated
     @gen.coroutine
     def get(self, collection_name):
         """Returns the collection of avilable items"""
@@ -50,6 +45,7 @@ class RESTCollectionHandler(RESTBaseHandler):
         self.write({"items": list(items)})
         self.flush()
 
+    @web.authenticated
     @gen.coroutine
     def post(self, collection_name):
         """Creates a new resource in the collection."""
@@ -69,8 +65,7 @@ class RESTCollectionHandler(RESTBaseHandler):
                                 reason="Unprocessable entity")
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
-        except Exception as e:
-            print(str(e))
+        except Exception:
             raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
 
         if resource_id is None:
@@ -89,6 +84,7 @@ class RESTResourceHandler(RESTBaseHandler):
     """
     SUPPORTED_METHODS = ("GET", "POST", "PUT", "DELETE")
 
+    @web.authenticated
     @gen.coroutine
     def get(self, collection_name, identifier):
         """Retrieves the resource representation."""
@@ -110,6 +106,7 @@ class RESTResourceHandler(RESTBaseHandler):
         self.write(representation)
         self.flush()
 
+    @web.authenticated
     @gen.coroutine
     def post(self, collection_name, identifier):
         """This operation is not possible in REST, and results
@@ -127,6 +124,7 @@ class RESTResourceHandler(RESTBaseHandler):
         else:
             raise web.HTTPError(httpstatus.NOT_FOUND)
 
+    @web.authenticated
     @gen.coroutine
     def put(self, collection_name, identifier):
         """Replaces the resource with a new representation."""
@@ -151,6 +149,7 @@ class RESTResourceHandler(RESTBaseHandler):
 
         self.set_status(httpstatus.NO_CONTENT)
 
+    @web.authenticated
     @gen.coroutine
     def delete(self, collection_name, identifier):
         """Deletes the resource."""
