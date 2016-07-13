@@ -100,6 +100,13 @@ class TestSpawner(unittest.TestCase):
         self.assertIn("PROXY_API_TOKEN", env)
         self.assertEqual(env["PROXY_API_TOKEN"], "whatever")
 
+    def test_env_has_docker_vars(self):
+        if "DOCKER_HOST" in os.environ:
+            env = self.spawner.get_env()
+            self.assertIn("DOCKER_HOST", env)
+            self.assertIn("DOCKER_CERT_PATH", env)
+            self.assertIn("DOCKER_MACHINE_NAME", env)
+
     def test_cmd_spawning(self):
         env = os.environ.copy()
         env["PROXY_API_TOKEN"] = "dummy_token"
@@ -186,6 +193,13 @@ class TestVirtualUserSpawner(unittest.TestCase):
         env = self.spawner.get_env()
         self.assertIn("PROXY_API_TOKEN", env)
         self.assertEqual(env["PROXY_API_TOKEN"], "whatever")
+
+    def test_env_has_docker_vars(self):
+        if "DOCKER_HOST" in os.environ:
+            env = self.spawner.get_env()
+            self.assertIn("DOCKER_HOST", env)
+            self.assertIn("DOCKER_CERT_PATH", env)
+            self.assertIn("DOCKER_MACHINE_NAME", env)
 
     def test_env_has_home_if_workspace_defined(self):
         self.spawner.workspace_dir = self.temp_dir

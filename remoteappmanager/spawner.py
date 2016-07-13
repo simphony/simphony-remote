@@ -40,6 +40,7 @@ class Spawner(LocalProcessSpawner):
     def get_env(self):
         env = super().get_env()
         env["PROXY_API_TOKEN"] = self.proxy.auth_token
+        env.update(_docker_envvars())
         return env
 
     @default("config_file_path")
@@ -118,6 +119,7 @@ class VirtualUserSpawner(LocalProcessSpawner):
         # LocalProcessSpawner.get_env calls user_env as well
         env = super().get_env()
         env["PROXY_API_TOKEN"] = self.proxy.auth_token
+        env.update(_docker_envvars())
         return env
 
     @gen.coroutine
@@ -185,3 +187,16 @@ class VirtualUserSpawner(LocalProcessSpawner):
                                self._virtual_workspace, str(exception))
             else:
                 self.log.info('Removed %s', self._virtual_workspace)
+
+
+def _docker_envvars():
+    """Returns a dictionary containing the docker environment variables, if
+    present. If not present, returns an empty dictionary"""
+    env = {envvar: os.environ[envvar]
+           for envvar in ["DOCKER_HOST",
+                          "DOCKER_CERT_PATH",
+                          "DOCKER_MACHINE_NAME",
+                          "DOCKER_TLS_VERIFY"]
+           if envvar in os.environ}
+
+    return env
