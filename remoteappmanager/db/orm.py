@@ -1,8 +1,7 @@
 import contextlib
 
 from sqlalchemy import (
-    Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum,
-    literal)
+    Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum)
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -135,17 +134,22 @@ class AppAccounting(ABCAccounting):
     def __init__(self, url, **kwargs):
         self.db = Database(url, **kwargs)
 
-        # We keep the same session for all transactions
-        # so that the session remains on one thread
-        self.session = self.db.create_session()
-
     def get_user_by_name(self, user_name):
         """ Return an orm.User given a user name.  Return None
         if the user name is not found in the database
         """
-        with transaction(self.session):
-            return self.session.query(User).filter_by(
+        session = self.db.create_session()
+
+        with transaction(session):
+            user = session.query(User).filter_by(
                 name=user_name).one_or_none()
+
+        # Removing internal references to the session is
+        # required such that the object is detached and
+        # can be reused in a different thread
+        session.expunge(user)
+        session.close()
+        return user
 
     def get_apps_for_user(self, user):
         """ Return a tuple of tuples, each containing an application
@@ -167,15 +171,24 @@ class AppAccounting(ABCAccounting):
         if user is None:
             return ()
 
-        with transaction(self.session):
-            res = self.session.query(Accounting).join(
-                Accounting.user, aliased=True).filter_by(
-                    name=user.name).all()
+        session = self.db.create_session()
 
-        return tuple(("_".join((acc.application.image,
-                                str(acc.application_policy.id))),
-                      acc.application,
-                      acc.application_policy) for acc in res)
+        with transaction(session):
+            session.add(user)
+            res = session.query(Accounting).filter(
+                Accounting.user == user).all()
+
+        result = tuple(("_".join((acc.application.image,
+                                  str(acc.application_policy.id))),
+                        acc.application,
+                        acc.application_policy) for acc in res)
+
+        # Removing internal references to the session is
+        # required such that the objects can be reused
+        # in a different thread
+        session.expunge_all()
+        session.close()
+        return result
 
 
 @contextlib.contextmanager
@@ -190,65 +203,3 @@ def transaction(session):
         raise
     finally:
         session.commit()
-
-
-def apps_for_user(session, user):
-    """Returns a list of tuples, each containing an application and the
-    associated policy that the specified orm user is allowed to run.
-    If the user is None, the default is to return an empty list.
-    The mapping_id is a unique string identifying the combination of
-    application and policy. It is not unique per user.
-
-    Parameters
-    ----------
-    session : Session
-        The current session
-    user : User or None
-        the orm User, or None.
-
-    Returns
-    -------
-    A list of tuples (mapping_id, orm.Application, orm.ApplicationPolicy)
-    """
-
-    if user is None:
-        return []
-
-    res = session.query(Accounting).filter(
-        Accounting.user == user).all()
-
-    return [(acc.application.image + "_" + str(acc.application_policy.id),
-             acc.application,
-             acc.application_policy) for acc in res]
-
-
-def user_can_run(session, user, application, policy):
-    """Returns True if the user can run a given application with a specific
-    policy. False otherwise. Note that the user can be None.
-    In that case, returns False.
-
-    Parameters
-    ----------
-    session : Session
-        The current session
-    user : orm.User or None
-        the orm User, or None.
-    application : orm.Application
-        The application object
-    policy : orm.ApplicationPolicy
-        The application policy
-
-    Returns
-    -------
-    boolean
-
-    """
-    if user is None:
-        return False
-
-    query = session.query(Accounting) \
-        .filter(Accounting.user == user,
-                Accounting.application == application,
-                Accounting.application_policy == policy)
-
-    return session.query(literal(True)).filter(query.exists()).scalar()
