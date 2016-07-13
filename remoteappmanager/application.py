@@ -1,4 +1,5 @@
 import os
+
 from traitlets import Instance, default
 from tornado import web
 import tornado.ioloop
@@ -15,6 +16,9 @@ from remoteappmanager.user import User
 from remoteappmanager.traitlets import as_dict
 from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
+from remoteappmanager import rest
+from remoteappmanager.rest import registry
+from remoteappmanager import restmodel
 
 
 class Application(web.Application, LoggingMixin):
@@ -56,6 +60,7 @@ class Application(web.Application, LoggingMixin):
         self._jinja_init(settings)
 
         handlers = self._get_handlers()
+        self._register_rest_models()
 
         super().__init__(handlers, **settings)
 
@@ -152,11 +157,16 @@ class Application(web.Application, LoggingMixin):
         """Returns the registered handlers"""
 
         base_url = self.command_line_config.base_url
-        return [
+        rest_api = rest.api_handlers(base_url)
+        return rest_api+[
             (base_url, HomeHandler),
-            (base_url.rstrip('/'),
-             web.RedirectHandler, {"url": base_url}),
+            (base_url.rstrip('/'), web.RedirectHandler, {"url": base_url}),
         ]
+
+    def _register_rest_models(self):
+        for rest_model_class in [restmodel.Image,
+                                 restmodel.Container]:
+            registry.registry.register(rest_model_class)
 
     def _jinja_init(self, settings):
         """Initializes the jinja template system settings.
