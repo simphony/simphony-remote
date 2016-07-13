@@ -137,7 +137,7 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         """ Test if deleting user cascade to deleting accounting rows
         """
         # Given user is created with two accountings (application, policy)
-        self._remoteappdb("app create myapp")
+        self._remoteappdb("app create myapp --no-verify")
         out = self._remoteappdb("user create user")
         self.assertEqual(out, "1\n")
 
@@ -163,7 +163,7 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         """ Test if deleting application cascade to deleting accounting rows
         """
         # Given user is created with two accountings (application, policy)
-        out = self._remoteappdb("app create myapp")
+        out = self._remoteappdb("app create myapp --no-verify")
         self.assertEqual(out, "1\n")
         out = self._remoteappdb("user create user")
         self.assertEqual(out, "1\n")
@@ -180,7 +180,7 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         # (This test relies on the fact that there is only one app and so
         # the application row has the same id as before)
         self._remoteappdb("app remove myapp")
-        out = self._remoteappdb("app create myapp")
+        out = self._remoteappdb("app create myapp --no-verify")
         self.assertEqual(out, "1\n")
 
         out = self._remoteappdb("user list --show-apps --no-decoration")
