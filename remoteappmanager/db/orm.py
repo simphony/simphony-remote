@@ -215,7 +215,7 @@ def apps_for_user(session, user):
     """
 
     if user is None:
-        return []
+        return ()
 
     try:
         user_name = user.name
