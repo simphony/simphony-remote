@@ -82,7 +82,7 @@ class TestContainer(TestCase):
             image_name='novnc-ubuntu:latest',
             image_id='sha256:f4610c75d3c0dfa25d3c0dfa25d3c0dfa2',
             ip='0.0.0.0',
-            port=None,
+            port=80,
             url_id="8e2fe66d5de74db9bbab50c0d2f92b33")
 
         assert_containers_equal(self, actual, expected)

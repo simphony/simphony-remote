@@ -54,7 +54,7 @@ class TestContainerManager(AsyncTestCase):
                              image_name='simphony/mayavi-4.4.4:latest',  # noqa
                              image_id='imageid',
                              ip='0.0.0.0',
-                             port=None,
+                             port=80,
                              url_id='url_id')
 
         self.assertEqual(len(result), 1)
