@@ -172,12 +172,18 @@ class RESTResourceHandler(RESTBaseHandler):
     def delete(self, collection_name, identifier):
         """Deletes the resource."""
         res_handler = self.get_resource_handler_or_404(collection_name)
-
         try:
             yield res_handler.delete(identifier)
+            print("done")
         except exceptions.NotFound:
             raise web.HTTPError(httpstatus.NOT_FOUND)
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
+        except Exception:
+            self.log.exception(
+                "Internal error during retrieve of {}/{}".format(
+                    collection_name,
+                    identifier))
+            raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
 
         self.set_status(httpstatus.NO_CONTENT)

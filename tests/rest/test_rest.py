@@ -1,4 +1,5 @@
 import unittest
+import urllib.parse
 from unittest import mock
 
 from tests import utils
@@ -48,8 +49,9 @@ class Student(Resource):
 
     @gen.coroutine
     def delete(self, identifier):
+        print("identifier", identifier)
         if identifier not in self.collection:
-            raise exceptions.NotFound()
+            raise exceptions.NotFound
 
         del self.collection[identifier]
 
@@ -151,7 +153,7 @@ class TestREST(AsyncHTTPTestCase):
                 })
             )
 
-            location = res.headers["Location"]
+            location = urllib.parse.urlparse(res.headers["Location"]).path
 
             res = self.fetch(location)
             self.assertEqual(res.code, httpstatus.OK)
@@ -176,7 +178,7 @@ class TestREST(AsyncHTTPTestCase):
                 })
             )
 
-            location = res.headers["Location"]
+            location = urllib.parse.urlparse(res.headers["Location"]).path
             res = self.fetch(
                 location,
                 method="POST",
@@ -200,7 +202,7 @@ class TestREST(AsyncHTTPTestCase):
                 })
             )
 
-            location = res.headers["Location"]
+            location = urllib.parse.urlparse(res.headers["Location"]).path
 
             res = self.fetch(
                 location,
@@ -238,7 +240,10 @@ class TestREST(AsyncHTTPTestCase):
                 })
             )
 
-            location = res.headers["Location"]
+            # Unfortunately, self.fetch wants a path and never consider
+            # the possibility of a fqdn in the url, but according to
+            # REST standard and HTTP standard, location should be absolute.
+            location = urllib.parse.urlparse(res.headers["Location"]).path
 
             res = self.fetch(location, method="DELETE")
             self.assertEqual(res.code, httpstatus.NO_CONTENT)
