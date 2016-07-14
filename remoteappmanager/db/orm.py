@@ -93,7 +93,7 @@ class Accounting(Base):
 
 
 @event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
+def _set_sqlite_pragma(dbapi_connection, connection_record):
     """ Set pragma for sqlite3 when the engine connects
     Currently it adds support for foreign keys.
     Do nothing if sqlite3 is not available or if the database
