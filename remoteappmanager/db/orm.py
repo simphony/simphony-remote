@@ -3,9 +3,9 @@ import contextlib
 from sqlalchemy import (
     Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum)
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.orm.exc import DetachedInstanceError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm.exc import DetachedInstanceError
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.db.interfaces import ABCAccounting
