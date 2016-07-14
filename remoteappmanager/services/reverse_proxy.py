@@ -1,6 +1,6 @@
 from urllib import parse
 
-from tornado import gen
+from tornado import gen, httpclient
 from jupyterhub import orm as jupyterhub_orm
 from traitlets import HasTraits, Unicode
 
@@ -53,7 +53,16 @@ class ReverseProxy(LoggingMixin, HasTraits):
             container.host_url
         ))
 
-        yield proxy.api_request(urlpath, method='DELETE')
+        try:
+            yield proxy.api_request(urlpath, method='DELETE')
+        except httpclient.HTTPError as e:
+            if e.code == 404:
+                self.log.warning("Could not find urlpath {} when removing"
+                                 " container. In any case, the reverse proxy"
+                                 " does not map the url. Continuing".format(
+                                    urlpath))
+            else:
+                raise e
 
     @gen.coroutine
     def add_container(self, container):

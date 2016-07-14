@@ -126,6 +126,7 @@ class HomeHandler(BaseHandler):
         web browser, but we validate the container id first.
         """
         container = yield self._container_from_options(options)
+        print(container)
         if not container:
             self.finish("Unable to view the application")
             return
