@@ -56,7 +56,7 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
         self.assertIsNotNone(app.container_manager)
         self.assertIsNotNone(app.hub)
         self.assertEqual(app.user.name, "username")
-        self.assertEqual(app.user.orm_user, None)
+        self.assertEqual(app.user.account, None)
 
     def test_error_default_value_with_unimportable_accounting(self):
         self.file_config.accounting_class = "not.importable.Class"
@@ -113,4 +113,4 @@ class TestApplicationWithCSV(TempMixin, testing.AsyncTestCase):
         self.assertIsNotNone(app.db)
         self.assertIsNotNone(app.user)
         self.assertEqual(app.user.name, "username")
-        self.assertIsInstance(app.user.orm_user, test_csv_db.CSVUser)
+        self.assertIsInstance(app.user.account, test_csv_db.CSVUser)

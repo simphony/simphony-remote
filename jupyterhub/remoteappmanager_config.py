@@ -12,13 +12,15 @@ if _platform == 'Darwin':
     # As a consequence, we set tls to false, and tls_verify to true, honoring
     # docker documentation (although not very clear on this point)
     # See https://docs.docker.com/engine/security/https/
+    if "DOCKER_CERT_PATH" not in os.environ:
+        raise ValueError("Docker environment has not been defined.")
+
     tls = False
-    tls_verify = True
-    tls_ca = os.path.expanduser('~/.docker/machine/machines/default/ca.pem')
-    tls_cert = os.path.expanduser(
-        '~/.docker/machine/machines/default/cert.pem')
-    tls_key = os.path.expanduser('~/.docker/machine/machines/default/key.pem')
-    docker_host = "tcp://192.168.99.100:2376"
+    tls_verify = bool(int(os.path.expandvars("${DOCKER_TLS_VERIFY}")))
+    tls_ca = os.path.expandvars('${DOCKER_CERT_PATH}/ca.pem')
+    tls_cert = os.path.expandvars('${DOCKER_CERT_PATH}/cert.pem')
+    tls_key = os.path.expandvars('${DOCKER_CERT_PATH}/key.pem')
+    docker_host = os.path.expandvars("${DOCKER_HOST}")
 elif _platform == 'Linux':
     # Linux works through unix socket, so we don't need tls.
     tls = False

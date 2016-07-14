@@ -2,7 +2,8 @@ import contextlib
 
 from sqlalchemy import (
     Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum,
-    literal)
+    literal, event)
+from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -72,22 +73,41 @@ class Accounting(Base):
     __tablename__ = "accounting"
 
     user_id = Column(Integer,
-                     ForeignKey("user.id"),
+                     ForeignKey("user.id", ondelete="CASCADE"),
                      primary_key=True)
 
     application_id = Column(Integer,
-                            ForeignKey("application.id"),
+                            ForeignKey("application.id", ondelete="CASCADE"),
                             primary_key=True)
 
-    application_policy_id = Column(Integer,
-                                   ForeignKey("application_policy.id"),
-                                   primary_key=True)
+    application_policy_id = Column(
+        Integer,
+        ForeignKey("application_policy.id", ondelete="CASCADE"),
+        primary_key=True)
 
     user = relationship("User")
 
     application = relationship("Application")
 
     application_policy = relationship("ApplicationPolicy")
+
+
+@event.listens_for(Engine, "connect")
+def _set_sqlite_pragma(dbapi_connection, connection_record):
+    """ Set pragma for sqlite3 when the engine connects
+    Currently it adds support for foreign keys.
+    Do nothing if sqlite3 is not available or if the database
+    is not using sqlite3.
+    """
+    try:
+        # In case sqlite3 is not compiled?
+        import sqlite3
+    except ImportError:
+        return
+    else:
+        if isinstance(dbapi_connection, sqlite3.Connection):
+            with contextlib.closing(dbapi_connection.cursor()) as cursor:
+                cursor.execute("PRAGMA foreign_keys=ON")
 
 
 class Database(LoggingMixin):
@@ -107,6 +127,7 @@ class Database(LoggingMixin):
 
         self.log.info("Creating session to db: {}".format(self.url))
         self.engine = create_engine(self.url, **kwargs)
+
         try:
             self.session_class = sessionmaker(bind=self.engine)
         except OperationalError:
