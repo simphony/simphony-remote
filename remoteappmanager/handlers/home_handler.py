@@ -11,7 +11,6 @@ from tornado.httpclient import AsyncHTTPClient, HTTPError
 from tornado.log import app_log
 
 from remoteappmanager.handlers.base_handler import BaseHandler
-from remoteappmanager.docker.container import Container
 
 
 class HomeHandler(BaseHandler):
@@ -125,11 +124,21 @@ class HomeHandler(BaseHandler):
         It is not different from pasting the appropriate URL in the
         web browser, but we validate the container id first.
         """
-        container = yield self._container_from_options(options)
+        try:
+            url_id = options["url_id"][0]
+        except (KeyError, IndexError):
+            message = "Failed to retrieve valid url_id from form."
+            self.log.exception(message)
+            self.finish(message)
+            return
+
+        container_manager = self.application.container_manager
+        container = yield container_manager.container_from_url_id(url_id)
         if not container:
             self.finish("Unable to view the application")
             return
 
+        # make sure the container is actually running and working
         yield self._wait_for_container_ready(container)
 
         # in case the reverse proxy is not already set up
@@ -142,10 +151,18 @@ class HomeHandler(BaseHandler):
     def _actionhandler_stop(self, options):
         """Stops a running container.
         """
+        try:
+            url_id = options["url_id"][0]
+        except (KeyError, IndexError):
+            message = "Failed to retrieve valid url_id from form."
+            self.log.exception(message)
+            self.finish(message)
+            return
+
         app = self.application
         container_manager = app.container_manager
 
-        container = yield self._container_from_options(options)
+        container = yield container_manager.container_from_url_id(url_id)
         if not container:
             self.finish("Unable to view the application")
             return
@@ -200,35 +217,6 @@ class HomeHandler(BaseHandler):
                 "container": container
             })
         return images_info
-
-    @gen.coroutine
-    def _container_from_options(self, options):
-        """Support routine to reduce duplication.
-        Retrieves and returns the container if valid and present.
-
-        If not present, returns None
-        """
-
-        container_manager = self.application.container_manager
-
-        try:
-            container_id = options["container_id"][0]
-        except (KeyError, IndexError):
-            self.log.exception(
-                "Failed to retrieve valid container_id from form"
-            )
-            return None
-
-        container_dict = yield container_manager.docker_client.containers(
-            filters={'id': container_id})
-
-        if not container_dict:
-            self.log.exception(
-                "Failed to retrieve valid "
-                "container from container id: {}".format(container_id))
-            return None
-
-        return Container.from_docker_containers_dict(container_dict[0])
 
     @gen.coroutine
     def _start_container(self, user_name, app, policy, mapping_id):

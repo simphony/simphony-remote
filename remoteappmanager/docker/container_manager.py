@@ -127,8 +127,55 @@ class ContainerManager(LoggingMixin):
             'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]
         }
 
+        containers = yield self.containers_from_filters(filters=filters)
+
+        return containers
+
+    @gen.coroutine
+    def container_from_url_id(self, url_id):
+        """Retrieves and returns the container by its url_id, if present.
+        If not present, returns None.
+        """
+
+        labels = {
+            SIMPHONY_NS+"url_id": url_id,
+        }
+
+        filters = {
+            'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]
+        }
+
+        containers = yield self.containers_from_filters(filters=filters)
+
+        return containers[0] if len(containers) else None
+
+    @gen.coroutine
+    def containers_from_filters(self, filters):
+        """Returns the currently running containers for a given filter
+
+        Parameters
+        ----------
+        filters: dict
+            A dictionary of filters as in dockerpy
+
+        Return
+        ------
+        A list of Container objects, or an empty list if nothing is found.
+        """
+        containers = []
         infos = yield self.docker_client.containers(filters=filters)
-        return [Container.from_docker_containers_dict(info) for info in infos]
+        for info in infos:
+            container = Container.from_docker_containers_dict(info)
+
+            # override the ip and port obtained by the docker info with the
+            # appropriate ip and port, considering that we might be using a
+            # separate docker machine
+            ip, port = yield from self._get_ip_and_port(container.docker_id)
+            container.ip = ip
+            container.port = port
+            containers.append(container)
+
+        return containers
 
     @gen.coroutine
     def image(self, image_id_or_name):
