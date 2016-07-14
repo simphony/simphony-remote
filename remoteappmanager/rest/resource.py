@@ -1,4 +1,4 @@
-from tornado import gen
+from tornado import gen, log
 
 
 class Resource:
@@ -22,6 +22,7 @@ class Resource:
         """
         self.application = application
         self.current_user = current_user
+        self.log = log.app_log
 
     @gen.coroutine
     def create(self, representation):

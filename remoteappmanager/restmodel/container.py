@@ -1,21 +1,22 @@
 import os
 from datetime import timedelta
 
+from tornado import gen
+
 from remoteappmanager.docker.docker_labels import SIMPHONY_NS
 from remoteappmanager.handlers.home_handler import _wait_for_http_server_2xx
 from remoteappmanager.rest import exceptions
 from remoteappmanager.rest.resource import Resource
 from remoteappmanager.docker.container import Container as DockerContainer
 from remoteappmanager.utils import url_path_join
-from tornado import gen
 
 
 class Container(Resource):
     @gen.coroutine
     def create(self, representation):
-        # This should create the container.
-        # the representation should accept the application mapping id we
-        # want to start
+        """Create the container.
+        The representation should accept the application mapping id we
+        want to start"""
         mapping_id = representation["mapping_id"]
 
         account = self.current_user.account
@@ -41,8 +42,7 @@ class Container(Resource):
 
     @gen.coroutine
     def retrieve(self, identifier):
-        # We should return the representation of the running container
-        # with its current status
+        """Return the representation of the running container."""
 
         container = yield self._container_from_url_id(identifier)
 
@@ -56,8 +56,7 @@ class Container(Resource):
 
     @gen.coroutine
     def delete(self, identifier):
-        """Stop the container.
-        """
+        """Stop the container."""
         app = self.application
         container = yield self._container_from_url_id(identifier)
         if not container:
@@ -69,8 +68,7 @@ class Container(Resource):
 
     @gen.coroutine
     def items(self):
-        # We should return the list of containers we are currently
-        # running.
+        """"Return the list of containers we are currently running."""
         container_manager = self.application.container_manager
 
         apps = self.application.db.get_apps_for_user(
@@ -136,7 +134,7 @@ class Container(Resource):
 
         Returns
         -------
-        Container
+        remoteappmanager.docker.container.Container
         """
 
         image_name = app.image
@@ -153,8 +151,8 @@ class Container(Resource):
             if home_path:
                 volumes[home_path] = {'bind': '/workspace', 'mode': 'rw'}
             else:
-                #self.log.warning('HOME (%s) is not available for %s',
-                #                 home_path, user_name)
+                self.log.warning('HOME (%s) is not available for %s',
+                                 home_path, user_name)
                 pass
 
         if None not in volume_spec:
@@ -172,18 +170,18 @@ class Container(Resource):
                 f
             )
         except gen.TimeoutError as e:
-            #self.log.warning(
-            #    "{user}'s container failed to start in a reasonable time. "
-            #    "giving up".format(user=user_name)
-            #)
-            #e.reason = 'timeout'
+            self.log.warning(
+                "{user}'s container failed to start in a reasonable time. "
+                "giving up".format(user=user_name)
+            )
+            e.reason = 'timeout'
             raise e
         except Exception as e:
-            #self.log.error(
-            #    "Unhandled error starting {user}'s "
-            #    "container: {error}".format(user=user_name, error=e)
-            #)
-            #e.reason = 'error'
+            self.log.error(
+                "Unhandled error starting {user}'s "
+                "container: {error}".format(user=user_name, error=e)
+            )
+            e.reason = 'error'
             raise e
 
         return container

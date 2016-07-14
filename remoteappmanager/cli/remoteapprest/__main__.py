@@ -8,12 +8,8 @@ from urllib.parse import urljoin
 
 import click
 
-# We silence the insecure requests warnings we get for using a
-# self-signed certificate.
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.packages.urllib3 import disable_warnings
-
-disable_warnings(InsecureRequestWarning)
 
 
 class Credentials:
@@ -114,12 +110,12 @@ def app(ctx):
     if ctx.obj.credentials is None:
         raise click.ClickException("Missing credentials. "
                                    "Use the login command to authenticate.")
-    pass
 
 
 @app.command()
 @click.pass_context
 def available(ctx):
+    """Shows the available applications."""
     cred = ctx.obj.credentials
     url, username, cookies = cred.url, cred.username, cred.cookies
 
@@ -203,6 +199,9 @@ def running(ctx):
 
 
 def main():
+    # We silence the insecure requests warnings we get for using
+    # self-signed certificates.
+    disable_warnings(InsecureRequestWarning)
     cli(obj=RemoteAppRestContext())
 
 
