@@ -1,5 +1,4 @@
 import contextlib
-import sqlite3
 
 from sqlalchemy import (
     Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum,
@@ -95,10 +94,20 @@ class Accounting(Base):
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
-    if type(dbapi_connection) is sqlite3.Connection:
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.close()
+    """ Set pragma for sqlite3 when the engine connects
+    Currently it adds support for foreign keys.
+    Do nothing if sqlite3 is not available or if the database
+    is not using sqlite3.
+    """
+    try:
+        # In case sqlite3 is not compiled?
+        import sqlite3
+    except ImportError:
+        return
+    else:
+        if isinstance(dbapi_connection, sqlite3.Connection):
+            with contextlib.closing(dbapi_connection.cursor()) as cursor:
+                cursor.execute("PRAGMA foreign_keys=ON")
 
 
 class Database(LoggingMixin):
