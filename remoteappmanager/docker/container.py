@@ -76,12 +76,12 @@ class Container(HasTraits):
 
         >>> Container.from_docker_containers_dict(containers[0])
         """
+        ip = cls.ip.default_value
+        port = cls.port.default_value
+
         if docker_dict.get('Ports'):
-            ip = docker_dict['Ports'][0].get('IP', "")
-            port = docker_dict['Ports'][0].get('PublicPort', 80)
-        else:
-            ip = ""
-            port = 80
+            ip = docker_dict['Ports'][0].get('IP', ip)
+            port = docker_dict['Ports'][0].get('PublicPort', port)
 
         labels = docker_dict.get("Labels", {})
         mapping_id = labels.get(SIMPHONY_NS+"mapping_id", "")
