@@ -33,7 +33,7 @@ class TestApplication(AsyncHTTPTestCase):
     def test_items(self):
         def prepare_side_effect(*args, **kwargs):
             user = Mock()
-            user.orm_user = Mock()
+            user.account = Mock()
             args[0].current_user = user
 
         with patch("remoteappmanager"
@@ -53,7 +53,7 @@ class TestApplication(AsyncHTTPTestCase):
     def test_retrieve(self):
         def prepare_side_effect(*args, **kwargs):
             user = Mock()
-            user.orm_user = Mock()
+            user.account = Mock()
             args[0].current_user = user
 
         with patch("remoteappmanager"
