@@ -43,7 +43,6 @@ class Container(Resource):
     @gen.coroutine
     def retrieve(self, identifier):
         """Return the representation of the running container."""
-
         container = yield self._container_from_url_id(identifier)
 
         if container is None:

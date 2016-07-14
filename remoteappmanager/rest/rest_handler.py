@@ -66,13 +66,19 @@ class RESTCollectionHandler(RESTBaseHandler):
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
         except Exception:
+            self.log.exception(
+                "Internal error during POST operation on {}".format(
+                    collection_name,
+                ))
             raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
 
         if resource_id is None:
+            self.log.error(
+                "create method for {} returned None".format(collection_name))
             raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
 
         location = with_end_slash(
-            url_path_join(self.request.uri, resource_id))
+            url_path_join(self.request.full_url(), resource_id))
 
         self.set_status(httpstatus.CREATED)
         self.set_header("Location", location)
@@ -101,6 +107,12 @@ class RESTResourceHandler(RESTBaseHandler):
                                 reason="Unprocessable entity")
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
+        except Exception:
+            self.log.exception(
+                "Internal error during retrieve of {}/{}".format(
+                    collection_name,
+                    identifier))
+            raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
 
         self.set_status(httpstatus.OK)
         self.write(representation)
@@ -118,6 +130,12 @@ class RESTResourceHandler(RESTBaseHandler):
             exists = yield res_handler.exists(identifier)
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
+        except Exception:
+            self.log.exception(
+                "Internal error during retrieve of {}/{}".format(
+                    collection_name,
+                    identifier))
+            raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
 
         if exists:
             raise web.HTTPError(httpstatus.CONFLICT)
