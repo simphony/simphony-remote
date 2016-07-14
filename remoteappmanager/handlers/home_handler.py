@@ -124,13 +124,7 @@ class HomeHandler(BaseHandler):
         It is not different from pasting the appropriate URL in the
         web browser, but we validate the container id first.
         """
-        try:
-            url_id = options["url_id"][0]
-        except (KeyError, IndexError):
-            message = "Failed to retrieve valid url_id from form."
-            self.log.exception(message)
-            self.finish(message)
-            return
+        url_id = options["url_id"][0]
 
         container_manager = self.application.container_manager
         container = yield container_manager.container_from_url_id(url_id)
@@ -151,13 +145,7 @@ class HomeHandler(BaseHandler):
     def _actionhandler_stop(self, options):
         """Stops a running container.
         """
-        try:
-            url_id = options["url_id"][0]
-        except (KeyError, IndexError):
-            message = "Failed to retrieve valid url_id from form."
-            self.log.exception(message)
-            self.finish(message)
-            return
+        url_id = options["url_id"][0]
 
         app = self.application
         container_manager = app.container_manager
