@@ -132,7 +132,7 @@ def available(ctx):
                                   item_id))
         response = requests.get(request_url, cookies=cookies, verify=False)
         app_data = json.loads(response.content.decode("utf-8"))
-        print("{}: {}".format(
+        print("{} : {}".format(
             item_id, app_data["image"]
         ))
 
@@ -194,7 +194,7 @@ def running(ctx):
                                   item_id))
         response = requests.get(request_url, cookies=cookies, verify=False)
         app_data = json.loads(response.content.decode("utf-8"))
-        print("{}: {}".format(
+        print("{} : {}".format(
             item_id, app_data["image_name"]
         ))
 
