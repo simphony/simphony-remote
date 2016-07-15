@@ -21,6 +21,9 @@ Components
     active sessions. There is one such server for each authenticated user.
   - **Docker**: The docker engine managing the docker containers.
 
+    .. note::
+       Docker containers are connected via HTTP.  HTTPS encryption
+       is only provided by the proxy.
 
 Usecases
 --------
