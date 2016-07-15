@@ -18,7 +18,7 @@ class TestCommandLineConfig(unittest.TestCase):
 
     def test_initialization(self):
         for key, value in arguments.items():
-            if key == "base-url":
+            if key == "base-urlpath":
                 value = with_end_slash(value)
 
             self.assertEqual(getattr(self.config, key.replace("-", "_")),

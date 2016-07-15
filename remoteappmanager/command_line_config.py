@@ -22,7 +22,7 @@ class CommandLineConfig(HasTraits):
 
     # This is the url path that the user sees and which leads to this server.
     # typically, it's /user/username
-    base_url = Unicode(help="The base url where the server resides")
+    base_urlpath = Unicode(help="The base url where the server resides")
 
     # This is the host of the hub. It's always empty (jupyterhub decision)
     hub_host = Unicode(help="The url of the jupyterhub server")
@@ -64,5 +64,5 @@ class CommandLineConfig(HasTraits):
 
         set_traits_from_dict(self, options)
 
-        # Normalize the base_url to end with a slash
-        self.base_url = with_end_slash(self.base_url)
+        # Normalize the base_urlpath to end with a slash
+        self.base_urlpath = with_end_slash(self.base_urlpath)
