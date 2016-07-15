@@ -33,6 +33,10 @@ class Spawner(LocalProcessSpawner):
 
     def get_args(self):
         args = super().get_args()
+
+        for iarg, arg in enumerate(args):
+            args[iarg] = arg.replace('--base-url=', '--base-urlpath=')
+
         args.append("--proxy-api-url={}".format(self.proxy.api_server.url))
         args.append("--config-file={}".format(self.config_file_path))
         return args
@@ -103,6 +107,10 @@ class VirtualUserSpawner(LocalProcessSpawner):
 
     def get_args(self):
         args = super().get_args()
+
+        for iarg, arg in enumerate(args):
+            args[iarg] = arg.replace('--base-url=', '--base-urlpath=')
+
         args.append("--proxy-api-url={}".format(self.proxy.api_server.url))
         args.append("--config-file={}".format(self.config_file_path))
         return args

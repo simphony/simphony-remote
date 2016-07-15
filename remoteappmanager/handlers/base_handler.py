@@ -32,9 +32,7 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
         """
         args = dict(
             user=self.current_user,
-            # command_line_config.base_url is often a url path
-            base_url=self.application.command_line_config.base_url,
-            # hub_prefix is often a url path '/hub'
+            base_url=self.application.command_line_config.base_urlpath,
             logout_url=urljoin(
                 self.application.command_line_config.hub_prefix,
                 "logout")

@@ -161,7 +161,7 @@ class HomeHandler(BaseHandler):
 
         # We don't have fancy stuff at the moment to change the button, so
         # we just reload the page.
-        self.redirect(self.application.command_line_config.base_url)
+        self.redirect(self.application.command_line_config.base_urlpath)
 
     # private
 
@@ -326,7 +326,7 @@ class HomeHandler(BaseHandler):
         server_url = "http://{}:{}{}/".format(
             container.ip,
             container.port,
-            url_path_join(self.application.command_line_config.base_url,
+            url_path_join(self.application.command_line_config.base_urlpath,
                           container.urlpath))
 
         yield _wait_for_http_server_2xx(
