@@ -151,11 +151,11 @@ class Application(web.Application, LoggingMixin):
     def _get_handlers(self):
         """Returns the registered handlers"""
 
-        base_url = self.command_line_config.base_url
+        base_urlpath = self.command_line_config.base_url
         return [
-            (base_url, HomeHandler),
-            (base_url.rstrip('/'),
-             web.RedirectHandler, {"url": base_url}),
+            (base_urlpath, HomeHandler),
+            (base_urlpath.rstrip('/'),
+             web.RedirectHandler, {"url": base_urlpath}),
         ]
 
     def _jinja_init(self, settings):

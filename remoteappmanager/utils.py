@@ -1,7 +1,9 @@
 def url_path_join(*pieces):
-    """Join components of url into a relative url
+    """Join components of url into a relative url path
     Use to prevent double slash when joining subpath. This will leave the
     initial and final / in place
+
+    Assume pieces do not contain protocol (e.g. http://)
     """
     stripped = [s.strip('/') for s in pieces]
     result = '/'.join(s for s in stripped if s)
