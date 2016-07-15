@@ -67,7 +67,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
         app.container_manager.containers_from_mapping_id = mock_coro_factory(
             [Container()]
         )
-        app.container_manager.containers_from_url_id = mock_coro_factory(
+        app.container_manager.container_from_url_id = mock_coro_factory(
             Container()
         )
         app.container_manager.stop_and_remove_container = mock_coro_factory()

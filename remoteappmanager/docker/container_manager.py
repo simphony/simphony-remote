@@ -165,12 +165,24 @@ class ContainerManager(LoggingMixin):
         containers = []
         infos = yield self.docker_client.containers(filters=filters)
         for info in infos:
-            container = Container.from_docker_containers_dict(info)
+            try:
+                container = Container.from_docker_containers_dict(info)
+            except Exception:
+                self.log.exception("Unable to parse container info.")
+                continue
 
             # override the ip and port obtained by the docker info with the
             # appropriate ip and port, considering that we might be using a
             # separate docker machine
-            ip, port = yield from self._get_ip_and_port(container.docker_id)
+            try:
+                ip, port = yield from self._get_ip_and_port(
+                    container.docker_id)
+            except RuntimeError:
+                self.log.exception(
+                    "Unable to retrieve ip/port "
+                    "for container {}".format(container.docker_id))
+                continue
+
             container.ip = ip
             container.port = port
             containers.append(container)
@@ -348,13 +360,25 @@ class ContainerManager(LoggingMixin):
         Return
         ------
         A tuple (ip, port)
+
+        Raises
+        ------
+        RuntimeError:
+            If for some reason it cannot retrieve the information
         """
 
         # retrieve the actual port binding
-        resp = yield self.docker_client.port(container_id, self.container_port)
+        try:
+            resp = yield self.docker_client.port(container_id,
+                                                 self.container_port)
+        except Exception as e:
+            raise RuntimeError("Failed to get port info for {}. "
+                               "Exception: {}.".format(container_id,
+                                                       str(e)))
 
         if resp is None:
-            raise RuntimeError("Failed to get port info for %s" % container_id)
+            raise RuntimeError("Failed to get port info for {}. "
+                               "Port response was None.".format(container_id))
 
         # We assume we are running on linux without any additional docker
         # machine. The container will therefore be reachable at 127.0.0.1.
@@ -367,7 +391,13 @@ class ContainerManager(LoggingMixin):
             if url.scheme == 'tcp':
                 ip = url.hostname
 
-        port = int(resp[0]['HostPort'])
+        try:
+            port = int(resp[0]['HostPort'])
+        except (KeyError, IndexError, ValueError) as e:
+            raise RuntimeError("Failed to get port info for {}. "
+                               "Exception: {}.".format(container_id,
+                                                       str(e)))
+
         return ip, port
 
     @gen.coroutine
