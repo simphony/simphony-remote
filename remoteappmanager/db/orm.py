@@ -161,19 +161,20 @@ class AppAccounting(ABCAccounting):
         """ Return an orm.User given a user name.  Return None
         if the user name is not found in the database
         """
-        session = self.db.create_session()
+        # We create a session here to make sure it is only
+        # used in one thread
+        with contextlib.closing(self.db.create_session()) as session:
 
-        with transaction(session):
-            user = session.query(User).filter_by(
-                name=user_name).one_or_none()
+            with transaction(session):
+                user = session.query(User).filter_by(
+                    name=user_name).one_or_none()
 
-        # Removing internal references to the session is
-        # required such that the object is detached and
-        # can be reused in a different thread
-        if user:
-            session.expunge(user)
+            # Removing internal references to the session is
+            # required such that the object is detached and
+            # can be reused in a different thread
+            if user:
+                session.expunge(user)
 
-        session.close()
         return user
 
     def get_apps_for_user(self, user):
@@ -193,15 +194,16 @@ class AppAccounting(ABCAccounting):
            The mapping_id is a unique string identifying the combination
            of application and policy. It is not unique per user.
         """
+        # We create a session here to make sure it is only
+        # used in one thread
+        with contextlib.closing(self.db.create_session()) as session:
+            result = apps_for_user(session, user)
 
-        session = self.db.create_session()
-        result = apps_for_user(session, user)
+            # Removing internal references to the session is
+            # required such that the objects can be reused
+            # in a different thread
+            session.expunge_all()
 
-        # Removing internal references to the session is
-        # required such that the objects can be reused
-        # in a different thread
-        session.expunge_all()
-        session.close()
         return result
 
 
