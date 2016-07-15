@@ -60,6 +60,7 @@ class RemoteAppRestContext:
 def cli(ctx, credentials_file):
     """Command line interface to start, stop, and inquire applications
     on the remote application server."""
+    ctx.obj = RemoteAppRestContext()
     ctx.obj.credentials_file = credentials_file
     try:
         ctx.obj.credentials = Credentials.from_file(credentials_file)
