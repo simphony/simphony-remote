@@ -1,3 +1,4 @@
+import contextlib
 import os
 import unittest
 
@@ -170,9 +171,8 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
             url="sqlite:///"+self.sqlite_file_path)
 
         # Fill the database
-        session = accounting.db.create_session()
-        fill_db(session)
-        session.close()
+        with contextlib.closing(accounting.db.create_session()) as session:
+            fill_db(session)
 
         return accounting
 
