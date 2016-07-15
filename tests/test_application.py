@@ -2,10 +2,17 @@ import os
 
 from tests.temp_mixin import TempMixin
 from tornado import testing
+from traitlets.traitlets import TraitError
 
 from remoteappmanager.application import Application
+
 from tests import utils
 from tests.db import test_csv_db
+
+
+class DummyAccounting:
+    def __init__(self, *args, **kwargs):
+        pass
 
 
 class TestApplication(TempMixin, testing.AsyncTestCase):
@@ -16,14 +23,9 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
 
         os.environ["PROXY_API_TOKEN"] = "dummy_token"
 
-        self.sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
-        utils.init_sqlite_db(self.sqlite_file_path)
-
-        self.command_line_config = utils.basic_command_line_config()
+        # File config with orm.AppAccounting
         self.file_config = utils.basic_file_config()
-        self.file_config.db_url = "sqlite:///"+self.sqlite_file_path
-
-        self.app = Application(self.command_line_config, self.file_config)
+        self.command_line_config = utils.basic_command_line_config()
 
     def tearDown(self):
         if self._old_proxy_api_token is not None:
@@ -33,8 +35,18 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
 
         super().tearDown()
 
-    def test_initialization(self):
-        app = self.app
+    def test_initialization_with_sqlite_db(self):
+        # Initialise database
+        sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
+        utils.init_sqlite_db(sqlite_file_path)
+
+        self.file_config.accounting_class = (
+            "remoteappmanager.db.orm.AppAccounting")
+        self.file_config.accounting_kwargs = {
+            "url": "sqlite:///"+sqlite_file_path}
+
+        app = Application(self.command_line_config, self.file_config)
+
         self.assertIsNotNone(app.command_line_config)
         self.assertIsNotNone(app.file_config)
 
@@ -45,6 +57,21 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
         self.assertIsNotNone(app.hub)
         self.assertEqual(app.user.name, "username")
         self.assertEqual(app.user.account, None)
+
+    def test_error_default_value_with_unimportable_accounting(self):
+        self.file_config.accounting_class = "not.importable.Class"
+        app = Application(self.command_line_config, self.file_config)
+
+        with self.assertRaises(ImportError):
+            app.db
+
+    def test_db_default_value_with_accounting_wrong_subclass(self):
+        self.file_config.accounting_class = (
+            "tests.test_application.DummyAccounting")
+        app = Application(self.command_line_config, self.file_config)
+
+        with self.assertRaises(TraitError):
+            app.db
 
 
 # FIXME: Some of these tests are the same and should be refactored
@@ -60,15 +87,6 @@ class TestApplicationWithCSV(TempMixin, testing.AsyncTestCase):
         self.command_line_config = utils.basic_command_line_config()
         self.file_config = utils.basic_file_config()
 
-        self.csv_file = os.path.join(self.tempdir, 'testing.csv')
-        self.file_config.db_url = self.csv_file
-
-        test_csv_db.write_csv_file(self.csv_file,
-                                   test_csv_db.GoodTable.headers,
-                                   test_csv_db.GoodTable.records)
-
-        self.app = Application(self.command_line_config, self.file_config)
-
     def tearDown(self):
         if self._old_proxy_api_token is not None:
             os.environ["PROXY_API_TOKEN"] = self._old_proxy_api_token
@@ -78,15 +96,21 @@ class TestApplicationWithCSV(TempMixin, testing.AsyncTestCase):
         super().tearDown()
 
     def test_initialization(self):
-        app = self.app
+        self.file_config.accounting_class = (
+            "remoteappmanager.db.csv_db.CSVAccounting")
+
+        csv_file = os.path.join(self.tempdir, 'testing.csv')
+        self.file_config.accounting_kwargs = {"csv_file_path": csv_file}
+
+        test_csv_db.write_csv_file(csv_file,
+                                   test_csv_db.GoodTable.headers,
+                                   test_csv_db.GoodTable.records)
+
+        app = Application(self.command_line_config, self.file_config)
+
         self.assertIsNotNone(app.command_line_config)
         self.assertIsNotNone(app.file_config)
-
-    def test_database_initialization(self):
-        app = self.app
-
         self.assertIsNotNone(app.db)
         self.assertIsNotNone(app.user)
-
         self.assertEqual(app.user.name, "username")
         self.assertIsInstance(app.user.account, test_csv_db.CSVUser)
