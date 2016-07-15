@@ -71,6 +71,26 @@ class TestContainer(AsyncHTTPTestCase):
             self.assertEqual(escape.json_decode(res.body),
                              {"items": []})
 
+            # Add a mock image so that we check what happens if we do
+            # have something
+            self._app.container_manager.image = mock_coro_factory(
+                return_value=[Mock()]
+            )
+            mock_container = Mock()
+            mock_container.url_id = "hello"
+            self._app.container_manager.containers_from_mapping_id = \
+                mock_coro_factory([mock_container])
+
+            res = self.fetch("/api/v1/containers/")
+
+            self.assertEqual(res.code, httpstatus.OK)
+
+            # We have two "hello" but it's an artifact of the mocking.
+            # in a real application they are different, one for each
+            # application+policy running
+            self.assertEqual(escape.json_decode(res.body),
+                             {"items": ["hello", "hello"]})
+
     def test_create(self):
         with patch("remoteappmanager"
                    ".handlers"
