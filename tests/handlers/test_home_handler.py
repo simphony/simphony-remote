@@ -35,7 +35,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
 
         command_line_config = utils.basic_command_line_config()
         file_config = utils.basic_file_config()
-        file_config.db_url = "sqlite:///"+sqlite_file_path
+        file_config.accounting_kwargs = {'url': "sqlite:///"+sqlite_file_path}
 
         app = Application(command_line_config, file_config)
         app.reverse_proxy = mock.Mock(spec=ReverseProxy)
@@ -54,6 +54,8 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
         app.container_manager.image = utils.mock_coro_factory(Image)
         app.container_manager.containers_from_mapping_id = \
             utils.mock_coro_factory([Container()])
+        app.container_manager.container_from_url_id = \
+            utils.mock_coro_factory(Container())
         app.container_manager.stop_and_remove_container = \
             utils.mock_coro_factory()
 
@@ -137,7 +139,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
     def test_post_stop(self):
         body = urllib.parse.urlencode(
             {'action': 'stop',
-             'container_id': '12345'
+             'url_id': '12345'
              }
         )
 
@@ -145,16 +147,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
                         ".handlers"
                         ".home_handler"
                         ".HomeHandler"
-                        "._container_from_options",
-                        new_callable=utils.mock_coro_factory
-                        ) as mock_container_from_options, \
-            mock.patch("remoteappmanager"
-                       ".handlers"
-                       ".home_handler"
-                       ".HomeHandler"
-                       ".redirect") as redirect:
-
-            mock_container_from_options.return_value = Container()
+                        ".redirect") as redirect:
 
             self.fetch("/user/username/",
                        method="POST",
@@ -169,7 +162,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
     def test_post_view(self):
         body = urllib.parse.urlencode(
             {'action': 'view',
-             'container_id': '12345'
+             'url_id': '12345'
              }
         )
 
@@ -182,16 +175,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
                            ".handlers"
                            ".home_handler"
                            ".HomeHandler"
-                           "._container_from_options",
-                           new_callable=utils.mock_coro_factory
-                           ) as mock_container_from_options, \
-                mock.patch("remoteappmanager"
-                           ".handlers"
-                           ".home_handler"
-                           ".HomeHandler"
                            ".redirect") as redirect:
-
-            mock_container_from_options.return_value = Container()
 
             self.fetch("/user/username/",
                        method="POST",

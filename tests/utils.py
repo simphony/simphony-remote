@@ -279,10 +279,7 @@ def basic_command_line_config():
 
 
 def basic_file_config():
-    options = {
-        "db_url": "sqlite://"
-    }
-    return FileConfig(**options)
+    return FileConfig()
 
 
 @contextlib.contextmanager

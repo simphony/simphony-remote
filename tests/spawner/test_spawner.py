@@ -1,40 +1,36 @@
 import contextlib
 import os
 import pwd
-import shutil
 import subprocess
 import sys
 import time
-import tempfile
-import unittest
 from unittest import mock
 
-from tornado.ioloop import IOLoop
+from tornado import testing
 from jupyterhub import orm
 
 from remoteappmanager.spawner import Spawner, VirtualUserSpawner
 from tests import fixtures
+from tests.temp_mixin import TempMixin
 
 
-def start_spawner(spawner):
-    io_loop = IOLoop.current()
+def start_spawner(io_loop, spawner):
     io_loop.run_sync(spawner.start)
     # Wait for the process to get to the while loop
     time.sleep(1)
 
 
-def stop_spawner(spawner):
-    io_loop = IOLoop.current()
+def stop_spawner(io_loop, spawner):
     io_loop.run_sync(spawner.stop)
 
 
 @contextlib.contextmanager
-def spawner_start_and_stop(spawner):
+def spawner_start_and_stop(io_loop, spawner):
     try:
-        start_spawner(spawner)
+        start_spawner(io_loop, spawner)
         yield
     finally:
-        stop_spawner(spawner)
+        stop_spawner(io_loop, spawner)
 
 
 def username():
@@ -76,9 +72,10 @@ def new_spawner(spawner_class):
     return spawner_class(db=db, user=user, hub=hub)
 
 
-class TestSpawner(unittest.TestCase):
+class TestSpawner(testing.AsyncTestCase):
     def setUp(self):
         self.spawner = new_spawner(Spawner)
+        super().setUp()
 
     def test_args(self):
         path = fixtures.get("remoteappmanager_config.py")
@@ -131,62 +128,50 @@ class TestSpawner(unittest.TestCase):
         path = fixtures.get("remoteappmanager_config.py")
         self.spawner.config_file_path = path
 
-        io_loop = IOLoop.current()
-
-        with spawner_start_and_stop(self.spawner):
-            status = io_loop.run_sync(self.spawner.poll)
+        with spawner_start_and_stop(self.io_loop, self.spawner):
+            status = self.io_loop.run_sync(self.spawner.poll)
             self.assertIsNone(status)
 
-        status = io_loop.run_sync(self.spawner.poll)
+        status = self.io_loop.run_sync(self.spawner.poll)
         self.assertEqual(status, 1)
 
 
-class TestVirtualUserSpawner(unittest.TestCase):
+class TestVirtualUserSpawner(TempMixin, testing.AsyncTestCase):
     def setUp(self):
+        super().setUp()
         self.spawner = new_spawner(VirtualUserSpawner)
         path = fixtures.get("remoteappmanager_config.py")
         self.spawner.config_file_path = path
 
-        # temporary directory for creating workspaces
-        self.temp_dir = tempfile.mkdtemp()
-        self.addCleanup(self.clean_up_temp_dir)
-
-    def clean_up_temp_dir(self):
-        shutil.rmtree(self.temp_dir)
-
     def test_spawner_without_workspace_dir(self):
-        io_loop = IOLoop.current()
-
-        with spawner_start_and_stop(self.spawner):
-            status = io_loop.run_sync(self.spawner.poll)
+        with spawner_start_and_stop(self.io_loop, self.spawner):
+            status = self.io_loop.run_sync(self.spawner.poll)
             self.assertIsNone(status)
 
             # spawner.worspace_dir is not defined
             # no temporary directory is created
-            self.assertFalse(os.listdir(self.temp_dir))
+            self.assertFalse(os.listdir(self.tempdir))
 
-        status = io_loop.run_sync(self.spawner.poll)
+        status = self.io_loop.run_sync(self.spawner.poll)
         self.assertEqual(status, 1)
 
     def test_spawner_with_workspace_dir(self):
-        self.spawner.workspace_dir = self.temp_dir
+        self.spawner.workspace_dir = self.tempdir
 
-        io_loop = IOLoop.current()
-
-        with spawner_start_and_stop(self.spawner):
-            status = io_loop.run_sync(self.spawner.poll)
+        with spawner_start_and_stop(self.io_loop, self.spawner):
+            status = self.io_loop.run_sync(self.spawner.poll)
             self.assertIsNone(status)
 
             # There should be a temporary directory created
             # and it should be assigned to _virtual_workspace
             virtual_directory = self.spawner._virtual_workspace
             self.assertIn(os.path.basename(virtual_directory),
-                          os.listdir(self.temp_dir))
+                          os.listdir(self.tempdir))
 
         # The temporary directory should be removed upon stop
-        self.assertFalse(os.listdir(self.temp_dir))
+        self.assertFalse(os.listdir(self.tempdir))
 
-        status = io_loop.run_sync(self.spawner.poll)
+        status = self.io_loop.run_sync(self.spawner.poll)
         self.assertEqual(status, 1)
 
     def test_env_has_proxy_api_token(self):
@@ -202,31 +187,31 @@ class TestVirtualUserSpawner(unittest.TestCase):
             self.assertIn("DOCKER_MACHINE_NAME", env)
 
     def test_env_has_home_if_workspace_defined(self):
-        self.spawner.workspace_dir = self.temp_dir
+        self.spawner.workspace_dir = self.tempdir
 
-        with spawner_start_and_stop(self.spawner):
+        with spawner_start_and_stop(self.io_loop, self.spawner):
             home = self.spawner.get_env().get('HOME')
             self.assertEqual(home, self.spawner._virtual_workspace)
 
     def test_home_not_in_env_if_workspace_undefined(self):
-        with spawner_start_and_stop(self.spawner):
+        with spawner_start_and_stop(self.io_loop, self.spawner):
             self.assertIsNone(self.spawner.get_env().get('HOME'))
 
     def test_state_if_workspace_defined(self):
-        self.spawner.workspace_dir = self.temp_dir
+        self.spawner.workspace_dir = self.tempdir
 
-        with spawner_start_and_stop(self.spawner):
+        with spawner_start_and_stop(self.io_loop, self.spawner):
             state = self.spawner.get_state()
             self.assertIn('virtual_workspace', state)
-            self.assertIn(self.temp_dir, state.get('virtual_workspace'))
+            self.assertIn(self.tempdir, state.get('virtual_workspace'))
 
     def test_state_if_workspace_not_defined(self):
-        with spawner_start_and_stop(self.spawner):
+        with spawner_start_and_stop(self.io_loop, self.spawner):
             state = self.spawner.get_state()
             self.assertNotIn('virtual_workspace', state)
 
     def test_clean_up_temporary_dir_if_start_fails(self):
-        self.spawner.workspace_dir = self.temp_dir
+        self.spawner.workspace_dir = self.tempdir
 
         # mock LocalProcessSpawner.start to fail
         def start_fail(instance):
@@ -235,22 +220,20 @@ class TestVirtualUserSpawner(unittest.TestCase):
         with mock.patch('jupyterhub.spawner.LocalProcessSpawner.start',
                         start_fail), \
                 self.assertRaises(Exception), \
-                spawner_start_and_stop(self.spawner):
+                spawner_start_and_stop(self.io_loop, self.spawner):
             pass
 
         # The temporary directory should be cleaned up
-        self.assertFalse(os.listdir(self.temp_dir))
+        self.assertFalse(os.listdir(self.tempdir))
 
     def test_start_if_workspace_path_not_exists(self):
         self.spawner.workspace_dir = '/no_way/this_exists'
 
-        io_loop = IOLoop.current()
-
-        with spawner_start_and_stop(self.spawner):
+        with spawner_start_and_stop(self.io_loop, self.spawner):
             # Started running
-            status = io_loop.run_sync(self.spawner.poll)
+            status = self.io_loop.run_sync(self.spawner.poll)
             self.assertIsNone(status)
 
         # Stopped running
-        status = io_loop.run_sync(self.spawner.poll)
+        status = self.io_loop.run_sync(self.spawner.poll)
         self.assertEqual(status, 1)
