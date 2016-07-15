@@ -120,15 +120,11 @@ class ContainerManager(LoggingMixin):
         """
         labels = {
             SIMPHONY_NS+"user": user_name,
-            SIMPHONY_NS+"mapping_id": mapping_id,
-        }
-
+            SIMPHONY_NS+"mapping_id": mapping_id}
         filters = {
-            'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]
-        }
+            'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]}
 
         containers = yield self.containers_from_filters(filters=filters)
-
         return containers
 
     @gen.coroutine
@@ -136,17 +132,11 @@ class ContainerManager(LoggingMixin):
         """Retrieves and returns the container by its url_id, if present.
         If not present, returns None.
         """
-
-        labels = {
-            SIMPHONY_NS+"url_id": url_id,
-        }
-
+        labels = {SIMPHONY_NS+"url_id": url_id}
         filters = {
-            'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]
-        }
+            'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]}
 
         containers = yield self.containers_from_filters(filters=filters)
-
         return containers[0] if len(containers) else None
 
     @gen.coroutine
