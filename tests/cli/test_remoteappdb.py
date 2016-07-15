@@ -1,6 +1,5 @@
 import os
 import unittest
-import subprocess
 from unittest import mock
 
 from click.testing import CliRunner
@@ -14,88 +13,77 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.db = os.path.join(self.tempdir, "test.db")
-        subprocess.check_output(
-            ("remoteappdb --db="+self.db+" init").split()
-        )
+        self._remoteappdb("init")
 
     def _remoteappdb(self, argstring):
-        return subprocess.check_output(
-            ("remoteappdb --db="+self.db+" "+argstring).split()
-        ).decode("utf-8")
+        runner = CliRunner()
+        result = runner.invoke(
+            remoteappdb.cli,
+            ("--db="+self.db+" "+argstring).split(),
+            catch_exceptions=False
+        )
+
+        return result.exit_code, result.output
 
     def test_init_command(self):
         self.assertTrue(os.path.exists(self.db))
 
     def test_user_create(self):
-        out = self._remoteappdb("user create foo")
+        _, out = self._remoteappdb("user create foo")
         self.assertEqual(out, "1\n")
 
-        out = self._remoteappdb("user create bar")
+        _, out = self._remoteappdb("user create bar")
         self.assertEqual(out, "2\n")
 
-        out = self._remoteappdb("user list")
+        _, out = self._remoteappdb("user list")
 
         self.assertIn("foo", out)
         self.assertIn("bar", out)
 
     def test_app_create_with_verify(self):
-        runner = CliRunner()
         with mock.patch('remoteappmanager.cli.remoteappdb.__main__.get_docker_client',  # noqa
                         mock_docker_client):
             # docker.client.inspect_image is mocked to always return
             # something, so verification would pass
-            result = runner.invoke(remoteappdb.cli,
-                                   ['--db='+self.db,
-                                    'app', 'create', 'anything'])
+            exit_code, output = self._remoteappdb("app create anything")
 
-            self.assertEqual(result.exit_code, 0)
+            self.assertEqual(exit_code, 0)
 
             # Check that the app is created
-            result = runner.invoke(remoteappdb.cli,
-                                   ['--db='+self.db,
-                                    'app', 'list'])
-            self.assertIn('anything', result.output)
+            exit_code, output = self._remoteappdb("app list")
+            self.assertIn('anything', output)
 
     def test_app_create_wrong_name_with_verify(self):
-        runner = CliRunner()
-
         # create an application with a wrong image name
-        result = runner.invoke(remoteappdb.cli,
-                               ['--db='+self.db, 'app', 'create', 'wrong'])
+        exit_code, output = self._remoteappdb('app create wrong')
 
-        self.assertEqual(result.exit_code, 2)
+        self.assertEqual(exit_code, 2)
 
         # Check that the app is not created
-        result = runner.invoke(remoteappdb.cli,
-                               ['--db='+self.db, 'app', 'list'])
-        self.assertNotIn('wrong', result.output)
+        exit_code, output = self._remoteappdb("app list")
+        self.assertNotIn('wrong', output)
 
     def test_app_create_wrong_name_without_verify(self):
-        runner = CliRunner()
-
         # create an application with a wrong image name
-        result = runner.invoke(remoteappdb.cli,
-                               ['--db='+self.db, 'app', 'create', 'wrong2',
-                                '--no-verify'])
+        exit_code, output = self._remoteappdb("app create wrong2 --no-verify")
 
-        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(exit_code, 0)
 
         # Check that the app is created
-        result = runner.invoke(remoteappdb.cli,
-                               ['--db='+self.db, 'app', 'list'])
-        self.assertIn('wrong2', result.output)
+        exit_code, output = self._remoteappdb("app list")
+        self.assertIn('wrong2', output)
 
     def test_app_grant(self):
         self._remoteappdb("app create myapp --no-verify")
         self._remoteappdb("user create user")
 
-        out = self._remoteappdb("user list")
+        _, out = self._remoteappdb("user list")
         self.assertNotIn("myapp", out)
         self._remoteappdb("app grant myapp user")
         self._remoteappdb("app grant myapp user "
                           "--allow-view "
                           "--volume=frobniz:froble:ro")
-        out = self._remoteappdb("user list --show-apps")
+        _, out = self._remoteappdb("user list --show-apps")
         self.assertIn("myapp", out)
         self.assertIn("frobniz", out)
         self.assertIn("froble", out)
@@ -107,10 +95,10 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
 
         self._remoteappdb("app grant myapp user")
         self._remoteappdb("app grant myapp user --allow-view")
-        out = self._remoteappdb("user list --show-apps --no-decoration")
+        _, out = self._remoteappdb("user list --show-apps --no-decoration")
         self.assertEqual(len(out.split('\n')), 3)
         self._remoteappdb("app revoke myapp user --revoke-all")
-        out = self._remoteappdb("user list --show-apps --no-decoration")
+        _, out = self._remoteappdb("user list --show-apps --no-decoration")
         self.assertEqual(len(out.split('\n')), 2)
         self.assertNotIn("myapp", out)
 
@@ -121,14 +109,14 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
                           "--allow-view "
                           "--volume=frobniz:froble:ro")
 
-        out = self._remoteappdb("user list --show-apps --no-decoration")
+        _, out = self._remoteappdb("user list --show-apps --no-decoration")
         self.assertEqual(len(out.split('\n')), 4)
         self._remoteappdb("app revoke myapp user")
-        out = self._remoteappdb("user list --show-apps --no-decoration")
+        _, out = self._remoteappdb("user list --show-apps --no-decoration")
         self.assertEqual(len(out.split('\n')), 3)
 
         self._remoteappdb("app revoke myapp user --allow-view")
-        out = self._remoteappdb("user list --show-apps --no-decoration")
+        _, out = self._remoteappdb("user list --show-apps --no-decoration")
         self.assertEqual(len(out.split('\n')), 2)
         self.assertIn("frobniz", out)
         self.assertIn("froble", out)
@@ -138,13 +126,13 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         """
         # Given user is created with two accountings (application, policy)
         self._remoteappdb("app create myapp --no-verify")
-        out = self._remoteappdb("user create user")
+        _, out = self._remoteappdb("user create user")
         self.assertEqual(out, "1\n")
 
         self._remoteappdb("app grant myapp user")
         self._remoteappdb("app grant myapp user --allow-view")
 
-        out = self._remoteappdb("user list --show-apps --no-decoration")
+        _, out = self._remoteappdb("user list --show-apps --no-decoration")
         self.assertEqual(len(out.split('\n')), 3)
 
         # When the user is deleted, the accounting rows should be deleted
@@ -152,10 +140,10 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         # not exist (This test relies on the fact that there is only one
         # user and so has the same id as before)
         self._remoteappdb("user remove user")
-        out = self._remoteappdb("user create user")
+        _, out = self._remoteappdb("user create user")
         self.assertEqual(out, "1\n")
 
-        out = self._remoteappdb("user list --show-apps --no-decoration")
+        _, out = self._remoteappdb("user list --show-apps --no-decoration")
         self.assertEqual(len(out.split('\n')), 2)
         self.assertNotIn("myapp", out)
 
@@ -163,15 +151,15 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         """ Test if deleting application cascade to deleting accounting rows
         """
         # Given user is created with two accountings (application, policy)
-        out = self._remoteappdb("app create myapp --no-verify")
+        _, out = self._remoteappdb("app create myapp --no-verify")
         self.assertEqual(out, "1\n")
-        out = self._remoteappdb("user create user")
+        _, out = self._remoteappdb("user create user")
         self.assertEqual(out, "1\n")
 
         self._remoteappdb("app grant myapp user")
         self._remoteappdb("app grant myapp user --allow-view")
 
-        out = self._remoteappdb("user list --show-apps --no-decoration")
+        _, out = self._remoteappdb("user list --show-apps --no-decoration")
         self.assertEqual(len(out.split('\n')), 3)
 
         # When the application is deleted, the associated accounting rows
@@ -180,9 +168,9 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         # (This test relies on the fact that there is only one app and so
         # the application row has the same id as before)
         self._remoteappdb("app remove myapp")
-        out = self._remoteappdb("app create myapp --no-verify")
+        _, out = self._remoteappdb("app create myapp --no-verify")
         self.assertEqual(out, "1\n")
 
-        out = self._remoteappdb("user list --show-apps --no-decoration")
+        _, out = self._remoteappdb("user list --show-apps --no-decoration")
         self.assertEqual(len(out.split('\n')), 2)
         self.assertNotIn("myapp", out)
