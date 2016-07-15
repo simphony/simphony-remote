@@ -174,7 +174,6 @@ class RESTResourceHandler(RESTBaseHandler):
         res_handler = self.get_resource_handler_or_404(collection_name)
         try:
             yield res_handler.delete(identifier)
-            print("done")
         except exceptions.NotFound:
             raise web.HTTPError(httpstatus.NOT_FOUND)
         except NotImplementedError:

@@ -49,7 +49,6 @@ class Student(Resource):
 
     @gen.coroutine
     def delete(self, identifier):
-        print("identifier", identifier)
         if identifier not in self.collection:
             raise exceptions.NotFound
 
