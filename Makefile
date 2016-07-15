@@ -56,4 +56,4 @@ images:
 test:
 	@echo "Running testsuite"
 	@echo "-----------------"
-	-. venv/bin/activate && python -m tornado.testing discover
+	-. venv/bin/activate && flake8 . && python -m tornado.testing discover
