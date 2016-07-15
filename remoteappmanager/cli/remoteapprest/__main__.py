@@ -88,7 +88,7 @@ def login(ctx, url, username, password):
         response = requests.post(login_url, payload, verify=False,
                                  allow_redirects=False)
     except Exception as e:
-        print("Could not perform request. {}".format(e))
+        print("Could not perform request. {}".format(e), file=sys.stderr)
         sys.exit(1)
 
     if response.status_code == 302:
@@ -97,7 +97,7 @@ def login(ctx, url, username, password):
         cred.write(ctx.obj.credentials_file)
     else:
         print("Failed to perform login. Server replied with error: {}".format(
-            response.status_code))
+            response.status_code), file=sys.stderr)
         sys.exit(1)
 
 # -------------------------------------------------------------------------
