@@ -90,6 +90,7 @@ class TestContainerManager(AsyncTestCase):
         self.manager.docker_client.client = docker_client
 
         result = yield self.manager.container_from_url_id("url_id")
+        self.assertEqual(result, None)
 
         # Making it so that no valid dictionary is returned.
         docker_client.port = mock.Mock(return_value=1234)
@@ -97,6 +98,7 @@ class TestContainerManager(AsyncTestCase):
         self.manager.docker_client.client = docker_client
 
         result = yield self.manager.container_from_url_id("url_id")
+        self.assertEqual(result, None)
 
     @gen_test
     def test_race_condition_spawning(self):
