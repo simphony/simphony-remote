@@ -1,10 +1,11 @@
+import importlib
 import os
+
 from traitlets import Instance, default
 from tornado import web
 import tornado.ioloop
 from jinja2 import Environment, FileSystemLoader
 
-from remoteappmanager.db import csv_db, orm
 from remoteappmanager.db.interfaces import ABCAccounting
 from remoteappmanager.handlers.api import HomeHandler
 from remoteappmanager.logging.logging_mixin import LoggingMixin
@@ -111,14 +112,11 @@ class Application(web.Application, LoggingMixin):
     @default("db")
     def _db_default(self):
         """Initializes the database connection."""
-        if self.file_config.db_url.endswith('.db'):
-            db = orm.AppAccounting(self.file_config.db_url)
-        elif self.file_config.db_url.endswith('.csv'):
-            db = csv_db.CSVAccounting(self.file_config.db_url)
-        else:
-            raise ValueError("Unsupported database format: {}".format(
-                self.file_config.db_url))
-        return db
+        class_path = self.file_config.accounting_class
+        module_path, _, cls_name = class_path.rpartition('.')
+        cls = getattr(importlib.import_module(module_path), cls_name)
+
+        return cls(**self.file_config.accounting_kwargs)
 
     @default("user")
     def _user_default(self):

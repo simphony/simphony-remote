@@ -27,7 +27,7 @@ class Container(HasTraits):
     ip = Unicode()
 
     #: ...and port where the container service will be listening
-    port = Int(None, allow_none=True)
+    port = Int(80)
 
     #: the id that will go in the URL of the container
     url_id = Unicode()
@@ -76,12 +76,12 @@ class Container(HasTraits):
 
         >>> Container.from_docker_containers_dict(containers[0])
         """
+        ip = cls.ip.default_value
+        port = cls.port.default_value
+
         if docker_dict.get('Ports'):
-            ip = docker_dict['Ports'][0].get('IP', "")
-            port = docker_dict['Ports'][0].get('PublicPort')
-        else:
-            ip = ""
-            port = None
+            ip = docker_dict['Ports'][0].get('IP', ip)
+            port = docker_dict['Ports'][0].get('PublicPort', port)
 
         labels = docker_dict.get("Labels", {})
         mapping_id = labels.get(SIMPHONY_NS+"mapping_id", "")
