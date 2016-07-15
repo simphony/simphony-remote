@@ -306,6 +306,25 @@ class TestREST(AsyncHTTPTestCase):
             )
             self.assertEqual(res.code, httpstatus.METHOD_NOT_ALLOWED)
 
+            res = self.fetch(
+                "/api/v1/unsupportalls/1/",
+                method="GET",
+            )
+            self.assertEqual(res.code, httpstatus.METHOD_NOT_ALLOWED)
+
+            res = self.fetch(
+                "/api/v1/unsupportalls/1/",
+                method="DELETE",
+            )
+            self.assertEqual(res.code, httpstatus.METHOD_NOT_ALLOWED)
+
+            res = self.fetch(
+                "/api/v1/unsupportalls/1/",
+                method="PUT",
+                body="{}"
+            )
+            self.assertEqual(res.code, httpstatus.METHOD_NOT_ALLOWED)
+
     def test_unprocessable(self):
         with mock.patch("remoteappmanager.handlers.base_handler.BaseHandler"
                         ".prepare",
