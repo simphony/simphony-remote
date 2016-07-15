@@ -6,13 +6,11 @@ from unittest import mock
 from click.testing import CliRunner
 
 from remoteappmanager.cli.remoteapprest import __main__ as remoteapprest
+from remoteappmanager.cli.remoteapprest.__main__ import Credentials
 from tests.temp_mixin import TempMixin
 
 
 class TestRemoteAppREST(TempMixin, unittest.TestCase):
-    def setUp(self):
-        super().setUp()
-
     def _remoteapprest(self, argstring):
         runner = CliRunner()
         result = runner.invoke(remoteapprest.cli,
@@ -20,6 +18,21 @@ class TestRemoteAppREST(TempMixin, unittest.TestCase):
                                catch_exceptions=False)
 
         return result.exit_code, result.output
+
+    def test_credentials_class(self):
+        credentials_file = os.path.join(self.tempdir,
+                                        "credentials")
+        with open(credentials_file, "w") as f:
+            f.write("url\n")
+            f.write("username\n")
+            f.write("cookie1=foo\n")
+            f.write("cookie2=bar\n")
+
+        credentials = Credentials.from_file(credentials_file)
+        self.assertEqual(credentials.url, "url")
+        self.assertEqual(credentials.username, "username")
+        self.assertEqual(credentials.cookies, {"cookie1": "foo",
+                                               "cookie2": "bar"})
 
     def test_login(self):
         with mock.patch('requests.post') as mock_post, \
