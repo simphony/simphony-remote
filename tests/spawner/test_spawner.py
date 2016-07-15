@@ -83,6 +83,7 @@ class TestSpawner(testing.AsyncTestCase):
         args = self.spawner.get_args()
         self.assertIn("--proxy-api-url=http://127.0.0.1:12345/foo/bar/", args)
         self.assertIn("--config-file={}".format(path), args)
+        self.assertIn("--base-urlpath=/", args)
 
     def test_cmd(self):
         self.assertEqual(self.spawner.cmd, ['remoteappmanager'])

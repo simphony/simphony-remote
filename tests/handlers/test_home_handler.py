@@ -46,7 +46,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
             'pending': None,
             'name': command_line_config.user,
             'admin': False,
-            'server': command_line_config.base_url})
+            'server': command_line_config.base_urlpath})
         app.db = mock.Mock(spec=ABCAccounting)
         app.container_manager = mock.Mock(spec=ContainerManager)
         app.container_manager.start_container = \

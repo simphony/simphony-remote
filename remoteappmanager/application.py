@@ -55,7 +55,7 @@ class Application(web.Application, LoggingMixin):
         settings.update(as_dict(command_line_config))
         settings.update(as_dict(file_config))
         settings["static_url_prefix"] = (
-            self._command_line_config.base_url + "static/")
+            self._command_line_config.base_urlpath + "static/")
 
         self._jinja_init(settings)
 
@@ -103,7 +103,7 @@ class Application(web.Application, LoggingMixin):
         return ReverseProxy(
             endpoint_url=self.command_line_config.proxy_api_url,
             auth_token=auth_token,
-            base_urlpath=self.command_line_config.base_url
+            base_urlpath=self.command_line_config.base_urlpath
         )
 
     @default("hub")
@@ -153,11 +153,12 @@ class Application(web.Application, LoggingMixin):
     def _get_handlers(self):
         """Returns the registered handlers"""
 
-        base_url = self.command_line_config.base_url
-        rest_api = rest.api_handlers(base_url)
+        base_urlpath = self.command_line_config.base_urlpath
+        rest_api = rest.api_handlers(base_urlpath)
         return rest_api+[
-            (base_url, HomeHandler),
-            (base_url.rstrip('/'), web.RedirectHandler, {"url": base_url}),
+            (base_urlpath, HomeHandler),
+            (base_urlpath.rstrip('/'),
+             web.RedirectHandler, {"url": base_urlpath}),
         ]
 
     def _register_rest_resources(self):
