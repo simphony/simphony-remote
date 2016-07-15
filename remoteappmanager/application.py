@@ -16,6 +16,9 @@ from remoteappmanager.user import User
 from remoteappmanager.traitlets import as_dict
 from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
+from remoteappmanager import rest
+from remoteappmanager.rest import registry
+from remoteappmanager import restresources
 
 
 class Application(web.Application, LoggingMixin):
@@ -57,6 +60,7 @@ class Application(web.Application, LoggingMixin):
         self._jinja_init(settings)
 
         handlers = self._get_handlers()
+        self._register_rest_resources()
 
         super().__init__(handlers, **settings)
 
@@ -150,11 +154,17 @@ class Application(web.Application, LoggingMixin):
         """Returns the registered handlers"""
 
         base_urlpath = self.command_line_config.base_urlpath
-        return [
+        rest_api = rest.api_handlers(base_urlpath)
+        return rest_api+[
             (base_urlpath, HomeHandler),
             (base_urlpath.rstrip('/'),
              web.RedirectHandler, {"url": base_urlpath}),
         ]
+
+    def _register_rest_resources(self):
+        for rest_resource_class in [restresources.Application,
+                                    restresources.Container]:
+            registry.registry.register(rest_resource_class)
 
     def _jinja_init(self, settings):
         """Initializes the jinja template system settings.
