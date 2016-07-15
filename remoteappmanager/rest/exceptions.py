@@ -1,9 +1,9 @@
-class BaseException(Exception):
+class RESTException(Exception):
     """Base exception for the REST infrastructure"""
     pass
 
 
-class NotFound(BaseException):
+class NotFound(RESTException):
     """Exception raised when the resource is not found.
     Raise this exception in your CRUD handlers when you can't
     find the resource the identifier refers to.
@@ -11,7 +11,7 @@ class NotFound(BaseException):
     pass
 
 
-class UnprocessableRepresentation(BaseException):
+class UnprocessableRepresentation(RESTException):
     """Exception raised when the resource representation is
     invalid or does not contain the appropriate keys.
     Raise this exception in your CRUD handlers when the received

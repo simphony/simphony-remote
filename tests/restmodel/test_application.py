@@ -1,6 +1,6 @@
 from unittest.mock import Mock, patch
 
-from remoteappmanager.restmodel import Application
+from remoteappmanager.restresources import Application
 from tests import utils
 from tornado import web, escape
 

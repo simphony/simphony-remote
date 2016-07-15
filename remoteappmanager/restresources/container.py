@@ -27,7 +27,7 @@ class Container(Resource):
                   if m_id == mapping_id]
 
         if not choice:
-            raise exceptions.UnprocessableRepresentation
+            raise exceptions.UnprocessableRepresentation()
 
         _, app, policy = choice[0]
 
@@ -46,7 +46,7 @@ class Container(Resource):
         container = yield self._container_from_url_id(identifier)
 
         if container is None:
-            raise exceptions.NotFound
+            raise exceptions.NotFound()
 
         return dict(
             name=container.name,
@@ -59,7 +59,7 @@ class Container(Resource):
         app = self.application
         container = yield self._container_from_url_id(identifier)
         if not container:
-            raise exceptions.NotFound
+            raise exceptions.NotFound()
 
         yield app.reverse_proxy.remove_container(container)
         yield app.container_manager.stop_and_remove_container(

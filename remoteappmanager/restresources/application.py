@@ -15,7 +15,7 @@ class Application(Resource):
                      for mapping_id, app, policy in apps}
 
         if identifier not in apps_dict:
-            raise NotFound
+            raise NotFound()
 
         app, policy = apps_dict[identifier]
         representation = dict(
