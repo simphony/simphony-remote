@@ -393,7 +393,7 @@ class ContainerManager(LoggingMixin):
 
         try:
             port = int(resp[0]['HostPort'])
-        except (KeyError, IndexError, ValueError) as e:
+        except (KeyError, IndexError, ValueError, TypeError) as e:
             raise RuntimeError("Failed to get port info for {}. "
                                "Exception: {}.".format(container_id,
                                                        str(e)))
