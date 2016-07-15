@@ -235,7 +235,9 @@ def app():
 
 @app.command()  # noqa
 @click.argument("image")
-@click.option('--verify/--no-verify', default=True)
+@click.option('--verify/--no-verify',
+              default=True,
+              help="Verify image name against docker.")
 @click.pass_context
 def create(ctx, image, verify):
     """Creates a new application for image IMAGE."""

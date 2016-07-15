@@ -18,6 +18,7 @@ Key provided features:
 
    deployment
    configuration
+   utilities
    design
    developer
    api
