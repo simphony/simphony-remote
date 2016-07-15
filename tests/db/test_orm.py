@@ -1,3 +1,4 @@
+import contextlib
 import os
 import unittest
 
@@ -132,30 +133,6 @@ class TestOrm(TempMixin, unittest.TestCase):
             res = orm.apps_for_user(session, None)
             self.assertEqual(len(res), 0)
 
-    def test_user_can_run(self):
-        db = Database(url="sqlite:///"+self.sqlite_file_path)
-        session = db.create_session()
-        fill_db(session)
-        with transaction(session):
-            # verify back population
-            users = session.query(orm.User).all()
-            applications = session.query(orm.Application).all()
-            policy = session.query(orm.ApplicationPolicy).first()
-
-            self.assertTrue(orm.user_can_run(session,
-                                             users[0],
-                                             applications[1],
-                                             policy))
-            self.assertFalse(orm.user_can_run(session,
-                                              users[0],
-                                              applications[0],
-                                              policy))
-
-            self.assertFalse(orm.user_can_run(session,
-                                              None,
-                                              applications[0],
-                                              policy))
-
 
 class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
                            unittest.TestCase):
@@ -194,7 +171,8 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
             url="sqlite:///"+self.sqlite_file_path)
 
         # Fill the database
-        fill_db(accounting.session)
+        with contextlib.closing(accounting.db.create_session()) as session:
+            fill_db(session)
 
         return accounting
 
@@ -203,8 +181,21 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
 
         user = accounting.get_user_by_name('user1')
         self.assertIsInstance(user, orm.User)
-        self.assertEqual(user.name, 'user1')
 
         # user not found, result should be None
         user = accounting.get_user_by_name('foo')
         self.assertIsNone(user)
+
+    def test_get_apps_for_user_across_sessions(self):
+        accounting = self.create_accounting()
+
+        # user is retrieved from one session
+        user = accounting.get_user_by_name('user1')
+
+        # apps is retrieved from another sessions
+        actual_app, actual_policy = accounting.get_apps_for_user(user)[0][1:]
+
+        expected_config = self.create_expected_configs(orm.User(name='user1'))
+
+        self.assertEqual(actual_app, expected_config[0][0])
+        self.assertEqual(actual_policy, expected_config[0][1])

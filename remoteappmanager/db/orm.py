@@ -2,11 +2,12 @@ import contextlib
 
 from sqlalchemy import (
     Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum,
-    literal, event)
+    event)
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm.exc import DetachedInstanceError
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.db.interfaces import ABCAccounting
@@ -156,17 +157,25 @@ class AppAccounting(ABCAccounting):
     def __init__(self, url, **kwargs):
         self.db = Database(url, **kwargs)
 
-        # We keep the same session for all transactions
-        # so that the session remains on one thread
-        self.session = self.db.create_session()
-
     def get_user_by_name(self, user_name):
         """ Return an orm.User given a user name.  Return None
         if the user name is not found in the database
         """
-        with transaction(self.session):
-            return self.session.query(User).filter_by(
-                name=user_name).one_or_none()
+        # We create a session here to make sure it is only
+        # used in one thread
+        with contextlib.closing(self.db.create_session()) as session:
+
+            with transaction(session):
+                user = session.query(User).filter_by(
+                    name=user_name).one_or_none()
+
+            # Removing internal references to the session is
+            # required such that the object is detached and
+            # can be reused in a different thread
+            if user:
+                session.expunge(user)
+
+        return user
 
     def get_apps_for_user(self, user):
         """ Return a tuple of tuples, each containing an application
@@ -185,18 +194,17 @@ class AppAccounting(ABCAccounting):
            The mapping_id is a unique string identifying the combination
            of application and policy. It is not unique per user.
         """
-        if user is None:
-            return ()
+        # We create a session here to make sure it is only
+        # used in one thread
+        with contextlib.closing(self.db.create_session()) as session:
+            result = apps_for_user(session, user)
 
-        with transaction(self.session):
-            res = self.session.query(Accounting).join(
-                Accounting.user, aliased=True).filter_by(
-                    name=user.name).all()
+            # Removing internal references to the session is
+            # required such that the objects can be reused
+            # in a different thread
+            session.expunge_all()
 
-        return tuple(("_".join((acc.application.image,
-                                str(acc.application_policy.id))),
-                      acc.application,
-                      acc.application_policy) for acc in res)
+        return result
 
 
 @contextlib.contextmanager
@@ -214,62 +222,39 @@ def transaction(session):
 
 
 def apps_for_user(session, user):
-    """Returns a list of tuples, each containing an application and the
+    """Returns a tuple of tuples, each containing an application and the
     associated policy that the specified orm user is allowed to run.
     If the user is None, the default is to return an empty list.
     The mapping_id is a unique string identifying the combination of
     application and policy. It is not unique per user.
-
     Parameters
     ----------
     session : Session
         The current session
     user : User or None
         the orm User, or None.
-
     Returns
     -------
-    A list of tuples (mapping_id, orm.Application, orm.ApplicationPolicy)
+    A tuple of tuples (mapping_id, orm.Application, orm.ApplicationPolicy)
     """
 
     if user is None:
-        return []
+        return ()
 
-    res = session.query(Accounting).filter(
-        Accounting.user == user).all()
+    try:
+        user_name = user.name
+    except DetachedInstanceError:
+        # If the orm.User object was obtained from
+        # another session and that it is detached
+        # we need to add it back so that we can refresh
+        # its attributes' value
+        session.add(user)
+        user_name = user.name
 
-    return [(acc.application.image + "_" + str(acc.application_policy.id),
-             acc.application,
-             acc.application_policy) for acc in res]
+    res = session.query(Accounting).join(
+        Accounting.user, aliased=True).filter_by(
+            name=user_name).all()
 
-
-def user_can_run(session, user, application, policy):
-    """Returns True if the user can run a given application with a specific
-    policy. False otherwise. Note that the user can be None.
-    In that case, returns False.
-
-    Parameters
-    ----------
-    session : Session
-        The current session
-    user : orm.User or None
-        the orm User, or None.
-    application : orm.Application
-        The application object
-    policy : orm.ApplicationPolicy
-        The application policy
-
-    Returns
-    -------
-    boolean
-
-    """
-    if user is None:
-        return False
-
-    query = session.query(Accounting) \
-        .filter(Accounting.user == user,
-                Accounting.application == application,
-                Accounting.application_policy == policy)
-
-    return session.query(literal(True)).filter(query.exists()).scalar()
+    return tuple((acc.application.image + "_" + str(acc.application_policy.id),
+                  acc.application,
+                  acc.application_policy) for acc in res)
