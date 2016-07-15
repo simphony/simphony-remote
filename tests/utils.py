@@ -251,7 +251,7 @@ arguments = {
     "user": "username",
     "port": 57022,
     "cookie-name": "jupyter-hub-token-username",
-    "base-url": "/user/username/",
+    "base-urlpath": "/user/username/",
     "hub-host": "",
     "hub-prefix": "/hub/",
     "hub-api-url": "http://172.17.5.167:8081/hub/api",
