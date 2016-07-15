@@ -1,7 +1,7 @@
 import os
 from datetime import timedelta
 
-from tornado import gen, httpclient
+from tornado import gen
 
 from remoteappmanager.docker.docker_labels import SIMPHONY_NS
 from remoteappmanager.handlers.home_handler import _wait_for_http_server_2xx

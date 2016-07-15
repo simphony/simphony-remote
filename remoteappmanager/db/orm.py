@@ -263,4 +263,3 @@ def apps_for_user(session, user):
                   ).hexdigest(),
                   acc.application,
                   acc.application_policy) for acc in res)
-
