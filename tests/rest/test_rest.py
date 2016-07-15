@@ -73,6 +73,12 @@ class Unprocessable(Resource):
         raise exceptions.UnprocessableRepresentation()
 
 
+class UnsupportsCollection(Resource):
+    @gen.coroutine
+    def items(self):
+        raise NotImplementedError()
+
+
 class TestREST(AsyncHTTPTestCase):
     def setUp(self):
         super().setUp()
@@ -84,6 +90,7 @@ class TestREST(AsyncHTTPTestCase):
         registry.registry.register(Student)
         registry.registry.register(UnsupportAll)
         registry.registry.register(Unprocessable)
+        registry.registry.register(UnsupportsCollection)
         app = web.Application(handlers=handlers)
         app.hub = mock.Mock()
         return app
@@ -317,6 +324,16 @@ class TestREST(AsyncHTTPTestCase):
                 body="{}"
             )
             self.assertEqual(res.code, httpstatus.UNPROCESSABLE_ENTITY)
+
+    def test_unsupports_collections(self):
+        with mock.patch("remoteappmanager.handlers.base_handler.BaseHandler"
+                        ".prepare",
+                        new_callable=utils.mock_coro_new_callable(
+                            side_effect=prepare_side_effect)):
+            res = self.fetch(
+                "/api/v1/unsupportscollections/",
+                method="GET")
+            self.assertEqual(res.code, httpstatus.METHOD_NOT_ALLOWED)
 
 
 class TestRESTFunctions(unittest.TestCase):
