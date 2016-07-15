@@ -120,15 +120,64 @@ class ContainerManager(LoggingMixin):
         """
         labels = {
             SIMPHONY_NS+"user": user_name,
-            SIMPHONY_NS+"mapping_id": mapping_id,
-        }
-
+            SIMPHONY_NS+"mapping_id": mapping_id}
         filters = {
-            'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]
-        }
+            'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]}
 
+        containers = yield self.containers_from_filters(filters=filters)
+        return containers
+
+    @gen.coroutine
+    def container_from_url_id(self, url_id):
+        """Retrieves and returns the container by its url_id, if present.
+        If not present, returns None.
+        """
+        labels = {SIMPHONY_NS+"url_id": url_id}
+        filters = {
+            'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]}
+
+        containers = yield self.containers_from_filters(filters=filters)
+        return containers[0] if len(containers) else None
+
+    @gen.coroutine
+    def containers_from_filters(self, filters):
+        """Returns the currently running containers for a given filter
+
+        Parameters
+        ----------
+        filters: dict
+            A dictionary of filters as in dockerpy
+
+        Return
+        ------
+        A list of Container objects, or an empty list if nothing is found.
+        """
+        containers = []
         infos = yield self.docker_client.containers(filters=filters)
-        return [Container.from_docker_containers_dict(info) for info in infos]
+        for info in infos:
+            try:
+                container = Container.from_docker_containers_dict(info)
+            except Exception:
+                self.log.exception("Unable to parse container info.")
+                continue
+
+            # override the ip and port obtained by the docker info with the
+            # appropriate ip and port, considering that we might be using a
+            # separate docker machine
+            try:
+                ip, port = yield from self._get_ip_and_port(
+                    container.docker_id)
+            except RuntimeError:
+                self.log.exception(
+                    "Unable to retrieve ip/port "
+                    "for container {}".format(container.docker_id))
+                continue
+
+            container.ip = ip
+            container.port = port
+            containers.append(container)
+
+        return containers
 
     @gen.coroutine
     def image(self, image_id_or_name):
@@ -301,13 +350,25 @@ class ContainerManager(LoggingMixin):
         Return
         ------
         A tuple (ip, port)
+
+        Raises
+        ------
+        RuntimeError:
+            If for some reason it cannot retrieve the information
         """
 
         # retrieve the actual port binding
-        resp = yield self.docker_client.port(container_id, self.container_port)
+        try:
+            resp = yield self.docker_client.port(container_id,
+                                                 self.container_port)
+        except Exception as e:
+            raise RuntimeError("Failed to get port info for {}. "
+                               "Exception: {}.".format(container_id,
+                                                       str(e)))
 
         if resp is None:
-            raise RuntimeError("Failed to get port info for %s" % container_id)
+            raise RuntimeError("Failed to get port info for {}. "
+                               "Port response was None.".format(container_id))
 
         # We assume we are running on linux without any additional docker
         # machine. The container will therefore be reachable at 127.0.0.1.
@@ -320,7 +381,13 @@ class ContainerManager(LoggingMixin):
             if url.scheme == 'tcp':
                 ip = url.hostname
 
-        port = int(resp[0]['HostPort'])
+        try:
+            port = int(resp[0]['HostPort'])
+        except (KeyError, IndexError, ValueError, TypeError) as e:
+            raise RuntimeError("Failed to get port info for {}. "
+                               "Exception: {}.".format(container_id,
+                                                       str(e)))
+
         return ip, port
 
     @gen.coroutine

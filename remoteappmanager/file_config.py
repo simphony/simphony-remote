@@ -1,5 +1,6 @@
 import tornado.options
-from traitlets import HasTraits, Int, Unicode, Bool
+from traitlets import HasTraits, Int, Unicode, Bool, Dict
+from traitlets.utils.sentinel import Sentinel
 
 from remoteappmanager import paths
 from remoteappmanager.traitlets import set_traits_from_dict
@@ -30,8 +31,13 @@ class FileConfig(HasTraits):
     docker_host = Unicode(default_value="",
                           help="The docker host to connect to")
 
-    db_url = Unicode(default_value="sqlite:///remoteappmanager.db",
-                     help="The url of the database, in sqlalchemy format.")
+    accounting_class = Unicode(
+        default_value="remoteappmanager.db.orm.AppAccounting",
+        help="The import path to a subclass of ABCAccounting.")
+
+    accounting_kwargs = Dict(
+        default_value={'url': 'sqlite:///remoteappmanager.db'},
+        help="The keyword arguments for initalising the Accounting instance")
 
     login_url = Unicode(default_value="/hub",
                         help=("The url to be redirected to if the user is not "
@@ -64,10 +70,19 @@ class FileConfig(HasTraits):
         file_line_parser = tornado.options.OptionParser()
 
         for traitlet_name, traitlet in self.traits().items():
+            # tornado.OptionParser defines an option with a Python type
+            # and performs type validation.
+            # traitlet.default_value may be a Sentinel value (e.g. Tuple,
+            # Dict, Instance), in which case we use the repr
+            default_value = traitlet.default_value
+
+            if type(default_value) is Sentinel:
+                default_value = eval(traitlet.default_value_repr())
+
             file_line_parser.define(
                 traitlet_name,
-                default=traitlet.default_value,
-                type=type(traitlet.default_value),
+                default=default_value,
+                type=type(default_value),
                 help=traitlet.help)
 
         # Let it raise the exception if the file is not there.

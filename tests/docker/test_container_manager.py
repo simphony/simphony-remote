@@ -53,12 +53,52 @@ class TestContainerManager(AsyncTestCase):
                              name='/remoteexec-image_3Alatest_user',
                              image_name='simphony/mayavi-4.4.4:latest',  # noqa
                              image_id='imageid',
-                             ip='0.0.0.0',
-                             port=80,
+                             ip='127.0.0.1',
+                             port=666,
                              url_id='url_id')
 
         self.assertEqual(len(result), 1)
         utils.assert_containers_equal(self, result[0], expected)
+
+    @gen_test
+    def test_containers_from_url_id(self):
+        ''' Test containers_for_mapping_id returns a list of Container '''
+        # The mock client mocks the output of docker Client.containers
+        docker_client = utils.mock_docker_client_with_running_containers()
+        self.mock_docker_client = docker_client
+        self.manager.docker_client.client = docker_client
+
+        result = yield self.manager.container_from_url_id("url_id")
+        expected = Container(docker_id='someid',
+                             mapping_id="mapping",
+                             name='/remoteexec-image_3Alatest_user',
+                             image_name='simphony/mayavi-4.4.4:latest',  # noqa
+                             image_id='imageid',
+                             ip='127.0.0.1',
+                             port=666,
+                             url_id='url_id')
+
+        utils.assert_containers_equal(self, result, expected)
+
+    @gen_test
+    def test_containers_from_url_id_exceptions(self):
+        ''' Test containers_for_mapping_id returns a list of Container '''
+        # The mock client mocks the output of docker Client.containers
+        docker_client = utils.mock_docker_client_with_running_containers()
+        docker_client.port = mock.Mock(side_effect=Exception("Boom!"))
+        self.mock_docker_client = docker_client
+        self.manager.docker_client.client = docker_client
+
+        result = yield self.manager.container_from_url_id("url_id")
+        self.assertEqual(result, None)
+
+        # Making it so that no valid dictionary is returned.
+        docker_client.port = mock.Mock(return_value=1234)
+        self.mock_docker_client = docker_client
+        self.manager.docker_client.client = docker_client
+
+        result = yield self.manager.container_from_url_id("url_id")
+        self.assertEqual(result, None)
 
     @gen_test
     def test_race_condition_spawning(self):
