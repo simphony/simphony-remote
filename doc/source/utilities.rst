@@ -1,7 +1,9 @@
+.. _utilities:
+
 Utilities
 =========
 
-Simphony remote comes with two utility scripts::
+Simphony remote comes with two utility scripts:
 
   - *remoteappdb*: Allows to add new applications, create new users, and
     specify permissions between users and applications in a database. 

@@ -67,7 +67,7 @@ class Container(HasTraits):
 
         Returns
         -------
-        container : Container
+        container : remoteappmanager.docker.container.Container
 
         Examples
         --------
