@@ -2,6 +2,7 @@ from unittest.mock import Mock, patch
 
 from remoteappmanager.restresources import Container
 from tests import utils
+from tests.mock.mock_reverse_proxy import MockReverseProxy
 from tornado import web, escape
 
 from remoteappmanager import rest
@@ -30,9 +31,7 @@ class TestContainer(AsyncHTTPTestCase):
         app.file_config.network_timeout = 5
         app.command_line_config = Mock()
         app.command_line_config.base_urlpath = "/"
-        app.reverse_proxy = Mock()
-        app.reverse_proxy.add_container = mock_coro_factory()
-        app.reverse_proxy.remove_container = mock_coro_factory()
+        app.reverse_proxy = MockReverseProxy()
         container = Mock()
         container.urlpath = "containers/12345"
         container.url_id = "12345"

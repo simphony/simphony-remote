@@ -16,9 +16,6 @@ class ReverseProxy(LoggingMixin, HasTraits):
     #: The authorization token to authenticate the request
     auth_token = Unicode()
 
-    #: The prefix for the url added to the passed object relative .url()
-    base_urlpath = Unicode('/')
-
     def __init__(self, *args, **kwargs):
         """Initializes the reverse proxy connection object."""
         super().__init__(*args, **kwargs)
@@ -30,14 +27,14 @@ class ReverseProxy(LoggingMixin, HasTraits):
             api_server=_server_from_url(self.endpoint_url)
         )
 
-        self.log.info("Reverse proxy setup on {} with base url {}".format(
+        self.log.info("Reverse proxy setup on {}".format(
             self.endpoint_url,
-            self.base_urlpath
         ))
 
     @gen.coroutine
     def register(self, urlpath, target_host_url):
-        """Register a given urlpath to redirect to a different target host
+        """Register a given urlpath to redirect to a different target host.
+        The operation is idempotent.
 
         Parameters
         ----------

@@ -7,10 +7,10 @@ from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.container_manager import ContainerManager
 from remoteappmanager.docker.image import Image
 from remoteappmanager.services.hub import Hub
-from remoteappmanager.services.reverse_proxy import ReverseProxy
 
 from remoteappmanager.application import Application
 from tests import utils
+from tests.mock.mock_reverse_proxy import MockReverseProxy
 from tests.temp_mixin import TempMixin
 
 
@@ -38,9 +38,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
         file_config.accounting_kwargs = {'url': "sqlite:///"+sqlite_file_path}
 
         app = Application(command_line_config, file_config)
-        app.reverse_proxy = mock.Mock(spec=ReverseProxy)
-        app.reverse_proxy.add_container = utils.mock_coro_factory("/")
-        app.reverse_proxy.remove_container = utils.mock_coro_factory()
+        app.reverse_proxy = MockReverseProxy()
         app.hub = mock.Mock(spec=Hub)
         app.hub.verify_token = utils.mock_coro_factory({
             'pending': None,
@@ -107,7 +105,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
                        ".HomeHandler"
                        ".redirect") as redirect:
 
-            self.assertFalse(self._app.reverse_proxy.add_container.called)
+            self.assertFalse(self._app.reverse_proxy.register.called)
             self.fetch("/user/username/",
                        method="POST",
                        headers={
@@ -115,7 +113,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
                        },
                        body=body)
 
-            self.assertTrue(self._app.reverse_proxy.add_container.called)
+            self.assertTrue(self._app.reverse_proxy.register.called)
             self.assertTrue(redirect.called)
 
     def test_post_failed_auth(self):
@@ -156,7 +154,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
                        },
                        body=body)
 
-            self.assertTrue(self._app.reverse_proxy.remove_container.called)
+            self.assertTrue(self._app.reverse_proxy.unregister.called)
             self.assertTrue(redirect.called)
 
     def test_post_view(self):
@@ -184,5 +182,5 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
                        },
                        body=body)
 
-            self.assertTrue(self._app.reverse_proxy.add_container.called)
+            self.assertTrue(self._app.reverse_proxy.register.called)
             self.assertTrue(redirect.called)

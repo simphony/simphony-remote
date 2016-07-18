@@ -104,7 +104,6 @@ class Application(web.Application, LoggingMixin):
         return ReverseProxy(
             endpoint_url=self.command_line_config.proxy_api_url,
             auth_token=auth_token,
-            base_urlpath=self.command_line_config.base_urlpath
         )
 
     @default("hub")
