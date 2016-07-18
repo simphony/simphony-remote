@@ -29,7 +29,7 @@ class TestContainer(AsyncHTTPTestCase):
         app.file_config = Mock()
         app.file_config.network_timeout = 5
         app.command_line_config = Mock()
-        app.command_line_config.base_url = "http://127.0.0.1:8000/"
+        app.command_line_config.base_urlpath = "/"
         app.reverse_proxy = Mock()
         app.reverse_proxy.add_container = mock_coro_factory()
         app.reverse_proxy.remove_container = mock_coro_factory()
