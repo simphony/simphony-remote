@@ -42,7 +42,7 @@ class ReverseProxy(LoggingMixin, HasTraits):
 
         Parameters
         ----------
-        container : Container
+        container : remoteappmanager.docker.container.Container
             A container object.
         """
         proxy = self._reverse_proxy
@@ -70,7 +70,7 @@ class ReverseProxy(LoggingMixin, HasTraits):
 
         Parameters
         ----------
-        container : Container
+        container : remoteappmanager.docker.container.Container
             A container object.
 
         Returns
