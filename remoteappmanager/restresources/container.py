@@ -36,7 +36,9 @@ class Container(Resource):
                                                 policy,
                                                 mapping_id)
         yield self._wait_for_container_ready(container)
-        yield self.application.reverse_proxy.add_container(container)
+        urlpath = app.urlpath_for_object(container)
+        yield self.application.reverse_proxy.register(urlpath,
+                                                      container.host_url)
 
         return container.url_id
 
@@ -61,7 +63,8 @@ class Container(Resource):
         if not container:
             raise exceptions.NotFound()
 
-        yield app.reverse_proxy.remove_container(container)
+        urlpath = app.urlpath_for_object(container)
+        yield app.reverse_proxy.unregister(urlpath)
         yield app.container_manager.stop_and_remove_container(
             container.docker_id)
 

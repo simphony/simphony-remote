@@ -19,6 +19,7 @@ from remoteappmanager.services.reverse_proxy import ReverseProxy
 from remoteappmanager import rest
 from remoteappmanager.rest import registry
 from remoteappmanager import restresources
+from remoteappmanager.utils import url_path_join
 
 
 class Application(web.Application, LoggingMixin):
@@ -148,6 +149,16 @@ class Application(web.Application, LoggingMixin):
         self.listen(self.command_line_config.port)
 
         tornado.ioloop.IOLoop.current().start()
+
+    def urlpath_for_object(self, object):
+        """
+        Resolves the absolute url path of a given object.
+        The object must have a urlpath property.
+        """
+
+        return url_path_join(
+            self.command_line_config.base_urlpath,
+            object.urlpath)
 
     # Private
     def _get_handlers(self):

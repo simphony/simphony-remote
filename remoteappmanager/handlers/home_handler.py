@@ -112,7 +112,9 @@ class HomeHandler(BaseHandler):
 
         # The server is up and running. Now contact the proxy and add
         # the container url to it.
-        urlpath = yield self.application.reverse_proxy.add_container(container)
+        urlpath = self.application.urlpath_for_object(container)
+        yield self.application.reverse_proxy.register(
+            urlpath, container.host_url)
 
         # Redirect the user
         self.log.info('Redirecting to {}'.format(urlpath))
@@ -136,7 +138,9 @@ class HomeHandler(BaseHandler):
         yield self._wait_for_container_ready(container)
 
         # in case the reverse proxy is not already set up
-        urlpath = yield self.application.reverse_proxy.add_container(container)
+        urlpath = self.application.urlpath_for_object(container)
+        yield self.application.reverse_proxy.register(
+            urlpath, container.host_url)
 
         self.log.info('Redirecting to {}'.format(urlpath))
         self.redirect(urlpath)
@@ -155,13 +159,8 @@ class HomeHandler(BaseHandler):
             self.finish("Unable to view the application")
             return
 
-        try:
-            yield app.reverse_proxy.remove_container(container)
-        except HTTPError as http_error:
-            # The reverse proxy may be absent to start with
-            if http_error.code != 404:
-                raise http_error
-
+        urlpath = app.urlpath_for_object(container)
+        yield app.reverse_proxy.unregister(urlpath)
         yield container_manager.stop_and_remove_container(container.docker_id)
 
         # We don't have fancy stuff at the moment to change the button, so
