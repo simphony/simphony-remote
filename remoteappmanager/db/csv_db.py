@@ -44,6 +44,7 @@ Note
 """
 
 import csv
+import hashlib
 
 from remoteappmanager.db.interfaces import (
     ABCAccounting, ABCApplication, ABCApplicationPolicy)
@@ -132,9 +133,11 @@ class CSVAccounting(ABCAccounting):
 
                 # Save the configuration
                 # Note that we don't filter existing duplicate entry
+                mapping_id_prehex = '_'.join((application.image, str(count)))
                 self.all_records.setdefault(username, []).append(
-                    ('_'.join((application.image, str(count))),
-                     application, application_policy))
+                    (hashlib.md5(mapping_id_prehex.encode('u8')).hexdigest(),
+                     application,
+                     application_policy))
 
     def get_user_by_name(self, user_name):
         """ Return a CSVUser for a given user_name, or return

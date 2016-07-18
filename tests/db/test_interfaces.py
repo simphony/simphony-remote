@@ -27,9 +27,9 @@ class Accounting(ABCAccounting):
         return User(name=username)
 
     def get_apps_for_user(self, user):
-        return (('mapping_id1',
+        return (('abc1',
                  Application(image=user.name+'1'), ApplicationPolicy()),
-                ('mapping_id2',
+                ('abc2',
                  Application(image=user.name+'2'), ApplicationPolicy()))
 
 
