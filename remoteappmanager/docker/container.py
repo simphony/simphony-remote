@@ -67,7 +67,7 @@ class Container(HasTraits):
 
         Returns
         -------
-        container : Container
+        container : docker.container.Container
 
         Examples
         --------
