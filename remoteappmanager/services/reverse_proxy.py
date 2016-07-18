@@ -5,7 +5,6 @@ from jupyterhub import orm as jupyterhub_orm
 from traitlets import HasTraits, Unicode
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
-from remoteappmanager.utils import url_path_join
 
 
 class ReverseProxy(LoggingMixin, HasTraits):
@@ -16,9 +15,6 @@ class ReverseProxy(LoggingMixin, HasTraits):
 
     #: The authorization token to authenticate the request
     auth_token = Unicode()
-
-    #: The prefix for the url added to the passed object relative .url()
-    base_urlpath = Unicode('/')
 
     def __init__(self, *args, **kwargs):
         """Initializes the reverse proxy connection object."""
@@ -31,72 +27,58 @@ class ReverseProxy(LoggingMixin, HasTraits):
             api_server=_server_from_url(self.endpoint_url)
         )
 
-        self.log.info("Reverse proxy setup on {} with base url {}".format(
+        self.log.info("Reverse proxy setup on {}".format(
             self.endpoint_url,
-            self.base_urlpath
         ))
 
     @gen.coroutine
-    def remove_container(self, container):
-        """Removes a container from the reverse proxy at the associated url.
+    def register(self, urlpath, target_host_url):
+        """Register a given urlpath to redirect to a different target host.
+        The operation is idempotent.
 
         Parameters
         ----------
-        container : remoteappmanager.docker.container.Container
-            A container object.
-        """
-        proxy = self._reverse_proxy
+        urlpath: str
+            The absolute path of the url (e.g. /my/internal/service/)"
 
-        urlpath = url_path_join(self.base_urlpath, container.urlpath)
-        self.log.info("Unregistering url {} to {} on reverse proxy.".format(
+        target_host_url:
+            The host to redirect to, e.g. http://127.0.0.1:31233/service/
+        """
+        self.log.info("Registering {} redirection to {}".format(
             urlpath,
-            container.host_url
-        ))
+            target_host_url))
+
+        yield self._reverse_proxy.api_request(
+            urlpath,
+            method='POST',
+            body=dict(
+                target=target_host_url,
+            )
+        )
+
+    @gen.coroutine
+    def unregister(self, urlpath):
+        """Unregisters a previously registered urlpath.
+        If the urlpath is not found in the reverse proxy, it will not raise
+        an error, but it will log the unexpected circumstance.
+
+        Parameters
+        ----------
+        urlpath: str
+            The absolute path of the url (e.g. /my/internal/service/"
+        """
+        self.log.info("Deregistering {} redirection".format(urlpath))
 
         try:
-            yield proxy.api_request(urlpath, method='DELETE')
+            yield self._reverse_proxy.api_request(urlpath, method='DELETE')
         except httpclient.HTTPError as e:
             if e.code == 404:
                 self.log.warning("Could not find urlpath {} when removing"
                                  " container. In any case, the reverse proxy"
                                  " does not map the url. Continuing".format(
-                                    urlpath))
+                                     urlpath))
             else:
                 raise e
-
-    @gen.coroutine
-    def add_container(self, container):
-        """Adds the url associated to a given container on the reverse proxy.
-
-        Parameters
-        ----------
-        container : remoteappmanager.docker.container.Container
-            A container object.
-
-        Returns
-        -------
-        urlpath : str
-            The absolute url path of the container as registered on the reverse
-            proxy.
-        """
-
-        proxy = self._reverse_proxy
-        urlpath = url_path_join(self.base_urlpath, container.urlpath)
-
-        self.log.info("Registering url {} to {} on reverse proxy.".format(
-            urlpath,
-            container.host_url
-        ))
-
-        yield proxy.api_request(
-            urlpath,
-            method='POST',
-            body=dict(
-                target=container.host_url,
-            )
-        )
-
-        return urlpath
 
 
 def _server_from_url(url):

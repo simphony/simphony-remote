@@ -36,7 +36,11 @@ class Container(Resource):
                                                 policy,
                                                 mapping_id)
         yield self._wait_for_container_ready(container)
-        yield self.application.reverse_proxy.add_container(container)
+        urlpath = url_path_join(
+            self.application.command_line_config.base_urlpath,
+            container.urlpath)
+        yield self.application.reverse_proxy.register(urlpath,
+                                                      container.host_url)
 
         return container.url_id
 
@@ -56,13 +60,15 @@ class Container(Resource):
     @gen.coroutine
     def delete(self, identifier):
         """Stop the container."""
-        app = self.application
         container = yield self._container_from_url_id(identifier)
         if not container:
             raise exceptions.NotFound()
 
-        yield app.reverse_proxy.remove_container(container)
-        yield app.container_manager.stop_and_remove_container(
+        urlpath = url_path_join(
+            self.application.command_line_config.base_urlpath,
+            container.urlpath)
+        yield self.application.reverse_proxy.unregister(urlpath)
+        yield self.application.container_manager.stop_and_remove_container(
             container.docker_id)
 
     @gen.coroutine
