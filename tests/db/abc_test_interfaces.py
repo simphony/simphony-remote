@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABCMeta
 import inspect as _inspect
+import string
 
 from remoteappmanager.db.interfaces import ABCApplication, ABCApplicationPolicy
 
@@ -80,7 +81,7 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
 
     def test_get_apps_for_user_mapping_id_rest_compliant(self):
         ''' Test if the mapping_id to be rest identifier complient '''
-        allowed_chars = set('0123456789abcdef')
+        allowed_chars = set(string.ascii_letters+string.digits)
         accounting = self.create_accounting()
 
         for user in self.create_expected_users():
