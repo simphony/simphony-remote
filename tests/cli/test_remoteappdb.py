@@ -25,8 +25,20 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
 
         return result.exit_code, result.output
 
+    def test_is_sqlitedb_url(self):
+        self.assertTrue(remoteappdb.is_sqlitedb_url("sqlite://foo.db"))
+        self.assertFalse(remoteappdb.is_sqlitedb_url("whatever://foo.db"))
+
+    def test_sqlite_present(self):
+        self.assertTrue(remoteappdb.sqlitedb_present(self.db))
+        self.assertFalse(remoteappdb.sqlitedb_present(self.db+"whatever"))
+
     def test_init_command(self):
         self.assertTrue(os.path.exists(self.db))
+
+        # This should fail because the database is already present
+        exit_code, output = self._remoteappdb("init")
+        self.assertNotEqual(exit_code, 0)
 
     def test_user_create(self):
         _, out = self._remoteappdb("user create foo")
@@ -174,3 +186,14 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         _, out = self._remoteappdb("user list --show-apps --no-decoration")
         self.assertEqual(len(out.split('\n')), 2)
         self.assertNotIn("myapp", out)
+
+    def test_commands_noinit(self):
+        # Remove the conveniently setup database
+        os.remove(self.db)
+
+        exit_code, out = self._remoteappdb("user create foo")
+        self.assertNotEqual(exit_code, 0)
+
+        exit_code, out = self._remoteappdb("app create foo")
+        self.assertNotEqual(exit_code, 0)
+

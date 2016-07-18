@@ -94,6 +94,22 @@ def get_docker_client():
     return client
 
 
+def is_sqlitedb_url(db_url):
+    return db_url.startswith("sqlite:///")
+
+
+def sqlitedb_present(db_url):
+    """Checks if the db url is present.
+    Remote urls are always assumed to be present, so this method
+    concerns mostly sqlite databases."""
+
+    if not db_url.startswith("sqlite:///"):
+        raise ValueError("db_url does not refer to a sqlite database.")
+
+    path = sqlite_url_to_path(db_url)
+    return os.path.exists(path)
+
+
 class RemoteAppDBContext(object):
     def __init__(self, db_url):
         db_url = normalise_to_url(db_url)
@@ -120,11 +136,9 @@ def init(ctx):
     db_url = db.url
 
     # Check if the database already exists
-    if db_url.startswith("sqlite:///"):
-        path = sqlite_url_to_path(db_url)
-        if os.path.exists(path):
-            raise click.UsageError("Refusing to overwrite database "
-                                   "at {}".format(db_url))
+    if is_sqlitedb_url(db_url) and sqlitedb_present(db_url):
+        raise click.UsageError("Refusing to overwrite database "
+                               "at {}".format(db_url))
     db.reset()
 
 
@@ -133,9 +147,14 @@ def init(ctx):
 
 
 @cli.group()
-def user():
+@click.pass_context
+def user(ctx):
     """Subcommand to manage users."""
-    pass
+    db = ctx.obj.db
+    db_url = db.url
+
+    if is_sqlitedb_url(db_url) and not sqlitedb_present(db_url):
+        raise click.UsageError("Could not find database at {}".format(db_url))
 
 
 @user.command()
@@ -228,9 +247,14 @@ def list(ctx, no_decoration, show_apps):
 
 
 @cli.group()
-def app():
+@click.pass_context
+def app(ctx):
     """Subcommand to manage applications."""
-    pass
+    db = ctx.obj.db
+    db_url = db.url
+
+    if is_sqlitedb_url(db_url) and not sqlitedb_present(db_url):
+        raise click.UsageError("Could not find database at {}".format(db_url))
 
 
 @app.command()  # noqa
