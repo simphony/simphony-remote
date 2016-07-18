@@ -29,6 +29,7 @@ class TestContainer(AsyncHTTPTestCase):
         app = web.Application(handlers=handlers)
         app.file_config = Mock()
         app.file_config.network_timeout = 5
+        app.urlpath_for_object = Mock(return_value="/urlpath_for_object/")
         app.command_line_config = Mock()
         app.command_line_config.base_urlpath = "/"
         app.reverse_proxy = MockReverseProxy()
