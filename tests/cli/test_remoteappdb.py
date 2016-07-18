@@ -196,4 +196,3 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
 
         exit_code, out = self._remoteappdb("app create foo")
         self.assertNotEqual(exit_code, 0)
-
