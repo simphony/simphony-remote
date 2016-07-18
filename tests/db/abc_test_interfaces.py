@@ -77,3 +77,24 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
 
             if temp:
                 self.fail('These are not expected: {}'.format(temp))
+
+    def test_get_apps_for_user_mapping_id_rest_compliant(self):
+        ''' Test if the mapping_id to be rest identifier complient '''
+        allowed_chars = set('0123456789abcdef')
+        accounting = self.create_accounting()
+
+        for user in self.create_expected_users():
+            # should be ((mapping_id, Application, ApplicationPolicy),
+            #            (mapping_id, Application, ApplicationPolicy) ... )
+            actual_id_configs = accounting.get_apps_for_user(user)
+
+            if not actual_id_configs:
+                continue
+
+            mapping_ids, _, _ = zip(*actual_id_configs)
+
+            self.assertFalse(
+                any(set(mapping_id) - allowed_chars
+                    for mapping_id in mapping_ids),
+                "mapping id should contain these characters only: {} "
+                "Got : {}".format(allowed_chars, mapping_ids))
