@@ -112,7 +112,9 @@ class HomeHandler(BaseHandler):
 
         # The server is up and running. Now contact the proxy and add
         # the container url to it.
-        urlpath = self.application.urlpath_for_object(container)
+        urlpath = url_path_join(
+            self.application.command_line_config.base_urlpath,
+            container.urlpath)
         yield self.application.reverse_proxy.register(
             urlpath, container.host_url)
 
@@ -138,7 +140,9 @@ class HomeHandler(BaseHandler):
         yield self._wait_for_container_ready(container)
 
         # in case the reverse proxy is not already set up
-        urlpath = self.application.urlpath_for_object(container)
+        urlpath = url_path_join(
+            self.application.command_line_config.base_urlpath,
+            container.urlpath)
         yield self.application.reverse_proxy.register(
             urlpath, container.host_url)
 
@@ -159,7 +163,9 @@ class HomeHandler(BaseHandler):
             self.finish("Unable to view the application")
             return
 
-        urlpath = app.urlpath_for_object(container)
+        urlpath = url_path_join(
+            self.application.command_line_config.base_urlpath,
+            container.urlpath)
         yield app.reverse_proxy.unregister(urlpath)
         yield container_manager.stop_and_remove_container(container.docker_id)
 
