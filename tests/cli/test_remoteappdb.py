@@ -26,12 +26,14 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         return result.exit_code, result.output
 
     def test_is_sqlitedb_url(self):
-        self.assertTrue(remoteappdb.is_sqlitedb_url("sqlite://foo.db"))
-        self.assertFalse(remoteappdb.is_sqlitedb_url("whatever://foo.db"))
+        self.assertTrue(remoteappdb.is_sqlitedb_url("sqlite:///foo.db"))
+        self.assertFalse(remoteappdb.is_sqlitedb_url("whatever:///foo.db"))
 
     def test_sqlite_present(self):
-        self.assertTrue(remoteappdb.sqlitedb_present(self.db))
-        self.assertFalse(remoteappdb.sqlitedb_present(self.db+"whatever"))
+        self.assertTrue(remoteappdb.sqlitedb_present(
+            "sqlite:///"+self.db))
+        self.assertFalse(remoteappdb.sqlitedb_present(
+            "sqlite:///"+self.db+"whatever"))
 
     def test_init_command(self):
         self.assertTrue(os.path.exists(self.db))

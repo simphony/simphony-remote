@@ -104,7 +104,8 @@ def sqlitedb_present(db_url):
     concerns mostly sqlite databases."""
 
     if not db_url.startswith("sqlite:///"):
-        raise ValueError("db_url does not refer to a sqlite database.")
+        raise ValueError("db_url {} does not refer to a "
+                         "sqlite database.".format(db_url))
 
     path = sqlite_url_to_path(db_url)
     return os.path.exists(path)
