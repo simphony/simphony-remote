@@ -92,10 +92,8 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
             if not actual_id_configs:
                 continue
 
-            mapping_ids, _, _ = zip(*actual_id_configs)
-
-            self.assertFalse(
-                any(set(mapping_id) - allowed_chars
-                    for mapping_id in mapping_ids),
-                "mapping id should contain these characters only: {} "
-                "Got : {}".format(allowed_chars, mapping_ids))
+            for mapping_id, _, _ in actual_id_configs:
+                self.assertFalse(
+                    set(mapping_id) - allowed_chars,
+                    "mapping id should contain these characters only: {} "
+                    "Got : {}".format(allowed_chars, mapping_id))
