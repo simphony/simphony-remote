@@ -11,27 +11,14 @@ Deployment of the complete system in a single machine/VM.
    The following instructions assume a clean up-to-date ubuntu 14.04
    system.
 
-#. Install dependencies::
-
-     sudo apt-get install npm nodejs-legacy python3-pip python3.4-venv
-     sudo npm install -g configurable-http-proxy
-
-#. Install the single user session manager::
+#. Retrieve the single user session manager::
 
      git clone https://github.com/simphony/simphony-remote
 
-#. Create a venv, activate it::
+#. Install dependencies. This will install the dependencies and create
+   a virtual environment for additional deployment::
 
-     cd simphony-remote
-     python3 -mvenv venv
-     . venv/bin/activate
-     pip3 install docker-py
-     python3 setup.py install (or develop)
-
-
-   .. note::
-      Install docker-py with pip due to
-      incorrect setup.py not handling python > 3.3
+     make deps
 
 #. Generate the SSL certificates if you do not already have them. The
    resulting certificates will have names test.* because they are
@@ -43,13 +30,11 @@ Deployment of the complete system in a single machine/VM.
 
    Once created the certificates, copy them to the jupyterhub directory::
 
-     cd ../scripts
-     sh generate_certificate.sh
-     cp test.* ../jupyterhub/
+     make certs
 
 #. Create the database. By default, this is a sqlite file::
 
-     remoteappdb --db=~/remoteappmanager.db init
+     make db
 
 #. Change dir into jupyterhub::
 
@@ -65,6 +50,10 @@ Compatible docker containers can be found in DockerHub. Refer to the documentati
 of `simphony-remote-docker <https://github.com/simphony/simphony-remote-docker>`_ 
 repository to deploy the images.
 
+Once installed, use the `remoteappdb` program to create users, applications,
+and authorize users to start applications. Refer to the :ref:`utilities`
+section for details on the use of this program.
+
 Start JupyterHub
 ----------------
 
@@ -75,5 +64,17 @@ Start JupyterHub
    .. note::
       If you want to keep the application running, use screen to start
       a detachable terminal.
+
+   .. note::
+      Running on OSX or with a separate docker machine requires that the
+      appropriate environment variables are set before starting jupyterhub.
+      refer to the command `docker-machine env` to setup the appropriate
+      environment. In general, invoking::
+
+            eval `docker-machine env`
+
+      will enable the appropriate environment.
+      On Linux, by default the host machine and the docker machine coincide,
+      so this step is not needed.
 
 #. JupyterHub is now running at https://localhost:8000
