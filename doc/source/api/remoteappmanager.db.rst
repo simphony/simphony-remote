@@ -4,6 +4,14 @@ remoteappmanager.db package
 Submodules
 ----------
 
+remoteappmanager.db.csv_db module
+---------------------------------
+
+.. automodule:: remoteappmanager.db.csv_db
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 remoteappmanager.db.interfaces module
 -------------------------------------
 
@@ -16,14 +24,6 @@ remoteappmanager.db.orm module
 ------------------------------
 
 .. automodule:: remoteappmanager.db.orm
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-remoteappmanager.db.csv_db module
----------------------------------
-
-.. automodule:: remoteappmanager.db.csv_db
     :members:
     :undoc-members:
     :show-inheritance:

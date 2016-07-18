@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
 
     remoteappmanager.cli.remoteappdb
+    remoteappmanager.cli.remoteapprest
 
 Module contents
 ---------------
