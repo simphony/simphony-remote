@@ -202,7 +202,7 @@ class Container(Resource):
         server_url = "http://{}:{}{}/".format(
             container.ip,
             container.port,
-            url_path_join(self.application.command_line_config.base_url,
+            url_path_join(self.application.command_line_config.base_urlpath,
                           container.urlpath))
 
         yield _wait_for_http_server_2xx(
