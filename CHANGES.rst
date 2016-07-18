@@ -1,6 +1,31 @@
 SimPhoNy Remote CHANGELOG
 =========================
 
+What's new in SimPhoNy Remote 0.4.0
+-----------------------------------
+
+Summary
+~~~~~~~
+
+- Experimental REST API and CLI program to control containers from the
+  command line (#7)
+- Support for arbitrary database implementations (#66)
+- Added remoteappdb `--verify` option to check against the docker repo for
+  matching images (#58)
+- Enabled Foreign Key and on cascade delete for sqlite database (#56)
+- Introduced makefile for basic deployment tasks (#68)
+- User.orm_user is now User.account (#67)
+- Asynchronous user verification with the jupyter hub is now in place (#37)
+- Consistently differentiate between url and urlpath in parameters, where
+  possible (#54)
+- Container.host_url now checks for None port (#63)
+- Isolated sqlalchemy sessions for the base handler (#71)
+- verify_token now returns a dictionary with user details. (#77)
+- Bug: ui_names no longer appearing (#64)
+- Bug: test error for sqlalchemy usage with multiple threads. (#99)
+- Bug: fixed test error message relative to unclosed files. (#60)
+
+
 What's new in SimPhoNy Remote 0.3.0
 -----------------------------------
 
