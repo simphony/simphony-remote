@@ -95,6 +95,7 @@ def get_docker_client():
 
 
 def is_sqlitedb_url(db_url):
+    """Returns True if the url refers to a sqlite database"""
     return db_url.startswith("sqlite:///")
 
 
