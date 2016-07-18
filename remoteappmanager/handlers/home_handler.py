@@ -1,6 +1,5 @@
 import socket
 import os
-import uuid
 from datetime import timedelta
 
 import errno
@@ -45,12 +44,11 @@ class HomeHandler(BaseHandler):
 
         try:
             yield handler(options)
-        except Exception as e:
+        except Exception as exc:
             # Create a random reference number for support
-            ref = str(uuid.uuid1())
-            self.log.exception("Failed with POST action: {0}. {1} "
-                               "Ref: {2}".format(
-                                   action, str(e), ref))
+            ref = self.log.issue(
+                "Failed with POST action {}".format(action),
+                exc)
 
             images_info = yield self._get_images_info()
 
@@ -63,7 +61,7 @@ class HomeHandler(BaseHandler):
                         images_info=images_info,
                         error_message=message.format(
                             action=action,
-                            error_type=type(e).__name__,
+                            error_type=type(exc).__name__,
                             ref=ref))
 
     # Subhandling after post
