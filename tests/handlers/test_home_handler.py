@@ -2,12 +2,6 @@ import os
 import urllib.parse
 from unittest import mock
 
-from remoteappmanager.db.interfaces import ABCAccounting
-from remoteappmanager.docker.container import Container
-from remoteappmanager.docker.container_manager import ContainerManager
-from remoteappmanager.docker.image import Image
-from remoteappmanager.services.hub import Hub
-from remoteappmanager.application import Application
 from tests import utils
 from tests.mocking import dummy
 from tests.temp_mixin import TempMixin
@@ -29,39 +23,12 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
         super().setUp()
 
     def get_app(self):
-        sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
-        utils.init_sqlite_db(sqlite_file_path)
-
-        command_line_config = utils.basic_command_line_config()
-        file_config = utils.basic_file_config()
-        file_config.accounting_kwargs = {'url': "sqlite:///"+sqlite_file_path}
-
-        app = Application(command_line_config, file_config)
-        app.reverse_proxy = dummy.create_reverse_proxy()
-        app.hub = mock.Mock(spec=Hub)
-        app.hub.verify_token = utils.mock_coro_factory({
+        app = dummy.create_application()
+        app.hub.verify_token.return_value = {
             'pending': None,
-            'name': command_line_config.user,
+            'name': app.settings['user'],
             'admin': False,
-            'server': command_line_config.base_urlpath})
-        app.db = mock.Mock(spec=ABCAccounting)
-        app.container_manager = mock.Mock(spec=ContainerManager)
-        app.container_manager.start_container = \
-            utils.mock_coro_factory(Container())
-        app.container_manager.image = utils.mock_coro_factory(Image)
-        app.container_manager.containers_from_mapping_id = \
-            utils.mock_coro_factory([Container()])
-        app.container_manager.container_from_url_id = \
-            utils.mock_coro_factory(Container())
-        app.container_manager.stop_and_remove_container = \
-            utils.mock_coro_factory()
-
-        mock_application = mock.Mock()
-        mock_policy = mock.Mock()
-        app.db.get_apps_for_user.return_value = (("12345",
-                                                  mock_application,
-                                                  mock_policy,
-                                                  ),)
+            'server': app.settings['base_urlpath']}
         return app
 
     def test_home(self):
