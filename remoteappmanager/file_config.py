@@ -56,6 +56,9 @@ class FileConfig(HasTraits):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Sets the default of the docker configuration options from the
+        # current environment. These will possibly be overridded by
+        # the appropriate entries in the configuration file
         config = docker.utils.kwargs_from_env()
         tls_config = config.get("tls")
 
@@ -121,15 +124,16 @@ class FileConfig(HasTraits):
     def docker_config(self):
         """Extracts the docker configuration as a dictionary suitable
         to be passed as keywords to the docker client"""
-        params = dict(
-            base_url=self.docker_host,
-            tls=tls.TLSConfig(
+        params = {}
+
+        params["base_url"] = self.docker_host
+        if self.tls_verify:
+            params["tls"] = tls.TLSConfig(
                 client_cert=(self.tls_cert, self.tls_key),
                 ca_cert=self.tls_ca,
                 verify=self.tls_verify,
                 ssl_version="auto",
                 assert_hostname=True,
-            )
-        )
+                )
 
         return params
