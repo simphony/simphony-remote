@@ -71,8 +71,8 @@ class FileConfig(HasTraits):
         if tls_config is not None:
             self.tls_verify = tls_config.verify
             self.tls_ca = tls_config.ca_cert
-            self.tls_cert = tls_config.client_cert[0]
-            self.tls_key = tls_config.client_cert[1]
+            self.tls_cert = tls_config.cert[0]
+            self.tls_key = tls_config.cert[1]
 
         self.docker_host = config.get("base_url", 'unix://var/run/docker.sock')
 
@@ -116,7 +116,7 @@ class FileConfig(HasTraits):
                 'Could not find specified configuration'
                 ' file "{}"'.format(config_file))
 
-        set_traits_from_dict(self, file_line_parser)
+        set_traits_from_dict(self, file_line_parser.as_dict())
 
     def docker_config(self):
         """Extracts the docker configuration as a dictionary suitable

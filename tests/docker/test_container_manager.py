@@ -13,9 +13,9 @@ from tests import utils
 class TestContainerManager(AsyncTestCase):
     def setUp(self):
         super().setUp()
-        self.manager = ContainerManager()
+        self.manager = ContainerManager({})
         self.mock_docker_client = utils.mock_docker_client()
-        self.manager.docker_client.client = self.mock_docker_client
+        self.manager.docker_client._sync_client = self.mock_docker_client
 
     def test_instantiation(self):
         self.assertIsNotNone(self.manager.docker_client)
@@ -44,7 +44,7 @@ class TestContainerManager(AsyncTestCase):
         # The mock client mocks the output of docker Client.containers
         docker_client = utils.mock_docker_client_with_running_containers()
         self.mock_docker_client = docker_client
-        self.manager.docker_client.client = docker_client
+        self.manager.docker_client._sync_client = docker_client
 
         result = yield self.manager.containers_from_mapping_id("user",
                                                                "mapping")
@@ -66,7 +66,7 @@ class TestContainerManager(AsyncTestCase):
         # The mock client mocks the output of docker Client.containers
         docker_client = utils.mock_docker_client_with_running_containers()
         self.mock_docker_client = docker_client
-        self.manager.docker_client.client = docker_client
+        self.manager.docker_client._sync_client = docker_client
 
         result = yield self.manager.container_from_url_id("url_id")
         expected = Container(docker_id='someid',
@@ -87,7 +87,7 @@ class TestContainerManager(AsyncTestCase):
         docker_client = utils.mock_docker_client_with_running_containers()
         docker_client.port = mock.Mock(side_effect=Exception("Boom!"))
         self.mock_docker_client = docker_client
-        self.manager.docker_client.client = docker_client
+        self.manager.docker_client._sync_client = docker_client
 
         result = yield self.manager.container_from_url_id("url_id")
         self.assertEqual(result, None)
@@ -95,7 +95,7 @@ class TestContainerManager(AsyncTestCase):
         # Making it so that no valid dictionary is returned.
         docker_client.port = mock.Mock(return_value=1234)
         self.mock_docker_client = docker_client
-        self.manager.docker_client.client = docker_client
+        self.manager.docker_client._sync_client = docker_client
 
         result = yield self.manager.container_from_url_id("url_id")
         self.assertEqual(result, None)
@@ -127,7 +127,7 @@ class TestContainerManager(AsyncTestCase):
     def test_start_already_present_container(self):
         mock_client = \
             utils.mock_docker_client_with_existing_stopped_container()
-        self.manager.docker_client.client = mock_client
+        self.manager.docker_client._sync_client = mock_client
 
         result = yield self.manager.start_container(
             "vagrant",
@@ -178,7 +178,8 @@ class TestContainerManager(AsyncTestCase):
                                            volumes)
 
         # Call args and keyword args that create_container receives
-        args = self.manager.docker_client.client.create_container.call_args
+        docker_client = self.manager.docker_client
+        args = docker_client._sync_client.create_container.call_args
         actual_volume_targets = args[1]['volumes']
 
         # Invalid volume paths should have been filtered away

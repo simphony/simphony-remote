@@ -2,7 +2,6 @@ from concurrent.futures import ThreadPoolExecutor
 
 import docker
 import functools
-from docker.utils import kwargs_from_env
 
 # Common threaded executor for asynchronous jobs.
 # Required for the AsyncDockerClient to operate.
@@ -30,16 +29,13 @@ class AsyncDockerClient:
 
         Note that the executor is a ThreadPoolExecutor with a single thread.
         """
-        self.client = docker.Client(*args, **kwargs)
+        self._sync_client = docker.Client(*args, **kwargs)
 
     def __getattr__(self, attr):
         """Returns the docker client method, wrapped in an async execution
         environment. The returned method must be used in conjunction with
         the yield keyword."""
-        if self.client is None:
-            self._init_client()
-
-        if hasattr(self.client, attr):
+        if hasattr(self._sync_client, attr):
             return functools.partial(self._submit_to_executor, attr)
         else:
             raise AttributeError(
@@ -74,5 +70,5 @@ class AsyncDockerClient:
         """wrapper for calling docker methods to be passed to
         ThreadPoolExecutor.
         """
-        m = getattr(self.client, method)
+        m = getattr(self._sync_client, method)
         return m(*args, **kwargs)

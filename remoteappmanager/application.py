@@ -10,7 +10,6 @@ from remoteappmanager.db.interfaces import ABCAccounting
 from remoteappmanager.handlers.api import HomeHandler
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.docker.container_manager import ContainerManager
-from remoteappmanager.docker.docker_client_config import DockerClientConfig
 from remoteappmanager.jinja2_adapters import Jinja2LoaderAdapter
 from remoteappmanager.user import User
 from remoteappmanager.traitlets import as_dict
