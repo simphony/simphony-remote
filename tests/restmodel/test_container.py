@@ -1,14 +1,14 @@
 from unittest.mock import Mock, patch
 
 from remoteappmanager.restresources import Container
-from tests import utils
-from tests.mock.mock_reverse_proxy import MockReverseProxy
 from tornado import web, escape
 
 from remoteappmanager import rest
 from remoteappmanager.rest import registry, httpstatus
 
-from tests.utils import AsyncHTTPTestCase, mock_coro_factory
+from tests.utils import (AsyncHTTPTestCase, mock_coro_factory,
+                         mock_coro_new_callable, containers_dict)
+from tests.mocking.dummy.reverse_proxy import create_reverse_proxy
 
 
 class TestContainer(AsyncHTTPTestCase):
@@ -20,7 +20,7 @@ class TestContainer(AsyncHTTPTestCase):
             user.account = Mock()
             args[0].current_user = user
 
-        self.mock_prepare = utils.mock_coro_new_callable(
+        self.mock_prepare = mock_coro_new_callable(
             side_effect=prepare_side_effect)
 
     def get_app(self):
@@ -32,7 +32,7 @@ class TestContainer(AsyncHTTPTestCase):
         app.urlpath_for_object = Mock(return_value="/urlpath_for_object/")
         app.command_line_config = Mock()
         app.command_line_config.base_urlpath = "/"
-        app.reverse_proxy = MockReverseProxy()
+        app.reverse_proxy = create_reverse_proxy()
         container = Mock()
         container.urlpath = "containers/12345"
         container.url_id = "12345"
@@ -103,7 +103,7 @@ class TestContainer(AsyncHTTPTestCase):
                    ".restresources"
                    ".container"
                    "._wait_for_http_server_2xx",
-                   new_callable=utils.mock_coro_factory):
+                   new_callable=mock_coro_factory):
 
             res = self.fetch(
                 "/api/v1/containers/",
@@ -131,7 +131,7 @@ class TestContainer(AsyncHTTPTestCase):
             self.assertEqual(res.code, httpstatus.NOT_FOUND)
 
             self._app.container_manager.docker_client.containers = \
-                mock_coro_factory(return_value=[utils.containers_dict()])
+                mock_coro_factory(return_value=[containers_dict()])
 
             # The url is not important. The replacement of the containers
             # method up there guarantees that the method will return
@@ -157,7 +157,7 @@ class TestContainer(AsyncHTTPTestCase):
             self.assertEqual(res.code, httpstatus.NOT_FOUND)
 
             self._app.container_manager.docker_client.containers = \
-                mock_coro_factory(return_value=[utils.containers_dict()])
+                mock_coro_factory(return_value=[containers_dict()])
 
             res = self.fetch("/api/v1/containers/found/", method="DELETE")
             self.assertEqual(res.code, httpstatus.NO_CONTENT)
