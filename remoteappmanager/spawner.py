@@ -20,7 +20,7 @@ class Spawner(LocalProcessSpawner):
     proxy = Any()
 
     #: The path of the configuration file for the cmd executable
-    config_file_path = Unicode()
+    config_file_path = Unicode(config=True)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
