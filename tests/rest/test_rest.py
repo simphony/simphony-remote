@@ -292,7 +292,7 @@ class TestREST(AsyncHTTPTestCase):
                 method="POST",
                 body="hello"
             )
-            self.assertEqual(res.code, httpstatus.UNSUPPORTED_MEDIA_TYPE)
+            self.assertEqual(res.code, httpstatus.BAD_REQUEST)
 
     def test_unsupported_methods(self):
         with mock.patch("remoteappmanager.handlers.base_handler.BaseHandler"
@@ -335,14 +335,14 @@ class TestREST(AsyncHTTPTestCase):
                 method="POST",
                 body="{}"
             )
-            self.assertEqual(res.code, httpstatus.UNPROCESSABLE_ENTITY)
+            self.assertEqual(res.code, httpstatus.BAD_REQUEST)
 
             res = self.fetch(
                 "/api/v1/unprocessables/0/",
                 method="PUT",
                 body="{}"
             )
-            self.assertEqual(res.code, httpstatus.UNPROCESSABLE_ENTITY)
+            self.assertEqual(res.code, httpstatus.BAD_REQUEST)
 
     def test_unsupports_collections(self):
         with mock.patch("remoteappmanager.handlers.base_handler.BaseHandler"
