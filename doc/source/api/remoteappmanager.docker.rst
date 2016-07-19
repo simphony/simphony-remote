@@ -28,14 +28,6 @@ remoteappmanager.docker.container_manager module
     :undoc-members:
     :show-inheritance:
 
-remoteappmanager.docker.docker_client_config module
----------------------------------------------------
-
-.. automodule:: remoteappmanager.docker.docker_client_config
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 remoteappmanager.docker.docker_labels module
 --------------------------------------------
 
