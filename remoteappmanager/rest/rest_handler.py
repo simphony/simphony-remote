@@ -32,13 +32,21 @@ class RESTCollectionHandler(RESTBaseHandler):
     @web.authenticated
     @gen.coroutine
     def get(self, collection_name):
-        """Returns the collection of avilable items"""
+        """Returns the collection of available items"""
         res_handler = self.get_resource_handler_or_404(collection_name)
 
         try:
             items = yield res_handler.items()
+        except exceptions.RESTException as e:
+            raise web.HTTPError(e.http_code)
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
+        except Exception:
+            self.log.exception(
+                "Internal error during get operation on {}".format(
+                    collection_name,
+                ))
+            raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
 
         self.set_status(httpstatus.OK)
         # Need to convert into a dict for security issue tornado/1009
@@ -54,20 +62,17 @@ class RESTCollectionHandler(RESTBaseHandler):
         try:
             data = escape.json_decode(self.request.body)
         except ValueError:
-            raise web.HTTPError(httpstatus.UNSUPPORTED_MEDIA_TYPE)
+            raise web.HTTPError(httpstatus.BAD_REQUEST)
 
         try:
             resource_id = yield res_handler.create(data)
-        except exceptions.UnprocessableRepresentation:
-            # Need reason for tornado quirk that would raise 500 for
-            # "unknown" status codes. See tornado.web line 1522
-            raise web.HTTPError(httpstatus.UNPROCESSABLE_ENTITY,
-                                reason="Unprocessable entity")
+        except exceptions.RESTException as e:
+            raise web.HTTPError(e.http_code)
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
         except Exception:
             self.log.exception(
-                "Internal error during POST operation on {}".format(
+                "Internal error during post operation on {}".format(
                     collection_name,
                 ))
             raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
@@ -98,18 +103,13 @@ class RESTResourceHandler(RESTBaseHandler):
 
         try:
             representation = yield res_handler.retrieve(identifier)
-        except exceptions.NotFound:
-            raise web.HTTPError(httpstatus.NOT_FOUND)
-        except exceptions.UnprocessableRepresentation:
-            # Need reason for tornado quirk that would raise 500 for
-            # "unknown" status codes. See tornado.web line 1522
-            raise web.HTTPError(httpstatus.UNPROCESSABLE_ENTITY,
-                                reason="Unprocessable entity")
+        except exceptions.RESTException as e:
+            raise web.HTTPError(e.http_code)
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
         except Exception:
             self.log.exception(
-                "Internal error during retrieve of {}/{}".format(
+                "Internal error during get of {}/{}".format(
                     collection_name,
                     identifier))
             raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
@@ -132,7 +132,7 @@ class RESTResourceHandler(RESTBaseHandler):
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
         except Exception:
             self.log.exception(
-                "Internal error during retrieve of {}/{}".format(
+                "Internal error during post of {}/{}".format(
                     collection_name,
                     identifier))
             raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
@@ -155,15 +155,16 @@ class RESTResourceHandler(RESTBaseHandler):
 
         try:
             yield res_handler.update(identifier, representation)
-        except exceptions.NotFound:
-            raise web.HTTPError(httpstatus.NOT_FOUND)
-        except exceptions.UnprocessableRepresentation:
-            # Need reason for tornado quirk that would raise 500 for
-            # "unknown" status codes. See tornado.web line 1522
-            raise web.HTTPError(httpstatus.UNPROCESSABLE_ENTITY,
-                                reason="Unprocessable entity")
+        except exceptions.RESTException as e:
+            raise web.HTTPError(e.http_code)
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
+        except Exception:
+            self.log.exception(
+                "Internal error during put of {}/{}".format(
+                    collection_name,
+                    identifier))
+            raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
 
         self.set_status(httpstatus.NO_CONTENT)
 
@@ -174,13 +175,13 @@ class RESTResourceHandler(RESTBaseHandler):
         res_handler = self.get_resource_handler_or_404(collection_name)
         try:
             yield res_handler.delete(identifier)
-        except exceptions.NotFound:
-            raise web.HTTPError(httpstatus.NOT_FOUND)
+        except exceptions.RESTException as e:
+            raise web.HTTPError(e.http_code)
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
         except Exception:
             self.log.exception(
-                "Internal error during retrieve of {}/{}".format(
+                "Internal error during delete of {}/{}".format(
                     collection_name,
                     identifier))
             raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)

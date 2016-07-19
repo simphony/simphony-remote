@@ -66,11 +66,11 @@ class UnsupportAll(Resource):
 class Unprocessable(Resource):
     @gen.coroutine
     def create(self, representation):
-        raise exceptions.UnprocessableRepresentation()
+        raise exceptions.BadRequest()
 
     @gen.coroutine
     def update(self, identifier, representation):
-        raise exceptions.UnprocessableRepresentation()
+        raise exceptions.BadRequest()
 
 
 class UnsupportsCollection(Resource):
