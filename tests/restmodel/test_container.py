@@ -8,7 +8,7 @@ from remoteappmanager.rest import registry, httpstatus
 
 from tests.utils import (AsyncHTTPTestCase, mock_coro_factory,
                          mock_coro_new_callable, containers_dict)
-from tests.mocking.dummy.reverse_proxy import create_reverse_proxy
+from tests.mocking import dummy
 
 
 class TestContainer(AsyncHTTPTestCase):
@@ -32,7 +32,7 @@ class TestContainer(AsyncHTTPTestCase):
         app.urlpath_for_object = Mock(return_value="/urlpath_for_object/")
         app.command_line_config = Mock()
         app.command_line_config.base_urlpath = "/"
-        app.reverse_proxy = create_reverse_proxy()
+        app.reverse_proxy = dummy.create_reverse_proxy()
         container = Mock()
         container.urlpath = "containers/12345"
         container.url_id = "12345"

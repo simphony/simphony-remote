@@ -9,7 +9,7 @@ from remoteappmanager.docker.image import Image
 from remoteappmanager.services.hub import Hub
 from remoteappmanager.application import Application
 from tests import utils
-from tests.mocking.dummy.reverse_proxy import create_reverse_proxy
+from tests.mocking import dummy
 from tests.temp_mixin import TempMixin
 
 
@@ -37,7 +37,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
         file_config.accounting_kwargs = {'url': "sqlite:///"+sqlite_file_path}
 
         app = Application(command_line_config, file_config)
-        app.reverse_proxy = create_reverse_proxy()
+        app.reverse_proxy = dummy.create_reverse_proxy()
         app.hub = mock.Mock(spec=Hub)
         app.hub.verify_token = utils.mock_coro_factory({
             'pending': None,
