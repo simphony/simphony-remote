@@ -18,10 +18,10 @@ def set_traits_from_dict(traited_instance, d):
     Note: if a set operation fails, the appropriate traitlet exception is
     raised. Traitlets that were already set won't be rolled back.
     """
-    for traitlet_name, traitlet in traited_instance.traits().items():
-        traited_instance.set_trait(
-            traitlet_name,
-            d[traitlet_name])
+    dict_keys = d.keys()
+    traitlet_names = traited_instance.traits().keys()
+    for name in [x for x in traitlet_names if x in dict_keys]:
+        traited_instance.set_trait(name, d[name])
 
 
 def as_dict(traited_instance):

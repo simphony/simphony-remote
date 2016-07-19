@@ -1,4 +1,5 @@
 import tornado.options
+import docker.utils
 from traitlets import HasTraits, Int, Unicode, Bool, Dict
 from traitlets.utils.sentinel import Sentinel
 
@@ -13,23 +14,17 @@ class FileConfig(HasTraits):
 
     ##########
     # Configuration file options. All of these come from the config file.
-    tls = Bool(default_value=False,
-               help="If True, connect to docker with --tls")
+    tls = Bool(help="If True, connect to docker with --tls")
 
-    tls_verify = Bool(default_value=False,
-                      help="If True, connect to docker with --tlsverify")
+    tls_verify = Bool(help="If True, connect to docker with --tlsverify")
 
-    tls_ca = Unicode(default_value="",
-                     help="Path to CA certificate for docker TLS")
+    tls_ca = Unicode(help="Path to CA certificate for docker TLS")
 
-    tls_cert = Unicode(default_value="",
-                       help="Path to client certificate for docker TLS")
+    tls_cert = Unicode(help="Path to client certificate for docker TLS")
 
-    tls_key = Unicode(default_value="",
-                      help="Path to client key for docker TLS")
+    tls_key = Unicode(help="Path to client key for docker TLS")
 
-    docker_host = Unicode(default_value="",
-                          help="The docker host to connect to")
+    docker_host = Unicode(help="The docker host to connect to")
 
     accounting_class = Unicode(
         default_value="remoteappmanager.db.orm.AppAccounting",
@@ -37,7 +32,7 @@ class FileConfig(HasTraits):
 
     accounting_kwargs = Dict(
         default_value={'url': 'sqlite:///remoteappmanager.db'},
-        help="The keyword arguments for initalising the Accounting instance")
+        help="The keyword arguments for initialising the Accounting instance")
 
     login_url = Unicode(default_value="/hub",
                         help=("The url to be redirected to if the user is not "
@@ -56,6 +51,32 @@ class FileConfig(HasTraits):
     static_path = Unicode(
         default_value=paths.static_dir,
         help="The path where to search for static files")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        config = docker.utils.kwargs_from_env()
+        tls_config = config.get("tls")
+
+        # if we use self-signed certificates, using tls as True
+        # will produce an error of incorrect CA validation.
+        # As a consequence, we set tls to False by default honoring
+        # docker documentation (although not very clear on this point)
+        # See https://docs.docker.com/engine/security/https/
+        # Verification can be enabled simply by issuing tls=True in the
+        # config file
+        self.tls = False
+
+        if tls_config is not None:
+            self.tls_verify = tls_config.verify
+            self.tls_ca = tls_config.ca_cert
+            self.tls_cert = tls_config.client_cert[0]
+            self.tls_key = tls_config.client_cert[1]
+
+        self.docker_host = config.get("base_url", 'unix://var/run/docker.sock')
+
+    # -------------------------------------------------------------------------
+    # Public
 
     def parse_config(self, config_file):
         """Parses the config file, and assign their values to our local traits.
