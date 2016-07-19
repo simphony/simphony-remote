@@ -184,3 +184,34 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
 
             self.assertTrue(self._app.reverse_proxy.register.called)
             self.assertTrue(redirect.called)
+
+    def test_container_manager_does_not_return_container(self):
+        self._app.container_manager.container_from_url_id = \
+            utils.mock_coro_factory(None)
+        res = self.fetch(
+            "/user/username/",
+            method="POST",
+            headers={
+                "Cookie": "jupyter-hub-token-username=foo"
+            },
+            body=urllib.parse.urlencode({
+                'action': 'view',
+                'url_id': '12345'
+            })
+        )
+
+        self.assertIn("ValueError", str(res.body))
+
+        res = self.fetch(
+            "/user/username/",
+            method="POST",
+            headers={
+                "Cookie": "jupyter-hub-token-username=foo"
+            },
+            body=urllib.parse.urlencode({
+                'action': 'stop',
+                'url_id': '12345'
+            })
+        )
+
+        self.assertIn("ValueError", str(res.body))
