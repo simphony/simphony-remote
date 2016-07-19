@@ -1,4 +1,3 @@
-import remoteappmanager
 from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
 from remoteappmanager.file_config import FileConfig
