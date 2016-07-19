@@ -136,13 +136,4 @@ def create_application(command_line_config=None, file_config=None):
     app.hub = create_hub()
     app.reverse_proxy = create_reverse_proxy()
     app.container_manager = create_container_manager()
-
-    if not isinstance(app.db, DummyDBAccounting):
-        raise ValueError('app.db should be a DummyDBAccounting, '
-                         'got {!r}'.format(app.db))
-
-    if not isinstance(app.user, remoteappmanager.user.User):
-        raise TypeError('app.user should be a remoteppmanager.user.User, '
-                        'got {!r}'.format(app.user))
-
     return app
