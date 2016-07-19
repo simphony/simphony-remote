@@ -155,6 +155,10 @@ def user(ctx):
     db = ctx.obj.db
     db_url = db.url
 
+    # sqlite driver for sqlalchemy creates an empty file on commit as a side effect.
+    # We don't want this creation to happen, so before attempting the creation we stop
+    # short if we already find out that the file is missing and cannot possibly be 
+    # initialized.
     if is_sqlitedb_url(db_url) and not sqlitedb_present(db_url):
         raise click.UsageError("Could not find database at {}".format(db_url))
 
