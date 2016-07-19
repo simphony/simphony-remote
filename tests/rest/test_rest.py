@@ -79,6 +79,18 @@ class UnsupportsCollection(Resource):
         raise NotImplementedError()
 
 
+class Broken(Resource):
+    @gen.coroutine
+    def boom(self, *args):
+        raise Exception("Boom!")
+
+    create = boom
+    retrieve = boom
+    update = boom
+    delete = boom
+    items = boom
+
+
 class TestREST(AsyncHTTPTestCase):
     def setUp(self):
         super().setUp()
@@ -91,6 +103,7 @@ class TestREST(AsyncHTTPTestCase):
         registry.registry.register(UnsupportAll)
         registry.registry.register(Unprocessable)
         registry.registry.register(UnsupportsCollection)
+        registry.registry.register(Broken)
         app = web.Application(handlers=handlers)
         app.hub = mock.Mock()
         return app
@@ -343,6 +356,23 @@ class TestREST(AsyncHTTPTestCase):
                 body="{}"
             )
             self.assertEqual(res.code, httpstatus.BAD_REQUEST)
+
+    def test_broken(self):
+        collection_url = "/api/v1/brokens/"
+        with mock.patch("remoteappmanager.handlers.base_handler.BaseHandler"
+                        ".prepare",
+                        new_callable=utils.mock_coro_new_callable(
+                            side_effect=prepare_side_effect)):
+
+            for method, body in [("POST", "{}"), ("PUT", "{}"),
+                                 ("GET", None), ("DELETE", None)]:
+                res = self.fetch(
+                    collection_url+"0/", method=method, body=body)
+                self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
+
+            for method, body in [("POST", "{}"), ("GET", None)]:
+                res = self.fetch(collection_url, method=method, body=body)
+                self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
 
     def test_unsupports_collections(self):
         with mock.patch("remoteappmanager.handlers.base_handler.BaseHandler"
