@@ -1,20 +1,20 @@
 import os
 from unittest import mock
 
-from docker.errors import NotFound
 from tornado.testing import AsyncTestCase, gen_test
 
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.container_manager import ContainerManager
 from remoteappmanager.docker.image import Image
 from tests import utils
+from tests.mocking.virtual.docker_client import create_docker_client
 
 
 class TestContainerManager(AsyncTestCase):
     def setUp(self):
         super().setUp()
         self.manager = ContainerManager()
-        self.mock_docker_client = utils.mock_docker_client()
+        self.mock_docker_client = create_docker_client()
         self.manager.docker_client.client = self.mock_docker_client
 
     def test_instantiation(self):
@@ -24,10 +24,11 @@ class TestContainerManager(AsyncTestCase):
     def test_start_stop(self):
         mock_client = self.mock_docker_client
 
-        result = yield self.manager.start_container("username",
-                                                    "imageid",
-                                                    "mapping_id",
-                                                    None)
+        result = yield self.manager.start_container(
+            "username",
+            'image_id1',
+            "new_mapping_id",
+            None)
         self.assertTrue(mock_client.start.called)
         self.assertIsInstance(result, Container)
         self.assertFalse(mock_client.stop.called)
@@ -42,17 +43,13 @@ class TestContainerManager(AsyncTestCase):
     def test_containers_from_mapping_id(self):
         ''' Test containers_for_mapping_id returns a list of Container '''
         # The mock client mocks the output of docker Client.containers
-        docker_client = utils.mock_docker_client_with_running_containers()
-        self.mock_docker_client = docker_client
-        self.manager.docker_client.client = docker_client
-
-        result = yield self.manager.containers_from_mapping_id("user",
-                                                               "mapping")
-        expected = Container(docker_id='someid',
-                             mapping_id="mapping",
-                             name='/remoteexec-image_3Alatest_user',
-                             image_name='simphony/mayavi-4.4.4:latest',  # noqa
-                             image_id='imageid',
+        result = yield self.manager.containers_from_mapping_id("username",
+                                                               "mapping_id")
+        expected = Container(docker_id='container_id1',
+                             mapping_id="mapping_id",
+                             name='/remoteexec-username-mapping_5Fid',
+                             image_name='image_name1',  # noqa
+                             image_id='image_id1',
                              ip='127.0.0.1',
                              port=666,
                              url_id='url_id')
@@ -64,16 +61,12 @@ class TestContainerManager(AsyncTestCase):
     def test_containers_from_url_id(self):
         ''' Test containers_for_mapping_id returns a list of Container '''
         # The mock client mocks the output of docker Client.containers
-        docker_client = utils.mock_docker_client_with_running_containers()
-        self.mock_docker_client = docker_client
-        self.manager.docker_client.client = docker_client
-
         result = yield self.manager.container_from_url_id("url_id")
-        expected = Container(docker_id='someid',
-                             mapping_id="mapping",
-                             name='/remoteexec-image_3Alatest_user',
-                             image_name='simphony/mayavi-4.4.4:latest',  # noqa
-                             image_id='imageid',
+        expected = Container(docker_id='container_id1',
+                             mapping_id="mapping_id",
+                             name='/remoteexec-username-mapping_5Fid',
+                             image_name='image_name1',  # noqa
+                             image_id='image_id1',
                              ip='127.0.0.1',
                              port=666,
                              url_id='url_id')
@@ -84,10 +77,8 @@ class TestContainerManager(AsyncTestCase):
     def test_containers_from_url_id_exceptions(self):
         ''' Test containers_for_mapping_id returns a list of Container '''
         # The mock client mocks the output of docker Client.containers
-        docker_client = utils.mock_docker_client_with_running_containers()
+        docker_client = self.mock_docker_client
         docker_client.port = mock.Mock(side_effect=Exception("Boom!"))
-        self.mock_docker_client = docker_client
-        self.manager.docker_client.client = docker_client
 
         result = yield self.manager.container_from_url_id("url_id")
         self.assertEqual(result, None)
@@ -106,12 +97,12 @@ class TestContainerManager(AsyncTestCase):
         # they will stop at the first yield and not go further until
         # we yield them
         f1 = self.manager.start_container("username",
-                                          "imageid",
+                                          "image_id1",
                                           "mapping_id",
                                           None)
 
         f2 = self.manager.start_container("username",
-                                          "imageid",
+                                          "image_id1",
                                           "mapping_id",
                                           None)
 
@@ -125,14 +116,12 @@ class TestContainerManager(AsyncTestCase):
 
     @gen_test
     def test_start_already_present_container(self):
-        mock_client = \
-            utils.mock_docker_client_with_existing_stopped_container()
-        self.manager.docker_client.client = mock_client
+        mock_client = self.mock_docker_client
 
         result = yield self.manager.start_container(
-            "vagrant",
-            "simphony/simphony-remote-docker:simphony-framework-paraview",
-            "mapping",
+            "username",
+            "image_name1",
+            "mapping_id",
             None)
         self.assertTrue(mock_client.start.called)
         self.assertIsInstance(result, Container)
@@ -143,19 +132,14 @@ class TestContainerManager(AsyncTestCase):
 
     @gen_test
     def test_image(self):
-        image = yield self.manager.image('simphony/mayavi-4.4.4:latest')
+        image = yield self.manager.image('image_name1')
         self.assertIsInstance(image, Image)
         self.assertEqual(image.description,
                          'Ubuntu machine with mayavi preinstalled')
         self.assertEqual(image.icon_128, "")
         self.assertEqual(image.ui_name, "Mayavi 4.4.4")
-        self.assertEqual(image.docker_id,
-                         'sha256:e54d71dde57576e9d2a4c77ce0c98501c8aa6268de5b2987e4c80e2e157cffe4')  # noqa
+        self.assertEqual(image.docker_id, 'image_id1')
 
-        def raiser(*args, **kwargs):
-            raise NotFound("not found", mock.Mock())
-
-        self.mock_docker_client.inspect_image = mock.Mock(side_effect=raiser)
         image = yield self.manager.image("whatev")
         self.assertIsNone(image)
 
@@ -173,7 +157,7 @@ class TestContainerManager(AsyncTestCase):
                               'mode': 'ro'}
 
         yield self.manager.start_container("username",
-                                           "imageid",
+                                           "image_id1",
                                            "mapping_id",
                                            volumes)
 
@@ -198,9 +182,9 @@ class TestContainerManager(AsyncTestCase):
 
         self.manager.docker_client.start = mock.Mock(side_effect=raiser)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegex(Exception, 'Boom!'):
             yield self.manager.start_container("username",
-                                               "imageid",
+                                               "image_id1",
                                                "mapping_id",
                                                None)
 
@@ -218,9 +202,9 @@ class TestContainerManager(AsyncTestCase):
 
         self.manager.docker_client.port = mock.Mock(side_effect=raiser)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegex(Exception, 'Boom!'):
             yield self.manager.start_container("username",
-                                               "imageid",
+                                               "image_id1",
                                                "mapping_id",
                                                None)
 
