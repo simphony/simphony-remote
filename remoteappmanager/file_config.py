@@ -1,5 +1,6 @@
 import tornado.options
 import docker.utils
+from docker import tls
 from traitlets import HasTraits, Int, Unicode, Bool, Dict
 from traitlets.utils.sentinel import Sentinel
 
@@ -116,3 +117,19 @@ class FileConfig(HasTraits):
                 ' file "{}"'.format(config_file))
 
         set_traits_from_dict(self, file_line_parser)
+
+    def docker_config(self):
+        """Extracts the docker configuration as a dictionary suitable
+        to be passed as keywords to the docker client"""
+        params = dict(
+            base_url=self.docker_host,
+            tls=tls.TLSConfig(
+                client_cert=(self.tls_cert, self.tls_key),
+                ca_cert=self.tls_ca,
+                verify=self.tls_verify,
+                ssl_version="auto",
+                assert_hostname=True,
+            )
+        )
+
+        return params

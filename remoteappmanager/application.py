@@ -79,14 +79,7 @@ class Application(web.Application, LoggingMixin):
         """Initializes the docker container manager."""
 
         return ContainerManager(
-            docker_config=DockerClientConfig(
-                tls=self.file_config.tls,
-                tls_verify=self.file_config.tls_verify,
-                tls_ca=self.file_config.tls_ca,
-                tls_key=self.file_config.tls_key,
-                tls_cert=self.file_config.tls_cert,
-                docker_host=self.file_config.docker_host,
-            )
+            docker_config=self.file_config.docker_config()
         )
 
     @default("reverse_proxy")
