@@ -131,8 +131,10 @@ class HomeHandler(BaseHandler):
         container_manager = self.application.container_manager
         container = yield container_manager.container_from_url_id(url_id)
         if not container:
-            self.finish("Unable to view the application")
-            return
+            self.log.warning("Could not find container for url_id {}".format(
+                url_id
+            ))
+            raise ValueError("Unable to view container for specified url_id")
 
         # make sure the container is actually running and working
         yield self._wait_for_container_ready(container)
@@ -158,8 +160,10 @@ class HomeHandler(BaseHandler):
 
         container = yield container_manager.container_from_url_id(url_id)
         if not container:
-            self.finish("Unable to view the application")
-            return
+            self.log.warning("Could not find container for url_id {}".format(
+                url_id
+            ))
+            raise ValueError("Unable to view container for specified url_id")
 
         urlpath = url_path_join(
             self.application.command_line_config.base_urlpath,
