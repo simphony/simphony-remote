@@ -7,13 +7,13 @@ from docker.errors import APIError, NotFound
 from escapism import escape
 from remoteappmanager.docker.async_docker_client import AsyncDockerClient
 from remoteappmanager.docker.container import Container
-from remoteappmanager.docker.docker_client_config import DockerClientConfig
 from remoteappmanager.docker.docker_labels import SIMPHONY_NS
 from remoteappmanager.docker.image import Image
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from tornado import gen
 from traitlets import (
     Int,
+    Dict,
     Set,
     Instance,
     default)
@@ -25,11 +25,6 @@ _CONTAINER_ESCAPE_CHAR = '_'
 
 
 class ContainerManager(LoggingMixin):
-    #: The configuration of the docker client.
-    #: Can be None. If that's the case, it will use the environment variables.
-    docker_config = Instance(DockerClientConfig,
-                             allow_none=True)
-
     #: The asynchronous docker client.
     docker_client = Instance(AsyncDockerClient)
 
@@ -43,6 +38,21 @@ class ContainerManager(LoggingMixin):
 
     #: Tracks if a given container is stopping down.
     _stop_pending = Set()
+
+    #: The docker client configuration
+    docker_config = Dict()
+
+    def __init__(self, docker_config, *args, **kwargs):
+        """Initializes the Container manager.
+
+        Parameters
+        ----------
+        docker_config: Dict
+            A dictionary containing the keywords for the configuration of
+            the docker client in agreement to docker py documentation.
+        """
+        self.docker_config = docker_config
+        super().__init__(*args, **kwargs)
 
     @gen.coroutine
     def start_container(self, user_name, image_name, mapping_id, volumes):
@@ -376,9 +386,10 @@ class ContainerManager(LoggingMixin):
         # docker url to extract the ip.
         ip = '127.0.0.1'
 
-        if self.docker_config and self.docker_config.docker_host != '':
-            url = urlparse(self.docker_config.docker_host)
-            if url.scheme == 'tcp':
+        base_url = self.docker_config.get("base_url")
+        if base_url:
+            url = urlparse(base_url)
+            if url.scheme != 'unix':
                 ip = url.hostname
 
         try:
@@ -459,7 +470,7 @@ class ContainerManager(LoggingMixin):
 
     @default("docker_client")
     def _docker_client_default(self):
-        return AsyncDockerClient(config=self.docker_config)
+        return AsyncDockerClient(**self.docker_config)
 
 
 def _get_container_env(user_name, url_id):

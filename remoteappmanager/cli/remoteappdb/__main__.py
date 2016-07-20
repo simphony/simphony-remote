@@ -126,7 +126,8 @@ class RemoteAppDBContext(object):
               default="sqlite:///sqlite.db")
 @click.pass_context
 def cli(ctx, db):
-    """Main click group placeholder."""
+    """Remote application database manager.
+    Performs administrative operations on the database contents."""
     ctx.obj = RemoteAppDBContext(db_url=db)
 
 

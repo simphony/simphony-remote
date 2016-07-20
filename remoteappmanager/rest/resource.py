@@ -1,3 +1,4 @@
+from remoteappmanager.rest import exceptions
 from tornado import gen, log
 
 
@@ -150,7 +151,7 @@ class Resource:
         """
         try:
             yield self.retrieve(identifier)
-        except Exception:
+        except exceptions.NotFound:
             return False
 
         return True

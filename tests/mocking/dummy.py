@@ -96,7 +96,7 @@ def create_container_manager(params=None):
     manager : remoteappmanager.docker.container_manager.ContainerManager
     '''
     if params is None:
-        params = {}
+        params = {'docker_config': {}}
 
     manager = ContainerManager(**params)
     manager.start_container = mock_coro_factory(Container())
