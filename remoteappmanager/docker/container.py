@@ -57,7 +57,7 @@ class Container(HasTraits):
             ")>")
 
     @classmethod
-    def from_docker_containers_dict(cls, docker_dict):
+    def from_docker_dict(cls, docker_dict):
         """Returns a Container object with the info given by a
         docker Client.
 
@@ -75,7 +75,7 @@ class Container(HasTraits):
         >>> # containers is a list of dict
         >>> containers = docker.Client().containers()
 
-        >>> Container.from_docker_containers_dict(containers[0])
+        >>> Container.from_docker_dict(containers[0])
         """
 
         is_inspect_container_output = ("Config" in docker_dict)
@@ -123,7 +123,7 @@ class Container(HasTraits):
 
             if len(ports):
                 kwargs["ip"] = ports[0].get('IP') or kwargs["ip"]
-                kwargs["port"] = int(ports[0].get('PublicPort') \
+                kwargs["port"] = int(ports[0].get('PublicPort')
                                      or kwargs["port"])
 
             labels = docker_dict.get("Labels") or {}

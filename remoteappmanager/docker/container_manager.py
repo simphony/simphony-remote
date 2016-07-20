@@ -166,7 +166,7 @@ class ContainerManager(LoggingMixin):
         infos = yield self.docker_client.containers(filters=filters)
         for info in infos:
             try:
-                container = Container.from_docker_containers_dict(info)
+                container = Container.from_docker_dict(info)
             except Exception:
                 self.log.exception("Unable to parse container info.")
                 continue

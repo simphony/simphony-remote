@@ -43,7 +43,7 @@ class TestContainer(TestCase):
             'Status': 'Up 56 minutes'}
 
         # Container with public port
-        actual = Container.from_docker_containers_dict(container_dict)
+        actual = Container.from_docker_dict(container_dict)
         expected = Container(
             docker_id='248e45e717cd740ae763a1c565',
             name='/remoteexec-user-empty-ubuntu_3Alatest',
@@ -76,7 +76,7 @@ class TestContainer(TestCase):
             'Status': 'Up 56 minutes'}
 
         # Container without public port
-        actual = Container.from_docker_containers_dict(container_dict)
+        actual = Container.from_docker_dict(container_dict)
         expected = Container(
             docker_id='812c765d0549be0ab831ae8348',
             name='/remoteexec-user-empty-ubuntu_3Alatest',
@@ -90,7 +90,7 @@ class TestContainer(TestCase):
 
     def test_from_docker_dict_inspect_container(self):
         client = mock_docker_client_with_running_containers()
-        actual = Container.from_docker_containers_dict(
+        actual = Container.from_docker_dict(
             client.inspect_container("id"))
 
         expected = Container(
