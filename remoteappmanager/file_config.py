@@ -3,7 +3,6 @@ import os
 import tornado.options
 from docker import tls
 from traitlets import HasTraits, Int, Unicode, Bool, Dict
-from traitlets.utils.sentinel import Sentinel
 
 from remoteappmanager import paths
 from remoteappmanager.traitlets import set_traits_from_dict
