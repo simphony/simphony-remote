@@ -66,17 +66,29 @@ class UnsupportAll(Resource):
 class Unprocessable(Resource):
     @gen.coroutine
     def create(self, representation):
-        raise exceptions.UnprocessableRepresentation()
+        raise exceptions.BadRequest()
 
     @gen.coroutine
     def update(self, identifier, representation):
-        raise exceptions.UnprocessableRepresentation()
+        raise exceptions.BadRequest()
 
 
 class UnsupportsCollection(Resource):
     @gen.coroutine
     def items(self):
         raise NotImplementedError()
+
+
+class Broken(Resource):
+    @gen.coroutine
+    def boom(self, *args):
+        raise Exception("Boom!")
+
+    create = boom
+    retrieve = boom
+    update = boom
+    delete = boom
+    items = boom
 
 
 class TestREST(AsyncHTTPTestCase):
@@ -91,6 +103,7 @@ class TestREST(AsyncHTTPTestCase):
         registry.registry.register(UnsupportAll)
         registry.registry.register(Unprocessable)
         registry.registry.register(UnsupportsCollection)
+        registry.registry.register(Broken)
         app = web.Application(handlers=handlers)
         app.hub = mock.Mock()
         return app
@@ -292,7 +305,7 @@ class TestREST(AsyncHTTPTestCase):
                 method="POST",
                 body="hello"
             )
-            self.assertEqual(res.code, httpstatus.UNSUPPORTED_MEDIA_TYPE)
+            self.assertEqual(res.code, httpstatus.BAD_REQUEST)
 
     def test_unsupported_methods(self):
         with mock.patch("remoteappmanager.handlers.base_handler.BaseHandler"
@@ -335,14 +348,31 @@ class TestREST(AsyncHTTPTestCase):
                 method="POST",
                 body="{}"
             )
-            self.assertEqual(res.code, httpstatus.UNPROCESSABLE_ENTITY)
+            self.assertEqual(res.code, httpstatus.BAD_REQUEST)
 
             res = self.fetch(
                 "/api/v1/unprocessables/0/",
                 method="PUT",
                 body="{}"
             )
-            self.assertEqual(res.code, httpstatus.UNPROCESSABLE_ENTITY)
+            self.assertEqual(res.code, httpstatus.BAD_REQUEST)
+
+    def test_broken(self):
+        collection_url = "/api/v1/brokens/"
+        with mock.patch("remoteappmanager.handlers.base_handler.BaseHandler"
+                        ".prepare",
+                        new_callable=utils.mock_coro_new_callable(
+                            side_effect=prepare_side_effect)):
+
+            for method, body in [("POST", "{}"), ("PUT", "{}"),
+                                 ("GET", None), ("DELETE", None)]:
+                res = self.fetch(
+                    collection_url+"0/", method=method, body=body)
+                self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
+
+            for method, body in [("POST", "{}"), ("GET", None)]:
+                res = self.fetch(collection_url, method=method, body=body)
+                self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
 
     def test_unsupports_collections(self):
         with mock.patch("remoteappmanager.handlers.base_handler.BaseHandler"

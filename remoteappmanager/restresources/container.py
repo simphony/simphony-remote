@@ -27,7 +27,7 @@ class Container(Resource):
                   if m_id == mapping_id]
 
         if not choice:
-            raise exceptions.UnprocessableRepresentation()
+            raise exceptions.BadRequest()
 
         _, app, policy = choice[0]
 
