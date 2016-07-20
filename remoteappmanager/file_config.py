@@ -1,5 +1,6 @@
+import os
+
 import tornado.options
-import docker.utils
 from docker import tls
 from traitlets import HasTraits, Int, Unicode, Bool, Dict
 from traitlets.utils.sentinel import Sentinel
@@ -15,17 +16,27 @@ class FileConfig(HasTraits):
 
     ##########
     # Configuration file options. All of these come from the config file.
-    tls = Bool(help="If True, connect to docker with --tls")
 
-    tls_verify = Bool(help="If True, connect to docker with --tlsverify")
+    #: Enable tls, with a twist. if we use self-signed certificates,
+    #: using tls as True will produce an error of incorrect CA validation.
+    #: As a consequence, defaults to False. TLS secure connection will still
+    #: happen thanks to tls_verify and tls[_cert|_key|_ca] being defined.
+    #: See https://docs.docker.com/engine/security/https/
+    #: Verification can be enabled simply by issuing tls=True in the
+    #: config file
+    tls = Bool(False,
+               help="If True, connect to docker with --tls")
 
-    tls_ca = Unicode(help="Path to CA certificate for docker TLS")
+    tls_verify = Bool(False,
+                      help="If True, connect to docker with --tlsverify")
 
-    tls_cert = Unicode(help="Path to client certificate for docker TLS")
+    tls_ca = Unicode("", help="Path to CA certificate for docker TLS")
 
-    tls_key = Unicode(help="Path to client key for docker TLS")
+    tls_cert = Unicode("", help="Path to client certificate for docker TLS")
 
-    docker_host = Unicode(help="The docker host to connect to")
+    tls_key = Unicode("", help="Path to client key for docker TLS")
+
+    docker_host = Unicode("", help="The docker host to connect to")
 
     accounting_class = Unicode(
         default_value="remoteappmanager.db.orm.AppAccounting",
@@ -55,29 +66,28 @@ class FileConfig(HasTraits):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         # Sets the default of the docker configuration options from the
         # current environment. These will possibly be overridded by
-        # the appropriate entries in the configuration file
-        config = docker.utils.kwargs_from_env()
-        tls_config = config.get("tls")
+        # the appropriate entries in the configuration file when parse_file
+        # is invoked
 
-        # if we use self-signed certificates, using tls as True
-        # will produce an error of incorrect CA validation.
-        # As a consequence, we set tls to False by default honoring
-        # docker documentation (although not very clear on this point)
-        # See https://docs.docker.com/engine/security/https/
-        # Verification can be enabled simply by issuing tls=True in the
-        # config file
-        self.tls = False
+        env = os.environ
 
-        if tls_config is not None:
-            self.tls_verify = tls_config.verify
-            self.tls_ca = tls_config.ca_cert
-            self.tls_cert = tls_config.cert[0]
-            self.tls_key = tls_config.cert[1]
+        self.docker_host = env.get("DOCKER_HOST", "")
+        if self.docker_host == "":
+            self.docker_host = "unix://var/run/docker.sock"
 
-        self.docker_host = config.get("base_url", 'unix://var/run/docker.sock')
+        self.tls_verify = (env.get("DOCKER_TLS_VERIFY", "") != "")
+
+        cert_path = env.get("DOCKER_CERT_PATH", "")
+        if self.tls_verify or cert_path != "":
+            if cert_path == "":
+                cert_path = os.path.join(os.path.expanduser("~"), ".docker")
+
+            self.docker_host = self.docker_host.replace('tcp://', 'https://')
+            self.tls_cert = os.path.join(cert_path, 'cert.pem')
+            self.tls_key = os.path.join(cert_path, 'key.pem')
+            self.tls_ca = os.path.join(cert_path, 'ca.pem')
 
     # -------------------------------------------------------------------------
     # Public
@@ -123,7 +133,8 @@ class FileConfig(HasTraits):
 
     def docker_config(self):
         """Extracts the docker configuration as a dictionary suitable
-        to be passed as keywords to the docker client"""
+        to be passed as keywords to the docker client.
+        """
         params = {}
 
         params["base_url"] = self.docker_host
