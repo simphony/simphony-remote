@@ -19,7 +19,7 @@ def set_traits_from_dict(traited_instance, d):
     raised. Traitlets that were already set won't be rolled back.
     """
     dict_keys = d.keys()
-    traitlet_names = traited_instance.traits().keys()
+    traitlet_names = traited_instance.trait_names()
     for name in [x for x in traitlet_names if x in dict_keys]:
         traited_instance.set_trait(name, d[name])
 
