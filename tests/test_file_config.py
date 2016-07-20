@@ -151,3 +151,15 @@ class TestFileConfig(TempMixin, unittest.TestCase):
         config = FileConfig(tls=True)
         self.assertNotEqual(config.tls_key, '')
         self.assertNotEqual(config.tls_cert, '')
+
+    def test_file_parsing_not_overriding_bug_131(self):
+        docker_config = textwrap.dedent('''
+            tls = True
+            ''')
+        with open(self.config_file, 'w') as fhandle:
+            print(docker_config, file=fhandle)
+
+        config = FileConfig()
+        config.parse_config(self.config_file)
+        self.assertNotEqual(config.tls_key, '')
+        self.assertNotEqual(config.tls_cert, '')

@@ -112,10 +112,7 @@ class FileConfig(HasTraits):
             # and performs type validation.
             # traitlet.default_value may be a Sentinel value (e.g. Tuple,
             # Dict, Instance), in which case we use the repr
-            default_value = traitlet.default_value
-
-            if type(default_value) is Sentinel:
-                default_value = eval(traitlet.default_value_repr())
+            default_value = getattr(self, traitlet_name)
 
             file_line_parser.define(
                 traitlet_name,
