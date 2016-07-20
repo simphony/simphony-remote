@@ -389,7 +389,7 @@ class ContainerManager(LoggingMixin):
         base_url = self.docker_config.get("base_url")
         if base_url:
             url = urlparse(base_url)
-            if url.scheme == 'tcp':
+            if url.scheme != 'unix':
                 ip = url.hostname
 
         try:

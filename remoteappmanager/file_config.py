@@ -79,6 +79,9 @@ class FileConfig(HasTraits):
 
         self.tls_verify = (env.get("DOCKER_TLS_VERIFY", "") != "")
 
+        # Note that certificate paths can still be present even if tls_verify
+        # is false: that is the case of using certificates signed by an
+        # authoritative CA.
         cert_path = env.get("DOCKER_CERT_PATH", "")
         if self.tls_verify or cert_path != "":
             if cert_path == "":
@@ -131,20 +134,31 @@ class FileConfig(HasTraits):
 
         set_traits_from_dict(self, file_line_parser.as_dict())
 
+        if self.tls or self.tls_verify:
+            self.docker_host = self.docker_host.replace('tcp://', 'https://')
+
     def docker_config(self):
         """Extracts the docker configuration as a dictionary suitable
         to be passed as keywords to the docker client.
         """
         params = {}
-
         params["base_url"] = self.docker_host
-        if self.tls_verify:
+
+        # Note that this will throw if the certificates are not
+        # present at the specified paths.
+        if self.tls:
             params["tls"] = tls.TLSConfig(
                 client_cert=(self.tls_cert, self.tls_key),
-                ca_cert=self.tls_ca,
-                verify=self.tls_verify,
                 ssl_version="auto",
                 assert_hostname=True,
                 )
+        elif self.tls_verify:
+            params["tls"] = tls.TLSConfig(
+                client_cert=(self.tls_cert, self.tls_key),
+                ca_cert=self.tls_ca,
+                verify=True,
+                ssl_version="auto",
+                assert_hostname=True,
+            )
 
         return params
