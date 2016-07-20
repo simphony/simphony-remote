@@ -24,6 +24,7 @@ accounting_kwargs = {"csv_file_path": "file_path.csv"}
 
 @contextlib.contextmanager
 def envvars(envs):
+    """Replaces some envvars and restores the old values when done."""
     old_env = {}
     for var, value in envs.items():
         old_env[var] = os.environ.get(var)
@@ -32,7 +33,10 @@ def envvars(envs):
     yield
 
     for var in envs:
-        os.environ[var] = old_env[var]
+        if old_env[var] is None:
+            del os.environ[var]
+        else:
+            os.environ[var] = old_env[var]
 
 
 class TestFileConfig(TempMixin, unittest.TestCase):
