@@ -146,13 +146,7 @@ class FileConfig(HasTraits):
 
         # Note that this will throw if the certificates are not
         # present at the specified paths.
-        if self.tls:
-            params["tls"] = tls.TLSConfig(
-                client_cert=(self.tls_cert, self.tls_key),
-                ssl_version="auto",
-                assert_hostname=True,
-                )
-        elif self.tls_verify:
+        if self.tls_verify:
             params["tls"] = tls.TLSConfig(
                 client_cert=(self.tls_cert, self.tls_key),
                 ca_cert=self.tls_ca,
@@ -160,5 +154,11 @@ class FileConfig(HasTraits):
                 ssl_version="auto",
                 assert_hostname=True,
             )
+        elif self.tls:
+            params["tls"] = tls.TLSConfig(
+                client_cert=(self.tls_cert, self.tls_key),
+                ssl_version="auto",
+                assert_hostname=True,
+                )
 
         return params
