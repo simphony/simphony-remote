@@ -123,3 +123,21 @@ class TestContainer(TestCase):
         }
         with self.assertRaises(ValueError):
             Container.from_docker_dict(docker_dict)
+
+        docker_dict = client.containers()[0]
+        docker_dict["Ports"] = [
+             {
+                'IP': '0.0.0.0',
+                'PublicIP': 34567,
+                'PrivatePort': 22,
+                'Type': 'tcp'
+             },
+             {
+                'IP': '0.0.0.0',
+                'PublicIP': 34562,
+                'PrivatePort': 21,
+                'Type': 'tcp'
+             }
+        ]
+        with self.assertRaises(ValueError):
+            Container.from_docker_dict(docker_dict)
