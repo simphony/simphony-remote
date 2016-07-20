@@ -146,3 +146,8 @@ class TestFileConfig(TempMixin, unittest.TestCase):
             self.assertNotIn("tls", docker_config)
             self.assertEqual(docker_config["base_url"],
                              "tcp://192.168.99.100:31337")
+
+    def test_tls_init(self):
+        config = FileConfig(tls=True)
+        self.assertNotEqual(config.tls_key, '')
+        self.assertNotEqual(config.tls_cert, '')

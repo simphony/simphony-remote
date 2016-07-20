@@ -82,15 +82,15 @@ class FileConfig(HasTraits):
         # Note that certificate paths can still be present even if tls_verify
         # is false: that is the case of using certificates signed by an
         # authoritative CA.
-        cert_path = env.get("DOCKER_CERT_PATH", "")
-        if self.tls_verify or cert_path != "":
-            if cert_path == "":
-                cert_path = os.path.join(os.path.expanduser("~"), ".docker")
+        cert_path = env.get("DOCKER_CERT_PATH",
+                            os.path.join(os.path.expanduser("~"), ".docker"))
 
+        self.tls_cert = os.path.join(cert_path, 'cert.pem')
+        self.tls_key = os.path.join(cert_path, 'key.pem')
+        self.tls_ca = os.path.join(cert_path, 'ca.pem')
+
+        if self.tls_verify or self.tls:
             self.docker_host = self.docker_host.replace('tcp://', 'https://')
-            self.tls_cert = os.path.join(cert_path, 'cert.pem')
-            self.tls_key = os.path.join(cert_path, 'key.pem')
-            self.tls_ca = os.path.join(cert_path, 'ca.pem')
 
     # -------------------------------------------------------------------------
     # Public
