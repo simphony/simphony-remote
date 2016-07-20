@@ -109,8 +109,6 @@ class FileConfig(HasTraits):
         for traitlet_name, traitlet in self.traits().items():
             # tornado.OptionParser defines an option with a Python type
             # and performs type validation.
-            # traitlet.default_value may be a Sentinel value (e.g. Tuple,
-            # Dict, Instance), in which case we use the repr
             default_value = getattr(self, traitlet_name)
 
             file_line_parser.define(
