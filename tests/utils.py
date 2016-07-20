@@ -110,6 +110,30 @@ def mock_docker_client_with_running_containers():
          'State': 'running',
          'Status': 'Up About an hour'},
     ]
+    client.inspect_container.return_value = {
+        'Config': {
+                   'Image': 'simphonyproject/simphonic-mayavi',
+                   'Labels': {'eu.simphony-project.docker.description': 'Ubuntu '
+                                                                        'machine '
+                                                                        'with '
+                                                                        'simphony '
+                                                                        'framework '
+                                                                        'preinstalled',
+                              'eu.simphony-project.docker.mapping_id': '1c08c87878634e90af43d799e90f61d2',
+                              'eu.simphony-project.docker.ui_name': 'Simphony '
+                                                                    'Framework '
+                                                                    '(w/ mayavi)',
+                              'eu.simphony-project.docker.url_id': '55555555555555555555555555555555',
+                              'eu.simphony-project.docker.user': 'username'},
+                    },
+        'Id': '35d88fe321c3d575ec3be64f54b8967ef49c0dc92395bf4c1e511ed3e6ae0c79',
+        'Image': 'sha256:f43b749341ee37b56e7bd8d99f09629f311aaec35a8045a39185b5659edef169',
+        'Name': '/remoteexec-username-simphonyproject_2Fsimphonic-mayavi_5F1',
+        'NetworkSettings': {
+                            'Ports': {'8888/tcp': [{'HostIp': '0.0.0.0',
+                                                    'HostPort': '32782'}]},
+                           },
+    }
 
     return client
 

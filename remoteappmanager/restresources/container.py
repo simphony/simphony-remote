@@ -118,7 +118,7 @@ class Container(Resource):
         if not container_dict:
             return None
 
-        return DockerContainer.from_docker_containers_dict(container_dict[0])
+        return DockerContainer.from_docker_dict(container_dict[0])
 
     @gen.coroutine
     def _start_container(self, user_name, app, policy, mapping_id):

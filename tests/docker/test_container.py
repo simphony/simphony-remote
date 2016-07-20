@@ -1,7 +1,8 @@
 from unittest import TestCase
 
 from remoteappmanager.docker.container import Container
-from tests.utils import assert_containers_equal
+from tests.utils import assert_containers_equal, \
+    mock_docker_client_with_running_containers
 
 
 class TestContainer(TestCase):
@@ -42,7 +43,7 @@ class TestContainer(TestCase):
             'Status': 'Up 56 minutes'}
 
         # Container with public port
-        actual = Container.from_docker_containers_dict(container_dict)
+        actual = Container.from_docker_dict(container_dict)
         expected = Container(
             docker_id='248e45e717cd740ae763a1c565',
             name='/remoteexec-user-empty-ubuntu_3Alatest',
@@ -75,7 +76,7 @@ class TestContainer(TestCase):
             'Status': 'Up 56 minutes'}
 
         # Container without public port
-        actual = Container.from_docker_containers_dict(container_dict)
+        actual = Container.from_docker_dict(container_dict)
         expected = Container(
             docker_id='812c765d0549be0ab831ae8348',
             name='/remoteexec-user-empty-ubuntu_3Alatest',
@@ -86,3 +87,57 @@ class TestContainer(TestCase):
             url_id="8e2fe66d5de74db9bbab50c0d2f92b33")
 
         assert_containers_equal(self, actual, expected)
+
+    def test_from_docker_dict_inspect_container(self):
+        client = mock_docker_client_with_running_containers()
+        actual = Container.from_docker_dict(
+            client.inspect_container("id"))
+
+        expected = Container(
+            docker_id='35d88fe321c3d575ec3be64f54b8967ef49c0dc92395bf4c1e511ed3e6ae0c79',  # noqa
+            name='/remoteexec-username-simphonyproject_2Fsimphonic-mayavi_5F1',
+            image_name='simphonyproject/simphonic-mayavi',
+            image_id='sha256:f43b749341ee37b56e7bd8d99f09629f311aaec35a8045a39185b5659edef169',  # noqa
+            ip='0.0.0.0',
+            port=32782,
+            url_id="55555555555555555555555555555555",
+            mapping_id="1c08c87878634e90af43d799e90f61d2")
+
+        assert_containers_equal(self, actual, expected)
+
+    def test_multiple_ports_data(self):
+        client = mock_docker_client_with_running_containers()
+        docker_dict = client.inspect_container("id")
+        docker_dict["NetworkSettings"]["Ports"] = {
+            '8888/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '32782'}],
+            '8889/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '32783'}]
+        }
+        with self.assertRaises(ValueError):
+            Container.from_docker_dict(docker_dict)
+
+        docker_dict["NetworkSettings"]["Ports"] = {
+            '8888/tcp': [
+                {'HostIp': '0.0.0.0', 'HostPort': '32782'},
+                {'HostIp': '0.0.0.0', 'HostPort': '32783'}
+            ]
+        }
+        with self.assertRaises(ValueError):
+            Container.from_docker_dict(docker_dict)
+
+        docker_dict = client.containers()[0]
+        docker_dict["Ports"] = [
+             {
+                'IP': '0.0.0.0',
+                'PublicIP': 34567,
+                'PrivatePort': 22,
+                'Type': 'tcp'
+             },
+             {
+                'IP': '0.0.0.0',
+                'PublicIP': 34562,
+                'PrivatePort': 21,
+                'Type': 'tcp'
+             }
+        ]
+        with self.assertRaises(ValueError):
+            Container.from_docker_dict(docker_dict)
