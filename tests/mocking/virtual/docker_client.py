@@ -1,8 +1,20 @@
+from itertools import cycle
 import json
 import requests
 from unittest import mock
 
 import docker
+
+
+FAKE_IMAGE_IDS = ('image_id1', 'image_id2')
+
+FAKE_IMAGE_NAMES = ('image_name1', 'image_name2')
+
+FAKE_CONTAINER_IDS = ('container_id1', 'container_id2', 'container_id3')
+
+FAKE_CONTAINER_NAMES = ('remoteexec-username-mapping_5Fid',
+                        'remoteexec-username-mapping_5Fid_5Fexited',
+                        'remoteexec-username-mapping_5Fid_5Fstopped')
 
 
 def docker_response(status_code=200, content='',
@@ -18,65 +30,43 @@ def docker_response(status_code=200, content='',
     return res
 
 
-def get_fake_image_ids():
-    return ('image_id1',
-            'image_id2')
+def get_fake_image_labels(num=2):
+    samples = cycle(({'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled',  # noqa
+                      'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4'},
+                     {'eu.simphony-project.docker.description': 'A vanilla Ubuntu installation'},  # noqa
+                 ))
+    return tuple(next(samples) for _ in range(num))
 
 
-def get_fake_image_names():
-    return ('image_name1',
-            'image_name2')
+def get_fake_container_ports(num=3):
+    samples = cycle(([{'IP': '0.0.0.0',
+                       'PublicPort': 666,
+                       'PrivatePort': 22,
+                       'Type': 'tcp'}],
+                     [{'PrivatePort': 22,
+                       'Type': 'tcp'}],
+                     []))
+    return tuple(next(samples) for _ in range(num))
 
 
-def get_fake_image_labels():
-    return (
-        {'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled',  # noqa
-         'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4'
-        },
-        {'eu.simphony-project.docker.description': 'A vanilla Ubuntu installation'}  # noqa
-        )
+def get_fake_container_states(num=3):
+    samples = cycle(('running',
+                     'exited',
+                     {'Paused': False, 'Running': False, 'Error': '', 'Pid': 0,
+                      'FinishedAt': '2016-06-22T09:15:35.574996772Z',
+                      'StartedAt': '2016-06-22T09:15:02.196670642Z',
+                      'Restarting': False, 'Status': 'exited', 'Dead': False,
+                      'OOMKilled': False, 'ExitCode': 0}))
+    return tuple(next(samples) for _ in range(num))
 
 
-def get_fake_container_ids():
-    return ('container_id1',
-            'container_id2',
-            'container_id3')
-
-
-def get_fake_container_names():
-    return ('remoteexec-username-mapping_5Fid',
-            'remoteexec-username-mapping_5Fid_5Fexited',
-            'remoteexec-username-mapping_5Fid_5Fstopped')
-
-
-def get_fake_container_ports():
-    return (
-        [{'IP': '0.0.0.0',
-          'PublicPort': 666,
-          'PrivatePort': 22,
-          'Type': 'tcp'}],
-        [],
-        [],
-    )
-
-
-def get_fake_container_states():
-    return ('running',
-            'exited',
-            {'Paused': False, 'Running': False, 'Error': '', 'Pid': 0,
-             'FinishedAt': '2016-06-22T09:15:35.574996772Z',
-             'StartedAt': '2016-06-22T09:15:02.196670642Z',
-             'Restarting': False, 'Status': 'exited', 'Dead': False,
-             'OOMKilled': False, 'ExitCode': 0})
-
-
-def get_fake_container_labels():
-    return (
-        {'eu.simphony-project.docker.user': 'user_name',
-         'eu.simphony-project.docker.mapping_id': 'mapping_id',
-         'eu.simphony-project.docker.url_id': 'url_id'},
-        {},
-        {})
+def get_fake_container_labels(num=3):
+    samples = cycle(({'eu.simphony-project.docker.user': 'user_name',
+                      'eu.simphony-project.docker.mapping_id': 'mapping_id',
+                      'eu.simphony-project.docker.url_id': 'url_id'},
+                     {'eu.simphony-project.docker.user': 'user_name'},
+                     {}))
+    return tuple(next(samples) for _ in range(num))
 
 
 def mock_containers(container_ids, container_names,
@@ -125,7 +115,7 @@ def mock_inspect_container(container_ids, container_names,
 
     def inspect_container(container_name_or_id):
         if container_name_or_id not in container_ids+container_names:
-            raise docker.errors.APIError(
+            raise docker.errors.NotFound(
                 'Container {} not found'.format(container_name_or_id),
                 response=docker_response(404))
 
@@ -167,7 +157,7 @@ def mock_inspect_image(image_ids, image_names, image_labels):
     def inspect_image(image_name_or_id):
         if image_name_or_id not in image_ids+image_names:
             raise docker.errors.NotFound(
-                'Image {} not found'.format(image_name_or_id),
+                'No such image: {}'.format(image_name_or_id),
                 response=docker_response(404))
 
         try:
@@ -205,7 +195,9 @@ def mock_images(image_ids, image_names, image_labels):
 def mock_container_port(container_ids, container_names, container_ports):
     def port(container_name_or_id, *args, **kwargs):
         if container_name_or_id not in container_ids+container_names:
-            raise Exception("Could not find container (mocked)")
+            raise docker.errors.NotFound(
+                "No such container: {} ".format(container_name_or_id),
+                response=docker_response(404))
 
         try:
             index = container_ids.index(container_name_or_id)
@@ -224,8 +216,11 @@ def mock_container_port(container_ids, container_names, container_ports):
     return port
 
 
-def create_docker_client(image_names=None, image_ids=None, image_labels=None,
-                         container_names=None, container_ids=None,
+def create_docker_client(image_names=FAKE_IMAGE_NAMES,
+                         image_ids=FAKE_IMAGE_IDS,
+                         image_labels=None,
+                         container_names=FAKE_CONTAINER_NAMES,
+                         container_ids=FAKE_CONTAINER_IDS,
                          container_ports=None, container_states=None,
                          container_labels=None):
     """Returns a mock synchronous docker client to return canned
@@ -251,11 +246,10 @@ def create_docker_client(image_names=None, image_ids=None, image_labels=None,
 
     container_ports : tuple
         tuple of lists, each list describe the ports available for each
-        container  (see `get_fake_container_ports`)
+        container
 
     container_states : tuple
         tuple of str or dict, states of the corresponding container
-        (see `get_fake_container_states`)
 
     container_labels : tuple
         tuple of dict containing the labels associated with each
@@ -267,14 +261,17 @@ def create_docker_client(image_names=None, image_ids=None, image_labels=None,
         with specification given by docker.Client
     """
     # Default image labels etc may contain mutable, so they are set here
-    image_names = image_names or get_fake_image_names()
-    image_ids = image_ids or get_fake_image_ids()
-    image_labels = image_labels or get_fake_image_labels()
-    container_ids = container_ids or get_fake_container_ids()
-    container_names = container_names or get_fake_container_names()
-    container_ports = container_ports or get_fake_container_ports()
-    container_states = container_states or get_fake_container_states()
-    container_labels = container_labels or get_fake_container_labels()
+    if image_labels is None:
+        image_labels = get_fake_image_labels(len(image_ids))
+
+    if container_ports is None:
+        container_ports = get_fake_container_ports(len(container_ids))
+
+    if container_states is None:
+        container_states = get_fake_container_states(len(container_ids))
+
+    if container_labels is None:
+        container_labels = get_fake_container_labels(len(container_ids))
 
     # mock the docker client
     docker_client = mock.Mock(spec=docker.Client)
