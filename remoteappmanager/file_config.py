@@ -3,7 +3,6 @@ import os
 import tornado.options
 from docker import tls
 from traitlets import HasTraits, Int, Unicode, Bool, Dict
-from traitlets.utils.sentinel import Sentinel
 
 from remoteappmanager import paths
 from remoteappmanager.traitlets import set_traits_from_dict
@@ -110,12 +109,7 @@ class FileConfig(HasTraits):
         for traitlet_name, traitlet in self.traits().items():
             # tornado.OptionParser defines an option with a Python type
             # and performs type validation.
-            # traitlet.default_value may be a Sentinel value (e.g. Tuple,
-            # Dict, Instance), in which case we use the repr
-            default_value = traitlet.default_value
-
-            if type(default_value) is Sentinel:
-                default_value = eval(traitlet.default_value_repr())
+            default_value = getattr(self, traitlet_name)
 
             file_line_parser.define(
                 traitlet_name,
