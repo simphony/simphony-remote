@@ -62,7 +62,7 @@ class CommandLineConfig(HasTraits):
 
         tornado.options.parse_command_line()
 
-        set_traits_from_dict(self, options)
+        set_traits_from_dict(self, options.as_dict())
 
         # Normalize the base_urlpath to end with a slash
         self.base_urlpath = with_end_slash(self.base_urlpath)

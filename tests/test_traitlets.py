@@ -35,3 +35,11 @@ class TestTraitlets(unittest.TestCase):
         set_traits_from_dict(c, d)
         self.assertEqual(c.a, 5)
         self.assertEqual(c.b, "world")
+
+        d = {
+            "a": 7
+        }
+
+        set_traits_from_dict(c, d)
+        self.assertEqual(c.a, 7)
+        self.assertEqual(c.b, "world")

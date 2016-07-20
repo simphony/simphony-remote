@@ -2,7 +2,6 @@ from concurrent.futures import ThreadPoolExecutor
 
 import docker
 import functools
-from docker.utils import kwargs_from_env
 
 # Common threaded executor for asynchronous jobs.
 # Required for the AsyncDockerClient to operate.
@@ -18,7 +17,7 @@ class AsyncDockerClient:
     executor.
     """
 
-    def __init__(self, config=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         """Initialises the docker async client.
 
         The client uses a single, module level executor to submit
@@ -30,50 +29,13 @@ class AsyncDockerClient:
 
         Note that the executor is a ThreadPoolExecutor with a single thread.
         """
-        self.config = config
-        self.client = None
-
-        super().__init__(*args, **kwargs)
-
-    def _init_client(self):
-        """Returns the docker-py synchronous client instance."""
-        config = self.config
-
-        # If there is no configuration, we try to obtain it
-        # from the envvars
-        if config is None:
-            kwargs = kwargs_from_env()
-            client = docker.Client(version='auto', **kwargs)
-        else:
-            if config.tls:
-                tls_config = True
-            elif config.tls_verify or config.tls_ca or config.tls_client:
-                tls_config = docker.tls.TLSConfig(
-                    client_cert=config.tls_client,
-                    ca_cert=config.tls_ca,
-                    verify=config.tls_verify,
-                    assert_hostname=config.tls_assert_hostname)
-            else:
-                tls_config = None
-
-            if len(config.docker_host) == 0:
-                docker_host = 'unix://var/run/docker.sock'
-            else:
-                docker_host = config.docker_host
-
-            client = docker.Client(base_url=docker_host,
-                                   tls=tls_config,
-                                   version='auto')
-        self.client = client
+        self._sync_client = docker.Client(*args, **kwargs)
 
     def __getattr__(self, attr):
         """Returns the docker client method, wrapped in an async execution
         environment. The returned method must be used in conjunction with
         the yield keyword."""
-        if self.client is None:
-            self._init_client()
-
-        if hasattr(self.client, attr):
+        if hasattr(self._sync_client, attr):
             return functools.partial(self._submit_to_executor, attr)
         else:
             raise AttributeError(
@@ -108,5 +70,5 @@ class AsyncDockerClient:
         """wrapper for calling docker methods to be passed to
         ThreadPoolExecutor.
         """
-        m = getattr(self.client, method)
+        m = getattr(self._sync_client, method)
         return m(*args, **kwargs)
