@@ -1,6 +1,5 @@
 from remoteappmanager.docker.docker_labels import SIMPHONY_NS
 from traitlets import Unicode, HasTraits, Int
-from tornado.log import app_log
 
 
 class Container(HasTraits):
@@ -97,17 +96,18 @@ class Container(HasTraits):
             # of dictionaries.
             # We assume that we only have one, as above
             if len(ports) > 1:
-                app_log.warning("Container Ports had more than one element.")
+                raise ValueError("Container Ports had more than one element.")
 
             if len(ports):
                 port_values = list(ports.values())[0]
                 if len(port_values) > 1:
-                    app_log.warning("Container Ports values had more than one "
-                                    "element.")
+                    raise ValueError("Container Ports values had "
+                                     "more than one element.")
+
                 if len(port_values):
                     kwargs["ip"] = port_values[0].get("HostIp") or kwargs["ip"]
-                    kwargs["port"] = int(port_values[0].get("HostPort")
-                                         or kwargs["port"])
+                    kwargs["port"] = int(port_values[0].get("HostPort") or
+                                         kwargs["port"])
 
             config = docker_dict.get("Config", {})
             labels = config.get("Labels")
@@ -119,12 +119,12 @@ class Container(HasTraits):
             # It's a client.containers() output, so we have different rules.
             ports = docker_dict.get('Ports') or []
             if len(ports) > 1:
-                app_log.warning("Container Ports had more than one element.")
+                raise ValueError("Container Ports had more than one element.")
 
             if len(ports):
                 kwargs["ip"] = ports[0].get('IP') or kwargs["ip"]
-                kwargs["port"] = int(ports[0].get('PublicPort')
-                                     or kwargs["port"])
+                kwargs["port"] = int(ports[0].get('PublicPort') or
+                                     kwargs["port"])
 
             labels = docker_dict.get("Labels") or {}
 

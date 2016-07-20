@@ -167,7 +167,7 @@ class ContainerManager(LoggingMixin):
         for info in infos:
             try:
                 container = Container.from_docker_dict(info)
-            except Exception:
+            except ValueError:
                 self.log.exception("Unable to parse container info.")
                 continue
 

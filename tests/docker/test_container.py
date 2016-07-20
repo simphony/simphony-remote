@@ -104,3 +104,22 @@ class TestContainer(TestCase):
             mapping_id="1c08c87878634e90af43d799e90f61d2")
 
         assert_containers_equal(self, actual, expected)
+
+    def test_multiple_ports_data(self):
+        client = mock_docker_client_with_running_containers()
+        docker_dict = client.inspect_container("id")
+        docker_dict["NetworkSettings"]["Ports"] = {
+            '8888/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '32782'}],
+            '8889/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '32783'}]
+        }
+        with self.assertRaises(ValueError):
+            Container.from_docker_dict(docker_dict)
+
+        docker_dict["NetworkSettings"]["Ports"] = {
+            '8888/tcp': [
+                {'HostIp': '0.0.0.0', 'HostPort': '32782'},
+                {'HostIp': '0.0.0.0', 'HostPort': '32783'}
+            ]
+        }
+        with self.assertRaises(ValueError):
+            Container.from_docker_dict(docker_dict)
