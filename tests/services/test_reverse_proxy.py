@@ -16,7 +16,9 @@ class TestReverseProxy(testing.AsyncTestCase):
             yield gen.sleep(0.1)
             coroutine_out = dict(args=args, kwargs=kwargs)
 
-        reverse_proxy = ReverseProxy("http://fake/api", "token")
+        reverse_proxy = ReverseProxy(
+            endpoint_url="http://fake/api",
+            auth_token="token")
         reverse_proxy._reverse_proxy = Mock(spec=orm.Proxy)
         reverse_proxy._reverse_proxy.api_request = mock_api_request
 
