@@ -85,7 +85,7 @@ Various accounting sources are supported:
 4. Others
 
    Any arbitrary database implementation may be used as long as an accounting
-   class compliant to the API of `remoteappmanager.db.interfaces.ABCAccounting`
+   class compliant to the API of :py:class:`remoteappmanager.db.interfaces.ABCAccounting`
    is provided. Please also refer to :ref:`config_remoteappmanager` for details
    on setting up the accounting class.
 
