@@ -7,14 +7,14 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 import unittest, time, re
 
-class LoginLogout(unittest.TestCase):
+class TestLoginLogout(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(30)
         self.base_url = "https://127.0.0.1:8000/"
         self.verificationErrors = []
         self.accept_next_alert = True
-    
+
     def test_login_logout(self):
         driver = self.driver
         driver.get(self.base_url + "/hub/login")
@@ -36,17 +36,17 @@ class LoginLogout(unittest.TestCase):
             except: pass
             time.sleep(1)
         else: self.fail("time out")
-    
+
     def is_element_present(self, how, what):
         try: self.driver.find_element(by=how, value=what)
         except NoSuchElementException as e: return False
         return True
-    
+
     def is_alert_present(self):
         try: self.driver.switch_to_alert()
         except NoAlertPresentException as e: return False
         return True
-    
+
     def close_alert_and_get_its_text(self):
         try:
             alert = self.driver.switch_to_alert()
@@ -57,7 +57,7 @@ class LoginLogout(unittest.TestCase):
                 alert.dismiss()
             return alert_text
         finally: self.accept_next_alert = True
-    
+
     def tearDown(self):
         self.driver.quit()
         self.assertEqual([], self.verificationErrors)
