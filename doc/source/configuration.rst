@@ -48,12 +48,12 @@ all remoteappmanagers for any user.
 
 2. Config file
 
-   The config file is referred to by the `--config-file-path` command line
+   Path to the config file is given by the `--config-file-path` command-line
    option. It is a Python file in which default values of attributes in
    :py:class:`remoteappmanager.file_config.FileConfig` can be override.
 
    For example, to use CSV as the database, one could provide a config file
-   with the following setting::
+   with the following settings::
 
      accounting_class = 'remoteappmanager.db.csv_db.CSVAccounting'
      accounting_kwargs = {'url': '/path/to/csv_file'}
