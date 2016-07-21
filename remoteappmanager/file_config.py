@@ -145,16 +145,14 @@ class FileConfig(HasTraits):
         if self.tls:
             params["tls"] = tls.TLSConfig(
                 client_cert=(self.tls_cert, self.tls_key),
-                ssl_version="auto",
-                assert_hostname=True,
                 )
         elif self.tls_verify:
             params["tls"] = tls.TLSConfig(
                 client_cert=(self.tls_cert, self.tls_key),
                 ca_cert=self.tls_ca,
                 verify=True,
-                ssl_version="auto",
-                assert_hostname=True,
             )
+
+        params["version"] = "auto"
 
         return params
