@@ -1,5 +1,3 @@
-import os
-
 # Configuration file for jupyterhub.
 from jupyter_client.localinterfaces import public_ips
 
@@ -15,9 +13,6 @@ setting_mode = ('system_user', 'virtual_user')[1]
 
 if setting_mode == 'virtual_user':
     c.JupyterHub.spawner_class = 'remoteappmanager.spawner.VirtualUserSpawner'
-
-    c.Spawner.config_file_path = os.path.abspath(
-        './remoteappmanager_config.py')
 
     # Parent directory in which temporary directory is created for
     # each virtual user

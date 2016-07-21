@@ -13,7 +13,10 @@ def main():
     try:
         command_line_config.parse_config()
         file_config = FileConfig()
-        file_config.parse_config(command_line_config.config_file)
+
+        if command_line_config.config_file:
+            file_config.parse_config(command_line_config.config_file)
+
     except Exception as e:
         print_help()
         print("Error: {}".format(e))
