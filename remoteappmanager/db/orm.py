@@ -156,6 +156,21 @@ class Database(LoggingMixin):
 class AppAccounting(ABCAccounting):
 
     def __init__(self, url, **kwargs):
+        ''' Initialiser
+
+        Parameters
+        ----------
+        url : str
+            the url for connecting to a database
+
+        **kwargs
+            optional keyword arguments for `Database`
+
+        See Also
+        --------
+        `SQLAlchemy Database Urls <http://docs.sqlalchemy.org/en/
+        latest/core/engines.html?highlight=database%20url>`_
+        '''
         self.db = Database(url, **kwargs)
 
     def get_user_by_name(self, user_name):

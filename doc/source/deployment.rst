@@ -47,12 +47,53 @@ Setup docker containers
 -----------------------
 
 Compatible docker containers can be found in DockerHub. Refer to the documentation
-of `simphony-remote-docker <https://github.com/simphony/simphony-remote-docker>`_ 
+of `simphony-remote-docker <https://github.com/simphony/simphony-remote-docker>`_
 repository to deploy the images.
 
-Once installed, use the `remoteappdb` program to create users, applications,
-and authorize users to start applications. Refer to the :ref:`utilities`
-section for details on the use of this program.
+
+Setup Database Accounting
+-------------------------
+
+A database is needed for managing the remote applications available for each user.
+Note that this database is in addition to the database created or used by JupyterHub.
+
+Various accounting sources are supported:
+
+1. Default sqlite database
+
+   **remoteappmanager** by default uses a sqlite database *remoteappmanager.db* in
+   the current work directory.  The **remoteappdb** command-line tool is provided
+   for setting up the database.  Please refer to the :ref:`utilities`
+   section for details on the use of this program.
+
+2. Other DBAPI_ implementations and databases
+
+   For database implementation supported by SQLAlchemy_, you may configure
+   **remoteappmanager** to use :py:class:`remoteappmanager.db.orm.AppAccounting`.
+   Please also refer to :ref:`config_remoteappmanager` for details on setting
+   up the accounting class.
+
+   .. note::
+      The use of databases other than sqlite3 is not tested
+
+3. CSV file
+
+   You may configurate **remoteappmanager** to use a CSV file as its database.
+   Please refer to :ref:`config_remoteappmanager` for details on setting up
+   the accounting class to use :py:class:`remoteappmanager.db.csv_db.CSVAccounting`.
+
+4. Others
+
+   Any arbitrary database implementation may be used as long as an accounting
+   class compliant to the API of `remoteappmanager.db.interfaces.ABCAccounting`
+   is provided. Please also refer to :ref:`config_remoteappmanager` for details
+   on setting up the accounting class.
+
+
+.. _SQLAlchemy: http://docs.sqlalchemy.org/en/latest/index.html
+.. _DBAPI: https://www.python.org/dev/peps/pep-0249/
+
+
 
 Start JupyterHub
 ----------------
