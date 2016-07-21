@@ -13,12 +13,16 @@ before_install:
     - pip install -r requirements.txt
     - pip install -r dev-requirements.txt
     - pip install -r doc-requirements.txt
+    - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
 install:
     - python setup.py install
 
 script:
     - flake8 .
-    - python -m tornado.testing discover -v
+    - python -m tornado.testing discover -s tests -v
+    - pushd jupyterhub && "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_jupyterhub.pid --make-pidfile --background --exec start.sh" && popd
+    - sleep 3
+    - python -m unittest discover -s selenium -v
     - sphinx-build -W doc/source doc/build/sphinx
 
 after_success:
