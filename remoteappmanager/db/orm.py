@@ -1,5 +1,6 @@
 import contextlib
 import hashlib
+import os
 
 from sqlalchemy import (
     Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum,
@@ -158,10 +159,26 @@ class AppAccounting(ABCAccounting):
     def __init__(self, url, **kwargs):
         self.db = Database(url, **kwargs)
 
+    def check_database_readable(self):
+        ''' Raise IOError if the database url points to a sqlite database
+        that is not readable
+
+        TODO: may extend for validating databases in other dialects?
+        '''
+        db_url = self.db.url
+
+        if db_url.startswith('sqlite:///'):
+            file_path = os.path.abspath(db_url[10:])
+            if not os.access(file_path, os.R_OK):
+                raise IOError(
+                    'Sqlite database {} is not readable'.format(file_path))
+
     def get_user_by_name(self, user_name):
         """ Return an orm.User given a user name.  Return None
         if the user name is not found in the database
         """
+        self.check_database_readable()
+
         # We create a session here to make sure it is only
         # used in one thread
         with contextlib.closing(self.db.create_session()) as session:
@@ -195,6 +212,8 @@ class AppAccounting(ABCAccounting):
            The mapping_id is a unique string identifying the combination
            of application and policy. It is not unique per user.
         """
+        self.check_database_readable()
+
         # We create a session here to make sure it is only
         # used in one thread
         with contextlib.closing(self.db.create_session()) as session:
