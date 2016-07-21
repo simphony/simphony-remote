@@ -20,7 +20,14 @@ install:
 script:
     - flake8 .
     - python -m tornado.testing discover -s tests -v
-    - pushd jupyterhub && "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_jupyterhub.pid --make-pidfile --background --exec start.sh" && popd
+    - pushd jupyterhub 
+	- docker pull simphonyproject/simphonic-mayavi:latest
+    - remoteappdb --db=remoteappmanager.db init
+    - remoteappdb --db=remoteappmanager.db user create test
+    - remoteappdb --db=remoteappmanager.db app create simphonyproject/simphonic-mayavi 
+    - remoteappdb --db=remoteappmanager.db app grant simphonyproject/simphonic-mayavi test
+    - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_jupyterhub.pid --make-pidfile --background --exec start.sh" 
+    - popd
     - sleep 3
     - python -m unittest discover -s selenium -v
     - sphinx-build -W doc/source doc/build/sphinx
