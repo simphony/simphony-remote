@@ -9,8 +9,13 @@ The jupyterhub configuration is documented in the `jupyterhub documentation
 important difference is the spawner to use, which is configured as::
 
     c.JupyterHub.spawner_class = 'remoteappmanager.spawner.Spawner'
+    # or
+    # c.JupyterHub.spawner_class = 'remoteappmanager.spawner.VirtualUserSpawner'
 
 in the `jupyterhub_config.py` file.
+
+Please refer to :py:mod:`remoteappmanager.spawner` for the available spawners
+in this project.
 
 
 .. _config_remoteappmanager:
