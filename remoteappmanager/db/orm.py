@@ -1,5 +1,6 @@
 import contextlib
 import hashlib
+import os
 
 from sqlalchemy import (
     Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum,
@@ -157,6 +158,21 @@ class AppAccounting(ABCAccounting):
 
     def __init__(self, url, **kwargs):
         self.db = Database(url, **kwargs)
+        self.check_database_readable()
+
+    def check_database_readable(self):
+        ''' Raise IOError if the database url points to a sqlite database
+        that is not readable
+
+        TODO: may extend for validating databases in other dialects?
+        '''
+        db_url = self.db.url
+
+        if db_url.startswith('sqlite:///'):
+            file_path = os.path.abspath(db_url[10:])
+            if not os.access(file_path, os.R_OK):
+                raise IOError(
+                    'Sqlite database {} is not readable'.format(file_path))
 
     def get_user_by_name(self, user_name):
         """ Return an orm.User given a user name.  Return None

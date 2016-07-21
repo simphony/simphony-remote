@@ -199,3 +199,12 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
 
         self.assertEqual(actual_app, expected_config[0][0])
         self.assertEqual(actual_policy, expected_config[0][1])
+
+    def test_no_file_creation_if_sqlite_database_not_exist(self):
+        temp_file_path = os.path.join(self.tempdir, 'some.db')
+
+        with self.assertRaises(IOError):
+            AppAccounting(
+                url="sqlite:///"+temp_file_path)
+
+        self.assertFalse(os.path.exists(temp_file_path))
