@@ -42,8 +42,8 @@ docker setup.
 
      c.Spawner.config_file_path = "/path/to/config.py"
 
-in the `jupyterhub_config.py` file. Note that this config file will be used by
-all remoteappmanagers for any user.
+   in the `jupyterhub_config.py` file. Note that this config file will be used by
+   all remoteappmanagers for any user.
 
 
 2. Config file
