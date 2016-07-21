@@ -21,7 +21,7 @@ script:
     - flake8 .
     - python -m tornado.testing discover -s tests -v
     - pushd jupyterhub 
-	- docker pull simphonyproject/simphonic-mayavi:latest
+    - docker pull simphonyproject/simphonic-mayavi:latest
     - remoteappdb --db=remoteappmanager.db init
     - remoteappdb --db=remoteappmanager.db user create test
     - remoteappdb --db=remoteappmanager.db app create simphonyproject/simphonic-mayavi 
