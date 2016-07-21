@@ -3,6 +3,8 @@ import contextlib
 import unittest
 import textwrap
 
+import docker
+
 from remoteappmanager.file_config import FileConfig
 
 from tests.temp_mixin import TempMixin
@@ -163,3 +165,11 @@ class TestFileConfig(TempMixin, unittest.TestCase):
         config.parse_config(self.config_file)
         self.assertNotEqual(config.tls_key, '')
         self.assertNotEqual(config.tls_cert, '')
+
+    def test_if_docker_config_result_is_acceptable_for_dockerpy(self):
+        config = FileConfig()
+        docker_config = config.docker_config()
+
+        client = docker.Client(**docker_config)
+
+        self.assertIsNotNone(client.info())
