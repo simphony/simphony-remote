@@ -158,6 +158,7 @@ class AppAccounting(ABCAccounting):
 
     def __init__(self, url, **kwargs):
         self.db = Database(url, **kwargs)
+        self.check_database_readable()
 
     def check_database_readable(self):
         ''' Raise IOError if the database url points to a sqlite database
@@ -177,8 +178,6 @@ class AppAccounting(ABCAccounting):
         """ Return an orm.User given a user name.  Return None
         if the user name is not found in the database
         """
-        self.check_database_readable()
-
         # We create a session here to make sure it is only
         # used in one thread
         with contextlib.closing(self.db.create_session()) as session:
@@ -212,8 +211,6 @@ class AppAccounting(ABCAccounting):
            The mapping_id is a unique string identifying the combination
            of application and policy. It is not unique per user.
         """
-        self.check_database_readable()
-
         # We create a session here to make sure it is only
         # used in one thread
         with contextlib.closing(self.db.create_session()) as session:
