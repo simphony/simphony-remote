@@ -8,13 +8,14 @@ dist: trusty
 
 before_install:
     - make deps
-    - . venv/bin/activate
     - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
 
 install:
+    - . venv/bin/activate
     - python setup.py install
 
 script:
+    - . venv/bin/activate
     - flake8 .
     - python -m tornado.testing discover -s tests -t . -v
     - docker pull simphonyproject/simphonic-mayavi:latest
@@ -33,6 +34,7 @@ script:
     - sphinx-build -W doc/source doc/build/sphinx
 
 after_success:
+    - . venv/bin/activate
     - coverage run -m tornado.testing discover
     - pip install codecov
     - codecov
