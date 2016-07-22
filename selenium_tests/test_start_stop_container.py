@@ -41,6 +41,7 @@ class TestStartStopContainer(unittest.TestCase):
             except: pass
             time.sleep(1)
         else: self.fail("time out")
+        print(driver.page_source)
         driver.find_element_by_link_text("Close").click()
         for i in range(10):
             print(driver.title)
