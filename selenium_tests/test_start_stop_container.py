@@ -24,6 +24,8 @@ class TestStartStopContainer(unittest.TestCase):
         driver.find_element_by_id("password_input").clear()
         driver.find_element_by_id("password_input").send_keys("test")
         driver.find_element_by_id("login_submit").click()
+        for i in range(10):
+            time.sleep(1)
         driver.find_element_by_name("action").click()
         for i in range(60):
             try:
@@ -32,6 +34,8 @@ class TestStartStopContainer(unittest.TestCase):
             time.sleep(1)
         else: self.fail("time out")
         driver.find_element_by_link_text("Close").click()
+        for i in range(10):
+            time.sleep(1)
         driver.find_element_by_name("action").click()
         for i in range(60):
             try:

@@ -8,9 +8,7 @@ import time
 
 class TestLoginLogout(unittest.TestCase):
     def setUp(self):
-        f=open("/tmp/firefox.log", "w+")
-        ff_binary = webdriver.firefox.firefox_binary.FirefoxBinary(
-            log_file=f)
+        ff_binary = webdriver.firefox.firefox_binary.FirefoxBinary()
         ff_profile = webdriver.firefox.firefox_profile.FirefoxProfile()
         ff_profile.assume_untrusted_cert_issuer = True
         ff_profile.accept_untrusted_certs = True
@@ -27,7 +25,6 @@ class TestLoginLogout(unittest.TestCase):
     def test_login_logout(self):
         driver = self.driver
         driver.get(self.base_url + "/hub/login")
-        print(driver.page_source.encode("utf-8"))
 
         driver.find_element_by_id("username_input").clear()
         driver.find_element_by_id("username_input").send_keys("test")
