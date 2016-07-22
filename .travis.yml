@@ -18,6 +18,7 @@ script:
     - flake8 .
     - python -m tornado.testing discover -s tests -t . -v
     - make db
+    - make certs
     - pushd jupyterhub
     - chmod 755 `pwd`/start.sh
     - "`pwd`/start.sh"
