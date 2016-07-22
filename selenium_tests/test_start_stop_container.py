@@ -45,11 +45,9 @@ class TestStartStopContainer(unittest.TestCase):
             time.sleep(1)
         else:
             self.fail("time out")
-        driver.save_screenshot("shot.png")
         driver.find_element_by_link_text("Close").click()
         driver.find_element_by_name("action").click()
         for i in range(60):
-            print(driver.title)
             try:
                 if "noVNC" == driver.title:
                     break
