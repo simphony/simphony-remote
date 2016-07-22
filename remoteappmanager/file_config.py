@@ -16,8 +16,8 @@ class FileConfig(HasTraits):
     ##########
     # Configuration file options. All of these come from the config file.
 
-    #: Enable tls, with a twist. if we use self-signed certificates,
-    #: using tls as True will produce an error of incorrect CA validation.
+    #: Enable tls, with a twist. If self-signed certificates are used,
+    #: setting tls as True will produce an error of incorrect CA validation.
     #: As a consequence, defaults to False. TLS secure connection will still
     #: happen thanks to tls_verify and tls[_cert|_key|_ca] being defined.
     #: See https://docs.docker.com/engine/security/https/
