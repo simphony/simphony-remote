@@ -8,13 +8,15 @@ import time
 
 class TestLoginLogout(unittest.TestCase):
     def setUp(self):
-        ff_binary = webdriver.firefox.firefox_binary.FirefoxBinary(log_file="/tmp/firefox.log")
+        ff_binary = webdriver.firefox.firefox_binary.FirefoxBinary(
+            log_file="/tmp/firefox.log")
         ff_profile = webdriver.firefox.firefox_profile.FirefoxProfile()
         ff_profile.assume_untrusted_cert_issuer = True
         ff_profile.accept_untrusted_certs = True
         capabilities = webdriver.DesiredCapabilities().FIREFOX
         capabilities['acceptSslCerts'] = True
-        self.driver = webdriver.Firefox(firefox_profile=ff_profile,
+        self.driver = webdriver.Firefox(firefox_binary=ff_binary,
+                                        firefox_profile=ff_profile,
                                         capabilities=capabilities)
         self.driver.implicitly_wait(30)
         self.base_url = "https://127.0.0.1:8000/"
