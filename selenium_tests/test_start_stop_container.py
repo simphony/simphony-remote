@@ -9,8 +9,15 @@ import unittest, time, re
 
 class TestStartStopContainer(unittest.TestCase):
     def setUp(self):
+        ff_binary = webdriver.firefox.firefox_binary.FirefoxBinary()
         ff_profile = webdriver.firefox.firefox_profile.FirefoxProfile()
-        self.driver = webdriver.Firefox(ff_profile)
+        ff_profile.assume_untrusted_cert_issuer = True
+        ff_profile.accept_untrusted_certs = True
+        capabilities = webdriver.DesiredCapabilities().FIREFOX
+        capabilities['acceptSslCerts'] = True
+        self.driver = webdriver.Firefox(firefox_binary=ff_binary,
+                                        firefox_profile=ff_profile,
+                                        capabilities=capabilities)
         self.driver.implicitly_wait(30)
         self.base_url = "https://127.0.0.1:8000/"
         self.verificationErrors = []
@@ -25,6 +32,7 @@ class TestStartStopContainer(unittest.TestCase):
         driver.find_element_by_id("password_input").send_keys("test")
         driver.find_element_by_id("login_submit").click()
         for i in range(10):
+            print(driver.title)
             time.sleep(1)
         driver.find_element_by_name("action").click()
         for i in range(60):
@@ -35,9 +43,11 @@ class TestStartStopContainer(unittest.TestCase):
         else: self.fail("time out")
         driver.find_element_by_link_text("Close").click()
         for i in range(10):
+            print(driver.title)
             time.sleep(1)
         driver.find_element_by_name("action").click()
         for i in range(60):
+            print(driver.title)
             try:
                 if "noVNC" == driver.title: break
             except: pass
