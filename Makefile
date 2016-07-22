@@ -11,14 +11,20 @@ help:
 	@echo "db: initializes the sqlite database"
 	@echo ""
 
+.PHONY: deps
 deps:
 	@echo "Installing dependencies"
 	@echo "-----------------------"
 	sudo apt-get update
 	sudo apt-get install docker-engine npm nodejs-legacy python3-pip python3.4-venv
+	sudo pip install --upgrade pip
 	sudo npm install -g configurable-http-proxy
 	python3 -mvenv venv
-	. venv/bin/activate && pip3 install docker-py
+	. venv/bin/activate && \
+		pip3 install docker-py && \
+		pip3 install -r requirements.txt \
+					-r dev-requirements.txt \
+					-r doc-requirements.txt
 
 .PHONY: develop
 develop: 
