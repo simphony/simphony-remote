@@ -43,14 +43,18 @@ certs:
 db: 
 	@echo "Creating database"
 	@echo "-----------------"
-	remoteappdb --db=~/remoteappmanager.db init
+	pushd jupyterhub; \
+        remoteappdb --db=remoteappmanager.db init;\
+        remoteappdb --db=remoteappmanager.db user create test; \
+        remoteappdb --db=remoteappmanager.db app create simphonyproject/simphonic-mayavi; \
+        remoteappdb --db=remoteappmanager.db app grant simphonyproject/simphonic-mayavi test; \
+        popd
 
 .PHONY: images
 images:
 	@echo "Downloading docker images"
 	@echo "-------------------------"
 	docker pull simphonyproject/simphonic-mayavi:latest
-	docker pull simphonyproject/simphonic-paraview:latest
 
 .PHONY: test
 test:
