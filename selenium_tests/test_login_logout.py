@@ -21,6 +21,8 @@ class TestLoginLogout(unittest.TestCase):
     def test_login_logout(self):
         driver = self.driver
         driver.get(self.base_url + "/hub/login")
+        print(driver.page_source.encode("utf-8"))
+
         driver.find_element_by_id("username_input").clear()
         driver.find_element_by_id("username_input").send_keys("test")
         driver.find_element_by_id("password_input").clear()
