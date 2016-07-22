@@ -26,7 +26,7 @@ script:
     - remoteappdb --db=remoteappmanager.db user create test
     - remoteappdb --db=remoteappmanager.db app create simphonyproject/simphonic-mayavi 
     - remoteappdb --db=remoteappmanager.db app grant simphonyproject/simphonic-mayavi test
-    - `pwd`/start.sh
+    - "`pwd`/start.sh"
     - "/sbin/start-stop-daemon --start --pidfile /tmp/custom_jupyterhub.pid --make-pidfile --background --exec `pwd`/start.sh"
     - popd
     - sleep 3
