@@ -22,6 +22,7 @@ import sys
 sys.path.append(os.path.abspath('../../remoteappmanager'))
 
 from remoteappmanager import __version__, MAJOR, MINOR
+from remoteappmanager.command_line_config import CommandLineConfig
 
 # -- General configuration ------------------------------------------------
 
@@ -429,3 +430,18 @@ epub_exclude_files = ['search.html']
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
+
+
+# ---------------------- Customised -------------------------- #
+
+# Create help text for remoteappmanager to be included in the doc
+
+HELP_FILE_PATH = 'remoteappmanager_help.txt'
+_config = CommandLineConfig()
+
+with open(HELP_FILE_PATH, 'w') as fh:
+    for name, traitlet in sorted(_config.traits().items()):
+        print('--{name:<30} {help}'.format(name=name, help=traitlet.help),
+              file=fh)
+
+del _config
