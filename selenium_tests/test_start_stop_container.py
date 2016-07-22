@@ -5,9 +5,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
-import unittest, time, re
+import unittest
+import time
+import re
+
 
 class TestStartStopContainer(unittest.TestCase):
+
     def setUp(self):
         ff_binary = webdriver.firefox.firefox_binary.FirefoxBinary()
         ff_profile = webdriver.firefox.firefox_profile.FirefoxProfile()
@@ -34,38 +38,51 @@ class TestStartStopContainer(unittest.TestCase):
         driver.find_element_by_name("action").click()
         for i in range(60):
             try:
-                if "noVNC" == driver.title: break
-            except: pass
+                if "noVNC" == driver.title:
+                    break
+            except:
+                pass
             time.sleep(1)
-        else: self.fail("time out")
+        else:
+            self.fail("time out")
         driver.save_screenshot("shot.png")
         driver.find_element_by_link_text("Close").click()
         driver.find_element_by_name("action").click()
         for i in range(60):
             print(driver.title)
             try:
-                if "noVNC" == driver.title: break
-            except: pass
+                if "noVNC" == driver.title:
+                    break
+            except:
+                pass
             time.sleep(1)
-        else: self.fail("time out")
+        else:
+            self.fail("time out")
         driver.find_element_by_xpath("//i").click()
         driver.find_element_by_xpath("(//button[@name='action'])[2]").click()
         for i in range(60):
             try:
-                if "Start" == driver.find_element_by_name("action").text: break
-            except: pass
+                if "Start" == driver.find_element_by_name("action").text:
+                    break
+            except:
+                pass
             time.sleep(1)
-        else: self.fail("time out")
+        else:
+            self.fail("time out")
         driver.find_element_by_id("logout").click()
 
     def is_element_present(self, how, what):
-        try: self.driver.find_element(by=how, value=what)
-        except NoSuchElementException as e: return False
+        try:
+            self.driver.find_element(by=how, value=what)
+        except NoSuchElementException as e:
+            return False
         return True
 
     def is_alert_present(self):
-        try: self.driver.switch_to_alert()
-        except NoAlertPresentException as e: return False
+        try:
+            self.driver.switch_to_alert()
+        except NoAlertPresentException as e:
+            return False
         return True
 
     def close_alert_and_get_its_text(self):
@@ -77,7 +94,8 @@ class TestStartStopContainer(unittest.TestCase):
             else:
                 alert.dismiss()
             return alert_text
-        finally: self.accept_next_alert = True
+        finally:
+            self.accept_next_alert = True
 
     def tearDown(self):
         self.driver.quit()

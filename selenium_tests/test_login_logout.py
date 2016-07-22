@@ -7,6 +7,7 @@ import time
 
 
 class TestLoginLogout(unittest.TestCase):
+
     def setUp(self):
         ff_binary = webdriver.firefox.firefox_binary.FirefoxBinary()
         ff_profile = webdriver.firefox.firefox_profile.FirefoxProfile()
@@ -33,26 +34,36 @@ class TestLoginLogout(unittest.TestCase):
         driver.find_element_by_id("login_submit").click()
         for i in range(60):
             try:
-                if "Available Applications" == driver.find_element_by_css_selector("h1").text: break
-            except: pass
+                if "Available Applications" == driver.find_element_by_css_selector("h1").text:
+                    break
+            except:
+                pass
             time.sleep(1)
-        else: self.fail("time out")
+        else:
+            self.fail("time out")
         driver.find_element_by_id("logout").click()
         for i in range(60):
             try:
-                if "Sign in" == driver.find_element_by_css_selector("div.auth-form-header").text: break
-            except: pass
+                if "Sign in" == driver.find_element_by_css_selector("div.auth-form-header").text:
+                    break
+            except:
+                pass
             time.sleep(1)
-        else: self.fail("time out")
+        else:
+            self.fail("time out")
 
     def is_element_present(self, how, what):
-        try: self.driver.find_element(by=how, value=what)
-        except NoSuchElementException as e: return False
+        try:
+            self.driver.find_element(by=how, value=what)
+        except NoSuchElementException as e:
+            return False
         return True
 
     def is_alert_present(self):
-        try: self.driver.switch_to_alert()
-        except NoAlertPresentException as e: return False
+        try:
+            self.driver.switch_to_alert()
+        except NoAlertPresentException as e:
+            return False
         return True
 
     def close_alert_and_get_its_text(self):
@@ -64,7 +75,8 @@ class TestLoginLogout(unittest.TestCase):
             else:
                 alert.dismiss()
             return alert_text
-        finally: self.accept_next_alert = True
+        finally:
+            self.accept_next_alert = True
 
     def tearDown(self):
         self.driver.quit()

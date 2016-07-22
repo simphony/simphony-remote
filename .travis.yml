@@ -10,17 +10,19 @@ addons:
 
 before_install:
     - firefox --version
+    - export NO_VENV=1
     - make deps
     - make images
     - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
 
 install:
+    - export NO_VENV=1
     - make install
 
 script:
-#    - flake8 .
-#    - python -m tornado.testing discover -s tests -t . -v
-#    - sphinx-build -W doc/source doc/build/sphinx
+    - export NO_VENV=1
+    - make test
+    - make docs
     - make db
     - make certs
     - pushd jupyterhub
@@ -31,11 +33,7 @@ script:
     - sleep 3
     - DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
 
-after_failure:
-    - curl --upload-file shot.png https://transfer.sh/shot.png
-
 after_success:
-    - . venv/bin/activate
     - coverage run -m tornado.testing discover
     - pip install codecov
     - codecov
