@@ -8,11 +8,13 @@ Summary
 ~~~~~~~
 
 - Updated documentation (#147)
-- Parameters for setting up docker client is now optional (#126)
+- Parameters for setting up docker client are now optional (#126)
 - Formalise BadRequest error in the Rest API (#127)
 - Add description to remoteappdb (#129)
 - Supports parsing outputs from both docker `inspect_container` and
   `containers` (#133)
+- Simplify the ReverseProxy (#114)
+- Provide a set of dummy and virtual objects for better testing (#98)
 - Bug fix: Subhandlers on the home page should raise instead of finish when
   error occurs (#123)
 - Bug fix: Spawner's config_file_path should be configurable from jupyterhub
