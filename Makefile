@@ -16,7 +16,7 @@ deps:
 	@echo "Installing dependencies"
 	@echo "-----------------------"
 	sudo apt-get update
-	sudo apt-get install docker-engine npm nodejs-legacy python3-pip python3.4-venv
+	sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
 	sudo pip install --upgrade pip
 	sudo npm install -g configurable-http-proxy
 	python3 -mvenv venv
