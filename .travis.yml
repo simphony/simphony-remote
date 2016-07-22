@@ -21,7 +21,7 @@ script:
     - make certs
     - pushd jupyterhub
     - chmod 755 `pwd`/start.sh
-    - "/sbin/start-stop-daemon --start --pidfile /tmp/custom_jupyterhub.pid --make-pidfile --background --exec `pwd`/start.sh"
+    - `pwd`/start.sh &
     - popd
     - sleep 3
     - DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
