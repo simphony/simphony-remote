@@ -19,7 +19,7 @@ deps:
 	sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
 	sudo pip install --upgrade pip
 	sudo npm install -g configurable-http-proxy
-    pip3 install -r requirements.txt -r dev-requirements.txt -r doc-requirements.txt
+	pip3 install -r requirements.txt -r dev-requirements.txt -r doc-requirements.txt
 
 .PHONY: develop
 develop: 
