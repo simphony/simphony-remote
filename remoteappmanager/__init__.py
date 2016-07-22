@@ -1,5 +1,5 @@
 MAJOR = 0
-MINOR = 5
+MINOR = 6
 MICRO = 0
 IS_RELEASED = False
 
