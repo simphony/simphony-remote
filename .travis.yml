@@ -21,7 +21,7 @@ script:
     - make certs
     - pushd jupyterhub
     - chmod 755 `pwd`/start.sh
-    - "`pwd`/start.sh" &
+    - "`pwd`/start.sh &"
     - popd
     - sleep 3
     - DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
