@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
-import unittest, time, re
+import unittest
+import time
+
 
 class TestLoginLogout(unittest.TestCase):
     def setUp(self):
         ff_profile = webdriver.firefox.firefox_profile.FirefoxProfile()
-        self.driver = webdriver.Firefox(ff_profile)
+        capabilities = webdriver.DesiredCapabilities().FIREFOX
+        capabilities['acceptSslCerts'] = True
+        self.driver = webdriver.Firefox(firefox_profile=ff_profile,
+                                        capabilities=capabilities)
         self.driver.implicitly_wait(30)
         self.base_url = "https://127.0.0.1:8000/"
         self.verificationErrors = []
