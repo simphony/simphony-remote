@@ -20,6 +20,7 @@ script:
     - make db
     - make certs
     - pushd jupyterhub
+    - mkdir -p /tmp/remoteapp
     - chmod 755 `pwd`/start.sh
     - "`pwd`/start.sh &"
     - popd
