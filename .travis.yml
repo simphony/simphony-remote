@@ -27,6 +27,8 @@ script:
     - popd
     - sleep 3
     - DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
+
+after_failure:
     - curl --upload-file shot.png https://transfer.sh/shot.png
 
 after_success:
