@@ -10,7 +10,7 @@ class TestLoginLogout(unittest.TestCase):
     def setUp(self):
         ff_profile = webdriver.firefox.firefox_profile.FirefoxProfile()
         ff_profile.assume_untrusted_cert_issuer = True
-        ff_profile.accept_untristed_certs = True
+        ff_profile.accept_untrusted_certs = True
         capabilities = webdriver.DesiredCapabilities().FIREFOX
         capabilities['acceptSslCerts'] = True
         self.driver = webdriver.Firefox(firefox_profile=ff_profile,
