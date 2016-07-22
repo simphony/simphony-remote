@@ -29,7 +29,7 @@ script:
     - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_jupyterhub.pid --make-pidfile --background --exec `pwd`/start.sh" 
     - popd
     - sleep 3
-    - python -m unittest discover -s selenium_tests -t . -v
+    - DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
     - sphinx-build -W doc/source doc/build/sphinx
 
 after_success:
