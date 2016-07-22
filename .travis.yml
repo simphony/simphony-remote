@@ -8,17 +8,15 @@ dist: trusty
 
 before_install:
     - make deps
+    - make images
     - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
 
 install:
-    - . venv/bin/activate
-    - python setup.py install
+    - make install
 
 script:
-    - . venv/bin/activate
     - flake8 .
     - python -m tornado.testing discover -s tests -t . -v
-    - docker pull simphonyproject/simphonic-mayavi:latest
     - pushd jupyterhub
     - remoteappdb --db=remoteappmanager.db init
     - remoteappdb --db=remoteappmanager.db user create test

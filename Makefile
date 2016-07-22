@@ -19,23 +19,19 @@ deps:
 	sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
 	sudo pip install --upgrade pip
 	sudo npm install -g configurable-http-proxy
-	python3 -mvenv venv
-	. venv/bin/activate && \
-		pip3 install -r requirements.txt \
-					-r dev-requirements.txt \
-					-r doc-requirements.txt
+    pip3 install -r requirements.txt -r dev-requirements.txt -r doc-requirements.txt
 
 .PHONY: develop
 develop: 
 	@echo "Installing application"
 	@echo "----------------------"
-	. venv/bin/activate && python3 setup.py develop 
+	python3 setup.py develop
 
 .PHONY: install
 install: 
 	@echo "Installing application"
 	@echo "----------------------"
-	. venv/bin/activate && python3 setup.py install
+	python3 setup.py install
 
 .PHONY: certs
 certs: 
@@ -47,13 +43,12 @@ certs:
 db: 
 	@echo "Creating database"
 	@echo "-----------------"
-	-. venv/bin/activate && remoteappdb --db=~/remoteappmanager.db init
+	remoteappdb --db=~/remoteappmanager.db init
 
 .PHONY: images
 images:
 	@echo "Downloading docker images"
 	@echo "-------------------------"
-	docker pull simphonyproject/ubuntu-14.04-remote:latest
 	docker pull simphonyproject/simphonic-mayavi:latest
 	docker pull simphonyproject/simphonic-paraview:latest
 
@@ -61,4 +56,4 @@ images:
 test:
 	@echo "Running testsuite"
 	@echo "-----------------"
-	-. venv/bin/activate && flake8 . && python -m tornado.testing discover -s tests
+	flake8 . && python -m tornado.testing discover -s tests
