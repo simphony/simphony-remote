@@ -9,7 +9,8 @@ import unittest, time, re
 
 class TestLoginLogout(unittest.TestCase):
     def setUp(self):
-        self.driver = webdriver.Firefox()
+        ff_profile = webdriver.firefox.firefox_profile.FirefoxProfile()
+        self.driver = webdriver.Firefox(ff_profile)
         self.driver.implicitly_wait(30)
         self.base_url = "https://127.0.0.1:8000/"
         self.verificationErrors = []
