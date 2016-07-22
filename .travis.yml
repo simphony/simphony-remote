@@ -30,6 +30,7 @@ script:
     - popd
     - sleep 3
     - DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
+    - cat /tmp/firefox.log
     - sphinx-build -W doc/source doc/build/sphinx
 
 after_success:

@@ -8,6 +8,7 @@ import time
 
 class TestLoginLogout(unittest.TestCase):
     def setUp(self):
+        ff_binary = webdriver.firefox.firefox_binary.FirefoxBinary(log_file="/tmp/firefox.log")
         ff_profile = webdriver.firefox.firefox_profile.FirefoxProfile()
         ff_profile.assume_untrusted_cert_issuer = True
         ff_profile.accept_untrusted_certs = True
