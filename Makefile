@@ -21,7 +21,6 @@ deps:
 	sudo npm install -g configurable-http-proxy
 	python3 -mvenv venv
 	. venv/bin/activate && \
-		pip3 install docker-py && \
 		pip3 install -r requirements.txt \
 					-r dev-requirements.txt \
 					-r doc-requirements.txt
