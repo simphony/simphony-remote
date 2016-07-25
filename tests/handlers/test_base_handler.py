@@ -5,7 +5,7 @@ from tests.mocking import dummy
 from tests.temp_mixin import TempMixin
 
 
-class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
+class TestBaseHandler(TempMixin, utils.AsyncHTTPTestCase):
     def setUp(self):
         self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
         os.environ["PROXY_API_TOKEN"] = "dummy_token"
@@ -33,7 +33,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
             'server': app.settings['base_urlpath']}
         return app
 
-    def test_home(self):
+    def test_home_internal_error(self):
         res = self.fetch("/user/username/",
                          headers={
                              "Cookie": "jupyter-hub-token-username=foo"
