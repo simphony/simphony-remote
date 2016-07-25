@@ -1,3 +1,4 @@
+from http.client import responses
 from urllib.parse import urljoin
 
 from tornado import web, gen
@@ -40,3 +41,23 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
 
         args.update(kwargs)
         super(BaseHandler, self).render(template_name, **args)
+
+    def write_error(self, status_code, **kwargs):
+        """Render error page for uncaught errors"""
+
+        status_message = responses.get(status_code, 'Unknown HTTP Error')
+
+        exc_info = kwargs.get('exc_info')
+
+        if exc_info:
+            exception = exc_info[1]
+
+            ref = self.log.issue(status_message, exception)
+            message = '{}. Ref.: {}'.format(str(exception), ref)
+
+        else:
+            ref = self.log.issue(status_message)
+            message = 'Ref.: {}'.format(ref)
+
+        self.render('error.html', status_code=status_code,
+                    status_message=status_message, message=message)
