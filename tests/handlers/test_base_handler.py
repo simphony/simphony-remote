@@ -1,6 +1,4 @@
 import os
-import urllib.parse
-from unittest import mock
 
 from tests import utils
 from tests.mocking import dummy
