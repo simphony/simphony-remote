@@ -1,4 +1,4 @@
-# Modified from enthought/trait-documenter/trait_documenter/class_trait_documenter.py
+# Modified from enthought/trait-documenter/trait_documenter/class_trait_documenter.py  # noqa
 
 # LICENSE: OSI Certified Open Source Software
 # OSI Certified is a certification mark of the Open Source Initiative.
