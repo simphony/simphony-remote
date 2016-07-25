@@ -5,21 +5,32 @@ python:
 
 sudo: required
 dist: trusty
+addons:
+    firefox: "latest"
 
 before_install:
-    - sudo apt-get update
-    - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine
-    - sudo pip install --upgrade pip
-    - pip install -r requirements.txt
-    - pip install -r dev-requirements.txt
-    - pip install -r doc-requirements.txt
+    - firefox --version
+    - sudo make aptdeps
+    - make pythondeps
+
 install:
-    - python setup.py install
+    - make install
 
 script:
-    - flake8 .
-    - python -m tornado.testing discover -v
-    - sphinx-build -W doc/source doc/build/sphinx
+    - make test
+    - make docs
+    - make testimages
+    - make testdb
+    - make certs
+    - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
+    - sleep 3
+    - pushd jupyterhub
+    - mkdir -p /tmp/remoteapp
+    - chmod 755 `pwd`/start.sh
+    - "`pwd`/start.sh &"
+    - popd
+    - sleep 3
+    - DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
 
 after_success:
     - coverage run -m tornado.testing discover
