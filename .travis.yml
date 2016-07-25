@@ -6,21 +6,18 @@ python:
 sudo: required
 dist: trusty
 addons:
-  firefox: "latest"
+    firefox: "latest"
 
 before_install:
     - firefox --version
-    - export NO_VENV=1
     - make deps
     - make testimages
     - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
 
 install:
-    - export NO_VENV=1
     - make install
 
 script:
-    - export NO_VENV=1
     - make test
     - make docs
     - make testdb

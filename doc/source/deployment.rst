@@ -15,20 +15,24 @@ Deployment of the complete system in a single machine/VM.
 
      git clone https://github.com/simphony/simphony-remote
 
-#. Install dependencies. This will install the dependencies and create
-   a virtual environment for additional deployment::
+#. Create and activate a virtual environment::
 
-     make deps
+     make venv
+     . venv/bin/activate 
+
+#. Install apt dependencies. You need to be root to execute this::
+
+     make aptdeps
+
+#. Install python dependencies::
+
+     make pythondeps
 
 #. Generate the SSL certificates if you do not already have them. The
    resulting certificates will have names test.* because they are
    self-signed and **are not supposed to be used for production**.
    A CA-signed certificate should be obtained instead.
-   You must choose and set a password of your liking, and use it when prompted.
-   Additional information will also be requested, but are not strictly required
-   and can be left as defaults.
-
-   Once created the certificates, copy them to the jupyterhub directory::
+   The certificates will be created in the jupyterhub directory::
 
      make certs
 
