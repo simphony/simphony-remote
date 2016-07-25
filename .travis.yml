@@ -10,9 +10,8 @@ addons:
 
 before_install:
     - firefox --version
-    - make deps
-    - make testimages
-    - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
+    - make aptdeps
+    - make pythondeps
 
 install:
     - make install
@@ -21,7 +20,10 @@ script:
     - make test
     - make docs
     - make testdb
+    - make testimages
     - make certs
+    - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
+    - sleep 3
     - pushd jupyterhub
     - mkdir -p /tmp/remoteapp
     - chmod 755 `pwd`/start.sh
