@@ -10,7 +10,7 @@ addons:
 
 before_install:
     - firefox --version
-    - make aptdeps
+    - sudo make aptdeps
     - make pythondeps
 
 install:
