@@ -12,7 +12,7 @@ before_install:
     - firefox --version
     - export NO_VENV=1
     - make deps
-    - make images
+    - make testimages
     - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
 
 install:
@@ -23,7 +23,7 @@ script:
     - export NO_VENV=1
     - make test
     - make docs
-    - make db
+    - make testdb
     - make certs
     - pushd jupyterhub
     - mkdir -p /tmp/remoteapp

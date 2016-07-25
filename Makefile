@@ -71,13 +71,24 @@ db:
 	fi; \
 	pushd jupyterhub; \
         remoteappdb --db=remoteappmanager.db init;\
+        popd
+
+.PHONY: testdb
+testdb: db
+	@echo "Creating Test database"
+	@echo "----------------------"
+	if test -z ${NO_VENV}; \
+	then \
+		. venv/bin/activate; \
+	fi; \
+	pushd jupyterhub; \
         remoteappdb --db=remoteappmanager.db user create test; \
         remoteappdb --db=remoteappmanager.db app create simphonyproject/simphonic-mayavi; \
         remoteappdb --db=remoteappmanager.db app grant simphonyproject/simphonic-mayavi test; \
         popd
 
-.PHONY: images
-images:
+.PHONY: testimages
+testimages:
 	@echo "Downloading docker images"
 	@echo "-------------------------"
 	docker pull simphonyproject/simphonic-mayavi:latest
