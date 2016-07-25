@@ -45,17 +45,15 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
     def write_error(self, status_code, **kwargs):
         """Render error page for uncaught errors"""
         status_message = responses.get(status_code, 'Unknown HTTP Error')
-        exc_info = kwargs.get('exc_info')
+        message = ""
 
+        # If this error was caused by an uncaught exception
+        # log exception message and reference number as well
+        exc_info = kwargs.get('exc_info')
         if exc_info:
-            # log exception message as well
             exception = exc_info[1]
             ref = self.log.issue(status_message, exception)
             message = '{}. Ref.: {}'.format(str(exception), ref)
-        else:
-            # no exception, just show the reference
-            ref = self.log.issue(status_message)
-            message = 'Ref.: {}'.format(ref)
 
         self.render('error.html', status_code=status_code,
                     status_message=status_message, message=message)
