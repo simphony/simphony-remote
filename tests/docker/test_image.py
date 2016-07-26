@@ -2,12 +2,12 @@ from unittest import TestCase
 
 from remoteappmanager.docker import docker_labels
 from remoteappmanager.docker.image import Image
-from tests.utils import mock_docker_client
+from tests.mocking.virtual.docker_client import create_docker_client
 
 
 class TestImage(TestCase):
     def test_from_docker_dict_images(self):
-        docker_client = mock_docker_client()
+        docker_client = create_docker_client()
         image_dict = docker_client.images()[0]
         image = Image.from_docker_dict(image_dict)
 
@@ -19,8 +19,8 @@ class TestImage(TestCase):
                          image_dict["Labels"][docker_labels.UI_NAME])
 
     def test_from_docker_dict_inspect_image(self):
-        docker_client = mock_docker_client()
-        image_dict = docker_client.inspect_image()
+        docker_client = create_docker_client()
+        image_dict = docker_client.inspect_image('image_id1')
         image = Image.from_docker_dict(image_dict)
 
         self.assertEqual(image.docker_id, image_dict["Id"])
