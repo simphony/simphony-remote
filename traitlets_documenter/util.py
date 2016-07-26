@@ -1,11 +1,3 @@
-# enthought/trait-documenter/trait_documenter/util.py
-
-# LICENSE: OSI Certified Open Source Software
-# OSI Certified is a certification mark of the Open Source Initiative.
-
-# Copyright (c) 2014, Enthought, Inc.
-# All rights reserved.
-
 import ast
 import inspect
 import collections
