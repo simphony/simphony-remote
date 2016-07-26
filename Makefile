@@ -24,8 +24,7 @@ aptdeps:
 	apt-get update
 	apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
 	pip install --upgrade pip
-	npm install -g configurable-http-proxy browserify browserify-derequire
-	npm install rest-js
+	npm install -g configurable-http-proxy
 
 .PHONY: pythondeps
 pythondeps:
@@ -33,18 +32,14 @@ pythondeps:
 	@echo "-----------------------"
 	pip3 install -r requirements.txt -r dev-requirements.txt -r doc-requirements.txt
 
-.PHONY: js
-js:
-	cd remoteappmanager/static/js/ && browserify -p browserify-derequire restclient.node.js > restclient.js
-
 .PHONY: develop
-develop: js
+develop: 
 	@echo "Installing application"
 	@echo "----------------------"
 	python3 setup.py develop
 
 .PHONY: install
-install: js
+install:
 	@echo "Installing application"
 	@echo "----------------------"
 	python3 setup.py install

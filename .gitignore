@@ -7,4 +7,3 @@ jupyterhub_cookie_secret
 *.crt
 *.key
 doc/build
-node_modules
