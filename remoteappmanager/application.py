@@ -111,8 +111,12 @@ class Application(web.Application, LoggingMixin):
         class_path = self.file_config.accounting_class
         module_path, _, cls_name = class_path.rpartition('.')
         cls = getattr(importlib.import_module(module_path), cls_name)
-
-        return cls(**self.file_config.accounting_kwargs)
+        try:
+            return cls(**self.file_config.accounting_kwargs)
+        except Exception:
+            reason = 'The database is not initialised properly.'
+            self.log.exception(reason)
+            raise web.HTTPError(reason=reason)
 
     @default("user")
     def _user_default(self):

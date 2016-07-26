@@ -42,4 +42,4 @@ class TestBaseHandler(TempMixin, utils.AsyncHTTPTestCase):
 
         self.assertEqual(res.code, 500)
         self.assertIn('Internal Server Error', str(res.body))
-        self.assertIn("Empty module name. Ref.:", str(res.body))
+        self.assertIn(" Ref.:", str(res.body))

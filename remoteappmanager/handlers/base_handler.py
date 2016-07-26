@@ -53,7 +53,8 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
         if exc_info:
             exception = exc_info[1]
             ref = self.log.issue(status_message, exception)
-            message = '{}. Ref.: {}'.format(str(exception), ref)
+            reason = getattr(exception, 'reason', '')
+            message = '{} Ref.: {}'.format(reason, ref)
 
         self.render('error.html', status_code=status_code,
                     status_message=status_message, message=message)
