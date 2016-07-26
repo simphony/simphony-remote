@@ -42,7 +42,7 @@ class TestContainerManager(AsyncTestCase):
     @gen_test
     def test_containers_from_mapping_id(self):
         ''' Test containers_for_mapping_id returns a list of Container '''
-        result = yield self.manager.containers_from_mapping_id("username",
+        result = yield self.manager.containers_from_mapping_id("user_name",
                                                                "mapping_id")
         expected = Container(docker_id='container_id1',
                              mapping_id="mapping_id",

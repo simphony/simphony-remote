@@ -44,9 +44,9 @@ def get_fake_image_labels(num=2):
 def get_fake_container_ports(num=3):
     samples = cycle(([{'IP': '0.0.0.0',
                        'PublicPort': 666,
-                       'PrivatePort': 22,
+                       'PrivatePort': 8888,
                        'Type': 'tcp'}],
-                     [{'PrivatePort': 22,
+                     [{'PrivatePort': 8889,
                        'Type': 'tcp'}],
                      []))
     return tuple(next(samples) for _ in range(num))
@@ -90,11 +90,16 @@ def mock_containers(container_ids, container_names,
             all_labels.update(labels)
 
             # Apply filters for labels
-            if 'filters' in kwargs and 'labels' in kwargs['filters']:
-                label_filters = kwargs['filters']['labels']
+            if 'filters' in kwargs and 'label' in kwargs['filters']:
+                label_filters = kwargs['filters']['label']
+
+                if not isinstance(label_filters, (list, tuple)):
+                    label_filters = [label_filters]
+
+                label_filters = (label.split('=') for label in label_filters)
                 if any(label_name not in all_labels or
                        all_labels[label_name] != label_value
-                       for label_name, label_value in label_filters.items()):
+                       for label_name, label_value in label_filters):
                     continue
 
             results.append(
@@ -136,20 +141,28 @@ def mock_inspect_container(container_ids, container_names,
         all_labels = image_labels.copy()
         all_labels.update(labels)
 
+        network_settings = {}
+
         if container_port:
-            host_ip = container_port[0].get('IP', '')
-            host_port = container_port[0].get('PublicPort', '')
-        else:
-            host_ip = host_port = ''
+            network_settings['Ports'] = {}
+
+            for port_settings in container_port:
+                target = '{}/{}'.format(port_settings.get('PrivatePort', ''),
+                                        port_settings.get('Type', 'tcp'))
+                host_ip = port_settings.get('IP', '')
+                host_port = port_settings.get('PublicPort', '')
+                network_settings['Ports'][target] = [
+                    {'HostIp': str(host_ip),
+                     'HostPort': str(host_port)}]
 
         return {'State': container_state,
                 'Name': '/'+container_name,
                 'Image': image_id,
-                'Image': image_name,
-                'Labels': all_labels,
+                'Config': {
+                    'Image': image_name,
+                    'Labels': all_labels},
                 'Id': container_id,
-                'Ports': {'8888/tcp': [
-                    {'HostIp': host_ip, 'HostPort': host_port}]}
+                'NetworkSettings': network_settings
                 }
 
     return inspect_container
