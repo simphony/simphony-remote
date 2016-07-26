@@ -2,4 +2,4 @@ Troubleshoot
 ------------
 
 .. include::
-    troubleshoot/database_not_readable.rst
+    troubleshoot/database.rst
