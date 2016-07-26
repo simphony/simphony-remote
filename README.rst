@@ -14,4 +14,8 @@ The package provides an executable replacement of jupyterhub-singleuser, and
 provides management capabilities for docker images and containers. It is spawn
 by the jupyterhub server in response to a login.
 
-.. include:: COPYING.txt
+License 
+-------
+
+This software is released under the terms of the BSD license. See the
+`COPYING.txt <COPYING.txt>`_ for license terms.
