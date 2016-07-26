@@ -1,8 +1,8 @@
 from unittest import TestCase
 
 from remoteappmanager.docker.container import Container
-from tests.utils import assert_containers_equal, \
-    mock_docker_client_with_running_containers
+from tests.utils import assert_containers_equal
+from tests.mocking.virtual.docker_client import create_docker_client
 
 
 class TestContainer(TestCase):
@@ -57,60 +57,61 @@ class TestContainer(TestCase):
 
     def test_from_docker_dict_without_public_port(self):
         '''Test convertion from "docker ps" to Container with public port'''
-        # With public port
-        container_dict = {
-            'Command': '/startup.sh',
-            'Created': 1466756760,
-            'HostConfig': {'NetworkMode': 'default'},
-            'Id': '812c765d0549be0ab831ae8348',
-            'Image': 'novnc-ubuntu:latest',
-            'ImageID': 'sha256:f4610c75d3c0dfa25d3c0dfa25d3c0dfa2',
-            'Labels': {'eu.simphony-project.docker.ui_name': 'Empty Ubuntu',
-                       'eu.simphony-project.docker.user': 'user',
-                       'eu.simphony-project.docker.url_id': "8e2fe66d5de74db9bbab50c0d2f92b33"},  # noqa
-            'Names': ['/remoteexec-user-empty-ubuntu_3Alatest'],
-            'Ports': [{'IP': '0.0.0.0',
-                       'PrivatePort': 8888,
-                       'Type': 'tcp'}],
-            'State': 'running',
-            'Status': 'Up 56 minutes'}
+        client = create_docker_client(container_ids=('container_id1',),
+                                      container_names=('container_name1',),
+                                      container_ports=([{'IP': '0.0.0.0',
+                                                         'PrivatePort': 8888,
+                                                         'Type': 'tcp'}],))
+        container_dict = client.containers()[0]
 
         # Container without public port
         actual = Container.from_docker_dict(container_dict)
         expected = Container(
-            docker_id='812c765d0549be0ab831ae8348',
-            name='/remoteexec-user-empty-ubuntu_3Alatest',
-            image_name='novnc-ubuntu:latest',
-            image_id='sha256:f4610c75d3c0dfa25d3c0dfa25d3c0dfa2',
+            docker_id='container_id1',
+            name='/container_name1',
+            image_name='image_name1',
+            image_id='image_id1',
             ip='0.0.0.0',
             port=80,
-            url_id="8e2fe66d5de74db9bbab50c0d2f92b33")
+            url_id="url_id",
+            mapping_id="mapping_id")
 
         assert_containers_equal(self, actual, expected)
 
     def test_from_docker_dict_inspect_container(self):
-        client = mock_docker_client_with_running_containers()
+        client = create_docker_client()
         actual = Container.from_docker_dict(
-            client.inspect_container("id"))
+            client.inspect_container('container_id1'))
 
         expected = Container(
-            docker_id='35d88fe321c3d575ec3be64f54b8967ef49c0dc92395bf4c1e511ed3e6ae0c79',  # noqa
-            name='/remoteexec-username-simphonyproject_2Fsimphonic-mayavi_5F1',
-            image_name='simphonyproject/simphonic-mayavi',
-            image_id='sha256:f43b749341ee37b56e7bd8d99f09629f311aaec35a8045a39185b5659edef169',  # noqa
+            docker_id='container_id1',
+            name='/remoteexec-username-mapping_5Fid',
+            image_name='image_name1',
+            image_id='image_id1',
             ip='0.0.0.0',
-            port=32782,
-            url_id="55555555555555555555555555555555",
-            mapping_id="1c08c87878634e90af43d799e90f61d2")
+            port=666,
+            url_id="url_id",
+            mapping_id="mapping_id")
 
         assert_containers_equal(self, actual, expected)
 
     def test_multiple_ports_data(self):
-        client = mock_docker_client_with_running_containers()
-        docker_dict = client.inspect_container("id")
+        client = create_docker_client(container_names=('container_name1'),
+                                      container_ids=('container_id1'),
+                                      container_ports=(
+                                          [{'IP': '0.0.0.0',
+                                            'PublicPort': 666,
+                                            'PrivatePort': 8888,
+                                            'Type': 'tcp'},
+                                           {'IP': '0.0.0.0',
+                                            'PublicPort': 667,
+                                            'PrivatePort': 8889,
+                                            'Type': 'tcp'}],))
+
+        docker_dict = client.inspect_container("container_id1")
         docker_dict["NetworkSettings"]["Ports"] = {
-            '8888/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '32782'}],
-            '8889/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '32783'}]
+            '8888/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '666'}],
+            '8889/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '667'}]
         }
         with self.assertRaises(ValueError):
             Container.from_docker_dict(docker_dict)

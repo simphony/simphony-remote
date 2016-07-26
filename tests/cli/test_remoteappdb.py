@@ -6,7 +6,7 @@ from click.testing import CliRunner
 
 from remoteappmanager.cli.remoteappdb import __main__ as remoteappdb
 from tests.temp_mixin import TempMixin
-from tests.utils import mock_docker_client
+from tests.mocking.virtual.docker_client import create_docker_client
 
 
 class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
@@ -54,19 +54,19 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         self.assertIn("foo", out)
         self.assertIn("bar", out)
 
+    @mock.patch('remoteappmanager.cli.remoteappdb.__main__.get_docker_client',  # noqa
+                create_docker_client)
     def test_app_create_with_verify(self):
-        with mock.patch('remoteappmanager.cli.remoteappdb.__main__.get_docker_client',  # noqa
-                        mock_docker_client):
-            # docker.client.inspect_image is mocked to always return
-            # something, so verification would pass
-            exit_code, output = self._remoteappdb("app create anything")
+        exit_code, output = self._remoteappdb("app create image_id1")
 
-            self.assertEqual(exit_code, 0)
+        self.assertEqual(exit_code, 0)
 
-            # Check that the app is created
-            exit_code, output = self._remoteappdb("app list")
-            self.assertIn('anything', output)
+        # Check that the app is created
+        exit_code, output = self._remoteappdb("app list")
+        self.assertIn('image_id1', output)
 
+    @mock.patch('remoteappmanager.cli.remoteappdb.__main__.get_docker_client',  # noqa
+                create_docker_client)
     def test_app_create_wrong_name_with_verify(self):
         # create an application with a wrong image name
         exit_code, output = self._remoteappdb('app create wrong')
@@ -77,6 +77,8 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         exit_code, output = self._remoteappdb("app list")
         self.assertNotIn('wrong', output)
 
+    @mock.patch('remoteappmanager.cli.remoteappdb.__main__.get_docker_client',  # noqa
+                create_docker_client)
     def test_app_create_wrong_name_without_verify(self):
         # create an application with a wrong image name
         exit_code, output = self._remoteappdb("app create wrong2 --no-verify")
