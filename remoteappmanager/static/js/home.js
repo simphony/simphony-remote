@@ -20,6 +20,8 @@ require(["jquery", "jhapi", "utils", "remoteappapi"],
     
     $(".start-button").click(function () {
         var id = this.id;
+        $(this).find(".fa-spinner").show();
+
         appapi.start_application(id, {
                 statusCode: {
                     201: function (data, textStatus, request) {
@@ -29,15 +31,29 @@ require(["jquery", "jhapi", "utils", "remoteappapi"],
                         var array = path.split('/');
                         id = array[array.length-1];
                         
-                        window.location = base_url+"containers/"+id
+                        window.location = utils.url_path_join(
+                            base_url,
+                            "containers",
+                            id
+                        )
                     }
                 }
             });
         }
     );
+            
+    $(".view-button").click(function () {
+        var id = this.id;
+        window.location = utils.url_path_join(
+            base_url,
+            "containers",
+            id)
+        }
+    );
 
     $(".stop-button").click(function () {
         var id = this.id;
+        $(this).find(".fa-spinner").show();
         appapi.stop_application(id, {
             success: function () {
                 window.location.reload()
