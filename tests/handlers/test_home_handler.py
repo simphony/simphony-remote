@@ -56,7 +56,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
     def test_post_start(self):
         body = urllib.parse.urlencode(
             {'action': 'start',
-             'mapping_id': '12345'
+             'mapping_id': 'mapping_id'
              }
         )
 
@@ -85,7 +85,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
     def test_post_failed_auth(self):
         body = urllib.parse.urlencode(
             {'action': 'start',
-             'mapping_id': '12345'
+             'mapping_id': 'mapping_id'
              }
         )
 
@@ -103,7 +103,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
     def test_post_stop(self):
         body = urllib.parse.urlencode(
             {'action': 'stop',
-             'url_id': '12345'
+             'url_id': 'url_id'
              }
         )
 
@@ -126,7 +126,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
     def test_post_view(self):
         body = urllib.parse.urlencode(
             {'action': 'view',
-             'url_id': '12345'
+             'url_id': 'url_id'
              }
         )
 
@@ -162,7 +162,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
             },
             body=urllib.parse.urlencode({
                 'action': 'view',
-                'url_id': '12345'
+                'url_id': 'url_id'
             })
         )
 
@@ -176,7 +176,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
             },
             body=urllib.parse.urlencode({
                 'action': 'stop',
-                'url_id': '12345'
+                'url_id': 'url_id'
             })
         )
 
