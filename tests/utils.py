@@ -367,7 +367,10 @@ def mock_coro_factory(return_value=None, side_effect=None):
         coro.called = True
         yield gen.sleep(0.1)
         if side_effect:
-            side_effect(*args, **kwargs)
+            if isinstance(side_effect, Exception):
+                raise side_effect
+            else:
+                side_effect(*args, **kwargs)
         return coro.return_value
 
     coro.called = False

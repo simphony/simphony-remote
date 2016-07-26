@@ -103,7 +103,7 @@ class TestContainer(AsyncHTTPTestCase):
                    ".restresources"
                    ".container"
                    ".wait_for_http_server_2xx",
-                   new_callable=mock_coro_factory):
+                   new_callable=mock_coro_new_callable()):
 
             res = self.fetch(
                 "/api/v1/containers/",

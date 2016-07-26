@@ -36,6 +36,7 @@ def wait_for_http_server_2xx(url, timeout=10):
             app_log.info("Server at %s responded with: %s", url, response.code)
             return
 
+        print("round")
         yield gen.sleep(0.1)
 
     raise TimeoutError("Server at {} didn't respond in {} seconds".format(
