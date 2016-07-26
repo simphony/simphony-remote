@@ -3,7 +3,7 @@ from tornado.testing import AsyncTestCase, gen_test
 from docker.utils import kwargs_from_env
 
 from remoteappmanager.docker.async_docker_client import AsyncDockerClient
-from tests import utils
+from tests.mocking.virtual.docker_client import create_docker_client
 
 
 class TestAsyncDockerClient(AsyncTestCase):
@@ -26,7 +26,7 @@ class TestAsyncDockerClient(AsyncTestCase):
     @gen_test
     def test_info(self):
         client = AsyncDockerClient()
-        client._sync_client = utils.mock_docker_client()
+        client._sync_client = create_docker_client()
         response = yield client.info()
         # Test contents of response
         self.assertIsInstance(response, dict)
