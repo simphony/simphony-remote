@@ -54,6 +54,7 @@ Compatible docker containers can be found in DockerHub. Refer to the documentati
 of `simphony-remote-docker <https://github.com/simphony/simphony-remote-docker>`_
 repository to deploy the images.
 
+.. _deploy_setup_db:
 
 Setup Database Accounting
 -------------------------

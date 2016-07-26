@@ -22,3 +22,4 @@ Key provided features:
    design
    developer
    api
+   troubleshooting
