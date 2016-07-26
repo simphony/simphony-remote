@@ -3,7 +3,7 @@ Traitlets Documenter
 
 A sphinx autodoc extension for documenting Traitlets classes.
 Currently support documenting classes with members of Traitlets TraitType.
-This code is inspired from `Traits Documenter <https://github.com/enthought/trait-documenter>_`
+This code is inspired from `Traits Documenter <https://github.com/enthought/trait-documenter>`_
 
 Installation
 ^^^^^^^^^^^^
