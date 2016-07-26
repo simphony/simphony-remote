@@ -18,4 +18,4 @@ License
 -------
 
 This software is released under the terms of the BSD license. See the
-`COPYING.txt <COPYING.txt>`_ for license terms.
+`COPYING.rst <COPYING.rst>`_ for license terms.
