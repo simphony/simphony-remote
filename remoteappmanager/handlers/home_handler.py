@@ -49,5 +49,3 @@ class HomeHandler(BaseHandler):
                 "container": container
             })
         return images_info
-
-
