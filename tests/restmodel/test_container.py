@@ -25,10 +25,7 @@ class TestContainer(AsyncHTTPTestCase):
     def get_app(self):
         command_line_config = dummy.basic_command_line_config()
         command_line_config.base_urlpath = '/'
-        app = dummy.create_application(command_line_config)
-        app.container_manager.docker_client._sync_client = (
-            create_docker_client())
-        return app
+        return dummy.create_application(command_line_config)
 
     def test_items(self):
         with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",   # noqa
