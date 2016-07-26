@@ -1,6 +1,7 @@
-from remoteappmanager.netutils import wait_for_http_server_2xx
-from tornado import web, gen
+from tornado import web
 from tornado.testing import AsyncHTTPTestCase, gen_test
+
+from remoteappmanager.netutils import wait_for_http_server_2xx
 
 
 class ShortHandler(web.RequestHandler):
