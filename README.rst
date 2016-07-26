@@ -13,3 +13,5 @@ for nanomaterials and systems by design".
 The package provides an executable replacement of jupyterhub-singleuser, and
 provides management capabilities for docker images and containers. It is spawn
 by the jupyterhub server in response to a login.
+
+.. include:: COPYING.txt
