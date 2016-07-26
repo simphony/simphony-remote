@@ -100,7 +100,8 @@ class TestContainer(AsyncHTTPTestCase):
                    new_callable=self.mock_prepare
                    ), \
              patch("remoteappmanager"
-                   ".netutils"
+                   ".restresources"
+                   ".container"
                    ".wait_for_http_server_2xx",
                    new_callable=mock_coro_factory):
 
