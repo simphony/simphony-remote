@@ -129,6 +129,11 @@ def cli(ctx, db):
     """Remote application database manager.
     Performs administrative operations on the database contents."""
     ctx.obj = RemoteAppDBContext(db_url=db)
+    ctx.obj.session = ctx.obj.db.create_session()
+
+    @ctx.call_on_close
+    def close_session():
+        ctx.obj.session.close()
 
 
 @cli.command()
@@ -169,8 +174,7 @@ def user(ctx):
 @click.pass_context
 def create(ctx, user):
     """Creates a user USER in the database."""
-    db = ctx.obj.db
-    session = db.create_session()
+    session = ctx.obj.session
     orm_user = orm.User(name=user)
 
     try:
@@ -188,8 +192,7 @@ def create(ctx, user):
 @click.pass_context
 def remove(ctx, user):
     """Removes a user."""
-    db = ctx.obj.db
-    session = db.create_session()
+    session = ctx.obj.session
 
     try:
         with orm.transaction(session):
@@ -222,8 +225,7 @@ def list(ctx, no_decoration, show_apps):
             headers += ["App", "Home", "View", "Common", "Vol. Source",
                         "Vol. Target", "Vol. Mode"]
 
-    db = ctx.obj.db
-    session = db.create_session()
+    session = ctx.obj.session
 
     table = []
     with orm.transaction(session):
@@ -285,8 +287,7 @@ def create(ctx, image, verify):
             raise click.BadParameter(msg.format(error=str(exception)),
                                      ctx=ctx)
 
-    db = ctx.obj.db
-    session = db.create_session()
+    session = ctx.obj.session
     try:
         with orm.transaction(session):
             orm_app = orm.Application(image=image)
@@ -302,8 +303,7 @@ def create(ctx, image, verify):
 @click.pass_context
 def remove(ctx, image):
     """Removes an application from the list."""
-    db = ctx.obj.db
-    session = db.create_session()
+    session = ctx.obj.session
 
     try:
         with orm.transaction(session):
@@ -321,8 +321,6 @@ def remove(ctx, image):
 @click.pass_context
 def list(ctx, no_decoration):
     """List all registered applications."""
-    db = ctx.obj.db
-
     if no_decoration:
         tablefmt = "plain"
         headers = []
@@ -331,7 +329,7 @@ def list(ctx, no_decoration):
         headers = ["ID", "Image"]
 
     table = []
-    session = db.create_session()
+    session = ctx.obj.session
     with orm.transaction(session):
         for orm_app in session.query(orm.Application).all():
             table.append([orm_app.id, orm_app.image])
@@ -355,7 +353,6 @@ def list(ctx, no_decoration):
 def grant(ctx, image, user, allow_home, allow_view, volume):
     """Grants access to application identified by IMAGE to a specific
     user USER and specified access policy."""
-    db = ctx.obj.db
     allow_common = False
     source = target = mode = None
 
@@ -363,7 +360,7 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
         allow_common = True
         source, target, mode = _parse_volume_string(volume)
 
-    session = db.create_session()
+    session = ctx.obj.session
     with orm.transaction(session):
         orm_app = session.query(orm.Application).filter(
             orm.Application.image == image).one_or_none()
@@ -435,8 +432,6 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
 def revoke(ctx, image, user, revoke_all, allow_home, allow_view, volume):
     """Revokes access to application identified by IMAGE to a specific
     user USER and specified parameters."""
-    db = ctx.obj.db
-
     allow_common = False
     source = target = mode = None
 
@@ -444,7 +439,7 @@ def revoke(ctx, image, user, revoke_all, allow_home, allow_view, volume):
         allow_common = True
         source, target, mode = _parse_volume_string(volume)
 
-    session = db.create_session()
+    session = ctx.obj.session
     with orm.transaction(session):
         orm_app = session.query(orm.Application).filter(
             orm.Application.image == image).one()
