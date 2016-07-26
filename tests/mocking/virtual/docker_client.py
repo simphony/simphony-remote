@@ -33,8 +33,7 @@ def docker_response(status_code=200, content='',
 def get_fake_image_labels(num=2):
     samples = cycle(({'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled',  # noqa
                       'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4'},
-                     {'eu.simphony-project.docker.description': 'A vanilla Ubuntu installation'},  # noqa
-                 ))
+                     {'eu.simphony-project.docker.description': 'A vanilla Ubuntu installation'}))  # noqa
     return tuple(next(samples) for _ in range(num))
 
 
