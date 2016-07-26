@@ -27,9 +27,8 @@ require(["jquery", "jhapi", "utils", "remoteappapi"],
                     201: function (data, textStatus, request) {
                         var location = request.getResponseHeader('Location');
                         var url = utils.parse_url(location);
-                        var path = url.pathname.replace(/\/$/, "");
-                        var array = path.split('/');
-                        id = array[array.length-1];
+                        var arr = url.pathname.replace(/\/$/, "").split('/');
+                        var id = arr[arr.length-1];
                         
                         window.location = utils.url_path_join(
                             base_url,
