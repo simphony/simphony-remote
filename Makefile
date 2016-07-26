@@ -11,26 +11,38 @@ help:
 	@echo "db: initializes the sqlite database"
 	@echo ""
 
-deps:
+.PHONY: venv
+venv:
+	@echo "Creating virtual environment"
+	@echo "----------------------------"
+	python3 -m venv venv
+
+.PHONY: aptdeps
+aptdeps:
+	@echo "Installing apt dependencies"
+	@echo "---------------------------"
+	apt-get update
+	apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
+	pip install --upgrade pip
+	npm install -g configurable-http-proxy
+
+.PHONY: pythondeps
+pythondeps:
 	@echo "Installing dependencies"
 	@echo "-----------------------"
-	sudo apt-get update
-	sudo apt-get install docker-engine npm nodejs-legacy python3-pip python3.4-venv
-	sudo npm install -g configurable-http-proxy
-	python3 -mvenv venv
-	. venv/bin/activate && pip3 install docker-py
+	pip3 install -r requirements.txt -r dev-requirements.txt -r doc-requirements.txt
 
 .PHONY: develop
 develop: 
 	@echo "Installing application"
 	@echo "----------------------"
-	. venv/bin/activate && python3 setup.py develop 
+	python3 setup.py develop
 
 .PHONY: install
 install: 
 	@echo "Installing application"
 	@echo "----------------------"
-	. venv/bin/activate && python3 setup.py install
+	python3 setup.py install
 
 .PHONY: certs
 certs: 
@@ -42,18 +54,32 @@ certs:
 db: 
 	@echo "Creating database"
 	@echo "-----------------"
-	-. venv/bin/activate && remoteappdb --db=~/remoteappmanager.db init
+	pushd jupyterhub; \
+        remoteappdb --db=remoteappmanager.db init;\
+        popd
 
-.PHONY: images
-images:
+.PHONY: testdb
+testdb: db
+	@echo "Creating Test database"
+	@echo "----------------------"
+	pushd jupyterhub; \
+        remoteappdb --db=remoteappmanager.db user create test; \
+        remoteappdb --db=remoteappmanager.db app create simphonyproject/simphonic-mayavi; \
+        remoteappdb --db=remoteappmanager.db app grant simphonyproject/simphonic-mayavi test; \
+        popd
+
+.PHONY: testimages
+testimages:
 	@echo "Downloading docker images"
 	@echo "-------------------------"
-	docker pull simphonyproject/ubuntu-14.04-remote:latest
 	docker pull simphonyproject/simphonic-mayavi:latest
-	docker pull simphonyproject/simphonic-paraview:latest
 
 .PHONY: test
 test:
 	@echo "Running testsuite"
 	@echo "-----------------"
-	-. venv/bin/activate && flake8 . && python -m tornado.testing discover
+	flake8 . && python -m tornado.testing discover -s tests -t . -v
+
+.PHONY: docs
+docs:
+	sphinx-build -W doc/source doc/build/sphinx

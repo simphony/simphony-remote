@@ -1,6 +1,29 @@
 SimPhoNy Remote CHANGELOG
 =========================
 
+What's new in SimPhoNy Remote 0.5.0
+-----------------------------------
+
+Summary
+~~~~~~~
+
+- Updated documentation (#147)
+- Parameters for setting up docker client are now optional (#126)
+- Formalise BadRequest error in the Rest API (#127)
+- Add description to remoteappdb (#129)
+- Supports parsing outputs from both docker `inspect_container` and
+  `containers` (#133)
+- Simplify the ReverseProxy (#114)
+- Provide a set of dummy and virtual objects for better testing (#98)
+- Bug fix: Subhandlers on the home page should raise instead of finish when
+  error occurs (#123)
+- Bug fix: Spawner's config_file_path should be configurable from jupyterhub
+  config (#124)
+- Bug fix: Deprecation warning from Traitlets (#135)
+- Bug fix: Empty file created if target sqlite database does not exist (#139, 122)
+- Bug fix: SSL failure for auto ssl version (#144)
+
+
 What's new in SimPhoNy Remote 0.4.0
 -----------------------------------
 

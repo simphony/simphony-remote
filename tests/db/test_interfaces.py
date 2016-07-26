@@ -8,7 +8,7 @@ from collections import namedtuple
 
 from remoteappmanager.db.interfaces import (
     ABCApplication, ABCApplicationPolicy, ABCAccounting)
-from .abc_test_interfaces import ABCTestDatabaseInterface
+from tests.db.abc_test_interfaces import ABCTestDatabaseInterface
 
 User = namedtuple('User', ('name',))
 

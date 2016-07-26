@@ -15,6 +15,12 @@ from jupyterhub import orm
 
 
 class Spawner(LocalProcessSpawner):
+    ''' Start remoteappmanager as a local process for a system user.
+
+    The user identifier of the process is set to be the system user.
+    The current directory is set to the system user's home directory.
+    '''
+
     #: The instance of the orm Proxy.
     #: We use Any in agreement with base class practice.
     proxy = Any()
@@ -52,6 +58,16 @@ class Spawner(LocalProcessSpawner):
 
 
 class VirtualUserSpawner(LocalProcessSpawner):
+    ''' Start remoteappmanager as a local process for a virtual user.
+
+    A virtual user is not recognised as a system user, even if the
+    user's name conincide with an existing system user.  As a result,
+    the user does not need to be a system user for this spawner.
+
+    The user identifier and the current work directory of the spawned
+    local process are the same as the one that is running jupyterhub.
+    '''
+
     #: The instance of the orm Proxy.
     #: We use Any in agreement with base class practice.
     proxy = Any()
@@ -61,7 +77,7 @@ class VirtualUserSpawner(LocalProcessSpawner):
 
     #: Directory in which temporary home directory for the virtual
     #: user is created.  No directory is created if this is not
-    #: defined.
+    #: defined and HOME directory would not be available.
     workspace_dir = Unicode(config=True)
 
     #: The path to the temporary workspace directory
