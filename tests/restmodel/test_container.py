@@ -85,9 +85,9 @@ class TestContainer(AsyncHTTPTestCase):
                 )))
 
             self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
-            virtual_docker_client = self._app.container_manager.docker_client._sync_client
-            self.assertTrue(virtual_docker_client.stop.called)
-            self.assertTrue(virtual_docker_client.remove_container.called)
+            client = self._app.container_manager.docker_client._sync_client
+            self.assertTrue(client.stop.called)
+            self.assertTrue(client.remove_container.called)
 
     def test_retrieve(self):
         with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",  # noqa
