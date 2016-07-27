@@ -58,6 +58,14 @@ remoteappmanager.jinja2_adapters module
     :undoc-members:
     :show-inheritance:
 
+remoteappmanager.netutils module
+--------------------------------
+
+.. automodule:: remoteappmanager.netutils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 remoteappmanager.paths module
 -----------------------------
 
