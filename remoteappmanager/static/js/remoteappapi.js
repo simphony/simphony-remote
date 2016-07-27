@@ -12,9 +12,9 @@ define(['jquery', 'utils'], function ($, utils) {
         dataType : "json",
         processData: false,
         success: null,
-        error: utils.ajax_error_dialog,
+        error: null
     };
-    
+   
     var update = function (d1, d2) {
         $.map(d2, function (i, key) {
             d1[key] = d2[key];

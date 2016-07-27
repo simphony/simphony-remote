@@ -14,11 +14,7 @@
     <h1>Available Applications</h1>
   </div>
   <div class="row col-sm-offset-2 col-sm-8">
-      {% if error_message %}
-          <p class="spawn-error-msg text-danger">
-              {{error_message}}
-          </p>
-      {% endif %}
+      <p class="spawn-error-msg text-danger" style="display: none"></p>
       {% for info in images_info %}
       <div class="row">
           {% if info.image.icon_128 == '' %}

@@ -21,21 +21,41 @@ class Container(Resource):
 
         account = self.current_user.account
         all_apps = self.application.db.get_apps_for_user(account)
+        container_manager = self.application.container_manager
 
         choice = [(m_id, app, policy)
                   for m_id, app, policy in all_apps
                   if m_id == mapping_id]
 
         if not choice:
+            self.log.warning("Could not find resource "
+                             "for mapping id {}".format(mapping_id))
             raise exceptions.BadRequest()
 
         _, app, policy = choice[0]
+        container = None
 
-        container = yield self._start_container(self.current_user.name,
-                                                app,
-                                                policy,
-                                                mapping_id)
-        yield self._wait_for_container_ready(container)
+        try:
+            container = yield self._start_container(
+                self.current_user.name,
+                app,
+                policy,
+                mapping_id)
+            yield self._wait_for_container_ready(container)
+        except Exception as e:
+            if container is not None:
+                try:
+                    yield container_manager.stop_and_remove_container(
+                        container.docker_id)
+                except Exception:
+                    self.log.exception(
+                        "Unable to stop container {} after "
+                        " failure to obtain a ready "
+                        "container".format(
+                            container.docker_id))
+
+            raise exceptions.InternalServerError()
+
         urlpath = url_path_join(
             self.application.command_line_config.base_urlpath,
             container.urlpath)
@@ -50,6 +70,8 @@ class Container(Resource):
         container = yield self._container_from_url_id(identifier)
 
         if container is None:
+            self.log.warning("Could not find container for id {}".format(
+                identifier))
             raise exceptions.NotFound()
 
         return dict(
@@ -62,6 +84,8 @@ class Container(Resource):
         """Stop the container."""
         container = yield self._container_from_url_id(identifier)
         if not container:
+            self.log.warning("Could not find container for id {}".format(
+                             identifier))
             raise exceptions.NotFound()
 
         urlpath = url_path_join(
