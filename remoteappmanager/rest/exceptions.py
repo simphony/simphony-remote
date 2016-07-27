@@ -9,8 +9,8 @@ class RESTException(Exception):
     #: Missing any better info, default is a server error.
     http_code = httpstatus.INTERNAL_SERVER_ERROR
 
-    def __init__(self, reason=None, **kwargs):
-        self.reason = reason
+    def __init__(self, message=None, **kwargs):
+        self.message = message
         self.info = kwargs if len(kwargs) else None
 
     def as_dict(self):
@@ -19,11 +19,11 @@ class RESTException(Exception):
             "type": type(self).__name__
         }
 
-        if self.reason is not None:
-            data["reason"] = self.reason
+        if self.message is not None:
+            data["message"] = self.message
 
         if self.info is not None:
-            data["info"] = self.info
+            data.update(self.info)
 
         return data
 

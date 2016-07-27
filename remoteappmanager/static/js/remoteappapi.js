@@ -46,7 +46,6 @@ define(['jquery', 'utils'], function ($, utils) {
         options = options || {};
         options = update(options, {
             type: 'POST', 
-            dataType: null,
             data: JSON.stringify({
                 mapping_id: id
             })});

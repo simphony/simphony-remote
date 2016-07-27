@@ -52,9 +52,7 @@ class RESTBaseHandler(BaseHandler):
 
         return PayloadedHTTPError(
             status_code=rest_exc.http_code,
-            payload=escape.json_encode({
-                "error": rest_exc.as_dict()
-            })
+            payload=escape.json_encode(rest_exc.as_dict())
         )
 
 

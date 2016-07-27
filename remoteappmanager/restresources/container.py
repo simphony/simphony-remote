@@ -21,7 +21,7 @@ class Container(Resource):
         try:
             mapping_id = representation["mapping_id"]
         except KeyError:
-            raise exceptions.BadRequest(reason="missing mapping_id")
+            raise exceptions.BadRequest(message="missing mapping_id")
 
         account = self.current_user.account
         all_apps = self.application.db.get_apps_for_user(account)
@@ -33,7 +33,7 @@ class Container(Resource):
         if not choice:
             self.log.warning("Could not find resource "
                              "for mapping id {}".format(mapping_id))
-            raise exceptions.BadRequest(reason="unrecognized mapping_id")
+            raise exceptions.BadRequest(message="unrecognized mapping_id")
 
         _, app, policy = choice[0]
 
@@ -44,13 +44,13 @@ class Container(Resource):
                 policy,
                 mapping_id)
         except Exception as e:
-            raise exceptions.Unable(reason=str(e))
+            raise exceptions.Unable(message=str(e))
 
         try:
             with self._remove_container_on_error(container):
                 yield self._wait_for_container_ready(container)
         except Exception as e:
-            raise exceptions.Unable(reason=str(e))
+            raise exceptions.Unable(message=str(e))
 
         urlpath = url_path_join(
             self.application.command_line_config.base_urlpath,
@@ -61,7 +61,7 @@ class Container(Resource):
                 yield self.application.reverse_proxy.register(
                     urlpath, container.host_url)
         except Exception as e:
-            raise exceptions.Unable(reason=str(e))
+            raise exceptions.Unable(message=str(e))
 
         return container.url_id
 
