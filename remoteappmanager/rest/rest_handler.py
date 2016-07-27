@@ -36,11 +36,13 @@ class RESTBaseHandler(BaseHandler):
 
         exc = exc_info[1]
         if isinstance(exc, PayloadedHTTPError):
+            self.set_header('Content-Type', 'application/json')
             self.finish(exc.payload)
         else:
             # For non-payloaded http errors or any other exception
             # we don't want to return anything as payload.
             # The error code is enough.
+            self.clear_header('Content-Type')
             self.finish()
 
     def rest_to_http_exception(self, rest_exc):
@@ -118,6 +120,7 @@ class RESTCollectionHandler(RESTBaseHandler):
 
         self.set_status(httpstatus.CREATED)
         self.set_header("Location", location)
+        self.clear_header('Content-Type')
         self.flush()
 
 
@@ -199,6 +202,7 @@ class RESTResourceHandler(RESTBaseHandler):
                     identifier))
             raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
 
+        self.clear_header('Content-Type')
         self.set_status(httpstatus.NO_CONTENT)
 
     @web.authenticated
@@ -219,4 +223,5 @@ class RESTResourceHandler(RESTBaseHandler):
                     identifier))
             raise web.HTTPError(httpstatus.INTERNAL_SERVER_ERROR)
 
+        self.clear_header('Content-Type')
         self.set_status(httpstatus.NO_CONTENT)
