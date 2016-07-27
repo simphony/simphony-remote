@@ -44,8 +44,8 @@ Deployment of the complete system in a single machine/VM.
 
      cd ../jupyterhub
 
-   and verify that `jupyterhub_config.py` and `remoteappmanager_config.py` are
-   correct for your deployment machine setup.
+   and verify that `jupyterhub_config.py` is correct for your deployment
+   machine setup (see :ref:`configuration`).
 
 Setup docker containers
 -----------------------

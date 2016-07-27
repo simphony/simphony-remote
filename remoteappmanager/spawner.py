@@ -2,7 +2,7 @@ import os
 import shutil
 import tempfile
 
-from traitlets import Any, Unicode, default
+from traitlets import Any, Unicode
 from tornado import gen
 
 from jupyterhub.spawner import LocalProcessSpawner
@@ -44,7 +44,10 @@ class Spawner(LocalProcessSpawner):
             args[iarg] = arg.replace('--base-url=', '--base-urlpath=')
 
         args.append("--proxy-api-url={}".format(self.proxy.api_server.url))
-        args.append("--config-file={}".format(self.config_file_path))
+
+        if self.config_file_path:
+            args.append("--config-file={}".format(self.config_file_path))
+
         return args
 
     def get_env(self):
@@ -52,13 +55,6 @@ class Spawner(LocalProcessSpawner):
         env["PROXY_API_TOKEN"] = self.proxy.auth_token
         env.update(_docker_envvars())
         return env
-
-    @default("config_file_path")
-    def _config_file_path_default(self):
-        """Defines the default position of the configuration file for
-        our utility. By default, it's the cwd of where we started up."""
-        return os.path.join(os.getcwd(),
-                            os.path.basename(self.cmd[0])+'_config.py')
 
 
 class VirtualUserSpawner(LocalProcessSpawner):
@@ -128,7 +124,10 @@ class VirtualUserSpawner(LocalProcessSpawner):
             args[iarg] = arg.replace('--base-url=', '--base-urlpath=')
 
         args.append("--proxy-api-url={}".format(self.proxy.api_server.url))
-        args.append("--config-file={}".format(self.config_file_path))
+
+        if self.config_file_path:
+            args.append("--config-file={}".format(self.config_file_path))
+
         return args
 
     def user_env(self, env):
