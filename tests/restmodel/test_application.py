@@ -1,7 +1,8 @@
 from unittest.mock import Mock, patch
 
 from remoteappmanager import rest
-from remoteappmanager.rest import registry, httpstatus
+from remoteappmanager.rest import registry
+from remoteappmanager.rest.http import httpstatus
 from remoteappmanager.restresources import Application
 from tests import utils
 from tests.utils import AsyncHTTPTestCase

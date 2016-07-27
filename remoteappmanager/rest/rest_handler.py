@@ -48,10 +48,10 @@ class RESTBaseHandler(BaseHandler):
         if isinstance(rest_exc, exceptions.NotFound):
             # NotFound is a special case, because it should have no payload,
             # just the http 404
-            return web.HTTPError(code=httpstatus.NOT_FOUND)
+            return web.HTTPError(status_code=httpstatus.NOT_FOUND)
 
         return PayloadedHTTPError(
-            code=rest_exc.http_code,
+            status_code=rest_exc.http_code,
             payload=escape.json_encode({
                 "error": rest_exc.as_dict()
             })

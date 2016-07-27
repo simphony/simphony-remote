@@ -4,7 +4,8 @@ from collections import OrderedDict
 from unittest import mock
 
 from remoteappmanager import rest
-from remoteappmanager.rest import registry, httpstatus, exceptions
+from remoteappmanager.rest import registry, exceptions
+from remoteappmanager.rest.http import httpstatus
 from remoteappmanager.rest.resource import Resource
 from remoteappmanager.rest.rest_handler import RESTResourceHandler, \
     RESTCollectionHandler
@@ -48,7 +49,7 @@ class Student(Resource):
     @gen.coroutine
     def delete(self, identifier):
         if identifier not in self.collection:
-            raise exceptions.NotFound
+            raise exceptions.NotFound()
 
         del self.collection[identifier]
 
