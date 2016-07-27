@@ -83,7 +83,7 @@ class TestFileConfig(TempMixin, unittest.TestCase):
         config.parse_config(self.config_file)
         docker_dict = config.docker_config()
         self.assertIn("tls", docker_dict)
-        self.assertEqual(docker_dict["tls"].verify, None)
+        self.assertEqual(docker_dict["tls"].verify, False)
         self.assertEqual(docker_dict["tls"].ca_cert, None)
 
     def test_initialization_with_good_accounting(self):
@@ -106,8 +106,7 @@ class TestFileConfig(TempMixin, unittest.TestCase):
 
         with envvars(envs):
             config = FileConfig()
-            # False by default, as we don't want CA verification
-            self.assertEqual(config.tls, False)
+            self.assertEqual(config.tls, True)
             self.assertEqual(config.tls_verify, True)
             self.assertEqual(config.tls_ca,
                              os.path.join(self.tempdir, "ca.pem"))
@@ -141,9 +140,9 @@ class TestFileConfig(TempMixin, unittest.TestCase):
 
         with envvars(envs):
             config = FileConfig()
+            config.tls = False
             config.tls_verify = False
             config.docker_host = "tcp://192.168.99.100:31337"
-            # False by default, as we don't want CA verification
             docker_config = config.docker_config()
             self.assertNotIn("tls", docker_config)
             self.assertEqual(docker_config["base_url"],

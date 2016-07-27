@@ -53,7 +53,7 @@ class TestContainer(AsyncHTTPTestCase):
     def test_create(self):
         with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",  # noqa
                    new_callable=self.mock_prepare), \
-                patch("remoteappmanager.restresources.container._wait_for_http_server_2xx",  # noqa
+                patch("remoteappmanager.restresources.container.wait_for_http_server_2xx",  # noqa
                       new_callable=mock_coro_factory), \
                 patch("remoteappmanager.docker.container_manager._generate_container_url_id",  # noqa
                       return_value="12345678"):
@@ -69,6 +69,25 @@ class TestContainer(AsyncHTTPTestCase):
             self.assertIn("http://", res.headers["Location"])
             self.assertIn("/api/v1/containers/12345678",
                           res.headers["Location"])
+
+    def test_create_fails(self):
+        with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",   # noqa
+                   new_callable=self.mock_prepare), \
+                patch("remoteappmanager.restresources.container.wait_for_http_server_2xx",   # noqa
+                      new_callable=mock_coro_new_callable(
+                          side_effect=TimeoutError())):
+
+            res = self.fetch(
+                "/api/v1/containers/",
+                method="POST",
+                body=escape.json_encode(dict(
+                    mapping_id="mapping_id"
+                )))
+
+            self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
+            virtual_docker_client = self._app.container_manager.docker_client._sync_client
+            self.assertTrue(virtual_docker_client.stop.called)
+            self.assertTrue(virtual_docker_client.remove_container.called)
 
     def test_retrieve(self):
         with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",  # noqa
