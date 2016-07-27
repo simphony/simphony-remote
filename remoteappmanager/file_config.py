@@ -15,19 +15,12 @@ class FileConfig(HasTraits):
 
     ##########
     # Configuration file options. All of these come from the config file.
-
-    #: Enable tls, with a twist. If self-signed certificates are used,
-    #: setting tls as True will produce an error of incorrect CA validation.
-    #: As a consequence, defaults to False. TLS secure connection will still
-    #: happen thanks to tls_verify and tls[_cert|_key|_ca] being defined.
-    #: See https://docs.docker.com/engine/security/https/
-    #: Verification can be enabled simply by issuing tls=True in the
-    #: config file
     tls = Bool(False,
-               help="If True, connect to docker with --tls")
+               help="If True, connect to docker with tls")
 
-    tls_verify = Bool(False,
-                      help="If True, connect to docker with --tlsverify")
+    tls_verify = Bool(True,
+                      help="If True, verify the CA certificate against a "
+                           "known or self-signed CA certificate")
 
     tls_ca = Unicode("", help="Path to CA certificate for docker TLS")
 
@@ -39,7 +32,7 @@ class FileConfig(HasTraits):
 
     accounting_class = Unicode(
         default_value="remoteappmanager.db.orm.AppAccounting",
-        help="The import path to a subclass of ABCAccounting.")
+        help="The import path to a subclass of ABCAccounting")
 
     accounting_kwargs = Dict(
         default_value={'url': 'sqlite:///remoteappmanager.db'},
@@ -48,7 +41,7 @@ class FileConfig(HasTraits):
     login_url = Unicode(default_value="/hub",
                         help=("The url to be redirected to if the user is not "
                               "authenticated for pages that require "
-                              "authentication."))
+                              "authentication"))
 
     # The network timeout for any async operation we have to perform,
     # in seconds. 30 seconds is plenty enough.
@@ -77,10 +70,10 @@ class FileConfig(HasTraits):
             self.docker_host = "unix://var/run/docker.sock"
 
         self.tls_verify = (env.get("DOCKER_TLS_VERIFY", "") != "")
+        # We don't have an envvar way of saying TLS = True, so we rely on
+        # TLS_VERIFY set status
+        self.tls = self.tls_verify
 
-        # Note that certificate paths can still be present even if tls_verify
-        # is false: that is the case of using certificates signed by an
-        # authoritative CA.
         cert_path = env.get("DOCKER_CERT_PATH",
                             os.path.join(os.path.expanduser("~"), ".docker"))
 
@@ -88,7 +81,7 @@ class FileConfig(HasTraits):
         self.tls_key = os.path.join(cert_path, 'key.pem')
         self.tls_ca = os.path.join(cert_path, 'ca.pem')
 
-        if self.tls_verify or self.tls:
+        if self.tls:
             self.docker_host = self.docker_host.replace('tcp://', 'https://')
 
     # -------------------------------------------------------------------------
@@ -138,17 +131,18 @@ class FileConfig(HasTraits):
         # present at the specified paths.
         # Note that the tls flag takes precedence against tls verify.
         # This is docker behavior.
-        if self.tls:
-            params["tls"] = tls.TLSConfig(
-                client_cert=(self.tls_cert, self.tls_key),
-                )
-        elif self.tls_verify:
-            params["tls"] = tls.TLSConfig(
-                client_cert=(self.tls_cert, self.tls_key),
-                ca_cert=self.tls_ca,
-                verify=True,
-            )
-
         params["version"] = "auto"
+
+        if not self.tls:
+            return params
+
+        tls_kwargs = {}
+        tls_kwargs["client_cert"] = (self.tls_cert, self.tls_key)
+        tls_kwargs["verify"] = self.tls_verify
+
+        if self.tls_verify and self.tls_ca:
+            tls_kwargs["ca_cert"] = self.tls_ca
+
+        params["tls"] = tls.TLSConfig(**tls_kwargs)
 
         return params

@@ -15,23 +15,19 @@
 # # TLS configuration
 # # -----------------
 # #
-# # Set this to True only if your docker machine has a certificate signed by
-# # a recognised CA.
-# # If using self-signed certificates, using tls as True will produce an error
-# # of incorrect CA validation. As a consequence, the default tls setting is
-# # False, and tls_verify is according to the current environment (likely True
-# # with default setup on OSX), honoring docker documentation.
-# # See https://docs.docker.com/engine/security/https/ for additional details
+# # Set this to True to enable TLS connection with the docker client
 #
 # tls = True
 #
 # # Enables verification of the certificates. By default, this is the
-# # result of the DOCKER_TLS_VERIFY envvar
+# # result of the DOCKER_TLS_VERIFY envvar. Set to False to skip verification/
 #
 # tls_verify = True
 #
 # # Full paths of the CA certificate, certificate and key of the docker
-# # machine. Normally these are computed from the DOCKER_CERT_PATH
+# # machine. Normally these are computed from the DOCKER_CERT_PATH.
+# # If you want to use a recognised CA for verification, set the tls_ca to
+# # an empty string
 #
 # tls_ca = "/path/to/ca.pem"
 # tls_cert = "/path/to/cert.pem"
