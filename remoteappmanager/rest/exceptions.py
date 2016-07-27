@@ -14,6 +14,7 @@ class RESTException(Exception):
         self.info = kwargs if len(kwargs) else None
 
     def as_dict(self):
+        """Returns a dictionary with the details of the exception"""
         data = {
             "type": type(self).__name__
         }
