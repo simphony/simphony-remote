@@ -45,14 +45,15 @@ class RESTBaseHandler(BaseHandler):
 
     def rest_to_http_exception(self, rest_exc):
         """Converts a REST exception into the appropriate HTTP one."""
-        if isinstance(rest_exc, exceptions.NotFound):
-            # NotFound is a special case, because it should have no payload,
-            # just the http 404
-            return web.HTTPError(status_code=httpstatus.NOT_FOUND)
+
+        representation = rest_exc.representation()
+        payload = (escape.json_encode(representation)
+                   if representation is not None
+                   else None)
 
         return PayloadedHTTPError(
             status_code=rest_exc.http_code,
-            payload=escape.json_encode(rest_exc.as_dict())
+            payload=payload
         )
 
 
