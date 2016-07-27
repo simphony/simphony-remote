@@ -48,7 +48,7 @@ class Container(Resource):
 
         try:
             with self._remove_container_on_error(container):
-                self._wait_for_container_ready(container)
+                yield self._wait_for_container_ready(container)
         except Exception as e:
             raise exceptions.Unable(reason=str(e))
 
