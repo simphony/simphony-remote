@@ -39,7 +39,7 @@ develop:
 	python3 setup.py develop
 
 .PHONY: install
-install: 
+install:
 	@echo "Installing application"
 	@echo "----------------------"
 	python3 setup.py install

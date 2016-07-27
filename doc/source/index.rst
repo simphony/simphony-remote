@@ -21,4 +21,5 @@ Key provided features:
    utilities
    design
    developer
-   api
+   troubleshooting
+   license

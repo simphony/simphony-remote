@@ -25,3 +25,7 @@ class BadRequest(RESTException):
     representation is ill-formed
     """
     http_code = httpstatus.BAD_REQUEST
+
+
+class InternalServerError(RESTException):
+    pass

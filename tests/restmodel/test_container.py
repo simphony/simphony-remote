@@ -102,8 +102,8 @@ class TestContainer(AsyncHTTPTestCase):
              patch("remoteappmanager"
                    ".restresources"
                    ".container"
-                   "._wait_for_http_server_2xx",
-                   new_callable=mock_coro_factory):
+                   ".wait_for_http_server_2xx",
+                   new_callable=mock_coro_new_callable()):
 
             res = self.fetch(
                 "/api/v1/containers/",
@@ -117,6 +117,32 @@ class TestContainer(AsyncHTTPTestCase):
             # The port is random due to testing env. Check if it's absolute
             self.assertIn("http://", res.headers["Location"])
             self.assertIn("/api/v1/containers/12345/", res.headers["Location"])
+
+    def test_create_fails(self):
+        with patch("remoteappmanager"
+                   ".handlers"
+                   ".base_handler"
+                   ".BaseHandler"
+                   ".prepare",
+                   new_callable=self.mock_prepare
+                   ), \
+             patch("remoteappmanager"
+                   ".restresources"
+                   ".container"
+                   ".wait_for_http_server_2xx",
+                   new_callable=mock_coro_new_callable(
+                       side_effect=TimeoutError())):
+
+            res = self.fetch(
+                "/api/v1/containers/",
+                method="POST",
+                body=escape.json_encode(dict(
+                    mapping_id="one"
+                )))
+
+            self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
+            self.assertTrue(
+                self._app.container_manager.stop_and_remove_container.called)
 
     def test_retrieve(self):
         with patch("remoteappmanager"

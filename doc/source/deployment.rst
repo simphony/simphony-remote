@@ -44,8 +44,8 @@ Deployment of the complete system in a single machine/VM.
 
      cd ../jupyterhub
 
-   and verify that `jupyterhub_config.py` and `remoteappmanager_config.py` are
-   correct for your deployment machine setup.
+   and verify that `jupyterhub_config.py` is correct for your deployment
+   machine setup (see :ref:`configuration`).
 
 Setup docker containers
 -----------------------
@@ -54,6 +54,7 @@ Compatible docker containers can be found in DockerHub. Refer to the documentati
 of `simphony-remote-docker <https://github.com/simphony/simphony-remote-docker>`_
 repository to deploy the images.
 
+.. _deploy_setup_db:
 
 Setup Database Accounting
 -------------------------
