@@ -1,18 +1,16 @@
 import unittest
 import urllib.parse
+from collections import OrderedDict
 from unittest import mock
 
-from tests import utils
-from tornado import web, gen, escape
-from collections import OrderedDict
-
 from remoteappmanager import rest
+from remoteappmanager.rest import registry, httpstatus, exceptions
 from remoteappmanager.rest.resource import Resource
 from remoteappmanager.rest.rest_handler import RESTResourceHandler, \
     RESTCollectionHandler
-from remoteappmanager.rest import registry, httpstatus, exceptions
-
+from tests import utils
 from tests.utils import AsyncHTTPTestCase
+from tornado import web, gen, escape
 
 
 def prepare_side_effect(*args, **kwargs):

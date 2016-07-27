@@ -1,4 +1,4 @@
-from remoteappmanager.rest import httpstatus
+from remoteappmanager.rest.http import httpstatus
 
 
 class RESTException(Exception):
@@ -8,6 +8,23 @@ class RESTException(Exception):
     #: HTTP code generally associated to this exception.
     #: Missing any better info, default is a server error.
     http_code = httpstatus.INTERNAL_SERVER_ERROR
+
+    def __init__(self, reason=None, **kwargs):
+        self.reason = reason
+        self.info = kwargs if len(kwargs) else None
+
+    def as_dict(self):
+        data = {
+            "type": type(self).__name__
+        }
+
+        if self.reason is not None:
+            data["reason"] = self.reason
+
+        if self.info is not None:
+            data["info"] = self.info
+
+        return data
 
 
 class NotFound(RESTException):
@@ -27,5 +44,9 @@ class BadRequest(RESTException):
     http_code = httpstatus.BAD_REQUEST
 
 
-class InternalServerError(RESTException):
-    pass
+class CannotCreate(RESTException):
+    """Exception raised when the resource cannot be created for
+    whatever reason.
+    """
+    http_code = httpstatus.INTERNAL_SERVER_ERROR
+

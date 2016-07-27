@@ -54,7 +54,7 @@ class Container(Resource):
                         "container".format(
                             container.docker_id))
 
-            raise exceptions.InternalServerError()
+            raise exceptions.CannotCreate()
 
         urlpath = url_path_join(
             self.application.command_line_config.base_urlpath,

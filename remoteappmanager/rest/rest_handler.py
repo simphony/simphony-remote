@@ -1,9 +1,10 @@
 from remoteappmanager.handlers.base_handler import BaseHandler
-from tornado import gen, web, escape
-
+from remoteappmanager.rest import exceptions
+from remoteappmanager.rest.http import httpstatus
+from remoteappmanager.rest.http.payloaded_http_error import PayloadedHTTPError
 from remoteappmanager.rest.registry import registry
 from remoteappmanager.utils import url_path_join, with_end_slash
-from remoteappmanager.rest import httpstatus, exceptions
+from tornado import gen, web, escape
 
 
 class RESTBaseHandler(BaseHandler):
@@ -25,6 +26,37 @@ class RESTBaseHandler(BaseHandler):
         except KeyError:
             raise web.HTTPError(httpstatus.NOT_FOUND)
 
+    def write_error(self, status_code, **kwargs):
+        """Provides appropriate payload to the response in case of error.
+        """
+        exc_info = kwargs.get("exc_info")
+
+        if exc_info is None:
+            self.finish()
+
+        exc = exc_info[1]
+        if isinstance(exc, PayloadedHTTPError):
+            self.finish(exc.payload)
+        else:
+            # For non-payloaded http errors or any other exception
+            # we don't want to return anything as payload.
+            # The error code is enough.
+            self.finish()
+
+    def rest_to_http_exception(self, rest_exc):
+        """Converts a REST exception into the appropriate HTTP one."""
+        if isinstance(rest_exc, exceptions.NotFound):
+            # NotFound is a special case, because it should have no payload,
+            # just the http 404
+            return web.HTTPError(code=httpstatus.NOT_FOUND)
+
+        return PayloadedHTTPError(
+            code=rest_exc.http_code,
+            payload=escape.json_encode({
+                "error": rest_exc.as_dict()
+            })
+        )
+
 
 class RESTCollectionHandler(RESTBaseHandler):
     """Handler for URLs addressing a collection.
@@ -38,7 +70,7 @@ class RESTCollectionHandler(RESTBaseHandler):
         try:
             items = yield res_handler.items()
         except exceptions.RESTException as e:
-            raise web.HTTPError(e.http_code)
+            raise self.rest_to_http_exception(e)
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
         except Exception:
@@ -67,7 +99,7 @@ class RESTCollectionHandler(RESTBaseHandler):
         try:
             resource_id = yield res_handler.create(data)
         except exceptions.RESTException as e:
-            raise web.HTTPError(e.http_code)
+            raise self.rest_to_http_exception(e)
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
         except Exception:
@@ -104,7 +136,7 @@ class RESTResourceHandler(RESTBaseHandler):
         try:
             representation = yield res_handler.retrieve(identifier)
         except exceptions.RESTException as e:
-            raise web.HTTPError(e.http_code)
+            raise self.rest_to_http_exception(e)
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
         except Exception:
@@ -128,6 +160,8 @@ class RESTResourceHandler(RESTBaseHandler):
 
         try:
             exists = yield res_handler.exists(identifier)
+        except exceptions.RESTException as e:
+            raise self.rest_to_http_exception(e)
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
         except Exception:
@@ -156,7 +190,7 @@ class RESTResourceHandler(RESTBaseHandler):
         try:
             yield res_handler.update(identifier, representation)
         except exceptions.RESTException as e:
-            raise web.HTTPError(e.http_code)
+            raise self.rest_to_http_exception(e)
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
         except Exception:
@@ -176,7 +210,7 @@ class RESTResourceHandler(RESTBaseHandler):
         try:
             yield res_handler.delete(identifier)
         except exceptions.RESTException as e:
-            raise web.HTTPError(e.http_code)
+            raise self.rest_to_http_exception(e)
         except NotImplementedError:
             raise web.HTTPError(httpstatus.METHOD_NOT_ALLOWED)
         except Exception:

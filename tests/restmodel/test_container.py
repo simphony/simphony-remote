@@ -1,14 +1,12 @@
 from unittest.mock import Mock, patch
 
-from remoteappmanager.restresources import Container
-from tornado import web, escape
-
 from remoteappmanager import rest
 from remoteappmanager.rest import registry, httpstatus
-
+from remoteappmanager.restresources import Container
+from tests.mocking import dummy
 from tests.utils import (AsyncHTTPTestCase, mock_coro_factory,
                          mock_coro_new_callable, containers_dict)
-from tests.mocking import dummy
+from tornado import web, escape
 
 
 class TestContainer(AsyncHTTPTestCase):
