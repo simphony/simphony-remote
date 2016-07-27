@@ -44,9 +44,8 @@ class BadRequest(RESTException):
     http_code = httpstatus.BAD_REQUEST
 
 
-class CannotCreate(RESTException):
-    """Exception raised when the resource cannot be created for
-    whatever reason.
+class Unable(RESTException):
+    """Exception raised when the CRUD request cannot be performed
+    for whatever reason that is not dependent on the client.
     """
     http_code = httpstatus.INTERNAL_SERVER_ERROR
-

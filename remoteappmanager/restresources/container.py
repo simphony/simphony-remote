@@ -1,3 +1,4 @@
+import contextlib
 import os
 from datetime import timedelta
 
@@ -17,11 +18,13 @@ class Container(Resource):
         """Create the container.
         The representation should accept the application mapping id we
         want to start"""
-        mapping_id = representation["mapping_id"]
+        try:
+            mapping_id = representation["mapping_id"]
+        except KeyError:
+            raise exceptions.BadRequest(reason="missing mapping_id")
 
         account = self.current_user.account
         all_apps = self.application.db.get_apps_for_user(account)
-        container_manager = self.application.container_manager
 
         choice = [(m_id, app, policy)
                   for m_id, app, policy in all_apps
@@ -30,10 +33,9 @@ class Container(Resource):
         if not choice:
             self.log.warning("Could not find resource "
                              "for mapping id {}".format(mapping_id))
-            raise exceptions.BadRequest()
+            raise exceptions.BadRequest(reason="unrecognized mapping_id")
 
         _, app, policy = choice[0]
-        container = None
 
         try:
             container = yield self._start_container(
@@ -41,26 +43,25 @@ class Container(Resource):
                 app,
                 policy,
                 mapping_id)
-            yield self._wait_for_container_ready(container)
         except Exception as e:
-            if container is not None:
-                try:
-                    yield container_manager.stop_and_remove_container(
-                        container.docker_id)
-                except Exception:
-                    self.log.exception(
-                        "Unable to stop container {} after "
-                        " failure to obtain a ready "
-                        "container".format(
-                            container.docker_id))
+            raise exceptions.Unable(reason=str(e))
 
-            raise exceptions.CannotCreate()
+        try:
+            with self._remove_container_on_error(container):
+                self._wait_for_container_ready(container)
+        except Exception as e:
+            raise exceptions.Unable(reason=str(e))
 
         urlpath = url_path_join(
             self.application.command_line_config.base_urlpath,
             container.urlpath)
-        yield self.application.reverse_proxy.register(urlpath,
-                                                      container.host_url)
+
+        try:
+            with self._remove_container_on_error(container):
+                yield self.application.reverse_proxy.register(
+                    urlpath, container.host_url)
+        except Exception as e:
+            raise exceptions.Unable(reason=str(e))
 
         return container.url_id
 
@@ -83,6 +84,8 @@ class Container(Resource):
     def delete(self, identifier):
         """Stop the container."""
         container = yield self._container_from_url_id(identifier)
+        container_manager = self.application.container_manager
+
         if not container:
             self.log.warning("Could not find container for id {}".format(
                              identifier))
@@ -91,9 +94,22 @@ class Container(Resource):
         urlpath = url_path_join(
             self.application.command_line_config.base_urlpath,
             container.urlpath)
-        yield self.application.reverse_proxy.unregister(urlpath)
-        yield self.application.container_manager.stop_and_remove_container(
-            container.docker_id)
+
+        try:
+            yield self.application.reverse_proxy.unregister(urlpath)
+        except Exception:
+            # If we can't remove the reverse proxy, we cannot do much more
+            # than log the problem and keep going, because we want to stop
+            # the container regardless.
+            self.log.exception("Could not remove reverse "
+                               "proxy for id {}".format(identifier))
+
+        try:
+            yield container_manager.stop_and_remove_container(
+                container.docker_id)
+        except Exception:
+            self.log.exception("Could not stop and remove container "
+                               "for id {}".format(identifier))
 
     @gen.coroutine
     def items(self):
@@ -124,6 +140,28 @@ class Container(Resource):
                 running_containers.append(container.url_id)
 
         return running_containers
+
+    ##################
+    # Private
+
+    @contextlib.contextmanager
+    def _remove_container_on_error(self, container):
+        """Context manager that guarantees we remove the container
+        if something goes wrong during the context-held operation"""
+        container_manager = self.application.container_manager
+        try:
+            yield
+        except Exception as e:
+            try:
+                yield container_manager.stop_and_remove_container(
+                    container.docker_id)
+            except Exception:
+                self.log.exception(
+                    "Unable to stop container {} after "
+                    " failure to obtain a ready "
+                    "container".format(
+                        container.docker_id))
+            raise e
 
     @gen.coroutine
     def _container_from_url_id(self, container_url_id):
