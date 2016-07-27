@@ -72,10 +72,10 @@ def new_spawner(spawner_class):
     return spawner_class(db=db, user=user, hub=hub)
 
 
-class TestSpawner(testing.AsyncTestCase):
+class TestSpawner(TempMixin, testing.AsyncTestCase):
     def setUp(self):
-        self.spawner = new_spawner(Spawner)
         super().setUp()
+        self.spawner = new_spawner(Spawner)
 
     def test_args(self):
         path = fixtures.get("remoteappmanager_config.py")
@@ -85,13 +85,17 @@ class TestSpawner(testing.AsyncTestCase):
         self.assertIn("--config-file={}".format(path), args)
         self.assertIn("--base-urlpath=/", args)
 
+    def test_args_without_config_file_path(self):
+        args = self.spawner.get_args()
+        self.assertIn("--proxy-api-url=http://127.0.0.1:12345/foo/bar/", args)
+        self.assertFalse(any("--config-file=" in arg for arg in args))
+        self.assertIn("--base-urlpath=/", args)
+
     def test_cmd(self):
         self.assertEqual(self.spawner.cmd, ['remoteappmanager'])
 
     def test_default_config_file_path(self):
-        self.assertEqual(self.spawner.config_file_path,
-                         os.path.join(os.getcwd(),
-                                      "remoteappmanager_config.py"))
+        self.assertEqual(self.spawner.config_file_path, "")
 
     def test_env(self):
         env = self.spawner.get_env()
@@ -125,7 +129,7 @@ class TestSpawner(testing.AsyncTestCase):
                 exc.output.decode(sys.getdefaultencoding())))
             raise
 
-    def test_spawner_start_and_stop(self):
+    def test_spawner_start_and_stop_with_config_file(self):
         path = fixtures.get("remoteappmanager_config.py")
         self.spawner.config_file_path = path
 
@@ -136,13 +140,19 @@ class TestSpawner(testing.AsyncTestCase):
         status = self.io_loop.run_sync(self.spawner.poll)
         self.assertEqual(status, 1)
 
+    def test_spawner_start_and_stop_without_config_file(self):
+        with spawner_start_and_stop(self.io_loop, self.spawner):
+            status = self.io_loop.run_sync(self.spawner.poll)
+            self.assertIsNone(status)
 
-class TestVirtualUserSpawner(TempMixin, testing.AsyncTestCase):
+        status = self.io_loop.run_sync(self.spawner.poll)
+        self.assertEqual(status, 1)
+
+
+class TestVirtualUserSpawner(TestSpawner):
     def setUp(self):
         super().setUp()
         self.spawner = new_spawner(VirtualUserSpawner)
-        path = fixtures.get("remoteappmanager_config.py")
-        self.spawner.config_file_path = path
 
     def test_spawner_without_workspace_dir(self):
         with spawner_start_and_stop(self.io_loop, self.spawner):

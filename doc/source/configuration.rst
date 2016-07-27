@@ -1,3 +1,5 @@
+.. _configuration:
+
 Configuration
 =============
 
@@ -40,28 +42,24 @@ docker setup.
    .. literalinclude:: remoteappmanager_help.txt
 
    When **remoteappmanager** is started from jupyterhub using the spawner,
-   all the command line options are filled in, with the config file path
-   default to `remoteappmanager_config.py` in the current directory.
-
-   It is possible to change this location by specifying::
-
-     c.Spawner.config_file_path = "/path/to/config.py"
-
-   in the `jupyterhub_config.py` file. Note that this config file will be used by
-   all remoteappmanagers for any user.
+   all the command line options are filled in automatically.
 
 
 2. Config file
 
-   Path to the config file is given by the `--config-file-path` command-line
-   option. It is a Python file in which default values of attributes in
-   :py:class:`remoteappmanager.file_config.FileConfig` can be override.
+   The **remoteappmanager** has a number of parameters configurable via a
+   config file.  The path of the config file should be specified in the
+   spawner in `jupyterhub_config.py`::
 
-   For example, to use CSV as the database, one could provide a config file
-   with the following settings::
+     c.Spawner.config_file_path = "/path/to/config.py"
+
+   Please refer to :py:class:`remoteappmanager.file_config.FileConfig` for
+   the configurable parameters.  Note that this config file will be used
+   by all remoteappmanagers for any user.
+
+   For example, to use CSV as the database, `/path/to/config.py` would
+   contain the followings::
 
      accounting_class = 'remoteappmanager.db.csv_db.CSVAccounting'
      accounting_kwargs = {'url': '/path/to/csv_file'}
 
-   Please refer to :py:class:`remoteappmanager.file_config.FileConfig` for
-   the configurable parameters.
