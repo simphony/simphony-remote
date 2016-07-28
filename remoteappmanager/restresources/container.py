@@ -1,4 +1,3 @@
-import contextlib
 import os
 from datetime import timedelta
 
@@ -45,9 +44,9 @@ class Container(Resource):
             raise exceptions.Unable(message=str(e))
 
         try:
-            with self._remove_container_on_error(container):
                 yield self._wait_for_container_ready(container)
         except Exception as e:
+            self._remove_container_noexcept(container)
             raise exceptions.Unable(message=str(e))
 
         urlpath = url_path_join(
@@ -55,10 +54,10 @@ class Container(Resource):
             container.urlpath)
 
         try:
-            with self._remove_container_on_error(container):
-                yield self.application.reverse_proxy.register(
-                    urlpath, container.host_url)
+            yield self.application.reverse_proxy.register(
+                urlpath, container.host_url)
         except Exception as e:
+            self._remove_container_noexcept(container)
             raise exceptions.Unable(message=str(e))
 
         return container.url_id
@@ -143,24 +142,23 @@ class Container(Resource):
     ##################
     # Private
 
-    @contextlib.contextmanager
-    def _remove_container_on_error(self, container):
-        """Context manager that guarantees we remove the container
-        if something goes wrong during the context-held operation"""
+    @gen.coroutine
+    def _remove_container_noexcept(self, container):
+        """Removes container and silences (but logs) all exceptions
+        during this circumstance."""
+
+        # Note, can't use a context manager to perform this, because
+        # context managers are only allowed to yield once
         container_manager = self.application.container_manager
         try:
-            yield
-        except Exception as e:
-            try:
-                yield container_manager.stop_and_remove_container(
-                    container.docker_id)
-            except Exception:
-                self.log.exception(
-                    "Unable to stop container {} after "
-                    " failure to obtain a ready "
-                    "container".format(
-                        container.docker_id))
-            raise e
+            yield container_manager.stop_and_remove_container(
+                container.docker_id)
+        except Exception:
+            self.log.exception(
+                "Unable to stop container {} after "
+                " failure to obtain a ready "
+                "container".format(
+                    container.docker_id))
 
     @gen.coroutine
     def _start_container(self, user_name, app, policy, mapping_id):

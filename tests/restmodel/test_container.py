@@ -86,7 +86,7 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                    ".container"
                    ".wait_for_http_server_2xx",
                    new_callable=mock_coro_new_callable(
-                       side_effect=TimeoutError())):
+                       side_effect=TimeoutError("timeout"))):
 
             self._app.container_manager.stop_and_remove_container = \
                 mock_coro_factory()
@@ -103,6 +103,65 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
             self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
             self.assertTrue(
                 self._app.container_manager.stop_and_remove_container.called)
+            self.assertEqual(escape.json_decode(res.body), {
+                "type": "Unable",
+                "message": "timeout"})
+
+    def test_create_fails_for_reverse_proxy_failure(self):
+        with patch("remoteappmanager"
+                   ".restresources"
+                   ".container"
+                   ".wait_for_http_server_2xx",
+                   new_callable=mock_coro_new_callable()):
+
+            self._app.container_manager.stop_and_remove_container = \
+                mock_coro_factory()
+            self._app.reverse_proxy.register = mock_coro_factory(
+                side_effect=Exception("Boom!"))
+
+            res = self.fetch(
+                "/user/username/api/v1/containers/",
+                method="POST",
+                headers={
+                    "Cookie": "jupyter-hub-token-username=foo"
+                },
+                body=escape.json_encode(dict(
+                    mapping_id="mapping_id"
+                )))
+
+            self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
+            self.assertTrue(
+                self._app.container_manager.stop_and_remove_container.called)
+            self.assertEqual(escape.json_decode(res.body), {
+                "type": "Unable",
+                "message": "Boom!"})
+
+    def test_create_fails_for_start_container_failure(self):
+        with patch("remoteappmanager"
+                   ".restresources"
+                   ".container"
+                   ".wait_for_http_server_2xx",
+                   new_callable=mock_coro_new_callable()):
+
+            self._app.container_manager.stop_and_remove_container = \
+                mock_coro_factory()
+            self._app.container_manager.start_container = mock_coro_factory(
+                side_effect=Exception("Boom!"))
+
+            res = self.fetch(
+                "/user/username/api/v1/containers/",
+                method="POST",
+                headers={
+                    "Cookie": "jupyter-hub-token-username=foo"
+                },
+                body=escape.json_encode(dict(
+                    mapping_id="mapping_id"
+                )))
+
+            self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
+            self.assertEqual(escape.json_decode(res.body), {
+                "type": "Unable",
+                "message": "Boom!"})
 
     def test_create_fails_for_missing_mapping_id(self):
         res = self.fetch(
