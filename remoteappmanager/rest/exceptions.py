@@ -9,9 +9,10 @@ class RESTException(Exception):
     #: Missing any better info, default is a server error.
     http_code = httpstatus.INTERNAL_SERVER_ERROR
 
-    def __init__(self, **kwargs):
+    def __init__(self, message=None, **kwargs):
         """Initializes the exception. keyword arguments will become
         part of the representation as key/value pairs."""
+        self.message = message
         self.info = kwargs if len(kwargs) else None
 
     def representation(self):
@@ -20,6 +21,8 @@ class RESTException(Exception):
         data = {
             "type": type(self).__name__
         }
+        if self.message is not None:
+            data["message"] = self.message
 
         if self.info is not None:
             data.update(self.info)
