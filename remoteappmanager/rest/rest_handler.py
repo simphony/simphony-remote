@@ -35,8 +35,9 @@ class RESTBaseHandler(BaseHandler):
             self.finish()
 
         exc = exc_info[1]
-        if isinstance(exc, PayloadedHTTPError):
-            self.set_header('Content-Type', 'application/json')
+
+        if isinstance(exc, PayloadedHTTPError) and exc.payload is not None:
+            self.set_header('Content-Type', exc.content_type)
             self.finish(exc.payload)
         else:
             # For non-payloaded http errors or any other exception
@@ -55,7 +56,8 @@ class RESTBaseHandler(BaseHandler):
 
         return PayloadedHTTPError(
             status_code=rest_exc.http_code,
-            payload=payload
+            payload=payload,
+            content_type="application/json"
         )
 
 
