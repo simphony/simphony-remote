@@ -143,6 +143,48 @@ class TestContainer(AsyncHTTPTestCase):
             self.assertTrue(
                 self._app.container_manager.stop_and_remove_container.called)
 
+    def test_create_fails_for_missing_mapping_id(self):
+        with patch("remoteappmanager"
+                   ".handlers"
+                   ".base_handler"
+                   ".BaseHandler"
+                   ".prepare",
+                   new_callable=self.mock_prepare
+                   ):
+
+            res = self.fetch(
+                "/api/v1/containers/",
+                method="POST",
+                body=escape.json_encode(dict(
+                    whatever="123"
+                )))
+
+            self.assertEqual(res.code, httpstatus.BAD_REQUEST)
+            self.assertEqual(escape.json_decode(res.body),
+                             {"type": "BadRequest",
+                              "message": "missing mapping_id"})
+
+    def test_create_fails_for_invalid_mapping_id(self):
+        with patch("remoteappmanager"
+                   ".handlers"
+                   ".base_handler"
+                   ".BaseHandler"
+                   ".prepare",
+                   new_callable=self.mock_prepare
+                   ):
+
+            res = self.fetch(
+                "/api/v1/containers/",
+                method="POST",
+                body=escape.json_encode(dict(
+                    mapping_id="whatever"
+                )))
+
+            self.assertEqual(res.code, httpstatus.BAD_REQUEST)
+            self.assertEqual(escape.json_decode(res.body),
+                             {"type": "BadRequest",
+                              "message": "unrecognized mapping_id"})
+
     def test_retrieve(self):
         with patch("remoteappmanager"
                    ".handlers"
