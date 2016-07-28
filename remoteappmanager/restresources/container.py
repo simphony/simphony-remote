@@ -68,7 +68,8 @@ class Container(Resource):
     @gen.coroutine
     def retrieve(self, identifier):
         """Return the representation of the running container."""
-        container = yield self._container_from_url_id(identifier)
+        container_manager = self.application.container_manager
+        container = yield container_manager.container_from_url_id(identifier)
 
         if container is None:
             self.log.warning("Could not find container for id {}".format(
@@ -83,8 +84,8 @@ class Container(Resource):
     @gen.coroutine
     def delete(self, identifier):
         """Stop the container."""
-        container = yield self._container_from_url_id(identifier)
         container_manager = self.application.container_manager
+        container = yield container_manager.container_from_url_id(identifier)
 
         if not container:
             self.log.warning("Could not find container for id {}".format(
@@ -162,25 +163,6 @@ class Container(Resource):
                     "container".format(
                         container.docker_id))
             raise e
-
-    @gen.coroutine
-    def _container_from_url_id(self, container_url_id):
-        """Retrieves and returns the container if valid and present.
-
-        If not present, returns None
-        """
-
-        container_manager = self.application.container_manager
-
-        container_dict = yield container_manager.docker_client.containers(
-            filters={'label': "{}={}".format(
-                SIMPHONY_NS+"url_id",
-                container_url_id)})
-
-        if not container_dict:
-            return None
-
-        return DockerContainer.from_docker_dict(container_dict[0])
 
     @gen.coroutine
     def _start_container(self, user_name, app, policy, mapping_id):
