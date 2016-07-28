@@ -1,13 +1,13 @@
 from unittest.mock import Mock, patch
 
-from remoteappmanager import rest
-from remoteappmanager.rest import registry
-from remoteappmanager.rest.http import httpstatus
-from remoteappmanager.restresources import Container
-from tests.mocking import dummy
+from tornado import escape
+
+from remoteappmanager.rest import httpstatus
+
 from tests.utils import (AsyncHTTPTestCase, mock_coro_factory,
-                         mock_coro_new_callable, containers_dict)
-from tornado import web, escape
+                         mock_coro_new_callable)
+from tests.mocking import dummy
+from tests.mocking.virtual.docker_client import create_docker_client
 
 
 class TestContainer(AsyncHTTPTestCase):
@@ -16,215 +16,100 @@ class TestContainer(AsyncHTTPTestCase):
 
         def prepare_side_effect(*args, **kwargs):
             user = Mock()
-            user.account = Mock()
+            user.name = 'user_name'
             args[0].current_user = user
 
         self.mock_prepare = mock_coro_new_callable(
             side_effect=prepare_side_effect)
 
     def get_app(self):
-        handlers = rest.api_handlers('/')
-        registry.registry.register(Container)
-        app = web.Application(handlers=handlers)
-        app.file_config = Mock()
-        app.file_config.network_timeout = 5
-        app.urlpath_for_object = Mock(return_value="/urlpath_for_object/")
-        app.command_line_config = Mock()
-        app.command_line_config.base_urlpath = "/"
-        app.reverse_proxy = dummy.create_reverse_proxy()
-        container = Mock()
-        container.urlpath = "containers/12345"
-        container.url_id = "12345"
-        app.container_manager = Mock()
-        app.container_manager.image = mock_coro_factory()
-        app.container_manager.start_container = mock_coro_factory(
-            return_value=container)
-        app.container_manager.stop_and_remove_container = mock_coro_factory()
-        app.container_manager.docker_client.containers = mock_coro_factory(
-            return_value=[]
-        )
-
-        app.db = Mock()
-        application_mock_1 = Mock()
-        application_mock_1.image = "hello1"
-
-        application_mock_2 = Mock()
-        application_mock_2.image = "hello2"
-        app.db.get_apps_for_user = Mock(return_value=[
-            ("one", application_mock_1, Mock()),
-            ("two", application_mock_2, Mock()),
-        ])
-        return app
+        command_line_config = dummy.basic_command_line_config()
+        command_line_config.base_urlpath = '/'
+        return dummy.create_application(command_line_config)
 
     def test_items(self):
-        with patch("remoteappmanager"
-                   ".handlers"
-                   ".base_handler"
-                   ".BaseHandler"
-                   ".prepare",
-                   new_callable=self.mock_prepare
-                   ):
+        with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",   # noqa
+                   new_callable=self.mock_prepare):
             res = self.fetch("/api/v1/containers/")
 
             self.assertEqual(res.code, httpstatus.OK)
             self.assertEqual(escape.json_decode(res.body),
-                             {"items": []})
+                             {"items": ['url_id']})
 
-            # Add a mock image so that we check what happens if we do
-            # have something
-            self._app.container_manager.image = mock_coro_factory(
-                return_value=[Mock()]
-            )
-            mock_container = Mock()
-            mock_container.url_id = "hello"
-            self._app.container_manager.containers_from_mapping_id = \
-                mock_coro_factory([mock_container])
+            # We have another container running
+            self._app.container_manager.docker_client._sync_client = (
+                create_docker_client(
+                    container_ids=('container_id1',),
+                    container_labels=(
+                        {'eu.simphony-project.docker.user': 'user_name',
+                         'eu.simphony-project.docker.mapping_id': 'mapping_id',
+                         'eu.simphony-project.docker.url_id': 'url_id1234'},)))
 
             res = self.fetch("/api/v1/containers/")
-
             self.assertEqual(res.code, httpstatus.OK)
-
-            # We have two "hello" but it's an artifact of the mocking.
-            # in a real application they are different, one for each
-            # application+policy running
             self.assertEqual(escape.json_decode(res.body),
-                             {"items": ["hello", "hello"]})
+                             {"items": ["url_id1234"]})
 
     def test_create(self):
-        with patch("remoteappmanager"
-                   ".handlers"
-                   ".base_handler"
-                   ".BaseHandler"
-                   ".prepare",
-                   new_callable=self.mock_prepare
-                   ), \
-             patch("remoteappmanager"
-                   ".restresources"
-                   ".container"
-                   ".wait_for_http_server_2xx",
-                   new_callable=mock_coro_new_callable()):
+        with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",  # noqa
+                   new_callable=self.mock_prepare), \
+                patch("remoteappmanager.restresources.container.wait_for_http_server_2xx",  # noqa
+                      new_callable=mock_coro_factory), \
+                patch("remoteappmanager.docker.container_manager._generate_container_url_id",  # noqa
+                      return_value="12345678"):
 
             res = self.fetch(
                 "/api/v1/containers/",
                 method="POST",
-                body=escape.json_encode(dict(
-                    mapping_id="one"
-                )))
+                body=escape.json_encode({'mapping_id': 'mapping_id'}))
 
             self.assertEqual(res.code, httpstatus.CREATED)
 
             # The port is random due to testing env. Check if it's absolute
             self.assertIn("http://", res.headers["Location"])
-            self.assertIn("/api/v1/containers/12345/", res.headers["Location"])
+            self.assertIn("/api/v1/containers/12345678",
+                          res.headers["Location"])
 
     def test_create_fails(self):
-        with patch("remoteappmanager"
-                   ".handlers"
-                   ".base_handler"
-                   ".BaseHandler"
-                   ".prepare",
-                   new_callable=self.mock_prepare
-                   ), \
-             patch("remoteappmanager"
-                   ".restresources"
-                   ".container"
-                   ".wait_for_http_server_2xx",
-                   new_callable=mock_coro_new_callable(
-                       side_effect=TimeoutError())):
+        with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",   # noqa
+                   new_callable=self.mock_prepare), \
+                patch("remoteappmanager.restresources.container.wait_for_http_server_2xx",   # noqa
+                      new_callable=mock_coro_new_callable(
+                          side_effect=TimeoutError())):
 
             res = self.fetch(
                 "/api/v1/containers/",
                 method="POST",
                 body=escape.json_encode(dict(
-                    mapping_id="one"
+                    mapping_id="mapping_id"
                 )))
 
             self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
-            self.assertTrue(
-                self._app.container_manager.stop_and_remove_container.called)
-
-    def test_create_fails_for_missing_mapping_id(self):
-        with patch("remoteappmanager"
-                   ".handlers"
-                   ".base_handler"
-                   ".BaseHandler"
-                   ".prepare",
-                   new_callable=self.mock_prepare
-                   ):
-
-            res = self.fetch(
-                "/api/v1/containers/",
-                method="POST",
-                body=escape.json_encode(dict(
-                    whatever="123"
-                )))
-
-            self.assertEqual(res.code, httpstatus.BAD_REQUEST)
-            self.assertEqual(escape.json_decode(res.body),
-                             {"type": "BadRequest",
-                              "message": "missing mapping_id"})
-
-    def test_create_fails_for_invalid_mapping_id(self):
-        with patch("remoteappmanager"
-                   ".handlers"
-                   ".base_handler"
-                   ".BaseHandler"
-                   ".prepare",
-                   new_callable=self.mock_prepare
-                   ):
-
-            res = self.fetch(
-                "/api/v1/containers/",
-                method="POST",
-                body=escape.json_encode(dict(
-                    mapping_id="whatever"
-                )))
-
-            self.assertEqual(res.code, httpstatus.BAD_REQUEST)
-            self.assertEqual(escape.json_decode(res.body),
-                             {"type": "BadRequest",
-                              "message": "unrecognized mapping_id"})
+            client = self._app.container_manager.docker_client._sync_client
+            self.assertTrue(client.stop.called)
+            self.assertTrue(client.remove_container.called)
 
     def test_retrieve(self):
-        with patch("remoteappmanager"
-                   ".handlers"
-                   ".base_handler"
-                   ".BaseHandler"
-                   ".prepare",
-                   new_callable=self.mock_prepare
-                   ):
+        with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",  # noqa
+                   new_callable=self.mock_prepare):
 
             res = self.fetch("/api/v1/containers/notfound/")
             self.assertEqual(res.code, httpstatus.NOT_FOUND)
 
-            self._app.container_manager.docker_client.containers = \
-                mock_coro_factory(return_value=[containers_dict()])
-
-            # The url is not important. The replacement of the containers
-            # method up there guarantees that the method will return
-            # something, regardless of the filter used.
-            res = self.fetch("/api/v1/containers/found/")
+            res = self.fetch("/api/v1/containers/url_id/")
             self.assertEqual(res.code, httpstatus.OK)
 
             content = escape.json_decode(res.body)
-            self.assertEqual(content["image_name"],
-                             "simphony/app:simphony-framework-mayavi")
-            self.assertEqual(content["name"], "/cocky_pasteur")
+            self.assertEqual(content["image_name"], "image_name1")
+            self.assertEqual(content["name"],
+                             "/remoteexec-username-mapping_5Fid")
 
     def test_delete(self):
-        with patch("remoteappmanager"
-                   ".handlers"
-                   ".base_handler"
-                   ".BaseHandler"
-                   ".prepare",
-                   new_callable=self.mock_prepare
-                   ):
+        with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",  # noqa
+                   new_callable=self.mock_prepare):
 
             res = self.fetch("/api/v1/containers/notfound/", method="DELETE")
             self.assertEqual(res.code, httpstatus.NOT_FOUND)
 
-            self._app.container_manager.docker_client.containers = \
-                mock_coro_factory(return_value=[containers_dict()])
-
-            res = self.fetch("/api/v1/containers/found/", method="DELETE")
+            res = self.fetch("/api/v1/containers/url_id/", method="DELETE")
             self.assertEqual(res.code, httpstatus.NO_CONTENT)
