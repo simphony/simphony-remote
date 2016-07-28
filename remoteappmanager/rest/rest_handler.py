@@ -32,6 +32,7 @@ class RESTBaseHandler(BaseHandler):
         exc_info = kwargs.get("exc_info")
 
         if exc_info is None:
+            self.clear_header('Content-Type')
             self.finish()
 
         exc = exc_info[1]
