@@ -75,6 +75,10 @@ class Unprocessable(Resource):
     def retrieve(self, identifier):
         raise exceptions.BadRequest("unprocessable", foo="bar")
 
+    @gen.coroutine
+    def items(self):
+        raise exceptions.BadRequest("unprocessable", foo="bar")
+
 
 class UnsupportsCollection(Resource):
     @gen.coroutine
@@ -351,6 +355,18 @@ class TestREST(AsyncHTTPTestCase):
                 "/api/v1/unprocessables/",
                 method="POST",
                 body="{}"
+            )
+            self.assertEqual(res.code, httpstatus.BAD_REQUEST)
+            self.assertEqual(res.headers["Content-Type"], 'application/json')
+            self.assertEqual(escape.json_decode(res.body), {
+                "type": "BadRequest",
+                "message": "unprocessable",
+                "foo": "bar",
+            })
+
+            res = self.fetch(
+                "/api/v1/unprocessables/",
+                method="GET",
             )
             self.assertEqual(res.code, httpstatus.BAD_REQUEST)
             self.assertEqual(res.headers["Content-Type"], 'application/json')
