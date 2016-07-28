@@ -102,7 +102,7 @@ def create_container_manager(params=None):
     manager.start_container = mock_coro_factory(Container())
     manager.stop_and_remove_container = mock_coro_factory()
     manager.containers_from_mapping_id = mock_coro_factory([Container()])
-    manager.container_from_url_is = mock_coro_factory(Container())
+    manager.container_from_url_id = mock_coro_factory(Container())
     manager.containers_from_filters = mock_coro_factory([Container()])
     manager.image = mock_coro_factory(Image())
     return manager
