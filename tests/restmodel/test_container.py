@@ -1,115 +1,203 @@
-from unittest.mock import Mock, patch
+import os
+from unittest.mock import patch
 
-from tornado import escape
-
-from remoteappmanager.rest import httpstatus
-
+from remoteappmanager.rest.http import httpstatus
+from remoteappmanager.docker.container import Container as DockerContainer
+from tests.mocking import dummy
+from tests.temp_mixin import TempMixin
 from tests.utils import (AsyncHTTPTestCase, mock_coro_factory,
                          mock_coro_new_callable)
-from tests.mocking import dummy
-from tests.mocking.virtual.docker_client import create_docker_client
+from tornado import escape
 
 
-class TestContainer(AsyncHTTPTestCase):
+class TestContainerApplication(TempMixin, AsyncHTTPTestCase):
     def setUp(self):
+        self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
+        os.environ["PROXY_API_TOKEN"] = "dummy_token"
+
+        def cleanup():
+            if self._old_proxy_api_token is not None:
+                os.environ["PROXY_API_TOKEN"] = self._old_proxy_api_token
+            else:
+                del os.environ["PROXY_API_TOKEN"]
+
+        self.addCleanup(cleanup)
+
         super().setUp()
 
-        def prepare_side_effect(*args, **kwargs):
-            user = Mock()
-            user.name = 'user_name'
-            args[0].current_user = user
-
-        self.mock_prepare = mock_coro_new_callable(
-            side_effect=prepare_side_effect)
-
     def get_app(self):
-        command_line_config = dummy.basic_command_line_config()
-        command_line_config.base_urlpath = '/'
-        return dummy.create_application(command_line_config)
+        app = dummy.create_application()
+        app.hub.verify_token.return_value = {
+            'pending': None,
+            'name': app.settings['user'],
+            'admin': False,
+            'server': app.settings['base_urlpath']}
+        return app
 
     def test_items(self):
-        with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",   # noqa
-                   new_callable=self.mock_prepare):
-            res = self.fetch("/api/v1/containers/")
+        res = self.fetch(
+            "/user/username/api/v1/containers/",
+            headers={
+                "Cookie": "jupyter-hub-token-username=foo"
+            },
+        )
 
-            self.assertEqual(res.code, httpstatus.OK)
-            self.assertEqual(escape.json_decode(res.body),
-                             {"items": ['url_id']})
+        self.assertEqual(res.code, httpstatus.OK)
 
-            # We have another container running
-            self._app.container_manager.docker_client._sync_client = (
-                create_docker_client(
-                    container_ids=('container_id1',),
-                    container_labels=(
-                        {'eu.simphony-project.docker.user': 'user_name',
-                         'eu.simphony-project.docker.mapping_id': 'mapping_id',
-                         'eu.simphony-project.docker.url_id': 'url_id1234'},)))
-
-            res = self.fetch("/api/v1/containers/")
-            self.assertEqual(res.code, httpstatus.OK)
-            self.assertEqual(escape.json_decode(res.body),
-                             {"items": ["url_id1234"]})
+        self.assertEqual(escape.json_decode(res.body),
+                         {"items": ["", ""]})
 
     def test_create(self):
-        with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",  # noqa
-                   new_callable=self.mock_prepare), \
-                patch("remoteappmanager.restresources.container.wait_for_http_server_2xx",  # noqa
-                      new_callable=mock_coro_factory), \
-                patch("remoteappmanager.docker.container_manager._generate_container_url_id",  # noqa
-                      return_value="12345678"):
+        with patch("remoteappmanager"
+                   ".restresources"
+                   ".container"
+                   ".wait_for_http_server_2xx",
+                   new_callable=mock_coro_new_callable()):
 
+            manager = self._app.container_manager
+            manager.start_container = mock_coro_factory(DockerContainer(
+                url_id="3456"
+            ))
             res = self.fetch(
-                "/api/v1/containers/",
+                "/user/username/api/v1/containers/",
                 method="POST",
-                body=escape.json_encode({'mapping_id': 'mapping_id'}))
+                headers={
+                    "Cookie": "jupyter-hub-token-username=foo"
+                },
+                body=escape.json_encode(dict(
+                    mapping_id="12345"
+                )))
 
             self.assertEqual(res.code, httpstatus.CREATED)
 
             # The port is random due to testing env. Check if it's absolute
             self.assertIn("http://", res.headers["Location"])
-            self.assertIn("/api/v1/containers/12345678",
-                          res.headers["Location"])
+            self.assertIn("/api/v1/containers/3456/", res.headers["Location"])
 
     def test_create_fails(self):
-        with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",   # noqa
-                   new_callable=self.mock_prepare), \
-                patch("remoteappmanager.restresources.container.wait_for_http_server_2xx",   # noqa
-                      new_callable=mock_coro_new_callable(
-                          side_effect=TimeoutError())):
+        with patch("remoteappmanager"
+                   ".restresources"
+                   ".container"
+                   ".wait_for_http_server_2xx",
+                   new_callable=mock_coro_new_callable(
+                       side_effect=TimeoutError())):
 
             res = self.fetch(
-                "/api/v1/containers/",
+                "/user/username/api/v1/containers/",
                 method="POST",
+                headers={
+                    "Cookie": "jupyter-hub-token-username=foo"
+                },
                 body=escape.json_encode(dict(
-                    mapping_id="mapping_id"
+                    mapping_id="12345"
                 )))
 
             self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
-            client = self._app.container_manager.docker_client._sync_client
-            self.assertTrue(client.stop.called)
-            self.assertTrue(client.remove_container.called)
+            self.assertTrue(
+                self._app.container_manager.stop_and_remove_container.called)
+
+    def test_create_fails_for_missing_mapping_id(self):
+        res = self.fetch(
+            "/user/username/api/v1/containers/",
+            method="POST",
+            headers={
+                "Cookie": "jupyter-hub-token-username=foo"
+            },
+            body=escape.json_encode(dict(
+                whatever="123"
+            )))
+
+        self.assertEqual(res.code, httpstatus.BAD_REQUEST)
+        self.assertEqual(escape.json_decode(res.body),
+                         {"type": "BadRequest",
+                          "message": "missing mapping_id"})
+
+    def test_create_fails_for_invalid_mapping_id(self):
+        res = self.fetch(
+            "/user/username/api/v1/containers/",
+            method="POST",
+            headers={
+                "Cookie": "jupyter-hub-token-username=foo"
+            },
+            body=escape.json_encode(dict(
+                mapping_id="whatever"
+            )))
+
+        self.assertEqual(res.code, httpstatus.BAD_REQUEST)
+        self.assertEqual(escape.json_decode(res.body),
+                         {"type": "BadRequest",
+                          "message": "unrecognized mapping_id"})
 
     def test_retrieve(self):
-        with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",  # noqa
-                   new_callable=self.mock_prepare):
+        res = self.fetch("/user/username/api/v1/containers/found/",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=foo"
+                         })
+        self.assertEqual(res.code, httpstatus.OK)
 
-            res = self.fetch("/api/v1/containers/notfound/")
-            self.assertEqual(res.code, httpstatus.NOT_FOUND)
+        content = escape.json_decode(res.body)
+        self.assertEqual(content["image_name"], "")
+        self.assertEqual(content["name"], "")
 
-            res = self.fetch("/api/v1/containers/url_id/")
-            self.assertEqual(res.code, httpstatus.OK)
-
-            content = escape.json_decode(res.body)
-            self.assertEqual(content["image_name"], "image_name1")
-            self.assertEqual(content["name"],
-                             "/remoteexec-username-mapping_5Fid")
+        self._app.container_manager.container_from_url_id = \
+            mock_coro_factory(return_value=None)
+        res = self.fetch("/user/username/api/v1/containers/notfound/",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=foo"
+                         })
+        self.assertEqual(res.code, httpstatus.NOT_FOUND)
 
     def test_delete(self):
-        with patch("remoteappmanager.handlers.base_handler.BaseHandler.prepare",  # noqa
-                   new_callable=self.mock_prepare):
+        res = self.fetch("/user/username/api/v1/containers/found/",
+                         method="DELETE",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=foo"
+                         })
+        self.assertEqual(res.code, httpstatus.NO_CONTENT)
 
-            res = self.fetch("/api/v1/containers/notfound/", method="DELETE")
-            self.assertEqual(res.code, httpstatus.NOT_FOUND)
+        self._app.container_manager.container_from_url_id = \
+            mock_coro_factory(return_value=None)
+        res = self.fetch("/user/username/api/v1/containers/notfound/",
+                         method="DELETE",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=foo"
+                         })
+        self.assertEqual(res.code, httpstatus.NOT_FOUND)
 
-            res = self.fetch("/api/v1/containers/url_id/", method="DELETE")
-            self.assertEqual(res.code, httpstatus.NO_CONTENT)
+    def test_post_start(self):
+        with patch("remoteappmanager"
+                   ".restresources"
+                   ".container"
+                   ".wait_for_http_server_2xx",
+                   new_callable=mock_coro_factory):
+
+            self.assertFalse(self._app.reverse_proxy.register.called)
+            self.fetch("/user/username/api/v1/containers/",
+                       method="POST",
+                       headers={
+                                "Cookie": "jupyter-hub-token-username=foo"
+                       },
+                       body=escape.json_encode({"mapping_id": "12345"}))
+
+            self.assertTrue(self._app.reverse_proxy.register.called)
+
+    def test_post_failed_auth(self):
+        self._app.hub.verify_token.return_value = {}
+
+        res = self.fetch("/user/username/api/v1/containers/",
+                         method="POST",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=foo"
+                         },
+                         body=escape.json_encode({"mapping_id": "12345"}))
+
+        self.assertGreaterEqual(res.code, 400)
+
+    def test_stop(self):
+        self.fetch("/user/username/api/v1/containers/12345/",
+                   method="DELETE",
+                   headers={
+                      "Cookie": "jupyter-hub-token-username=foo"
+                   })
+
+        self.assertTrue(self._app.reverse_proxy.unregister.called)

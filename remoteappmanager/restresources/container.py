@@ -4,10 +4,8 @@ from datetime import timedelta
 
 from tornado import gen
 
-from remoteappmanager.docker.docker_labels import SIMPHONY_NS
 from remoteappmanager.rest import exceptions
 from remoteappmanager.rest.resource import Resource
-from remoteappmanager.docker.container import Container as DockerContainer
 from remoteappmanager.utils import url_path_join
 from remoteappmanager.netutils import wait_for_http_server_2xx
 
