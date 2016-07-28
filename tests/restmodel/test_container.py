@@ -10,7 +10,7 @@ from tests.utils import (AsyncHTTPTestCase, mock_coro_factory,
 from tornado import escape
 
 
-class TestContainerApplication(TempMixin, AsyncHTTPTestCase):
+class TestContainer(TempMixin, AsyncHTTPTestCase):
     def setUp(self):
         self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
         os.environ["PROXY_API_TOKEN"] = "dummy_token"
