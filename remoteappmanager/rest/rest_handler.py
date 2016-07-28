@@ -51,14 +51,17 @@ class RESTBaseHandler(BaseHandler):
         """Converts a REST exception into the appropriate HTTP one."""
 
         representation = rest_exc.representation()
-        payload = (escape.json_encode(representation)
-                   if representation is not None
-                   else None)
+        payload = None
+        content_type = None
+
+        if representation is not None:
+            payload = escape.json_encode(representation)
+            content_type = "application/json"
 
         return PayloadedHTTPError(
             status_code=rest_exc.http_code,
             payload=payload,
-            content_type="application/json"
+            content_type=content_type
         )
 
 
