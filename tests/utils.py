@@ -14,45 +14,6 @@ from remoteappmanager.db.orm import Database
 from tests import fixtures
 
 
-def containers_dict():
-    """Returns the dictionary that is returned by invoking Client.containers()
-    Note that this is different from Client.inspect_container(), which follows
-    """
-    return {
-        'Command': '/startup.sh',
-        'Created': 1466584191,
-        'HostConfig': {'NetworkMode': 'default'},
-        'Id': '849ac3a16d88fe410ba8396988c27b0dfad49ce3a05fa835b8f301e728640d0a',
-        'Image': 'simphony/app:simphony-framework-mayavi',
-        'ImageID':
-            'sha256:92016cfc2901fc11a39829033c81a1b8ed530d84fd1111e6caaa66c81b7ec1a8',
-        'Labels': {'eu.simphony-project.docker.description': 'Ubuntu machine '
-                                                             'with simphony '
-                                                             'framework '
-                                                             'preinstalled',
-                   'eu.simphony-project.docker.icon_128': '',
-                   'eu.simphony-project.docker.ui_name': 'Simphony Framework ('
-                                                         'w/ '
-                                                         'mayavi)'},
-        'Mounts': [],
-        'Names': ['/cocky_pasteur'],
-        'NetworkSettings': {'Networks': {'bridge': {'Aliases': None,
-                                                    'EndpointID': '',
-                                                    'Gateway': '',
-                                                    'GlobalIPv6Address': '',
-                                                    'GlobalIPv6PrefixLen': 0,
-                                                    'IPAMConfig': None,
-                                                    'IPAddress': '',
-                                                    'IPPrefixLen': 0,
-                                                    'IPv6Gateway': '',
-                                                    'Links': None,
-                                                    'MacAddress': '',
-                                                    'NetworkID': ''}}},
-        'Ports': [],
-        'State': 'exited',
-        'Status': 'Exited (0) 12 days ago'}
-
-
 # A set of viable start arguments
 arguments = {
     "user": "username",

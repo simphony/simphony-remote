@@ -4,10 +4,9 @@ from remoteappmanager.file_config import FileConfig
 from remoteappmanager.application import Application
 from remoteappmanager.db import interfaces
 from remoteappmanager.docker.container_manager import ContainerManager
-from remoteappmanager.docker.container import Container
-from remoteappmanager.docker.image import Image
 
 from tests.utils import mock_coro_factory, basic_command_line_config
+from tests.mocking.virtual.docker_client import create_docker_client
 
 
 class DummyDBApplication(interfaces.ABCApplication):
@@ -24,11 +23,11 @@ class DummyDBAccounting(interfaces.ABCAccounting):
         return user_name
 
     def get_apps_for_user(self, account):
-        return (('12345',
-                 DummyDBApplication(image='image1'),
+        return (('mapping_id',
+                 DummyDBApplication(image='image_id1'),
                  DummyDBApplicationPolicy()),
                 ('id678',
-                 DummyDBApplication(image='image2'),
+                 DummyDBApplication(image='image_id1'),
                  DummyDBApplicationPolicy()))
 
 
@@ -99,12 +98,7 @@ def create_container_manager(params=None):
         params = {'docker_config': {}}
 
     manager = ContainerManager(**params)
-    manager.start_container = mock_coro_factory(Container())
-    manager.stop_and_remove_container = mock_coro_factory()
-    manager.containers_from_mapping_id = mock_coro_factory([Container()])
-    manager.container_from_url_is = mock_coro_factory(Container())
-    manager.containers_from_filters = mock_coro_factory([Container()])
-    manager.image = mock_coro_factory(Image())
+    manager.docker_client._sync_client = create_docker_client()
     return manager
 
 
