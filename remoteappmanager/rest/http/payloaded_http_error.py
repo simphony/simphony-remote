@@ -28,6 +28,9 @@ class PayloadedHTTPError(HTTPError):
 
             if content_type is None:
                 content_type = "text/plain"
+        else:
+            if content_type is not None:
+                raise ValueError("Content type specified, but no payload")
 
         self.content_type = content_type
         self.payload = payload
