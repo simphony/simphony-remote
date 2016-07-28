@@ -1,6 +1,7 @@
 import os
 from unittest.mock import patch
 
+from remoteappmanager.docker.image import Image
 from remoteappmanager.rest.http import httpstatus
 from remoteappmanager.docker.container import Container as DockerContainer
 from tests.mocking import dummy
@@ -35,6 +36,11 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
         return app
 
     def test_items(self):
+        manager = self._app.container_manager
+        manager.image = mock_coro_factory(Image())
+        manager.containers_from_mapping_id = mock_coro_factory(
+            [DockerContainer()])
+
         res = self.fetch(
             "/user/username/api/v1/containers/",
             headers={
@@ -65,7 +71,7 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                     "Cookie": "jupyter-hub-token-username=foo"
                 },
                 body=escape.json_encode(dict(
-                    mapping_id="12345"
+                    mapping_id="mapping_id"
                 )))
 
             self.assertEqual(res.code, httpstatus.CREATED)
@@ -82,6 +88,8 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                    new_callable=mock_coro_new_callable(
                        side_effect=TimeoutError())):
 
+            self._app.container_manager.stop_and_remove_container = \
+                mock_coro_factory()
             res = self.fetch(
                 "/user/username/api/v1/containers/",
                 method="POST",
@@ -89,7 +97,7 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                     "Cookie": "jupyter-hub-token-username=foo"
                 },
                 body=escape.json_encode(dict(
-                    mapping_id="12345"
+                    mapping_id="mapping_id"
                 )))
 
             self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
@@ -129,6 +137,9 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                           "message": "unrecognized mapping_id"})
 
     def test_retrieve(self):
+        self._app.container_manager.container_from_url_id = mock_coro_factory(
+            DockerContainer()
+        )
         res = self.fetch("/user/username/api/v1/containers/found/",
                          headers={
                              "Cookie": "jupyter-hub-token-username=foo"
@@ -148,6 +159,9 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
         self.assertEqual(res.code, httpstatus.NOT_FOUND)
 
     def test_delete(self):
+        self._app.container_manager.container_from_url_id = mock_coro_factory(
+            DockerContainer()
+        )
         res = self.fetch("/user/username/api/v1/containers/found/",
                          method="DELETE",
                          headers={
@@ -170,6 +184,8 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                    ".container"
                    ".wait_for_http_server_2xx",
                    new_callable=mock_coro_factory):
+            self._app.container_manager.containers_from_mapping_id = \
+                mock_coro_factory(return_value=[DockerContainer()])
 
             self.assertFalse(self._app.reverse_proxy.register.called)
             self.fetch("/user/username/api/v1/containers/",
@@ -177,7 +193,7 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                        headers={
                                 "Cookie": "jupyter-hub-token-username=foo"
                        },
-                       body=escape.json_encode({"mapping_id": "12345"}))
+                       body=escape.json_encode({"mapping_id": "mapping_id"}))
 
             self.assertTrue(self._app.reverse_proxy.register.called)
 
@@ -194,6 +210,9 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
         self.assertGreaterEqual(res.code, 400)
 
     def test_stop(self):
+        self._app.container_manager.container_from_url_id = mock_coro_factory(
+            DockerContainer()
+        )
         self.fetch("/user/username/api/v1/containers/12345/",
                    method="DELETE",
                    headers={
