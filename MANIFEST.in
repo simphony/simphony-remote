@@ -1,4 +1,5 @@
 include *.txt
 include tests/fixtures/remoteappmanager.db
+include tests/fixtures/templates/*.html
 recursive-include remoteappmanager/templates *
 recursive-include remoteappmanager/static *
