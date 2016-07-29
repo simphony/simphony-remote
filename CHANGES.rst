@@ -1,6 +1,25 @@
 SimPhoNy Remote CHANGELOG
 =========================
 
+What's new in SimPhoNy Remote 0.6.0
+-----------------------------------
+
+Summary
+~~~~~~~
+
+- Added error payload to REST api (#186)
+- Use dummy and virtual objects for testing (#172)
+- Fix remoteappmanager config file consistency with docker-py (#171)
+- Config file is made optional for remoteappmanager (#170)
+- Add license in documentation (#169)
+- Add REST Javascript client (#165)
+- Add traitlets documenter for documentation (#163)
+- Add troubleshoot page in documentation (#160)
+- Bug fix: Timeout issue in tests (#167)
+- Bug fix: Make sure remoteappdb closes the session on exit
+- Bug fix: Source distribution with requirement files (#155)
+
+
 What's new in SimPhoNy Remote 0.5.0
 -----------------------------------
 
