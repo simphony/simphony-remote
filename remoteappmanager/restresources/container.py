@@ -3,10 +3,8 @@ from datetime import timedelta
 
 from tornado import gen
 
-from remoteappmanager.docker.docker_labels import SIMPHONY_NS
 from remoteappmanager.rest import exceptions
 from remoteappmanager.rest.resource import Resource
-from remoteappmanager.docker.container import Container as DockerContainer
 from remoteappmanager.utils import url_path_join
 from remoteappmanager.netutils import wait_for_http_server_2xx
 
@@ -17,11 +15,13 @@ class Container(Resource):
         """Create the container.
         The representation should accept the application mapping id we
         want to start"""
-        mapping_id = representation["mapping_id"]
+        try:
+            mapping_id = representation["mapping_id"]
+        except KeyError:
+            raise exceptions.BadRequest(message="missing mapping_id")
 
         account = self.current_user.account
         all_apps = self.application.db.get_apps_for_user(account)
-        container_manager = self.application.container_manager
 
         choice = [(m_id, app, policy)
                   for m_id, app, policy in all_apps
@@ -30,10 +30,9 @@ class Container(Resource):
         if not choice:
             self.log.warning("Could not find resource "
                              "for mapping id {}".format(mapping_id))
-            raise exceptions.BadRequest()
+            raise exceptions.BadRequest(message="unrecognized mapping_id")
 
         _, app, policy = choice[0]
-        container = None
 
         try:
             container = yield self._start_container(
@@ -41,33 +40,33 @@ class Container(Resource):
                 app,
                 policy,
                 mapping_id)
-            yield self._wait_for_container_ready(container)
         except Exception as e:
-            if container is not None:
-                try:
-                    yield container_manager.stop_and_remove_container(
-                        container.docker_id)
-                except Exception:
-                    self.log.exception(
-                        "Unable to stop container {} after "
-                        " failure to obtain a ready "
-                        "container".format(
-                            container.docker_id))
+            raise exceptions.Unable(message=str(e))
 
-            raise exceptions.InternalServerError()
+        try:
+                yield self._wait_for_container_ready(container)
+        except Exception as e:
+            self._remove_container_noexcept(container)
+            raise exceptions.Unable(message=str(e))
 
         urlpath = url_path_join(
             self.application.command_line_config.base_urlpath,
             container.urlpath)
-        yield self.application.reverse_proxy.register(urlpath,
-                                                      container.host_url)
+
+        try:
+            yield self.application.reverse_proxy.register(
+                urlpath, container.host_url)
+        except Exception as e:
+            self._remove_container_noexcept(container)
+            raise exceptions.Unable(message=str(e))
 
         return container.url_id
 
     @gen.coroutine
     def retrieve(self, identifier):
         """Return the representation of the running container."""
-        container = yield self._container_from_url_id(identifier)
+        container_manager = self.application.container_manager
+        container = yield container_manager.container_from_url_id(identifier)
 
         if container is None:
             self.log.warning("Could not find container for id {}".format(
@@ -82,7 +81,9 @@ class Container(Resource):
     @gen.coroutine
     def delete(self, identifier):
         """Stop the container."""
-        container = yield self._container_from_url_id(identifier)
+        container_manager = self.application.container_manager
+        container = yield container_manager.container_from_url_id(identifier)
+
         if not container:
             self.log.warning("Could not find container for id {}".format(
                              identifier))
@@ -91,9 +92,22 @@ class Container(Resource):
         urlpath = url_path_join(
             self.application.command_line_config.base_urlpath,
             container.urlpath)
-        yield self.application.reverse_proxy.unregister(urlpath)
-        yield self.application.container_manager.stop_and_remove_container(
-            container.docker_id)
+
+        try:
+            yield self.application.reverse_proxy.unregister(urlpath)
+        except Exception:
+            # If we can't remove the reverse proxy, we cannot do much more
+            # than log the problem and keep going, because we want to stop
+            # the container regardless.
+            self.log.exception("Could not remove reverse "
+                               "proxy for id {}".format(identifier))
+
+        try:
+            yield container_manager.stop_and_remove_container(
+                container.docker_id)
+        except Exception:
+            self.log.exception("Could not stop and remove container "
+                               "for id {}".format(identifier))
 
     @gen.coroutine
     def items(self):
@@ -125,24 +139,26 @@ class Container(Resource):
 
         return running_containers
 
+    ##################
+    # Private
+
     @gen.coroutine
-    def _container_from_url_id(self, container_url_id):
-        """Retrieves and returns the container if valid and present.
+    def _remove_container_noexcept(self, container):
+        """Removes container and silences (but logs) all exceptions
+        during this circumstance."""
 
-        If not present, returns None
-        """
-
+        # Note, can't use a context manager to perform this, because
+        # context managers are only allowed to yield once
         container_manager = self.application.container_manager
-
-        container_dict = yield container_manager.docker_client.containers(
-            filters={'label': "{}={}".format(
-                SIMPHONY_NS+"url_id",
-                container_url_id)})
-
-        if not container_dict:
-            return None
-
-        return DockerContainer.from_docker_dict(container_dict[0])
+        try:
+            yield container_manager.stop_and_remove_container(
+                container.docker_id)
+        except Exception:
+            self.log.exception(
+                "Unable to stop container {} after "
+                " failure to obtain a ready "
+                "container".format(
+                    container.docker_id))
 
     @gen.coroutine
     def _start_container(self, user_name, app, policy, mapping_id):

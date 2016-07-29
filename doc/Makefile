@@ -44,6 +44,7 @@ help:
 	@echo "  coverage   to run coverage check of the documentation (if enabled)"
 	@echo "  dummy      to check syntax errors of document sources"
 	@echo "  uml        to convert all uml files into images"
+	@echo "  apidoc     to rebuild the apidoc documents"
 
 .PHONY: clean
 clean:

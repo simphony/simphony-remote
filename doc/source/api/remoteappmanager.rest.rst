@@ -1,6 +1,13 @@
 remoteappmanager.rest package
 =============================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    remoteappmanager.rest.http
+
 Submodules
 ----------
 
@@ -8,14 +15,6 @@ remoteappmanager.rest.exceptions module
 ---------------------------------------
 
 .. automodule:: remoteappmanager.rest.exceptions
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-remoteappmanager.rest.httpstatus module
----------------------------------------
-
-.. automodule:: remoteappmanager.rest.httpstatus
     :members:
     :undoc-members:
     :show-inheritance:

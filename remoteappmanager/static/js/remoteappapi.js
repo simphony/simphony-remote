@@ -9,7 +9,7 @@ define(['jquery', 'utils'], function ($, utils) {
         type: 'GET',
         contentType: "application/json",
         cache: false,
-        dataType : "json",
+        dataType : null, 
         processData: false,
         success: null,
         error: null
@@ -46,7 +46,6 @@ define(['jquery', 'utils'], function ($, utils) {
         options = options || {};
         options = update(options, {
             type: 'POST', 
-            dataType: null,
             data: JSON.stringify({
                 mapping_id: id
             })});
@@ -58,7 +57,7 @@ define(['jquery', 'utils'], function ($, utils) {
 
     RemoteAppAPI.prototype.stop_application = function (id, options) {
         options = options || {};
-        options = update(options, {type: 'DELETE', dataType: null});
+        options = update(options, {type: 'DELETE'});
         this.api_request(
             utils.url_path_join('containers', id),
             options

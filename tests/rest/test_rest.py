@@ -1,18 +1,17 @@
 import unittest
 import urllib.parse
+from collections import OrderedDict
 from unittest import mock
 
-from tests import utils
-from tornado import web, gen, escape
-from collections import OrderedDict
-
 from remoteappmanager import rest
+from remoteappmanager.rest import registry, exceptions
+from remoteappmanager.rest.http import httpstatus
 from remoteappmanager.rest.resource import Resource
 from remoteappmanager.rest.rest_handler import RESTResourceHandler, \
     RESTCollectionHandler
-from remoteappmanager.rest import registry, httpstatus, exceptions
-
+from tests import utils
 from tests.utils import AsyncHTTPTestCase
+from tornado import web, gen, escape
 
 
 def prepare_side_effect(*args, **kwargs):
@@ -50,7 +49,7 @@ class Student(Resource):
     @gen.coroutine
     def delete(self, identifier):
         if identifier not in self.collection:
-            raise exceptions.NotFound
+            raise exceptions.NotFound()
 
         del self.collection[identifier]
 
@@ -66,11 +65,19 @@ class UnsupportAll(Resource):
 class Unprocessable(Resource):
     @gen.coroutine
     def create(self, representation):
-        raise exceptions.BadRequest()
+        raise exceptions.BadRequest("unprocessable", foo="bar")
 
     @gen.coroutine
     def update(self, identifier, representation):
-        raise exceptions.BadRequest()
+        raise exceptions.BadRequest("unprocessable", foo="bar")
+
+    @gen.coroutine
+    def retrieve(self, identifier):
+        raise exceptions.BadRequest("unprocessable", foo="bar")
+
+    @gen.coroutine
+    def items(self):
+        raise exceptions.BadRequest("unprocessable", foo="bar")
 
 
 class UnsupportsCollection(Resource):
@@ -183,6 +190,7 @@ class TestREST(AsyncHTTPTestCase):
 
             res = self.fetch("/api/v1/students/1/")
             self.assertEqual(res.code, httpstatus.NOT_FOUND)
+            self.assertNotIn("Content-Type", res.headers)
 
     def test_post_on_resource(self):
         with mock.patch("remoteappmanager.handlers.base_handler.BaseHandler"
@@ -349,6 +357,24 @@ class TestREST(AsyncHTTPTestCase):
                 body="{}"
             )
             self.assertEqual(res.code, httpstatus.BAD_REQUEST)
+            self.assertEqual(res.headers["Content-Type"], 'application/json')
+            self.assertEqual(escape.json_decode(res.body), {
+                "type": "BadRequest",
+                "message": "unprocessable",
+                "foo": "bar",
+            })
+
+            res = self.fetch(
+                "/api/v1/unprocessables/",
+                method="GET",
+            )
+            self.assertEqual(res.code, httpstatus.BAD_REQUEST)
+            self.assertEqual(res.headers["Content-Type"], 'application/json')
+            self.assertEqual(escape.json_decode(res.body), {
+                "type": "BadRequest",
+                "message": "unprocessable",
+                "foo": "bar",
+            })
 
             res = self.fetch(
                 "/api/v1/unprocessables/0/",
@@ -356,6 +382,37 @@ class TestREST(AsyncHTTPTestCase):
                 body="{}"
             )
             self.assertEqual(res.code, httpstatus.BAD_REQUEST)
+            self.assertEqual(res.headers["Content-Type"], 'application/json')
+            self.assertEqual(escape.json_decode(res.body), {
+                "type": "BadRequest",
+                "message": "unprocessable",
+                "foo": "bar",
+            })
+
+            res = self.fetch(
+                "/api/v1/unprocessables/0/",
+                method="GET",
+            )
+            self.assertEqual(res.code, httpstatus.BAD_REQUEST)
+            self.assertEqual(res.headers["Content-Type"], 'application/json')
+            self.assertEqual(escape.json_decode(res.body), {
+                "type": "BadRequest",
+                "message": "unprocessable",
+                "foo": "bar",
+            })
+
+            res = self.fetch(
+                "/api/v1/unprocessables/0/",
+                method="POST",
+                body="{}"
+            )
+            self.assertEqual(res.code, httpstatus.BAD_REQUEST)
+            self.assertEqual(res.headers["Content-Type"], 'application/json')
+            self.assertEqual(escape.json_decode(res.body), {
+                "type": "BadRequest",
+                "message": "unprocessable",
+                "foo": "bar",
+            })
 
     def test_broken(self):
         collection_url = "/api/v1/brokens/"
