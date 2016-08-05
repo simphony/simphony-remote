@@ -23,8 +23,7 @@ def mock_modules():
     try:
         import pwd
     except ImportError:
-        MOCK_MODULES = [
-            'pwd',
+        MOCK_MODULES = ['pwd']
         MOCK_TYPES = []
     else:
         del pwd
