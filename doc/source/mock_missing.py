@@ -25,11 +25,23 @@ def mock_modules():
     except ImportError:
         MOCK_MODULES = [
             'pwd',
-            'grp',
-            'pamela']
         MOCK_TYPES = []
     else:
-        del tornado
+        del pwd
+
+    try:
+        import grp
+    except ImportError:
+        MOCK_MODULES.append('grp')
+    else:
+        del grp
+
+    try:
+        import pamela
+    except ImportError:
+        MOCK_MODULES.append('pamela')
+    else:
+        del pamela
 
     TYPES = {
         mock_type: type(mock_type, bases, {'__module__': path})
