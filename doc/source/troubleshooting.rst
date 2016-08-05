@@ -1,5 +1,9 @@
 Troubleshoot
 ------------
 
-.. include::
-    troubleshoot/database.rst
+
+
+.. toctree::
+   :includehidden:
+
+   troubleshoot/database
