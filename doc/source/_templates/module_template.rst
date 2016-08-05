@@ -1,61 +1,61 @@
 {{ name }}
 {{ underline }}
 
-.. automodule:: {{ fullname }}
-   {% block functions %}
-   {% if functions %}
-   .. rubric:: Functions
+.. currentmodule:: {{ fullname }}
+.. module:: {{ fullname }}
 
-   .. autosummary::
-   {% for item in functions %}
-      {{ item }}
-   {%- endfor %}
+{% block functions %}
+{% if functions %}
+.. rubric:: Functions
 
-   |
-   |
+.. autosummary::
+{% for item in functions %}
+   {{ item }}
+{%- endfor %}
 
-   {% for item in functions %}
-   .. autofunction:: {{ item }}
-   {%- endfor %}
-   {% endif %}
-   {% endblock %}
-   {% block classes %}
-   {% if classes %}
-   .. rubric:: Classes
+|
+|
 
-   .. autosummary::
+{% for item in functions %}
+.. autofunction:: {{ item }}
+{%- endfor %}
+{% endif %}
+{% endblock %}
+{% block classes %}
+{% if classes %}
+.. rubric:: Classes
 
-   {% for item in classes %}
-      {{ item }}
-   {%- endfor %}
+.. autosummary::
 
-   |
-   |
+{% for item in classes %}
+   {{ item }}
+{%- endfor %}
 
-   {% for item in classes %}
-   {% if item.__module__ == module %}
-   .. autoclass:: {{ item }}
-   {%- endif %}
-   {%- endfor %}
-   {% endif %}
-   {% endblock %}
+|
+|
 
-   {% block exceptions %}
-   {% if exceptions %}
-   .. rubric:: Exceptions
+{% for item in classes %}
+.. autoclass:: {{ item }}
+{%- endfor %}
+{% endif %}
+{% endblock %}
 
-   .. autosummary::
+{% block exceptions %}
+{% if exceptions %}
+.. rubric:: Exceptions
 
-   {% for item in exceptions %}
-      {{ item }}
-   {%- endfor %}
+.. autosummary::
 
-   |
-   |
+{% for item in exceptions %}
+   {{ item }}
+{%- endfor %}
 
-   {% for item in exceptions %}
-   .. autoclass:: {{ item }}
+|
+|
 
-   {%- endfor %}
-   {% endif %}
-   {% endblock %}
+{% for item in exceptions %}
+.. autoclass:: {{ item }}
+
+{%- endfor %}
+{% endif %}
+{% endblock %}
