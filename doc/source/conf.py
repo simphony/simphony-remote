@@ -45,6 +45,10 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'traitlets_documenter',
+    # patched autosummary for issue
+    # https://github.com/sphinx-doc/sphinx/issues/1061
+    '_extensions'
+    #'sphinx.ext.autosummary'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
