@@ -18,22 +18,19 @@ for each user.
    remoteappmanager.file_config
    remoteappmanager.jinja2_adapters
    remoteappmanager.netutils
-   remoteappmanager.paths
    remoteappmanager.spawner
    remoteappmanager.traitlets
    remoteappmanager.user
    remoteappmanager.utils
-   remoteappmanager.cli.remoteappdb
-   remoteappmanager.cli.remoteapprest
+   remoteappmanager.cli.remoteappdb.__main__
+   remoteappmanager.cli.remoteapprest.__main__
    remoteappmanager.db.csv_db
    remoteappmanager.db.interfaces
    remoteappmanager.db.orm
    remoteappmanager.docker.async_docker_client
    remoteappmanager.docker.container
    remoteappmanager.docker.container_manager
-   remoteappmanager.docker.docker_labels
    remoteappmanager.docker.image
-   remoteappmanager.handlers.api
    remoteappmanager.handlers.base_handler
    remoteappmanager.handlers.home_handler
    remoteappmanager.logging.logging_mixin
@@ -56,9 +53,7 @@ A generic implementation of Rest APIs using tornado.
    remoteappmanager.rest.registry
    remoteappmanager.rest.resource
    remoteappmanager.rest.rest_handler
-   remoteappmanager.rest.http.httpstatus
    remoteappmanager.rest.http.payloaded_http_error
-   remoteappmanager.rest.http
 
 
 Traitlet sphinx documenter
@@ -71,3 +66,5 @@ A sphinx autodoc friendly documenter for traitlet attributes.
    :template: module_template.rst
 
    traitlets_documenter
+   traitlets_documenter.class_traitlets_documenter
+   traitlets_documenter.util
