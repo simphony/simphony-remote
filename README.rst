@@ -1,21 +1,24 @@
-Remote Application Manager
---------------------------
+Simphony-remote
+===============
 
 .. image:: https://readthedocs.org/projects/simphony-remote/badge/?version=latest
    :target: http://simphony-remote.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
-This software is developed under the SimPhoNy project, an EU-project funded by
-the 7th Framework Programme (Project number 604005) under the call
-NMP.2013.1.4-1: "Development of an integrated multi-scale modelling environment
-for nanomaterials and systems by design".
+The Simphony-remote is web service that allows users to start and work with simphony enabled environments remotely.
 
-The package provides an executable replacement of jupyterhub-singleuser, and
-provides management capabilities for docker images and containers. It is spawn
-by the jupyterhub server in response to a login.
+Key provided features:
 
-License 
--------
+   - Isolated working environments using docker containers.
+   - No install remote access through a web browser.
+   - Sharing of working sessions.
+   - Based on community supported open source initiatives (JupyterHub)
 
-This software is released under the terms of the BSD license. See the
-`COPYING.rst <COPYING.rst>`_ for license terms.
+
+Acknowledgments
+---------------
+
+This software is developed under the SimPhoNy project, an EU-project
+funded by the 7th Framework Programme (Project number 604005) under
+the call NMP.2013.1.4-1: "Development of an integrated multi-scale
+modelling environment for nanomaterials and systems by design".
