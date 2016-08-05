@@ -20,6 +20,10 @@
 import os
 import sys
 sys.path.append(os.path.abspath('../../remoteappmanager'))
+sys.path.append(os.path.abspath('.'))
+
+from mock_missing import mock_modules
+mock_modules()
 
 from remoteappmanager import __version__, MAJOR, MINOR
 from remoteappmanager.command_line_config import CommandLineConfig
