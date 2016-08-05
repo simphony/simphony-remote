@@ -454,3 +454,9 @@ with open(HELP_FILE_PATH, 'w') as fh:
               file=fh)
 
 del _config
+
+autodoc_member_order = 'source'
+autoclass_content = 'both'
+autodoc_default_flags = [
+    'show-inheritance', 'members', 'undoc-members']
+autosummary_generate = True
