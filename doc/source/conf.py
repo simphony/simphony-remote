@@ -19,7 +19,7 @@
 #
 import os
 import sys
-sys.path.append(os.path.abspath('../../remoteappmanager'))
+sys.path.append(os.path.abspath('../../'))
 sys.path.append(os.path.abspath('.'))
 
 from mock_missing import mock_modules
@@ -450,10 +450,11 @@ _config = CommandLineConfig()
 
 with open(HELP_FILE_PATH, 'w') as fh:
     for name, traitlet in sorted(_config.traits().items()):
-        print('--{name:<30} {help}'.format(name=name, help=traitlet.help),
-              file=fh)
-
+        print(
+            '--{name:<30} {help}'.format(
+                name=name, help=traitlet.help), file=fh)
 del _config
+
 
 autodoc_member_order = 'source'
 autoclass_content = 'both'
