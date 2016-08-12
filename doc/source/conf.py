@@ -461,3 +461,13 @@ autoclass_content = 'both'
 autodoc_default_flags = [
     'show-inheritance', 'members', 'undoc-members']
 autosummary_generate = True
+
+# Patch sphinx to 1.4.x to suppress warning about nonlocal image URI
+import sphinx.environment
+from docutils.utils import get_source_line
+
+def _warn_node(self, msg, node, **kwargs):
+    if not msg.startswith('nonlocal image URI found:'):
+        self._warnfunc(msg, '%s:%s' % get_source_line(node), **kwargs)
+
+sphinx.environment.BuildEnvironment.warn_node = _warn_node
