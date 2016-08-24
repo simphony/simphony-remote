@@ -25,7 +25,6 @@ aptdeps:
 	apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
 	pip install --upgrade pip
 	npm install -g configurable-http-proxy
-	npm install -g jslint
 
 .PHONY: pythondeps
 pythondeps:
@@ -88,7 +87,11 @@ pythontest:
 jstest:
 	@echo "Running javascript testsuite"
 	@echo "----------------------------"
+	apt-get install phantomjs
+	npm install -g jshint
+	npm install -g node-qunit-phantomjs
 	jshint --config .jshintrc remoteappmanager/static/js/
+	node-qunit-phantomjs jstests/tests.html
 
 .PHONY: docs
 docs:
