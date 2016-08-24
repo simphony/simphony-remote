@@ -25,6 +25,7 @@ aptdeps:
 	apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
 	pip install --upgrade pip
 	npm install -g configurable-http-proxy
+	npm install -g jslint
 
 .PHONY: pythondeps
 pythondeps:
@@ -75,10 +76,19 @@ testimages:
 	docker pull simphonyproject/simphonic-mayavi:latest
 
 .PHONY: test
-test:
-	@echo "Running testsuite"
-	@echo "-----------------"
+test: pythontest jstest
+
+.PHONY: pythontest
+pythontest:
+	@echo "Running python testsuite"
+	@echo "------------------------"
 	flake8 . && python -m tornado.testing discover -s tests -t . -v
+
+.PHONY: jstest
+jstest:
+	@echo "Running javascript testsuite"
+	@echo "----------------------------"
+	jshint --config .jshintrc remoteappmanager/static/js/
 
 .PHONY: docs
 docs:
