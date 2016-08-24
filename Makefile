@@ -17,29 +17,24 @@ venv:
 	@echo "----------------------------"
 	python3 -m venv venv
 
-.PHONY: aptdeps
-aptdeps:
+.PHONY: deps
+deps:
 	@echo "Installing apt dependencies"
 	@echo "---------------------------"
-	apt-get update
-	apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
+	sudo apt-get update
+	sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
 	pip install --upgrade pip
-	npm install -g configurable-http-proxy
-
-.PHONY: pythondeps
-pythondeps:
-	@echo "Installing dependencies"
-	@echo "-----------------------"
+	sudo npm install -g configurable-http-proxy
 	pip3 install -r requirements.txt 
 
-.PHONY: testdeps
-testdeps:
+.PHONY: devdeps
+devdeps:
 	@echo "Installing test dependencies"
 	@echo "----------------------------"
 	pip3 install -r dev-requirements.txt -r doc-requirements.txt
-	apt-get install phantomjs
-	npm install -g jshint
-	npm install -g node-qunit-phantomjs
+	sudo apt-get install phantomjs
+	sudo npm install -g jshint
+	sudo npm install -g node-qunit-phantomjs
 
 .PHONY: develop
 develop: 

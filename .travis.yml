@@ -10,14 +10,13 @@ addons:
 
 before_install:
     - firefox --version
-    - sudo make aptdeps
-    - make pythondeps
+    - make deps
 
 install:
     - make install
 
 script:
-    - sudo make testdeps
+    - make devdeps
     - make pythontest
     - make jstest
     - make docs
