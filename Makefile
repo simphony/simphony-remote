@@ -30,7 +30,16 @@ aptdeps:
 pythondeps:
 	@echo "Installing dependencies"
 	@echo "-----------------------"
-	pip3 install -r requirements.txt -r dev-requirements.txt -r doc-requirements.txt
+	pip3 install -r requirements.txt 
+
+.PHONY: testdeps
+testdeps:
+	@echo "Installing test dependencies"
+	@echo "----------------------------"
+	pip3 install -r dev-requirements.txt -r doc-requirements.txt
+	apt-get install phantomjs
+	npm install -g jshint
+	npm install -g node-qunit-phantomjs
 
 .PHONY: develop
 develop: 
@@ -84,12 +93,9 @@ pythontest:
 	flake8 . && python -m tornado.testing discover -s tests -t . -v
 
 .PHONY: jstest
-jstest:
+jstest: testdeps
 	@echo "Running javascript testsuite"
 	@echo "----------------------------"
-	apt-get install phantomjs
-	npm install -g jshint
-	npm install -g node-qunit-phantomjs
 	jshint --config .jshintrc remoteappmanager/static/js/
 	node-qunit-phantomjs jstests/tests.html
 

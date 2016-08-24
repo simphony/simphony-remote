@@ -17,7 +17,9 @@ install:
     - make install
 
 script:
-    - make test
+    - sudo make testdeps
+    - make pythontest
+    - make jstest
     - make docs
     - make testimages
     - make testdb
