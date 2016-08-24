@@ -69,6 +69,10 @@ class FileConfig(HasTraits):
         if self.docker_host == "":
             self.docker_host = "unix://var/run/docker.sock"
 
+        # Note that definedness, not value, is considered, meaning
+        # that defining DOCKER_TLS_VERIFY=0 will still evaluate to True.
+        # This is consistent with both docker behavior and general shell
+        # practice.
         self.tls_verify = (env.get("DOCKER_TLS_VERIFY", "") != "")
         # We don't have an envvar way of saying TLS = True, so we rely on
         # TLS_VERIFY set status
