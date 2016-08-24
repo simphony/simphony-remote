@@ -78,7 +78,7 @@ testimages:
 test:
 	@echo "Running testsuite"
 	@echo "-----------------"
-	flake8 . && python -m tornado.testing discover -s tests -t . -v
+	flake8 . && python -m tornado.testing discover -s remoteappmanager -t . -v
 
 .PHONY: docs
 docs:
