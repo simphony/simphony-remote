@@ -93,7 +93,7 @@ pythontest:
 	flake8 . && python -m tornado.testing discover -s tests -t . -v
 
 .PHONY: jstest
-jstest: testdeps
+jstest: 
 	@echo "Running javascript testsuite"
 	@echo "----------------------------"
 	jshint --config .jshintrc remoteappmanager/static/js/
