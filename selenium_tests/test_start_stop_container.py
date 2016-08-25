@@ -25,9 +25,6 @@ class TestStartStopContainer(SeleniumTestBase):
         else:
             self.fail("time out")
         driver.find_element_by_link_text("Close").click()
-        for i in range(60):
-            print(driver.title)
-            time.sleep(1)
         driver.find_element_by_name("action").click()
         self.wait_for(lambda: "noVNC" == driver.title)
         driver.find_element_by_xpath("//i").click()
