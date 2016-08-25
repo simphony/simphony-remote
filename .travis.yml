@@ -31,6 +31,8 @@ script:
     - popd
     - sleep 3
     - DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
+    - curl --upload-file screenshot1.png https://transfer.sh/screenshot1.png
+    - curl --upload-file screenshot2.png https://transfer.sh/screenshot2.png
 
 after_success:
     - coverage run -m tornado.testing discover

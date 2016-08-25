@@ -24,7 +24,10 @@ class TestStartStopContainer(SeleniumTestBase):
             time.sleep(1)
         else:
             self.fail("time out")
+        driver.save_screenshot('screenshot1.png')
         driver.find_element_by_link_text("Close").click()
+        time.sleep(1)
+        driver.save_screenshot('screenshot2.png')
         driver.find_element_by_name("action").click()
         self.wait_for(lambda: "noVNC" == driver.title)
         driver.find_element_by_xpath("//i").click()
