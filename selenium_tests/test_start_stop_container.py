@@ -16,7 +16,10 @@ class TestStartStopContainer(SeleniumTestBase):
         driver.find_element_by_id("login_submit").click()
         driver.find_element_by_name("action").click()
         self.wait_for(lambda: "noVNC" == driver.title)
-        driver.find_element_by_partial_link_text("Close").click()
+        driver.execute_script(
+            "arguments[0].click()",
+            driver.find_element_by_link_text("Close")
+            )
         self.wait_for(lambda: "noVNC" != driver.title)
         driver.find_element_by_name("action").click()
         driver.find_element_by_xpath("//i").click()
