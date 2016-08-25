@@ -21,7 +21,7 @@ venv:
 aptdeps:
 	@echo "Installing apt dependencies"
 	@echo "---------------------------"
-	sudo add-apt-repository ppa:mc3man/trusty-media
+	sudo add-apt-repository -y ppa:mc3man/trusty-media
 	-apt-get update
 	apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv ffmpeg
 	pip install --upgrade pip
