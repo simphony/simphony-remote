@@ -17,8 +17,8 @@ install:
     - make install
 
 script:
-#    - make test
-#    - make docs
+    - make test
+    - make docs
     - make testimages
     - make testdb
     - make certs
@@ -33,7 +33,7 @@ script:
     - DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
 
 after_success:
-#    - coverage run -m tornado.testing discover
-#    - pip install codecov
-#    - codecov
-#    - bash <(curl -s https://codecov.io/bash)
+    - coverage run -m tornado.testing discover
+    - pip install codecov
+    - codecov
+    - bash <(curl -s https://codecov.io/bash)
