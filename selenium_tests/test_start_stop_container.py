@@ -16,10 +16,12 @@ class TestStartStopContainer(SeleniumTestBase):
         driver.find_element_by_id("login_submit").click()
         driver.find_element_by_name("action").click()
         self.wait_for(lambda: "noVNC" == driver.title)
-        for i in range(timeout):
+        for i in range(60):
             try:
+                print(driver.title)
                 if "noVNC" != driver.title:
                     break
+                print("clicking")
                 driver.find_element_by_xpath("//i").click()
             except:
                 pass
