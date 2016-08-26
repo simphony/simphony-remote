@@ -14,23 +14,15 @@ from remoteappmanager.tests import fixtures
 from remoteappmanager.tests.temp_mixin import TempMixin
 
 
-def start_spawner(io_loop, spawner):
-    io_loop.run_sync(spawner.start)
-    # Wait for the process to get to the while loop
-    time.sleep(1)
-
-
-def stop_spawner(io_loop, spawner):
-    io_loop.run_sync(spawner.stop)
-
-
 @contextlib.contextmanager
 def spawner_start_and_stop(io_loop, spawner):
     try:
-        start_spawner(io_loop, spawner)
+        io_loop.run_sync(spawner.start)
+        # Wait for the process to get to the while loop
+        time.sleep(1)
         yield
     finally:
-        stop_spawner(io_loop, spawner)
+        io_loop.run_sync(spawner.stop)
 
 
 def username():
