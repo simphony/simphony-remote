@@ -122,6 +122,22 @@ define(['jquery'], function ($) {
         dialog.modal();
     };
 
+    var all = function (promises) {
+        if (!Array.isArray(promises)) {
+            throw new Error("$.all() must be passed an array of promises");
+        }
+        return $.when.apply($, promises).then(function () {
+            // if single argument was expanded into multiple arguments, then put it back into an array
+            // for consistency
+            if (promises.length === 1 && arguments.length > 1) {
+                // put arguments into an array
+                return [Array.prototype.slice.call(arguments, 0)];
+            } else {
+                return Array.prototype.slice.call(arguments, 0);
+            }
+        });
+    };
+    
     var utils = {
         url_path_join : url_path_join,
         url_join_encode : url_join_encode,
@@ -134,6 +150,7 @@ define(['jquery'], function ($) {
         ajax_error_msg : ajax_error_msg,
         log_ajax_error : log_ajax_error,
         ajax_error_dialog : ajax_error_dialog,
+        all : all
     };
     
     return utils;

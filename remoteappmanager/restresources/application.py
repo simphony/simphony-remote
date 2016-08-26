@@ -1,3 +1,4 @@
+from remoteappmanager import traitlets
 from remoteappmanager.rest.exceptions import NotFound
 from remoteappmanager.rest.resource import Resource
 from tornado import gen
@@ -18,9 +19,29 @@ class Application(Resource):
             raise NotFound()
 
         app, policy = apps_dict[identifier]
-        representation = dict(
-            image=app.image,
-        )
+
+        container_manager = self.application.container_manager
+        image = yield container_manager.image(app.image)
+        if image is None:
+            # The user has access to an application that is no longer
+            # available in docker.
+            raise NotFound()
+
+        containers = yield container_manager.containers_from_mapping_id(
+            self.current_user.name,
+            identifier)
+
+        representation = {
+            "image": traitlets.as_dict(image),
+            "mapping_id": identifier,
+        }
+
+        if len(containers):
+            # We assume that we can only run one container only (although the
+            # API considers a broader possibility for future extension.
+            container = containers[0]
+            representation["container"] = traitlets.as_dict(container)
+
         return representation
 
     @gen.coroutine
