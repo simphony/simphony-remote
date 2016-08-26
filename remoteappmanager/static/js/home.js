@@ -45,7 +45,7 @@ require(["jquery", "jhapi", "utils", "remoteappapi"],
                             base_url,
                             "containers",
                             id
-                        )
+                        );
                     },
                 }
             });
@@ -57,7 +57,7 @@ require(["jquery", "jhapi", "utils", "remoteappapi"],
         window.location = utils.url_path_join(
             base_url,
             "containers",
-            id)
+            id);
         }
     );
 
@@ -68,9 +68,9 @@ require(["jquery", "jhapi", "utils", "remoteappapi"],
         appapi.stop_application(id, {
             success: function () {
                 $(button).find(".fa-spinner").hide();
-                window.location.reload()
+                window.location.reload();
             },
-            error: function(jqXHR, status, error) {
+            error: function (jqXHR, status, error) {
                 report_error(jqXHR, status, error);
                 $(button).find(".fa-spinner").hide();
             }
