@@ -1,5 +1,5 @@
-include *.txt
-include tests/fixtures/remoteappmanager.db
-include tests/fixtures/templates/*.html
+include *requirements.txt
+include remoteappmanager/tests/fixtures/remoteappmanager.db
+include remoteappmanager/tests/fixtures/templates/*.html
 recursive-include remoteappmanager/templates *
 recursive-include remoteappmanager/static *
