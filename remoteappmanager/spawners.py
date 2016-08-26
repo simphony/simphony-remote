@@ -14,7 +14,7 @@ from jupyterhub import orm
 # of not updating one of them.
 
 
-class Spawner(LocalProcessSpawner):
+class SystemUserSpawner(LocalProcessSpawner):
     ''' Start remoteappmanager as a local process for a system user.
 
     The user identifier of the process is set to be the system user.

@@ -74,10 +74,10 @@ remoteappmanager.paths module
     :undoc-members:
     :show-inheritance:
 
-remoteappmanager.spawner module
--------------------------------
+remoteappmanager.spawners module
+--------------------------------
 
-.. automodule:: remoteappmanager.spawner
+.. automodule:: remoteappmanager.spawners
     :members:
     :undoc-members:
     :show-inheritance:
