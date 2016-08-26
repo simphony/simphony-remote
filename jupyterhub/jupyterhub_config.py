@@ -25,4 +25,4 @@ if setting_mode == 'virtual_user':
         'remoteappmanager.auth.WorldAuthenticator')
 
 elif setting_mode == 'system_user':
-    c.JupyterHub.spawner_class = 'remoteappmanager.spawners.Spawner'
+    c.JupyterHub.spawner_class = 'remoteappmanager.spawners.SystemUserSpawner'
