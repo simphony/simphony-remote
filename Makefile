@@ -74,7 +74,7 @@ test: pythontest jstest
 pythontest:
 	@echo "Running python testsuite"
 	@echo "------------------------"
-	flake8 . && python -m tornado.testing discover -s tests -t . -v
+	flake8 . && python -m tornado.testing discover -s remoteappmanager -t . -v
 
 .PHONY: jstest
 jstest: 
