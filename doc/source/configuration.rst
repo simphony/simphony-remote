@@ -10,13 +10,13 @@ The jupyterhub configuration is documented in the `jupyterhub documentation
 <https://jupyterhub.readthedocs.io/en/latest/getting-started.html>`_. The
 important difference is the spawner to use, which is configured as::
 
-    c.JupyterHub.spawner_class = 'remoteappmanager.spawner.Spawner'
+    c.JupyterHub.spawner_class = 'remoteappmanager.spawners.SystemUserSpawner'
     # or
-    # c.JupyterHub.spawner_class = 'remoteappmanager.spawner.VirtualUserSpawner'
+    # c.JupyterHub.spawner_class = 'remoteappmanager.spawners.VirtualUserSpawner'
 
 in the `jupyterhub_config.py` file.
 
-Please refer to :py:mod:`remoteappmanager.spawner` for the available spawners
+Please refer to :py:mod:`remoteappmanager.spawners` for the available spawners
 in this project.
 
 
@@ -51,7 +51,7 @@ docker setup.
    config file.  The path of the config file should be specified in the
    spawner in `jupyterhub_config.py`::
 
-     c.Spawner.config_file_path = "/path/to/config.py"
+     c.SystemUserSpawner.config_file_path = "/path/to/config.py"
 
    Please refer to :py:class:`remoteappmanager.file_config.FileConfig` for
    the configurable parameters.  Note that this config file will be used

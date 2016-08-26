@@ -9,7 +9,7 @@ from unittest import mock
 from tornado import testing
 from jupyterhub import orm
 
-from remoteappmanager.spawner import Spawner, VirtualUserSpawner
+from remoteappmanager.spawners import SystemUserSpawner, VirtualUserSpawner
 from remoteappmanager.tests import fixtures
 from remoteappmanager.tests.temp_mixin import TempMixin
 
@@ -72,10 +72,10 @@ def new_spawner(spawner_class):
     return spawner_class(db=db, user=user, hub=hub)
 
 
-class TestSpawner(TempMixin, testing.AsyncTestCase):
+class TestSystemUserSpawner(TempMixin, testing.AsyncTestCase):
     def setUp(self):
         super().setUp()
-        self.spawner = new_spawner(Spawner)
+        self.spawner = new_spawner(SystemUserSpawner)
 
     def test_args(self):
         path = fixtures.get("remoteappmanager_config.py")
@@ -149,7 +149,7 @@ class TestSpawner(TempMixin, testing.AsyncTestCase):
         self.assertEqual(status, 1)
 
 
-class TestVirtualUserSpawner(TestSpawner):
+class TestVirtualUserSpawner(TestSystemUserSpawner):
     def setUp(self):
         super().setUp()
         self.spawner = new_spawner(VirtualUserSpawner)
