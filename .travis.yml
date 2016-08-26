@@ -6,7 +6,7 @@ python:
 sudo: required
 dist: trusty
 addons:
-    firefox: "latest"
+    firefox: "45.0"
 
 before_install:
     - firefox --version
