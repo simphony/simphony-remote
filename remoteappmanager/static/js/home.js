@@ -5,128 +5,166 @@ require(
         "use strict";
     
         var base_url = window.apidata.base_url;
-        var user = window.apidata.user;
-        var api = new JHAPI(base_url);
         var appapi = new RemoteAppAPI(base_url);
+       
+        // This model keeps the retrieved content from the REST query locally.
+        // It is only synchronized at initial load.
+        var application_model = [];
         
         var report_error = function (jqXHR, status, error) {
+            // Writes an error message resulting from an incorrect
+            // ajax operation. Parameters are from the resulting ajax.
             var msg = utils.log_ajax_error(jqXHR, status, error);
             $(".spawn-error-msg").text(msg).show();
         };
 
-        var render_applist_entry = function (info) {
-            // Adds the retrieved information to the DOM for a single entry.
+        var render_applist_entry = function (index, info) {
+            // Returns a HTML snippet for a single application entry
+            // index: 
+            //     a progressive index for the entry.
+            // info:
+            //     A dictionary containing the retrieved data about the application
+            //     and (possibly) the container.
             var html = '<div class="row">';
             html += '<img src="'+utils.url_path_join(
                         base_url, "static","images","generic_appicon_128.png")+
                     '" class="col-sm-2 va" />';
             html += '<div class="col-sm-7 va"><h4>'+info.image.ui_name+'</h4></div>';
-            html += '<div">';
-            if (info.container === null) {
-                html += '<div class="col-sm-2 va">';
-                html += '<button id="'+info.mapping_id+'" name="action" value="start" class="start-button btn btn-primary"><i class="fa fa-spinner fa-spin" aria-hidden="true" style="display: none"></i> Start</button>';
-                html += '</div>';
+            var cls, text, stop_style;
+            if (info.container !== null) {
+                cls = "view-button btn-success";
+                text = " View";
+                stop_style = "";
             } else {
-                html += '<div class="col-sm-1 va">';
-                html += '<button id="'+info.container.url_id+'" name="action" value="view" class="view-button btn btn-success">View</button>';
-                html += '</div>';
-                html += '<div class="col-sm-1 va">';
-                html += '<button id="'+info.container.url_id+'" name="action" value="stop" class="stop-button btn btn-danger"><i class="fa fa-spinner fa-spin" aria-hidden="true" style="display: none"></i> Stop</button>';
-                html += '</div>';
+                cls = "start-button btn-primary";
+                text = " Start";
+                stop_style = 'style="visibility: hidden;"';
             }
+            html += '<div class="col-sm-1 va">';
+            html += '<button id="bnx_'+index+'" data-index="'+index+'" class="'+cls+' btn bnx"><i class="fa fa-spinner fa-spin" aria-hidden="true" style="display: none;"></i> <span>'+text+'</span></button>';
+            html += '</div>';
+            html += '<div class="col-sm-1 va">';
+            html += '<button id="bny_'+index+'" data-index="'+index+'" class="stop-button btn btn-danger bny" '+stop_style+'><i class="fa fa-spinner fa-spin" aria-hidden="true" style="display: none"></i> Stop</button>';
             html += '</div>';
             html += '</div>';
             return html;
         };
-        
-        var render_applist = function (promises) {
-            var html = "";
+
+        var reset_buttons_to_start = function (index) {
+            // Used to revert the buttons to their "start" state when the
+            // User clicks on "stop". 
+            $("#bnx_"+index)
+                .removeClass("view-button btn-success")
+                .addClass("start-button btn-primary");
+            $("#bnx_"+index+" > span").text(" Start");
+            $("#bny_"+index).hide();
+        };
+
+        var fill_local_model = function (promises) {
+            // Fills the local application model with the results of the
+            // retrieve promises.
             for (var i = 0; i < promises.length; i++) {
                 var result = promises[i];
                 if (result[2].status === 200) {
-                    var info = result[0];
-                    html += render_applist_entry(info);
+                    application_model.push(result[0]);
                 }
+            }
+        };
+        
+        var render_applist = function () {
+            // Renders the full application list and adds it to the DOM.
+            var html = "";
+            for (var i = 0; i < application_model.length; i++) {
+                var info = application_model[i];
+                html += render_applist_entry(i, info);
             }
             $("#applist").html(html);
         };
       
-        var request_single_app_infos = function (response) {
-            var requests = [];
-            
-            for (var i = 0; i < response.items.length; i++) {
-                requests.push(appapi.application_info(response.items[i]));
+        var x_button_clicked = function () {
+            // Triggered when the button X (left side) is clicked
+            var button = this;
+            var index = $(button).data("index");
+            $(button).find(".fa-spinner").show();
+            var app_info = application_model[index];
+
+            if (app_info.container !== null) {
+                // The container is already running, this is a View button
+                window.location = utils.url_path_join(
+                    base_url, 
+                    "containers", 
+                    app_info.container.url_id);
+            } else {
+                // The container is not running. This is a start button. 
+                var mapping_id = application_model[index].mapping_id;
+                appapi.start_application(mapping_id, {
+                    error: function(jqXHR, status, error) {
+                        report_error(jqXHR, status, error);
+                        $(button).find(".fa-spinner").hide();
+                    },
+                    statusCode: {
+                        201: function (data, textStatus, request) {
+                            var location = request.getResponseHeader('Location');
+                            var url = utils.parse_url(location);
+                            var arr = url.pathname.replace(/\/$/, "").split('/');
+                            var url_id = arr[arr.length-1];
+                            $(button).find(".fa-spinner").hide();
+
+                            window.location = utils.url_path_join(
+                                base_url,
+                                "containers",
+                                url_id
+                            );
+                        }
+                    }
+                });
             }
-            
-            utils.all(requests)
-                .always(render_applist)
-                .done(register_button_eventhandlers);
+        };
+
+        var y_button_clicked = function () {
+            // Triggered when the button Y (right side) is clicked
+            var button = this;
+            var index = $(button).data("index");
+            $(button).find(".fa-spinner").show();
+            var app_info = application_model[index];
+
+            var url_id = app_info.container.url_id;
+            appapi.stop_application(url_id, {
+                success: function () {
+                    $(button).find(".fa-spinner").hide();
+                    reset_buttons_to_start(index);
+                    app_info.container = null;
+                },
+                error: function (jqXHR, status, error) {
+                    report_error(jqXHR, status, error);
+                    $(button).find(".fa-spinner").hide();
+                }
+            });
         };
         
         var register_button_eventhandlers = function () {
             // Registers the event handlers on the buttons after addition
             // of the new entries to the list.
-            $("#stop").click(function () {
-                api.stop_server(user, {
-                    success: function () {
-                        $("#stop").hide();
-                    }
-                });
-            });
-
-            $(".start-button").click(function () {
-                    var button = this;
-                    var id = button.id;
-                    $(button).find(".fa-spinner").show();
-
-                    appapi.start_application(id, {
-                        error: function(jqXHR, status, error) {
-                            report_error(jqXHR, status, error);
-                            $(button).find(".fa-spinner").hide();
-                        },
-                        statusCode: {
-                            201: function (data, textStatus, request) {
-                                var location = request.getResponseHeader('Location');
-                                var url = utils.parse_url(location);
-                                var arr = url.pathname.replace(/\/$/, "").split('/');
-                                var id = arr[arr.length-1];
-                                $(button).find(".fa-spinner").hide();
-
-                                window.location = utils.url_path_join(
-                                    base_url,
-                                    "containers",
-                                    id
-                                );
-                            }
-                        }
-                    });
-                }
-            );
-
-            $(".view-button").click(function () {
-                    var id = this.id;
-                    window.location = utils.url_path_join(base_url, "containers", id);
-                }
-            );
-
-            $(".stop-button").click(function () {
-                var button = this;
-                var id = this.id;
-                $(button).find(".fa-spinner").show();
-                appapi.stop_application(id, {
-                    success: function () {
-                        $(button).find(".fa-spinner").hide();
-                        window.location.reload();
-                    },
-                    error: function (jqXHR, status, error) {
-                        report_error(jqXHR, status, error);
-                        $(button).find(".fa-spinner").hide();
-                    }
-                });
-            });
+            $(".bnx").click(x_button_clicked);
+            $(".bny").click(y_button_clicked);
         };
         
-        $.when(appapi.available_applications()).done(request_single_app_infos);
+        var request_app_infos = function (response) {
+            // Retrieve information from the various applications and 
+            // connect the cascading callbacks.
+            var requests = [];
+
+            for (var i = 0; i < response.items.length; i++) {
+                requests.push(appapi.application_info(response.items[i]));
+            }
+
+            utils.all(requests)
+                .always(fill_local_model)
+                .done(render_applist)
+                .done(register_button_eventhandlers);
+        };
+
+        $.when(appapi.available_applications()).done(request_app_infos);
 
     }
 );
