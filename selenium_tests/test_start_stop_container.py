@@ -28,14 +28,20 @@ class TestStartStopContainer(SeleniumTestBase):
             driver.find_element_by_link_text("Close")
             )
         self.wait_for(lambda: "noVNC" != driver.title)
+
+        # Try clicking on View.
         driver.execute_script(
             "arguments[0].click()",
             driver.find_element_by_id("bnx_0")
         )
+        self.wait_for(lambda: "noVNC" == driver.title)
         driver.execute_script(
             "arguments[0].click()",
-            driver.find_element_by_id("bnx_0")
-        )
+            driver.find_element_by_link_text("Close")
+            )
+
+        # Click on Stop.
+        self.wait_for(lambda: "noVNC" != driver.title)
         driver.execute_script(
             "arguments[0].click()",
             driver.find_element_by_id("bny_0")
