@@ -30,8 +30,14 @@ script:
     - chmod 755 `pwd`/start.sh
     - "`pwd`/start.sh &"
     - popd
+    - sudo add-apt-repository ppa:mc3man/trusty-media
+    - sudo apt-get update
+    - sudo apt-get install ffmpeg
+    - ffmpeg -f x11grab -video_size 800x600 -i :1 -codec:v libx264 -r 12 -t 5 video.mp4
     - sleep 3
     - DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
+    - sleep 3
+    - curl --upload-file ./video.mp4 https://transfer.sh/video.mp4
 
 after_success:
     - coverage run -m tornado.testing discover
