@@ -40,7 +40,13 @@ class Application(Resource):
             # We assume that we can only run one container only (although the
             # API considers a broader possibility for future extension.
             container = containers[0]
-            representation["container"] = traitlets.as_dict(container)
+            representation["container"] = dict(
+                name=container.name,
+                image_name=container.image_name,
+                url_id=container.url_id,
+            )
+        else:
+            representation["container"] = None
 
         return representation
 

@@ -123,12 +123,15 @@ define(['jquery'], function ($) {
     };
 
     var all = function (promises) {
+        // A form of jQuery.when that handles an array of promises
+        // and equalises the behavior regardless if there's one or more than
+        // one elements.
         if (!Array.isArray(promises)) {
             throw new Error("$.all() must be passed an array of promises");
         }
         return $.when.apply($, promises).then(function () {
-            // if single argument was expanded into multiple arguments, then put it back into an array
-            // for consistency
+            // if single argument was expanded into multiple arguments, 
+            // then put it back into an array for consistency
             if (promises.length === 1 && arguments.length > 1) {
                 // put arguments into an array
                 return [Array.prototype.slice.call(arguments, 0)];
