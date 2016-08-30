@@ -8,7 +8,7 @@ require(
         var user = window.apidata.user;
         var api = new JHAPI(base_url);
         var appapi = new RemoteAppAPI(base_url);
-                
+        
         var report_error = function (jqXHR, status, error) {
             var msg = utils.log_ajax_error(jqXHR, status, error);
             $(".spawn-error-msg").text(msg).show();
@@ -17,11 +17,15 @@ require(
         var render_applist_entry = function (info) {
             // Adds the retrieved information to the DOM for a single entry.
             var html = '<div class="row">';
-            html += '<img src="static/images/generic_appicon_128.png" class="col-sm-2 va" />';
-            html += '<div class="col-sm-7 va"><h4>'+info.image.name+'</h4></div>';
-            html += '<div class="col-sm-2 va">';
+            html += '<img src="'+utils.url_path_join(
+                        base_url, "static","images","generic_appicon_128.png")+
+                    '" class="col-sm-2 va" />';
+            html += '<div class="col-sm-7 va"><h4>'+info.image.ui_name+'</h4></div>';
+            html += '<div">';
             if (info.container === null) {
+                html += '<div class="col-sm-2 va">';
                 html += '<button id="'+info.mapping_id+'" name="action" value="start" class="start-button btn btn-primary"><i class="fa fa-spinner fa-spin" aria-hidden="true" style="display: none"></i> Start</button>';
+                html += '</div>';
             } else {
                 html += '<div class="col-sm-1 va">';
                 html += '<button id="'+info.container.url_id+'" name="action" value="view" class="view-button btn btn-success">View</button>';
