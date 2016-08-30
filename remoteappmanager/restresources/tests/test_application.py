@@ -6,7 +6,6 @@ from remoteappmanager.rest import registry
 from remoteappmanager.rest.http import httpstatus
 from remoteappmanager.restresources import Application
 from remoteappmanager.tests import utils
-from remoteappmanager.tests.mocking.dummy import create_container_manager
 from remoteappmanager.tests.utils import AsyncHTTPTestCase, mock_coro_factory
 from tornado import web, escape
 
