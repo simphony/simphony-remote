@@ -36,7 +36,7 @@ script:
     - "ffmpeg -f x11grab -video_size 800x600 -i :99 -codec:v libx264 -r 12 -t 50 video.mp4 &"
     - sleep 3
     - DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
-    - sleep 3
+    - sleep 50
     - curl --upload-file ./video.mp4 https://transfer.sh/video.mp4
 
 after_success:
