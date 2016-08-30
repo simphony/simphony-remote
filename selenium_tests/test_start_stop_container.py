@@ -18,16 +18,28 @@ class TestStartStopContainer(SeleniumTestBase):
         wait = WebDriverWait(driver, 10)
         wait.until(EC.element_to_be_clickable((By.ID, 'bnx_0')))
 
-        driver.find_element_by_id("bnx_0").click()
+        driver.execute_script(
+            "arguments[0].click()",
+            driver.find_element_by_id("bnx_0")
+        )
         self.wait_for(lambda: "noVNC" == driver.title)
         driver.execute_script(
             "arguments[0].click()",
             driver.find_element_by_link_text("Close")
             )
         self.wait_for(lambda: "noVNC" != driver.title)
-        driver.find_element_by_id("bnx_0").click()
-        driver.find_element_by_xpath("//i").click()
-        driver.find_element_by_id("bny_0").click()
+        driver.execute_script(
+            "arguments[0].click()",
+            driver.find_element_by_id("bnx_0")
+        )
+        driver.execute_script(
+            "arguments[0].click()",
+            driver.find_element_by_id("bnx_0")
+        )
+        driver.execute_script(
+            "arguments[0].click()",
+            driver.find_element_by_id("bny_0")
+        )
         self.wait_for(
             lambda: "Start" == driver.find_element_by_id("bnx_0").text)
         driver.find_element_by_id("logout").click()
