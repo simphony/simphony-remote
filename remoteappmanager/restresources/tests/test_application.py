@@ -1,11 +1,13 @@
 from unittest.mock import Mock, patch
 
 from remoteappmanager import rest
+from remoteappmanager.docker.image import Image
 from remoteappmanager.rest import registry
 from remoteappmanager.rest.http import httpstatus
 from remoteappmanager.restresources import Application
 from remoteappmanager.tests import utils
-from remoteappmanager.tests.utils import AsyncHTTPTestCase
+from remoteappmanager.tests.mocking.dummy import create_container_manager
+from remoteappmanager.tests.utils import AsyncHTTPTestCase, mock_coro_factory
 from tornado import web, escape
 
 
@@ -18,6 +20,11 @@ class TestApplication(AsyncHTTPTestCase):
         registry.registry.register(Application)
         app = web.Application(handlers=handlers)
         app.db = Mock()
+        app.container_manager = Mock()
+        app.container_manager.image = mock_coro_factory(
+            return_value=Image(name="boo", ui_name="foo_ui"))
+        app.container_manager.containers_from_mapping_id = mock_coro_factory(
+            return_value=[])
         application_mock_1 = Mock()
         application_mock_1.image = "hello1"
 
@@ -67,13 +74,15 @@ class TestApplication(AsyncHTTPTestCase):
 
             self.assertEqual(res.code, httpstatus.OK)
             self.assertEqual(escape.json_decode(res.body),
-                             {"image": "hello1"})
+                             {'container': None,
+                              'image': {'description': '',
+                                        'docker_id': '',
+                                        'icon_128': '',
+                                        'name': 'boo',
+                                        'ui_name': 'foo_ui'},
+                              'mapping_id': 'one'})
 
             res = self.fetch("/api/v1/applications/two/")
-
-            self.assertEqual(res.code, httpstatus.OK)
-            self.assertEqual(escape.json_decode(res.body),
-                             {"image": "hello2"})
 
             res = self.fetch("/api/v1/applications/three/")
 
