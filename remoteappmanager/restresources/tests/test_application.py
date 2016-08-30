@@ -81,8 +81,6 @@ class TestApplication(AsyncHTTPTestCase):
                                         'ui_name': 'foo_ui'},
                               'mapping_id': 'one'})
 
-            res = self.fetch("/api/v1/applications/two/")
-
             res = self.fetch("/api/v1/applications/three/")
 
             self.assertEqual(res.code, httpstatus.NOT_FOUND)

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import unittest
-import time
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
 from selenium_tests.selenium_test_base import SeleniumTestBase
+from selenium.webdriver.support import expected_conditions as EC
 
 
 class TestStartStopContainer(SeleniumTestBase):
@@ -14,6 +14,10 @@ class TestStartStopContainer(SeleniumTestBase):
         driver.find_element_by_id("password_input").clear()
         driver.find_element_by_id("password_input").send_keys("test")
         driver.find_element_by_id("login_submit").click()
+
+        wait = WebDriverWait(driver, 10)
+        wait.until(EC.element_to_be_clickable((By.ID, 'bnx_0')))
+
         driver.find_element_by_id("bnx_0").click()
         self.wait_for(lambda: "noVNC" == driver.title)
         driver.execute_script(
