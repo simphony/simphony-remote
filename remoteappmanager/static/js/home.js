@@ -26,10 +26,23 @@ require(
             //     A dictionary containing the retrieved data about the application
             //     and (possibly) the container.
             var html = '<div class="row">';
-            html += '<img src="'+utils.url_path_join(
-                        base_url, "static","images","generic_appicon_128.png")+
+            
+            if (info.image.icon_128 === '') {
+                html += '<img src="' + utils.url_path_join(
+                        base_url, "static", "images", "generic_appicon_128.png") +
                     '" class="col-sm-2 va" />';
-            html += '<div class="col-sm-7 va"><h4>'+info.image.ui_name+'</h4></div>';
+            } else {
+                html += '<img src="data:image/png;base64,'+info.image.icon_128+'" class="col-sm-2 va" />';
+            }
+            
+            var name;
+            if (info.image.ui_name !== '') {
+                name = info.image.ui_name;
+            } else {
+                name = info.image.name;
+            }
+            html += '<div class="col-sm-7 va"><h4>'+name+'</h4></div>';
+
             var cls, text, stop_style;
             if (info.container !== null) {
                 cls = "view-button btn-success";

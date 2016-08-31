@@ -1,4 +1,3 @@
-from remoteappmanager import traitlets
 from remoteappmanager.rest.exceptions import NotFound
 from remoteappmanager.rest.resource import Resource
 from tornado import gen
@@ -32,7 +31,12 @@ class Application(Resource):
             identifier)
 
         representation = {
-            "image": traitlets.as_dict(image),
+            "image": {
+                "name": image.name,
+                "ui_name": image.ui_name,
+                "icon_128": image.icon_128,
+                "description": image.description,
+            },
             "mapping_id": identifier,
         }
 
