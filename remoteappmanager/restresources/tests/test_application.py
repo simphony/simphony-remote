@@ -1,11 +1,13 @@
 from unittest.mock import Mock, patch
 
 from remoteappmanager import rest
+from remoteappmanager.docker.container import Container
+from remoteappmanager.docker.image import Image
 from remoteappmanager.rest import registry
 from remoteappmanager.rest.http import httpstatus
 from remoteappmanager.restresources import Application
 from remoteappmanager.tests import utils
-from remoteappmanager.tests.utils import AsyncHTTPTestCase
+from remoteappmanager.tests.utils import AsyncHTTPTestCase, mock_coro_factory
 from tornado import web, escape
 
 
@@ -18,6 +20,11 @@ class TestApplication(AsyncHTTPTestCase):
         registry.registry.register(Application)
         app = web.Application(handlers=handlers)
         app.db = Mock()
+        app.container_manager = Mock()
+        app.container_manager.image = mock_coro_factory(
+            return_value=Image(name="boo", ui_name="foo_ui"))
+        app.container_manager.containers_from_mapping_id = mock_coro_factory(
+            return_value=[])
         application_mock_1 = Mock()
         application_mock_1.image = "hello1"
 
@@ -67,14 +74,39 @@ class TestApplication(AsyncHTTPTestCase):
 
             self.assertEqual(res.code, httpstatus.OK)
             self.assertEqual(escape.json_decode(res.body),
-                             {"image": "hello1"})
+                             {'container': None,
+                              'image': {'description': '',
+                                        'icon_128': '',
+                                        'name': 'boo',
+                                        'ui_name': 'foo_ui'},
+                              'mapping_id': 'one'})
 
-            res = self.fetch("/api/v1/applications/two/")
+            self._app.container_manager.containers_from_mapping_id = \
+                mock_coro_factory(return_value=[Container(
+                    name="container",
+                    image_name="xxx",
+                    url_id="yyy")])
+
+            res = self.fetch("/api/v1/applications/one/")
 
             self.assertEqual(res.code, httpstatus.OK)
             self.assertEqual(escape.json_decode(res.body),
-                             {"image": "hello2"})
+                             {'container':
+                                 {'image_name': 'xxx',
+                                  'name': 'container',
+                                  'url_id': 'yyy'},
+                              'image': {'description': '',
+                                        'icon_128': '',
+                                        'name': 'boo',
+                                        'ui_name': 'foo_ui'},
+                              'mapping_id': 'one'})
 
             res = self.fetch("/api/v1/applications/three/")
 
+            self.assertEqual(res.code, httpstatus.NOT_FOUND)
+
+            # Check the not found case if the image is not present
+            self._app.container_manager.image = mock_coro_factory(None)
+
+            res = self.fetch("/api/v1/applications/one/")
             self.assertEqual(res.code, httpstatus.NOT_FOUND)

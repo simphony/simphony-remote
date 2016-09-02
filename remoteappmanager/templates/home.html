@@ -13,34 +13,7 @@
   <div class="row text-center">
     <h1>Available Applications</h1>
   </div>
-  <div class="row col-sm-offset-2 col-sm-8">
-      <p class="spawn-error-msg text-danger" style="display: none"></p>
-      {% for info in images_info %}
-      <div class="row">
-          {% if info.image.icon_128 == '' %}
-              <img src="{{ static_url("images/generic_appicon_128.png") }}" class="col-sm-2 va" />
-          {% else %}
-              <img src="data:image/png;base64,{{ info.image.icon_128 }}" class="col-sm-2 va" />
-          {% endif %}
-          {% if info.image.ui_name == '' %}
-              <div class="col-sm-7 va"><h4>{{info.image.name}}</h4></div>
-          {% else %}
-              <div class="col-sm-7 va"><h4>{{info.image.ui_name}}</h4></div>
-          {% endif %}
-          {% if info.container == None %}
-              <div class="col-sm-2 va">
-                  <button id="{{info.mapping_id}}" name="action" value="start" class="start-button btn btn-primary"><i class="fa fa-spinner fa-spin" aria-hidden="true" style="display: none"></i> Start</button>
-              </div>
-          {% else %}
-              <div class="col-sm-1 va">
-                  <button id="{{ info.container.url_id }}" name="action" value="view" class="view-button btn btn-success">View</button>
-              </div>
-              <div class="col-sm-1 va">
-                  <button id="{{ info.container.url_id }}" name="action" value="stop" class="stop-button btn btn-danger"><i class="fa fa-spinner fa-spin" aria-hidden="true" style="display: none"></i> Stop</button>
-              </div>
-          {% endif %}
-      </div>
-      {% endfor %}
+  <div class="row col-sm-offset-2 col-sm-8" id="applist">
   </div>
 
   <div class="row">
