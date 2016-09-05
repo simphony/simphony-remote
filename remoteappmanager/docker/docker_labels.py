@@ -1,14 +1,41 @@
 """Contains established common dictionary of labels
 that we use to add information to docker images or containers."""
+from traitlets import HasTraits
 
-# Namespaces for our labels. Must end with a dot.
-SIMPHONY_NS = "eu.simphony-project.docker."
 
-# User interface name for the image
-UI_NAME = SIMPHONY_NS+"ui_name"
+class DockerLabelNamespace(HasTraits):
+    def __init__(self, namespace, labels):
+        super().__init__()
+        self.namespace = (
+            namespace[:-1] if namespace.endswith(".")
+            else namespace)
 
-# A 128x128px icon to represent the image
-ICON_128 = SIMPHONY_NS+"icon_128"
+        self.labels = labels
 
-# A long description of the image
-DESCRIPTION = SIMPHONY_NS+"description"
+        for label in self.labels:
+            setattr(self, label, ".".join([
+                self.namespace,
+                str(label)]))
+
+
+# Namespaces for our labels.
+SIMPHONY_NS = DockerLabelNamespace(
+    "eu.simphony-project.docker",
+    [
+        # User interface name for the image
+        "ui_name",
+        # A 128x128px icon to represent the image
+        "icon_128",
+        # A long description of the image
+        "description",
+        # The jupyterhub user a given container is assigned to
+        "user",
+        # A unique identifier generated to refer uniquely to a given
+        # docker application+configuration option
+        "mapping_id",
+        # A unique identifier that ends up in the URL to refer to a
+        # running container. Could be the docker container ID but in
+        # practice this is hard to obtain from inside the container,
+        # leading to a chicken/egg situation
+        "url_id",
+    ])
