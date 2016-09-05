@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from remoteappmanager.docker import docker_labels
+from remoteappmanager.docker.docker_labels import SIMPHONY_NS
 from remoteappmanager.docker.image import Image
 from remoteappmanager.tests.mocking.virtual.docker_client import (
     create_docker_client)
@@ -15,9 +15,9 @@ class TestImage(TestCase):
         self.assertEqual(image.docker_id, image_dict["Id"])
         self.assertEqual(image.name, image_dict["RepoTags"][0])
         self.assertEqual(image.description,
-                         image_dict["Labels"][docker_labels.DESCRIPTION])
+                         image_dict["Labels"][SIMPHONY_NS.description])
         self.assertEqual(image.ui_name,
-                         image_dict["Labels"][docker_labels.UI_NAME])
+                         image_dict["Labels"][SIMPHONY_NS.ui_name])
 
     def test_from_docker_dict_inspect_image(self):
         docker_client = create_docker_client()
@@ -28,7 +28,7 @@ class TestImage(TestCase):
         self.assertEqual(image.name, image_dict["RepoTags"][0])
         self.assertEqual(
             image.description,
-            image_dict['Config']["Labels"][docker_labels.DESCRIPTION])
+            image_dict['Config']["Labels"][SIMPHONY_NS.description])
         self.assertEqual(
             image.ui_name,
-            image_dict['Config']["Labels"][docker_labels.UI_NAME])
+            image_dict['Config']["Labels"][SIMPHONY_NS.ui_name])

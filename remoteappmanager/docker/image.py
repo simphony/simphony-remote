@@ -1,4 +1,4 @@
-from remoteappmanager.docker import docker_labels
+from remoteappmanager.docker.docker_labels import SIMPHONY_NS
 from traitlets import Unicode, HasTraits
 
 
@@ -44,8 +44,8 @@ class Image(HasTraits):
                   docker_dict.get("Config", {}).get("Labels"))
 
         if labels is not None:
-            self.ui_name = labels.get(docker_labels.UI_NAME, '')
-            self.icon_128 = labels.get(docker_labels.ICON_128, '')
-            self.description = labels.get(docker_labels.DESCRIPTION, '')
+            self.ui_name = labels.get(SIMPHONY_NS.ui_name, '')
+            self.icon_128 = labels.get(SIMPHONY_NS.icon_128, '')
+            self.description = labels.get(SIMPHONY_NS.description, '')
 
         return self

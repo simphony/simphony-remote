@@ -133,7 +133,7 @@ class Container(HasTraits):
             names = docker_dict.get("Names") or ('', )
             kwargs["name"] = names[0]
 
-        kwargs["mapping_id"] = labels.get(SIMPHONY_NS+"mapping_id") or ""
-        kwargs["url_id"] = labels.get(SIMPHONY_NS+"url_id") or ""
+        kwargs["mapping_id"] = labels.get(SIMPHONY_NS.mapping_id) or ""
+        kwargs["url_id"] = labels.get(SIMPHONY_NS.url_id) or ""
 
         return cls(**kwargs)

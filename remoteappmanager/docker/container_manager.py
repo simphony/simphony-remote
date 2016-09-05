@@ -129,8 +129,8 @@ class ContainerManager(LoggingMixin):
         A list of Container objects, or an empty list if nothing is found.
         """
         labels = {
-            SIMPHONY_NS+"user": user_name,
-            SIMPHONY_NS+"mapping_id": mapping_id}
+            SIMPHONY_NS.user: user_name,
+            SIMPHONY_NS.mapping_id: mapping_id}
         filters = {
             'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]}
 
@@ -142,7 +142,7 @@ class ContainerManager(LoggingMixin):
         """Retrieves and returns the container by its url_id, if present.
         If not present, returns None.
         """
-        labels = {SIMPHONY_NS+"url_id": url_id}
+        labels = {SIMPHONY_NS.url_id: url_id}
         filters = {
             'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]}
 
@@ -510,9 +510,9 @@ def _get_container_labels(user_name, mapping_id, url_id):
     to docker guidelines."""
 
     return {
-        SIMPHONY_NS+"user": user_name,
-        SIMPHONY_NS+"mapping_id": mapping_id,
-        SIMPHONY_NS+"url_id": url_id,
+        SIMPHONY_NS.user: user_name,
+        SIMPHONY_NS.mapping_id: mapping_id,
+        SIMPHONY_NS.url_id: url_id,
     }
 
 
