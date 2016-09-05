@@ -27,7 +27,7 @@ SIMPHONY_NS = DockerLabelNamespace(
         # A 128x128px icon to represent the image
         "icon_128",
         # A long description of the image
-        "description"
+        "description",
         # The jupyterhub user a given container is assigned to
         "user",
         # A unique identifier generated to refer uniquely to a given
