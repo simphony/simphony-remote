@@ -4,10 +4,14 @@ from urllib.parse import urljoin
 from tornado import web, gen
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
+from remoteappmanager.handlers.handler_authenticator import HubAuthenticator
 
 
 class BaseHandler(web.RequestHandler, LoggingMixin):
     """Base class for the request handler."""
+
+    #: The authenticator that is used to recognize the user.
+    authenticator_class = HubAuthenticator
 
     @gen.coroutine
     def prepare(self):
@@ -15,17 +19,8 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
 
         # Authenticate the user against the hub. We can't use get_current_user
         # because we want to do it asynchronously.
-        hub = self.application.hub
-        cookie_name = self.settings["cookie_name"]
-        user_cookie = self.get_cookie(cookie_name)
-        user = None
-
-        if user_cookie:
-            user_data = (yield hub.verify_token(cookie_name, user_cookie))
-            if user_data.get('name', '') == self.application.user.name:
-                user = self.application.user
-
-        self.current_user = user
+        authenticator = self.authenticator_class()
+        self.current_user = yield authenticator.authenticate(self)
 
     def render(self, template_name, **kwargs):
         """Reimplements render to pass well known information to the rendering
