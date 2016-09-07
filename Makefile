@@ -12,7 +12,7 @@ deps:
 	@echo "---------------------------"
 	-sudo apt-get update
 	sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
-	pip install --upgrade pip
+	pip install --upgrade pip setuptools
 	sudo npm install -g configurable-http-proxy
 	pip3 install -r requirements.txt 
 
