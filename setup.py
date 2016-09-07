@@ -21,7 +21,7 @@ setup(
         "jupyter_client>=4.3.0",
         "click>=6.6",
         "tabulate>=0.7.5",
-    ]
+    ],
     packages=find_packages(),
     include_package_data=True,
     entry_points={
