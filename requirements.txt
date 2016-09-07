@@ -4,7 +4,7 @@ tornado>=4.3
 docker-py>=1.8
 escapism>=0.0.1
 jinja2>=2.8
-jupyterhub>=0.6.1
+git+git://github.com/jupyterhub/jupyterhub.git
 jupyter_client>=4.3.0
 click>=6.6
 tabulate>=0.7.5
