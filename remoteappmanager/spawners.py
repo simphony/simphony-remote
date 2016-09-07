@@ -176,7 +176,7 @@ class VirtualUserSpawner(LocalProcessSpawner):
 
         # Make sure we clean up in case `start` fails
         try:
-            yield super().start()
+            return (yield super().start())
         except Exception:
             self._clean_up_workspace_dir()
             raise
