@@ -13,7 +13,8 @@ deps:
 	-sudo apt-get update
 	sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
 	pip3 install --upgrade pip setuptools
-	sudo npm install -g git://github.com/stefanoborini/configurable-http-proxy.git#fix-x-forward
+	# Currently set to 1.4.0dev fixing X-Forward behavior
+	sudo npm install -g "git://github.com/jupyterhub/configurable-http-proxy.git#f54c6a46a235f17cb6c36046a913d37fa45ec95b"
 	pip3 install -r requirements.txt 
 
 .PHONY: devdeps
