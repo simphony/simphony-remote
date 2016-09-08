@@ -13,7 +13,7 @@ deps:
 	-sudo apt-get update
 	sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
 	pip3 install --upgrade pip setuptools
-	sudo npm install -g configurable-http-proxy
+	sudo npm install -g git://github.com/stefanoborini/configurable-http-proxy.git#fix-x-forward
 	pip3 install -r requirements.txt 
 
 .PHONY: devdeps
