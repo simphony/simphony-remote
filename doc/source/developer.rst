@@ -18,7 +18,7 @@ for each user.
    remoteappmanager.file_config
    remoteappmanager.jinja2_adapters
    remoteappmanager.netutils
-   remoteappmanager.spawner
+   remoteappmanager.spawners
    remoteappmanager.traitlets
    remoteappmanager.user
    remoteappmanager.utils
