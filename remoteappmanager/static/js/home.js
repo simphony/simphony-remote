@@ -162,22 +162,11 @@ require(
             $(".bny").click(y_button_clicked);
         };
         
-        var request_app_infos = function (response) {
-            // Retrieve information from the various applications and 
-            // connect the cascading callbacks.
-            var requests = [];
-
-            for (var i = 0; i < response.items.length; i++) {
-                requests.push(appapi.application_info(response.items[i]));
-            }
-
-            utils.all(requests)
-                .always(fill_local_model)
-                .done(render_applist)
-                .done(register_button_eventhandlers);
-        };
-
-        $.when(appapi.available_applications()).done(request_app_infos);
+        $.when(appapi.available_applications_info())
+            .done(fill_local_model)
+            .done(render_applist)
+            .done(register_button_eventhandlers);
+        ;
 
     }
 );

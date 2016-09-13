@@ -141,6 +141,14 @@ define(['jquery'], function ($) {
         });
     };
     
+    var update = function (d1, d2) {
+        // Transfers the keys from d2 to d1. Returns d1
+        $.map(d2, function (i, key) {
+            d1[key] = d2[key];
+        });
+        return d1;
+    };
+
     var utils = {
         url_path_join : url_path_join,
         url_join_encode : url_join_encode,
@@ -149,11 +157,12 @@ define(['jquery'], function ($) {
         get_body_data : get_body_data,
         parse_url : parse_url,
         browser : browser,
-        platform: platform,
+        platform : platform,
         ajax_error_msg : ajax_error_msg,
         log_ajax_error : log_ajax_error,
         ajax_error_dialog : ajax_error_dialog,
-        all : all
+        all : all,
+        update : update
     };
     
     return utils;
