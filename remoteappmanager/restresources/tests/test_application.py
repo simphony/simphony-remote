@@ -30,6 +30,7 @@ class TestApplication(AsyncHTTPTestCase):
 
         application_mock_2 = Mock()
         application_mock_2.image = "hello2"
+
         app.db.get_apps_for_user = Mock(return_value=[
             ("one", application_mock_1, Mock()),
             ("two", application_mock_2, Mock()),
@@ -55,6 +56,16 @@ class TestApplication(AsyncHTTPTestCase):
             self.assertEqual(res.code, httpstatus.OK)
             self.assertEqual(escape.json_decode(res.body),
                              {"items": ["one", "two"]})
+
+            # Check if nothing is returned if no images are present
+            self._app.container_manager.image = mock_coro_factory(
+                return_value=None)
+
+            res = self.fetch("/api/v1/applications/")
+
+            self.assertEqual(res.code, httpstatus.OK)
+            self.assertEqual(escape.json_decode(res.body),
+                             {"items": []})
 
     def test_retrieve(self):
         def prepare_side_effect(*args, **kwargs):

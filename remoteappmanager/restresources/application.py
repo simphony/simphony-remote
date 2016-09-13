@@ -60,4 +60,11 @@ class Application(Resource):
         container, if active, as values."""
         apps = self.application.db.get_apps_for_user(self.current_user.account)
 
-        return [mapping_id for mapping_id, _, _ in apps]
+        container_manager = self.application.container_manager
+
+        result = []
+        for mapping_id, app, policy in apps:
+            if (yield container_manager.image(app.image)) is not None:
+                result.append(mapping_id)
+
+        return result
