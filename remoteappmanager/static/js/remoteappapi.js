@@ -93,33 +93,39 @@ define(['jquery', 'utils'], function ($, utils) {
         var self = this;
 
         $.when(self.available_applications(options))
-            .done(
-                function (response) {
-                    var request, requests = [];
+            .done(function (response) {
+                var request, requests = [];
 
-                    for (var i = 0; i < response.items.length; i++) {
-                        // We neutralize the potential error from a jXHR request
-                        // and make sure that all our requests "succeed" so that
-                        // all/when can guarantee everything is done.
-                        request = $.Deferred();
+                for (var i = 0; i < response.items.length; i++) {
+                    // We neutralize the potential error from a jXHR request
+                    // and make sure that all our requests "succeed" so that
+                    // all/when can guarantee everything is done.
+                    request = $.Deferred();
 
-                        // These will go out of scope but they are still alive
-                        // and performing to completion
-                        self.application_info(response.items[i]).always(
-                            request.resolve);
+                    // These will go out of scope but they are still alive
+                    // and performing to completion
+                    self.application_info(response.items[i]).always(
+                        request.resolve);
 
-                        requests.push(request);
-                    }
-
-                    utils.all(requests).done(
-                        function (promises) {
-                            promise.resolve(promises);
-                        }
-                    );
-                
+                    requests.push(request);
                 }
-            );
-        
+
+                utils.all(requests)
+                    .done(function (promises) {
+                        // Fills the local application model with the results of the
+                        // retrieve promises.
+                            var data = [];
+                            for (var i = 0; i < promises.length; i++) {
+                                var result = promises[i];
+                                if (result[2].status === 200) {
+                                    data.push(result[0]);
+                                }
+                            }
+                            promise.resolve(data);
+                    });
+            
+            });
+                
         return promise;
     };
 

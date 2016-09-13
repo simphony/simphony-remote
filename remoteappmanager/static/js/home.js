@@ -73,17 +73,6 @@ require(
             $("#bny_"+index).hide();
         };
 
-        var fill_local_model = function (promises) {
-            // Fills the local application model with the results of the
-            // retrieve promises.
-            for (var i = 0; i < promises.length; i++) {
-                var result = promises[i];
-                if (result[2].status === 200) {
-                    application_model.push(result[0]);
-                }
-            }
-        };
-        
         var render_applist = function () {
             // Renders the full application list and adds it to the DOM.
             var html = "";
@@ -162,8 +151,12 @@ require(
             $(".bny").click(y_button_clicked);
         };
         
+        var sync_local_model = function (app_data) {
+            application_model = app_data;
+        };
+        
         $.when(appapi.available_applications_info())
-            .done(fill_local_model)
+            .done(sync_local_model)
             .done(render_applist)
             .done(register_button_eventhandlers);
         ;
