@@ -55,16 +55,3 @@ A generic implementation of Rest APIs using tornado.
    remoteappmanager.rest.rest_handler
    remoteappmanager.rest.http.payloaded_http_error
 
-
-Traitlet sphinx documenter
---------------------------
-
-A sphinx autodoc friendly documenter for traitlet attributes.
-
-.. autosummary::
-   :toctree: api
-   :template: module_template.rst
-
-   traitlets_documenter
-   traitlets_documenter.class_traitlets_documenter
-   traitlets_documenter.util
