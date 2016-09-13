@@ -15,6 +15,7 @@ setup(
         "traitlets>=4.1",
         "tornado>=4.3",
         "docker-py>=1.8",
+        "requests>=2.10.0",
         "escapism>=0.0.1",
         "jinja2>=2.8",
         "jupyterhub>=0.7.0dev0",
