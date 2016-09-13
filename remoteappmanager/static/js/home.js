@@ -159,7 +159,6 @@ require(
             .done(sync_local_model)
             .done(render_applist)
             .done(register_button_eventhandlers);
-        ;
 
     }
 );
