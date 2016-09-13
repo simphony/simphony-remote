@@ -42,7 +42,7 @@ Deployment of the complete system in a single machine/VM.
 
 #. Change dir into jupyterhub::
 
-     cd ../jupyterhub
+     cd ./jupyterhub
 
    and verify that `jupyterhub_config.py` is correct for your deployment
    machine setup (see :ref:`configuration`).

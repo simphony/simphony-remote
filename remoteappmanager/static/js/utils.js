@@ -5,17 +5,18 @@
 // Modifications Copyright (c) Juptyer Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-define(['jquery'], function($){
+define(['jquery'], function ($) {
     "use strict";
-    
+
     var url_path_join = function () {
         // join a sequence of url components with '/'
-        var url = '';
-        for (var i = 0; i < arguments.length; i++) {
+        var url = '', i = 0;
+
+        for (i = 0; i < arguments.length; i += 1) {
             if (arguments[i] === '') {
                 continue;
             }
-            if (url.length > 0 && url[url.length-1] != '/') {
+            if (url.length > 0 && url[url.length-1] !== '/') {
                 url = url + '/' + arguments[i];
             } else {
                 url = url + arguments[i];
@@ -73,7 +74,9 @@ define(['jquery'], function($){
         }
         var N= navigator.appName, ua= navigator.userAgent, tem;
         var M= ua.match(/(opera|chrome|safari|firefox|msie)\/?\s*(\.?\d+(\.\d+)*)/i);
-        if (M && (tem= ua.match(/version\/([\.\d]+)/i)) !== null) M[2]= tem[1];
+        if (M && (tem= ua.match(/version\/([\.\d]+)/i)) !== null) {
+            M[2]= tem[1];
+        }
         M= M? [M[1], M[2]]: [N, navigator.appVersion,'-?'];
         return M;
     })();
@@ -85,10 +88,10 @@ define(['jquery'], function($){
             return 'None';
         }
         var OSName="None";
-        if (navigator.appVersion.indexOf("Win")!=-1) OSName="Windows";
-        if (navigator.appVersion.indexOf("Mac")!=-1) OSName="MacOS";
-        if (navigator.appVersion.indexOf("X11")!=-1) OSName="UNIX";
-        if (navigator.appVersion.indexOf("Linux")!=-1) OSName="Linux";
+        if (navigator.appVersion.indexOf("Win")!==-1) { OSName="Windows"; }
+        if (navigator.appVersion.indexOf("Mac")!==-1) { OSName="MacOS"; }
+        if (navigator.appVersion.indexOf("X11")!==-1) { OSName="UNIX"; }
+        if (navigator.appVersion.indexOf("Linux")!==-1) { OSName="Linux"; }
         return OSName;
     })();
 
@@ -119,6 +122,25 @@ define(['jquery'], function($){
         dialog.modal();
     };
 
+    var all = function (promises) {
+        // A form of jQuery.when that handles an array of promises
+        // and equalises the behavior regardless if there's one or more than
+        // one elements.
+        if (!Array.isArray(promises)) {
+            throw new Error("$.all() must be passed an array of promises");
+        }
+        return $.when.apply($, promises).then(function () {
+            // if single argument was expanded into multiple arguments, 
+            // then put it back into an array for consistency
+            if (promises.length === 1 && arguments.length > 1) {
+                // put arguments into an array
+                return [Array.prototype.slice.call(arguments, 0)];
+            } else {
+                return Array.prototype.slice.call(arguments, 0);
+            }
+        });
+    };
+    
     var utils = {
         url_path_join : url_path_join,
         url_join_encode : url_join_encode,
@@ -131,6 +153,7 @@ define(['jquery'], function($){
         ajax_error_msg : ajax_error_msg,
         log_ajax_error : log_ajax_error,
         ajax_error_dialog : ajax_error_dialog,
+        all : all
     };
     
     return utils;

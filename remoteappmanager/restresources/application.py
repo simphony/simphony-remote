@@ -18,9 +18,40 @@ class Application(Resource):
             raise NotFound()
 
         app, policy = apps_dict[identifier]
-        representation = dict(
-            image=app.image,
-        )
+
+        container_manager = self.application.container_manager
+        image = yield container_manager.image(app.image)
+        if image is None:
+            # The user has access to an application that is no longer
+            # available in docker.
+            raise NotFound()
+
+        containers = yield container_manager.containers_from_mapping_id(
+            self.current_user.name,
+            identifier)
+
+        representation = {
+            "image": {
+                "name": image.name,
+                "ui_name": image.ui_name,
+                "icon_128": image.icon_128,
+                "description": image.description,
+            },
+            "mapping_id": identifier,
+        }
+
+        if len(containers):
+            # We assume that we can only run one container only (although the
+            # API considers a broader possibility for future extension.
+            container = containers[0]
+            representation["container"] = dict(
+                name=container.name,
+                image_name=container.image_name,
+                url_id=container.url_id,
+            )
+        else:
+            representation["container"] = None
+
         return representation
 
     @gen.coroutine

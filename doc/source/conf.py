@@ -44,7 +44,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
-    'traitlets_documenter',
+    'traitlet_documenter',
     # patched autosummary for issue
     # https://github.com/sphinx-doc/sphinx/issues/1061
     '_extensions'

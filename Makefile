@@ -1,36 +1,30 @@
 SHELL=bash
 
-.PHONY: help
-help:
-	@echo "Please specify one of the following:"
-	@echo ""
-	@echo "deps: install the dependencies of the project for your platform"
-	@echo "install: install the application"
-	@echo "certs: builds and installs the certificates"
-	@echo "images: installs basic simphony images"
-	@echo "db: initializes the sqlite database"
-	@echo ""
-
 .PHONY: venv
 venv:
 	@echo "Creating virtual environment"
 	@echo "----------------------------"
 	python3 -m venv venv
 
-.PHONY: aptdeps
-aptdeps:
+.PHONY: deps
+deps:
 	@echo "Installing apt dependencies"
 	@echo "---------------------------"
-	-apt-get update
-	apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
-	pip install --upgrade pip
-	npm install -g configurable-http-proxy
+	-sudo apt-get update
+	sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
+	pip3 install --upgrade pip setuptools
+	# Currently set to 1.4.0dev fixing X-Forward behavior
+	sudo npm install -g "git://github.com/jupyterhub/configurable-http-proxy.git#f54c6a46a235f17cb6c36046a913d37fa45ec95b"
+	pip3 install -r requirements.txt 
 
-.PHONY: pythondeps
-pythondeps:
-	@echo "Installing dependencies"
-	@echo "-----------------------"
-	pip3 install -r requirements.txt -r dev-requirements.txt -r doc-requirements.txt
+.PHONY: devdeps
+devdeps:
+	@echo "Installing test dependencies"
+	@echo "----------------------------"
+	pip3 install -r dev-requirements.txt -r doc-requirements.txt
+	sudo apt-get install phantomjs
+	sudo npm install -g jshint
+	sudo npm install -g node-qunit-phantomjs
 
 .PHONY: develop
 develop: 
@@ -66,6 +60,8 @@ testdb: db
         remoteappdb --db=remoteappmanager.db user create test; \
         remoteappdb --db=remoteappmanager.db app create simphonyproject/simphonic-mayavi; \
         remoteappdb --db=remoteappmanager.db app grant simphonyproject/simphonic-mayavi test; \
+        remoteappdb --db=remoteappmanager.db app create simphonyproject/simphonic-paraview; \
+        remoteappdb --db=remoteappmanager.db app grant simphonyproject/simphonic-paraview test; \
         popd
 
 .PHONY: testimages
@@ -73,12 +69,23 @@ testimages:
 	@echo "Downloading docker images"
 	@echo "-------------------------"
 	docker pull simphonyproject/simphonic-mayavi:latest
+	docker pull simphonyproject/simphonic-paraview:latest
 
 .PHONY: test
-test:
-	@echo "Running testsuite"
-	@echo "-----------------"
-	flake8 . && python -m tornado.testing discover -s tests -t . -v
+test: pythontest jstest
+
+.PHONY: pythontest
+pythontest:
+	@echo "Running python testsuite"
+	@echo "------------------------"
+	flake8 . && python -m tornado.testing discover -s remoteappmanager -t . -v
+
+.PHONY: jstest
+jstest: 
+	@echo "Running javascript testsuite"
+	@echo "----------------------------"
+	jshint --config .jshintrc remoteappmanager/static/js/
+	node-qunit-phantomjs jstests/tests.html
 
 .PHONY: docs
 docs:

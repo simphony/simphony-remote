@@ -1,9 +1,11 @@
 Troubleshoot
 ------------
 
-
-
 .. toctree::
    :includehidden:
 
-   troubleshoot/database
+.. include::
+    troubleshoot/database.rst
+
+.. include::
+    troubleshoot/docker.rst

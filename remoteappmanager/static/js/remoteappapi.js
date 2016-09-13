@@ -39,7 +39,7 @@ define(['jquery', 'utils'], function ($, utils) {
             utils.encode_uri_components(path)
         )+'/';
         
-        $.ajax(url, options);
+        return $.ajax(url, options);
     };
     
     RemoteAppAPI.prototype.start_application = function(id, options) {
@@ -49,7 +49,7 @@ define(['jquery', 'utils'], function ($, utils) {
             data: JSON.stringify({
                 mapping_id: id
             })});
-        this.api_request(
+        return this.api_request(
             'containers',
             options
         );
@@ -58,8 +58,24 @@ define(['jquery', 'utils'], function ($, utils) {
     RemoteAppAPI.prototype.stop_application = function (id, options) {
         options = options || {};
         options = update(options, {type: 'DELETE'});
-        this.api_request(
+        return this.api_request(
             utils.url_path_join('containers', id),
+            options
+        );
+    };
+
+    RemoteAppAPI.prototype.available_applications = function (options) {
+        options = options || {};
+        return this.api_request(
+            utils.url_path_join('applications'),
+            options
+        );
+    };
+    
+    RemoteAppAPI.prototype.application_info = function (id, options) {
+        options = options || {};
+        return this.api_request(
+            utils.url_path_join('applications', id),
             options
         );
     };
