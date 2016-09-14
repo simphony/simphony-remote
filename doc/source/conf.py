@@ -19,7 +19,11 @@
 #
 import os
 import sys
-sys.path.append(os.path.abspath('../../remoteappmanager'))
+sys.path.append(os.path.abspath('../../'))
+sys.path.append(os.path.abspath('.'))
+
+from mock_missing import mock_modules
+mock_modules()
 
 from remoteappmanager import __version__, MAJOR, MINOR
 from remoteappmanager.command_line_config import CommandLineConfig
@@ -41,6 +45,10 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'traitlet_documenter',
+    # patched autosummary for issue
+    # https://github.com/sphinx-doc/sphinx/issues/1061
+    '_extensions'
+    #'sphinx.ext.autosummary'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -442,7 +450,24 @@ _config = CommandLineConfig()
 
 with open(HELP_FILE_PATH, 'w') as fh:
     for name, traitlet in sorted(_config.traits().items()):
-        print('--{name:<30} {help}'.format(name=name, help=traitlet.help),
-              file=fh)
-
+        print(
+            '--{name:<30} {help}'.format(
+                name=name, help=traitlet.help), file=fh)
 del _config
+
+
+autodoc_member_order = 'source'
+autoclass_content = 'both'
+autodoc_default_flags = [
+    'show-inheritance', 'members', 'undoc-members']
+autosummary_generate = True
+
+# Patch sphinx to 1.4.x to suppress warning about nonlocal image URI
+import sphinx.environment
+from docutils.utils import get_source_line
+
+def _warn_node(self, msg, node, **kwargs):
+    if not msg.startswith('nonlocal image URI found:'):
+        self._warnfunc(msg, '%s:%s' % get_source_line(node), **kwargs)
+
+sphinx.environment.BuildEnvironment.warn_node = _warn_node

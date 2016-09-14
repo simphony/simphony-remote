@@ -7,3 +7,5 @@ jupyterhub_cookie_secret
 *.crt
 *.key
 doc/build
+doc/source/api
+doc/source/remoteappmanager_help.txt
