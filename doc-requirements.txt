@@ -1,4 +1,4 @@
 sphinx>=1.4.4
 astor>=0.5
 git+https://github.com/simphony/traitlet-documenter.git
--e file:./foo#egg=foo
+-e file:.
