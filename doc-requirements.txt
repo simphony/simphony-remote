@@ -1,6 +1,4 @@
 sphinx>=1.4.4
 astor>=0.5
 git+https://github.com/simphony/traitlet-documenter.git
-# Strange format of this url due to strange bug (?) of pip that 
-# incorrectly resolves local paths based on .
-file:../simphony-remote/doc/mock_packages/jupyterhub-0.7.0.dev0-py3.4.egg
+-r requirements.txt
