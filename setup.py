@@ -31,8 +31,6 @@ if on_rtd:
     requirements.extend(["sqlalchemy>=1.0"])
 else:
     requirements.extend(["jupyterhub>=0.7.0dev0", "docker-py>=1.8"])
-else:
-
 
 # main setup configuration class
 setup(
