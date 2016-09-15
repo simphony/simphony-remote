@@ -1,12 +1,12 @@
+import os
 from setuptools import setup, find_packages
 
 from remoteappmanager import __version__
 
 VERSION = __version__
 
-import os
 
-requirements=[
+requirements = [
     "setuptools>=21.0",
     "traitlets>=4.1",
     "tornado>=4.3",
@@ -17,7 +17,6 @@ requirements=[
     "click>=6.6",
     "tabulate>=0.7.5",
 ]
-
 
 # Unfortunately RTD cannot install jupyterhub because jupyterhub needs bower,
 # and that is not available. We prevent the request for the unreleased jhub
