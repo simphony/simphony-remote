@@ -12,7 +12,6 @@ for each user.
    :toctree: api
    :template: module_template.rst
 
-   remoteappmanager.db.orm
    remoteappmanager.application
    remoteappmanager.auth
    remoteappmanager.command_line_config
@@ -27,6 +26,7 @@ for each user.
    remoteappmanager.cli.remoteapprest.__main__
    remoteappmanager.db.csv_db
    remoteappmanager.db.interfaces
+   remoteappmanager.db.orm
    remoteappmanager.docker.async_docker_client
    remoteappmanager.docker.container
    remoteappmanager.docker.container_manager

@@ -479,7 +479,6 @@ def import_by_name(name, prefixes=[None]):
 
 def _import_by_name(name):
     """Import a Python object given its full name."""
-    print("XXX importing by name ", name)
     try:
         name_parts = name.split('.')
 
@@ -490,8 +489,7 @@ def _import_by_name(name):
                 __import__(modname)
                 mod = sys.modules[modname]
                 return getattr(mod, name_parts[-1]), mod, modname
-            except (ImportError, IndexError, AttributeError) as e:
-                print("XXX exception 1 "+str(e))
+            except (ImportError, IndexError, AttributeError):
                 pass
 
         # ... then as MODNAME, MODNAME.OBJ1, MODNAME.OBJ1.OBJ2, ...
@@ -502,8 +500,7 @@ def _import_by_name(name):
             modname = '.'.join(name_parts[:j])
             try:
                 __import__(modname)
-            except ImportError as e:
-                print("XXX exception 2 "+str(e))
+            except ImportError:
                 continue
             if modname in sys.modules:
                 break
@@ -517,8 +514,7 @@ def _import_by_name(name):
             return obj, parent, modname
         else:
             return sys.modules[modname], None, modname
-    except (ValueError, ImportError, AttributeError, KeyError) as e:
-        print("XXX exception 3 "+str(e))
+    except (ValueError, ImportError, AttributeError, KeyError):
         raise ImportError(*e.args)
 
 
