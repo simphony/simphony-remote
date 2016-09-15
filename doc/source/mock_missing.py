@@ -42,6 +42,13 @@ def mock_modules():
     else:
         del pamela
 
+    try:
+        import jupyterhub
+    except ImportError:
+        MOCK_MODULES.append('jupyterhub')
+    else:
+        del pamela
+
     TYPES = {
         mock_type: type(mock_type, bases, {'__module__': path})
         for path, mock_type, bases in MOCK_TYPES}
