@@ -53,6 +53,7 @@ def mock_modules():
         import sqlalchemy
     except ImportError:
         MOCK_MODULES.append('sqlalchemy')
+        MOCK_MODULES.append('sqlalchemy.engine')
     else:
         del sqlalchemy
 

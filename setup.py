@@ -25,8 +25,14 @@ requirements = [
 # provides 2.11.1
 
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
-if not on_rtd:
+if on_rtd:
+    # These are the dependencies of jupyterhub that we need to have in order
+    # for our code to import on RTD.
+    requirements.extend(["sqlalchemy>=1.0"])
+else:
     requirements.extend(["jupyterhub>=0.7.0dev0", "docker-py>=1.8"])
+else:
+
 
 # main setup configuration class
 setup(
