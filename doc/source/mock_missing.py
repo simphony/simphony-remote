@@ -44,7 +44,7 @@ def mock_modules():
 
     try:
         import jupyterhub
-        print("uh? Jupyterhub package found ", jupyterhub.__version__)
+        print("uh? Jupyterhub package found ", jupyterhub)
     except ImportError:
         MOCK_MODULES.append('jupyterhub')
     else:
