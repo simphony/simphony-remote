@@ -75,11 +75,11 @@ class TestRemoteAppREST(TempMixin, unittest.TestCase):
             ).encode("utf-8")
 
             responses[1].content = json.dumps(
-                {'image': "foo"}
+                {'image': {"ui_name": "foo"}}
             ).encode("utf-8")
 
             responses[2].content = json.dumps(
-                {'image': "bar"}
+                {'image': {"ui_name": "bar"}}
             ).encode("utf-8")
 
             mock_get.side_effect = responses
