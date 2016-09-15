@@ -514,7 +514,7 @@ def _import_by_name(name):
             return obj, parent, modname
         else:
             return sys.modules[modname], None, modname
-    except (ValueError, ImportError, AttributeError, KeyError):
+    except (ValueError, ImportError, AttributeError, KeyError) as e:
         raise ImportError(*e.args)
 
 
