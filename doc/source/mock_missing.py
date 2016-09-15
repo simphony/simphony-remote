@@ -44,11 +44,24 @@ def mock_modules():
 
     try:
         import jupyterhub
-        print("uh? Jupyterhub package found ", jupyterhub)
     except ImportError:
         MOCK_MODULES.append('jupyterhub')
     else:
         del jupyterhub
+
+    try:
+        import sqlalchemy
+    except ImportError:
+        MOCK_MODULES.append('sqlalchemy')
+    else:
+        del sqlalchemy
+
+    try:
+        import docker
+    except ImportError:
+        MOCK_MODULES.append('docker')
+    else:
+        del docker
 
     TYPES = {
         mock_type: type(mock_type, bases, {'__module__': path})
