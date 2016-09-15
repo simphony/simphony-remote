@@ -50,14 +50,6 @@ def mock_modules():
         del jupyterhub
 
     try:
-        import sqlalchemy
-    except ImportError:
-        MOCK_MODULES.append('sqlalchemy')
-        MOCK_MODULES.append('sqlalchemy.engine')
-    else:
-        del sqlalchemy
-
-    try:
         import docker
     except ImportError:
         MOCK_MODULES.append('docker')
