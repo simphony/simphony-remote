@@ -44,10 +44,11 @@ def mock_modules():
 
     try:
         import jupyterhub
+        print("uh? Jupyterhub package found ", jupyterhub.__version__)
     except ImportError:
         MOCK_MODULES.append('jupyterhub')
     else:
-        del pamela
+        del jupyterhub
 
     TYPES = {
         mock_type: type(mock_type, bases, {'__module__': path})
