@@ -3,4 +3,4 @@ astor>=0.5
 git+https://github.com/simphony/traitlet-documenter.git
 # Strange format of this url due to strange bug (?) of pip that 
 # incorrectly resolves local paths based on .
-file:../simphony-remote/doc/mock_packages/jupyterhub
+-e file:../simphony-remote/doc/mock_packages/jupyterhub
