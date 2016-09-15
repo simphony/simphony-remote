@@ -39,19 +39,3 @@ for each user.
    remoteappmanager.services.hub
    remoteappmanager.services.reverse_proxy
 
-
-REST tornado
-------------
-
-A generic implementation of Rest APIs using tornado.
-
-.. autosummary::
-   :toctree: api
-   :template: module_template.rst
-
-   remoteappmanager.rest.exceptions
-   remoteappmanager.rest.registry
-   remoteappmanager.rest.resource
-   remoteappmanager.rest.rest_handler
-   remoteappmanager.rest.http.payloaded_http_error
-
