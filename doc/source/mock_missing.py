@@ -46,6 +46,8 @@ def mock_modules():
         import jupyterhub
     except ImportError:
         MOCK_MODULES.append('jupyterhub')
+        MOCK_MODULES.append('jupyterhub.auth')
+        MOCK_MODULES.append('jupyterhub.spawner')
     else:
         del jupyterhub
 
@@ -53,6 +55,7 @@ def mock_modules():
         import docker
     except ImportError:
         MOCK_MODULES.append('docker')
+        MOCK_MODULES.append('docker.errors')
     else:
         del docker
 
