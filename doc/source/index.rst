@@ -4,6 +4,8 @@
 Contents
 --------
 
+This documentation is for simphony-remote |version| (|release|)
+
 .. toctree::
    :maxdepth: 1
 
