@@ -10,7 +10,6 @@ requirements=[
     "setuptools>=21.0",
     "traitlets>=4.1",
     "tornado>=4.3",
-    "docker-py>=1.8",
     "requests>=2.10.0",
     "escapism>=0.0.1",
     "jinja2>=2.8",
@@ -23,9 +22,12 @@ requirements=[
 # Unfortunately RTD cannot install jupyterhub because jupyterhub needs bower,
 # and that is not available. We prevent the request for the unreleased jhub
 # by skipping it if we are on RTD
+# We also have problems with requests as docker-py wants <2.11 and RTD
+# provides 2.11.1
+
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if not on_rtd:
-    requirements.append("jupyterhub>=0.7.0dev0")
+    requirements.extend(["jupyterhub>=0.7.0dev0", "docker-py>=1.8"])
 
 # main setup configuration class
 setup(
