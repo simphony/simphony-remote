@@ -10,8 +10,17 @@ venv:
 deps:
 	@echo "Installing apt dependencies"
 	@echo "---------------------------"
+	if [ `uname -s` != "Linux" ]; then \
+		echo "ERROR: Cannot run on non-Linux systems"; \
+		false; \
+	fi
 	-sudo apt-get update
-	sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
+	if [ `lsb_release -rs` = "16.04" ]; then \
+		packages="docker-engine npm nodejs-legacy python3-pip python3.4-venv"; \
+	else \
+		packages="docker-engine npm nodejs-legacy python3-pip python3.4-venv"; \
+	fi; \
+		sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y ${packages}
 	pip3 install --upgrade pip setuptools
 	# Currently set to 1.4.0dev fixing X-Forward behavior
 	sudo npm install -g "git://github.com/jupyterhub/configurable-http-proxy.git#f54c6a46a235f17cb6c36046a913d37fa45ec95b"
