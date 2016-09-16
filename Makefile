@@ -82,6 +82,11 @@ testimages:
 	@echo "-------------------------"
 	docker pull simphonyproject/simphonic-mayavi:latest
 	docker pull simphonyproject/simphonic-paraview:latest
+	if ! [ $$TRAVIS ]; then \
+		docker pull simphonyproject/filetransfer:latest; \
+		docker pull simphonyproject/jupyter:latest; \
+	fi
+		
 
 .PHONY: test
 test: pythontest jstest
