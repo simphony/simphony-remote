@@ -1,7 +1,6 @@
 from unittest.mock import Mock, patch
 
 from remoteappmanager import rest
-from remoteappmanager.db.orm import ApplicationPolicy
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.image import Image
 from remoteappmanager.rest import registry
