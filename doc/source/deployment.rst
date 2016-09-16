@@ -70,6 +70,10 @@ Deployment of the complete system in a single machine/VM.
 
      sh start.sh
 
+#. Visit the site at::
+
+    https://127.0.0.1:8000
+
 
 Setup docker containers
 -----------------------
