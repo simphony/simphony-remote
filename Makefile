@@ -20,7 +20,7 @@ deps:
 	else \
 		packages="docker-engine npm nodejs-legacy python3-pip python3.4-venv"; \
 	fi; \
-		sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y ${packages}
+		sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y $$packages
 	# Currently set to 1.4.0dev fixing X-Forward behavior
 	sudo npm install -g "git://github.com/jupyterhub/configurable-http-proxy.git#f54c6a46a235f17cb6c36046a913d37fa45ec95b"
 
