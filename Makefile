@@ -16,7 +16,7 @@ deps:
 	fi
 	-sudo apt-get update
 	if [ `lsb_release -rs` = "16.04" ]; then \
-		packages="docker-engine npm nodejs-legacy python3-pip python3.4-venv"; \
+		packages="docker.io npm nodejs-legacy python3-pip python3-venv"; \
 	else \
 		packages="docker-engine npm nodejs-legacy python3-pip python3.4-venv"; \
 	fi; \
