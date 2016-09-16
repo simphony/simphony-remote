@@ -38,6 +38,10 @@ Deployment of the complete system in a single machine/VM.
     
      make pythondeps
 
+#. And install the package itself::
+
+     make install
+
 #. Generate the SSL certificates if you do not already have them. The
    resulting certificates will have names test.* because they are
    self-signed and **are not supposed to be used for production**.
@@ -56,6 +60,16 @@ Deployment of the complete system in a single machine/VM.
 
    and verify that `jupyterhub_config.py` is correct for your deployment
    machine setup (see :ref:`configuration`).
+
+#. If you are using virtual users (users that are not present on the system) you need to create
+   a temporary space where the virtual user homes are created::
+
+     mkdir /tmp/remoteapp
+
+#. You can now start the service::
+
+     sh start.sh
+
 
 Setup docker containers
 -----------------------
