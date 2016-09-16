@@ -3,7 +3,9 @@ traitlets>=4.1
 tornado>=4.3
 # Fix to 2.10.0 due to docker-py needs (fails with 2.11.1)
 requests==2.10.0
-docker-py>=1.8
+# We want 1.8 because 1.10 uses API version 1.24 and the docker server
+# on ubuntu uses 1.23, so they don't like each other.
+docker-py==1.8
 escapism>=0.0.1
 jinja2>=2.8
 git+git://github.com/jupyterhub/jupyterhub.git
