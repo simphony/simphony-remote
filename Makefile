@@ -15,6 +15,9 @@ deps:
 	pip3 install --upgrade pip setuptools
 	# Currently set to 1.4.0dev fixing X-Forward behavior
 	sudo npm install -g "git://github.com/jupyterhub/configurable-http-proxy.git#f54c6a46a235f17cb6c36046a913d37fa45ec95b"
+
+.PHONY: pythondeps
+pythondeps:
 	pip3 install -r requirements.txt 
 
 .PHONY: devdeps

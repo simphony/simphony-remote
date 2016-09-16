@@ -13,3 +13,12 @@ you recently recreated your default docker machine, or the docker machine is no 
 Make sure that your docker environment (DOCKER_HOST environment variable) is compatible with the 
 docker machine current ip address (`docker-machine ip`). If not, reconfigure your docker machine
 environment with `eval $(docker-machine env)`.
+
+Error when connecting to docker: Permission denied
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Check if your `/var/run/docker.sock` is accessible and readable. The likely cause is
+that your current user is not in the `docker` group. Fix this by running::
+
+    sudo addgroup your_username docker
+
