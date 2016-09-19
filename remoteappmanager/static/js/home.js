@@ -41,7 +41,26 @@ require(
             } else {
                 name = info.image.name;
             }
-            html += '<div class="col-sm-7 va"><h4>'+name+'</h4></div>';
+            html += '<div class="col-sm-7 va"><h4>'+name+'</h4>';
+            
+            var policy = info.image.policy;
+            var mount_html = '';
+            
+            if (policy.allow_home) {
+                mount_html += "<li>Workspace</li>";
+            }
+            if (policy.volume_source && policy.volume_target && policy.volume_mode) {
+                mount_html += "<li>"+ policy.volume_source +
+                    " &#x2192; " +
+                    policy.volume_target +
+                    " " +
+                    "(" + policy.volume_mode + ")</li>";
+            }
+            if (mount_html !== '') {
+                html += "<ul>" + mount_html + "</ul>";
+            }
+            
+            html += '</div>';
 
             var cls, text, stop_style;
             if (info.container !== null) {

@@ -31,9 +31,16 @@ class TestApplication(AsyncHTTPTestCase):
         application_mock_2 = Mock()
         application_mock_2.image = "hello2"
 
+        policy = Mock(
+            allow_home=True,
+            volume_source="foo",
+            volume_target="bar",
+            volume_mode="ro",
+        )
+
         app.db.get_apps_for_user = Mock(return_value=[
-            ("one", application_mock_1, Mock()),
-            ("two", application_mock_2, Mock()),
+            ("one", application_mock_1, policy),
+            ("two", application_mock_2, policy),
         ])
         return app
 
@@ -89,7 +96,13 @@ class TestApplication(AsyncHTTPTestCase):
                               'image': {'description': '',
                                         'icon_128': '',
                                         'name': 'boo',
-                                        'ui_name': 'foo_ui'},
+                                        'ui_name': 'foo_ui',
+                                        'policy': {
+                                            "allow_home": True,
+                                            "volume_mode": 'ro',
+                                            "volume_source": "foo",
+                                            "volume_target": "bar",
+                                        }},
                               'mapping_id': 'one'})
 
             self._app.container_manager.containers_from_mapping_id = \
@@ -109,7 +122,13 @@ class TestApplication(AsyncHTTPTestCase):
                               'image': {'description': '',
                                         'icon_128': '',
                                         'name': 'boo',
-                                        'ui_name': 'foo_ui'},
+                                        'ui_name': 'foo_ui',
+                                        'policy': {
+                                            "allow_home": True,
+                                            "volume_mode": 'ro',
+                                            "volume_source": "foo",
+                                            "volume_target": "bar",
+                                        }},
                               'mapping_id': 'one'})
 
             res = self.fetch("/api/v1/applications/three/")

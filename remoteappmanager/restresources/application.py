@@ -36,6 +36,12 @@ class Application(Resource):
                 "ui_name": image.ui_name,
                 "icon_128": image.icon_128,
                 "description": image.description,
+                "policy": {
+                    "allow_home": policy.allow_home,
+                    "volume_source": policy.volume_source,
+                    "volume_target": policy.volume_target,
+                    "volume_mode": policy.volume_mode,
+                }
             },
             "mapping_id": identifier,
         }
