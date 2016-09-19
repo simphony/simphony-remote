@@ -30,7 +30,7 @@ if on_rtd:
     # for our code to import on RTD.
     requirements.extend(["sqlalchemy>=1.0"])
 else:
-    requirements.extend(["jupyterhub>=0.7.0dev0", "docker-py>=1.8"])
+    requirements.extend(["jupyterhub>=0.7.0dev0", "docker-py==1.8"])
 
 # main setup configuration class
 setup(

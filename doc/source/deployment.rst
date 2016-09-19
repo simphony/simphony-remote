@@ -15,18 +15,33 @@ Deployment of the complete system in a single machine/VM.
 
      git clone https://github.com/simphony/simphony-remote
 
+#. Install dependencies. You might be prompted for the root password to execute this::
+
+     make deps
+
+#. Make sure your docker server is running, and your user is allowed to connect to
+   the docker server (check accessibility of `/var/run/docker.sock`). You obtain this by
+   running::
+   
+     sudo service docker start
+     sudo addgroup your_username docker
+    
+   and logging out and in again. Check if your docker server is operative by running::
+
+     docker info
+   
 #. Create and activate a virtual environment::
 
      make venv
      . venv/bin/activate 
 
-#. Install apt dependencies. You need to be root to execute this::
-
-     make aptdeps
-
-#. Install python dependencies::
-
+#. Install the python dependencies::
+    
      make pythondeps
+
+#. And install the package itself::
+
+     make install
 
 #. Generate the SSL certificates if you do not already have them. The
    resulting certificates will have names test.* because they are
@@ -46,6 +61,20 @@ Deployment of the complete system in a single machine/VM.
 
    and verify that `jupyterhub_config.py` is correct for your deployment
    machine setup (see :ref:`configuration`).
+
+#. If you are using virtual users (users that are not present on the system) you need to create
+   a temporary space where the virtual user homes are created::
+
+     mkdir /tmp/remoteapp
+
+#. You can now start the service::
+
+     sh start.sh
+
+#. Visit the site at::
+
+    https://127.0.0.1:8000
+
 
 Setup docker containers
 -----------------------

@@ -10,8 +10,20 @@ venv:
 deps:
 	@echo "Installing apt dependencies"
 	@echo "---------------------------"
+	if [ `uname -s` != "Linux" ]; then \
+		echo "ERROR: Cannot run on non-Linux systems"; \
+		false; \
+	fi
 	-sudo apt-get update
-	sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine npm nodejs-legacy python3-pip python3.4-venv
+	if [ `lsb_release -rs` = "14.04" ]; then \
+		plat_packages="docker-engine python3.4-venv"; \
+	else \
+		plat_packages="docker.io python3-venv"; \
+	fi; \
+		sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages npm nodejs-legacy python3-pip 
+
+.PHONY: pythondeps
+pythondeps:
 	pip3 install --upgrade pip setuptools
 	# Currently set to 1.4.0dev fixing X-Forward behavior
 	npm install "git://github.com/jupyterhub/configurable-http-proxy.git#f54c6a46a235f17cb6c36046a913d37fa45ec95b"
@@ -70,6 +82,11 @@ testimages:
 	@echo "-------------------------"
 	docker pull simphonyproject/simphonic-mayavi:latest
 	docker pull simphonyproject/simphonic-paraview:latest
+	if ! [ $$TRAVIS ]; then \
+		docker pull simphonyproject/filetransfer:latest; \
+		docker pull simphonyproject/jupyter:latest; \
+	fi
+		
 
 .PHONY: test
 test: pythontest jstest
