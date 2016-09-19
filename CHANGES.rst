@@ -1,6 +1,43 @@
 SimPhoNy Remote CHANGELOG
 =========================
 
+What's new in SimPhoNy Remote 0.7.0
+-----------------------------------
+
+Summary
+~~~~~~~
+
+- Addressed issues for general support for Docker containers holding Web applications 
+  (jupyter notebook, filemanager) available as simphony-remote-docker 0.3.0.
+- REST+ajax based retrieval of available applications (#209, #214)
+- Show application policy information in application list (#242)
+- Preparation for REST framework extraction: 
+    - factored out authenticator code from the BaseHandler (#215)
+    - soft deprecation of subpackage (#236)
+- Upgraded dependencies to jupyterhub 0.7.0.dev0 (#217), configurable-http-proxy (#219)
+  to fix forwarding bugs in jupyterhub. 
+- Pinned request package dependency to 2.10.0 due to dockerpy constraints (#222)
+- Renamed Spawner to SystemUserSpawner (#205)
+- Added linting and testing infrastructure for javascript (#200)
+- Documentation fixes and refactorings:
+    - General fixes (#179, #198, #199, #202, #232, #233) 
+    - Use of autosummary for API extraction (#194, #234) 
+    - Extracted traitlets documenter in a separate repository (#210)
+- Migrated tests under the appropriate paths in the package tree (#196)
+- Command remoteapprest prints out only essential (UI name) application information, 
+  instead of the whole content of the request. (#230)
+- Removed the need for sudo in configurable-http-proxy installation (#244). Installation is now local.
+- Support for Ubuntu 16.04 (#243)
+    - Pinned dockerpy package dependency to 1.8.1
+    - Update deployment docs for Ubuntu 16.04
+- Fix: Failing selenium tests due to unexpected client-side selenium behavior (#203)
+- Fix: Added missing jupyterhub_config.py from MANIFEST.in (#206), fixed other paths (#207)
+- Fix: Exclude applications in the REST item list when not available (#225)
+- Fix: Handle failure of ajax retrieval so that partial failure is tolerated (#223)
+- Refactor: removed start/stop_spawner (#208)
+- Refactor: cleaned up docker label namespacing (#212)
+
+
 What's new in SimPhoNy Remote 0.6.0
 -----------------------------------
 
