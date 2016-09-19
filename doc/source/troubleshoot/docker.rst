@@ -22,3 +22,4 @@ that your current user is not in the `docker` group. Fix this by running::
 
     sudo addgroup your_username docker
 
+and then logging out and in again.

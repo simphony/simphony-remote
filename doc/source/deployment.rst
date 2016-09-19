@@ -20,7 +20,8 @@ Deployment of the complete system in a single machine/VM.
      make deps
 
 #. Make sure your docker server is running, and your user is allowed to connect to
-   the docker server. You obtain this by::
+   the docker server (check accessibility of `/var/run/docker.sock`). You obtain this by
+   running::
    
      sudo service docker start
      sudo addgroup your_username docker
