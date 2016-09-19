@@ -15,12 +15,12 @@ deps:
 		false; \
 	fi
 	-sudo apt-get update
-	if [ `lsb_release -rs` = "16.04" ]; then \
-		packages="docker.io npm nodejs-legacy python3-pip python3-venv"; \
+	if [ `lsb_release -rs` = "14.04" ]; then \
+		plat_packages="docker-engine python3.4-venv"; \
 	else \
-		packages="docker-engine npm nodejs-legacy python3-pip python3.4-venv"; \
+		plat_packages="docker.io python3-venv"; \
 	fi; \
-		sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y $$packages
+		sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages npm nodejs-legacy python3-pip 
 
 .PHONY: pythondeps
 pythondeps:
