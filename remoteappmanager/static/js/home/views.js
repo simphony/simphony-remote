@@ -5,6 +5,39 @@ define(["jquery", "utils"], function ($, utils) {
     
     var ApplicationListView = function(model) { 
         this.model = model;
+        var self = this;
+
+        this.stop_button_clicked = function() {};
+        this.start_button_clicked = function() {};
+        this.view_button_clicked = function() {};
+        
+        this._x_button_clicked = function () {
+            // Triggered when the button X (left side) is clicked
+            var button = this;
+            var index = $(button).data("index");
+            $(button).find(".fa-spinner").show();
+
+            var app_info = self.model.data[index];
+            
+            var hide_spinner = function () {
+                $(button).find(".fa-spinner").hide();
+            };
+            
+            if (app_info.container !== null) {
+                self.view_button_clicked(index).done(hide_spinner);
+            } else {
+                self.start_button_clicked(index).done(hide_spinner);
+            }
+        };
+        
+        this._y_button_clicked = function () {
+            var button = this;
+            var index = $(button).data("index");
+            $(button).find(".fa-spinner").show();
+            self.stop_button_clicked(index).done(function () {
+                    $(button).find(".fa-spinner").hide();
+            });
+        };
     };
 
     ApplicationListView.prototype.render = function () {
@@ -15,7 +48,7 @@ define(["jquery", "utils"], function ($, utils) {
             html += this.render_applist_entry(i, info);
         }
         $("#applist").html(html);
-        this.register_button_eventhandlers()
+        this.register_button_eventhandlers();
     };
     
     ApplicationListView.prototype.render_applist_entry = function (index, info) {
@@ -92,17 +125,13 @@ define(["jquery", "utils"], function ($, utils) {
         $("#bny_"+index).hide();
     };
     
-
     ApplicationListView.prototype.register_button_eventhandlers = function () {
         // Registers the event handlers on the buttons after addition
         // of the new entries to the list.
-        $(".bnx").click(this.x_button_clicked);
-        $(".bny").click(this.y_button_clicked);
+        $(".bnx").click(this._x_button_clicked);
+        $(".bny").click(this._y_button_clicked);
     };
 
-    ApplicationListView.prototype.x_button_clicked = function () {};
-    ApplicationListView.prototype.y_button_clicked = function () {};
-    
     return {
         ApplicationListView : ApplicationListView
     };

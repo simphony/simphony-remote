@@ -19,67 +19,53 @@ require(
             $(".spawn-error-msg").text(msg).show();
         };
 
-        view.x_button_clicked = function () {
-            // Triggered when the button X (left side) is clicked
-            var button = this;
-            var index = $(button).data("index");
-            $(button).find(".fa-spinner").show();
+        view.view_button_clicked = function (index) {
             var app_info = model.data[index];
 
-            if (app_info.container !== null) {
-                // The container is already running, this is a View button
-                window.location = utils.url_path_join(
-                    base_url, 
-                    "containers", 
-                    app_info.container.url_id);
-            } else {
-                // The container is not running. This is a start button. 
-                var mapping_id = model.data[index].mapping_id;
-                appapi.start_application(mapping_id, {
-                    error: function(jqXHR, status, error) {
-                        report_error(jqXHR, status, error);
-                        $(button).find(".fa-spinner").hide();
-                    },
-                    statusCode: {
-                        201: function (data, textStatus, request) {
-                            var location = request.getResponseHeader('Location');
-                            var url = utils.parse_url(location);
-                            var arr = url.pathname.replace(/\/$/, "").split('/');
-                            var url_id = arr[arr.length-1];
-                            $(button).find(".fa-spinner").hide();
-
-                            window.location = utils.url_path_join(
-                                base_url,
-                                "containers",
-                                url_id
-                            );
-                        }
-                    }
-                });
-            }
+            window.location = utils.url_path_join(
+                base_url,
+                "containers",
+                app_info.container.url_id);
         };
-
-        view.y_button_clicked = function () {
-            // Triggered when the button Y (right side) is clicked
-            var button = this;
-            var index = $(button).data("index");
-            $(button).find(".fa-spinner").show();
+        
+        view.stop_button_clicked = function (index) {
             var app_info = model.data[index];
 
             var url_id = app_info.container.url_id;
-            appapi.stop_application(url_id, {
+            return appapi.stop_application(url_id, {
                 success: function () {
-                    $(button).find(".fa-spinner").hide();
                     view.reset_buttons_to_start(index);
                     app_info.container = null;
                 },
                 error: function (jqXHR, status, error) {
                     report_error(jqXHR, status, error);
-                    $(button).find(".fa-spinner").hide();
+                }});
+        };
+            
+        view.start_button_clicked = function (index) {
+            // The container is not running. This is a start button.
+            var mapping_id = model.data[index].mapping_id;
+            return appapi.start_application(mapping_id, {
+                error: function(jqXHR, status, error) {
+                    report_error(jqXHR, status, error);
+                },
+                statusCode: {
+                    201: function (data, textStatus, request) {
+                        var location = request.getResponseHeader('Location');
+                        var url = utils.parse_url(location);
+                        var arr = url.pathname.replace(/\/$/, "").split('/');
+                        var url_id = arr[arr.length-1];
+
+                        window.location = utils.url_path_join(
+                            base_url,
+                            "containers",
+                            url_id
+                        );
+                    }
                 }
             });
         };
-       
+
         $.when(model.update()).done(function () { view.render(); });
 
     }
