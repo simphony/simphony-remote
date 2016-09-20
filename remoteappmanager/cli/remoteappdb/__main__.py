@@ -233,6 +233,7 @@ def list(ctx, no_decoration, show_apps):
             cur = [user.id, user.name]
             table.append(cur)
             if show_apps:
+                accounting = orm.AppAccounting(ctx.obj.db.url)
                 apps = [[app.image,
                          policy.allow_home,
                          policy.allow_view,
@@ -240,7 +241,8 @@ def list(ctx, no_decoration, show_apps):
                          policy.volume_source,
                          policy.volume_target,
                          policy.volume_mode]
-                        for _, app, policy in orm.apps_for_user(session, user)]
+                        for _, app, policy in accounting.get_apps_for_user(
+                            user)]
 
                 if len(apps) == 0:
                     apps = [['']*7]

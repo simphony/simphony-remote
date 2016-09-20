@@ -103,37 +103,6 @@ class TestOrm(TempMixin, unittest.TestCase):
             self.assertIn("docker/image0",
                           [acc.application.image for acc in res])
 
-    def test_apps_for_user(self):
-        db = Database(url="sqlite:///"+self.sqlite_file_path)
-        session = db.create_session()
-        fill_db(session)
-        with transaction(session):
-            # verify back population
-            users = session.query(orm.User).all()
-            res = orm.apps_for_user(session, users[1])
-            self.assertEqual(len(res), 2)
-            self.assertIn("docker/image0",
-                          [acc[1].image for acc in res])
-            self.assertIn("docker/image2",
-                          [acc[1].image for acc in res])
-
-            res = orm.apps_for_user(session, users[2])
-            self.assertEqual(len(res), 0)
-
-            # User 0 should have access to app 1
-            res = orm.apps_for_user(session, users[0])
-            self.assertEqual(len(res), 1)
-            self.assertIn("docker/image1",
-                          [acc[1].image for acc in res])
-
-            res = orm.apps_for_user(session, users[3])
-            self.assertEqual(len(res), 1)
-            self.assertIn("docker/image0",
-                          [acc[1].image for acc in res])
-
-            res = orm.apps_for_user(session, None)
-            self.assertEqual(len(res), 0)
-
 
 class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
                            unittest.TestCase):
