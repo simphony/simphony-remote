@@ -15,6 +15,13 @@ Deployment of the complete system in a single machine/VM.
 
      git clone https://github.com/simphony/simphony-remote
 
+#. Make sure that you are obtaining a recent version of Docker, at least 1.12.
+   Full instructions available at `the Docker website <https://docs.docker.com/engine/installation/linux/ubuntulinux/>`_.
+   A Makefile rule is provided for convenience. **NOTE: this overwrites the docker.list file you might have setup in your
+   /etc/apt/sources.d/ directory**.  You might be prompted for the root password to execute this::
+     
+     make dockerengine
+
 #. Install dependencies. You might be prompted for the root password to execute this::
 
      make deps

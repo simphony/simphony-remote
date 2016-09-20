@@ -6,6 +6,16 @@ venv:
 	@echo "----------------------------"
 	python3 -m venv venv
 
+# Only use this on ubuntu-14.04 to retrieve a recent version of docker-engine. The docker.io default shipment with Trusty is
+# too old for our software.
+.PHONY: dockerengine
+dockerengine:
+	sudo apt-get update
+	sudo apt-get install apt-transport-https ca-certificates
+	sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+	sudo bash -c 'echo "deb https://apt.dockerproject.org/repo ubuntu-trusty main" > /etc/apt/sources.list.d/docker.list'
+	sudo apt-get update
+
 .PHONY: deps
 deps:
 	@echo "Installing apt dependencies"
