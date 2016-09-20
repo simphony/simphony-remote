@@ -1,4 +1,4 @@
-define(["jquery", "utils", "initialization"], function ($, utils, initialization) {
+define(["jquery", "utils"], function ($, utils) {
     "use strict";
     
     var ApplicationListView = function(model) { 
