@@ -1,7 +1,7 @@
 /*globals: require, console*/
 require(
-    ["jquery", "jhapi", "utils", "remoteappapi", "home/models", "home/views"],
-    function($, JHAPI, utils, RemoteAppAPI, models, views) {
+    ["jquery", "utils", "remoteappapi", "home/models", "home/views"],
+    function($, utils, RemoteAppAPI, models, views) {
         "use strict";
     
         var base_url = window.apidata.base_url;
