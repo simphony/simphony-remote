@@ -1,11 +1,11 @@
-define(["jquery", "utils"], function ($, utils) {
+define(["jquery", "utils", "initialization"], function ($, utils, initialization) {
     "use strict";
-    
-    var base_url = window.apidata.base_url;
     
     var ApplicationListView = function(model) { 
         this.model = model;
         var self = this;
+        
+        self.base_url = window.apidata.base_url;
 
         this.stop_button_clicked = function() {};
         this.start_button_clicked = function() {};
@@ -60,16 +60,16 @@ define(["jquery", "utils"], function ($, utils) {
         //     and (possibly) the container.
         var html = '<div class="row">';
 
-        if (info.image.icon_128 === '') {
-            html += '<img src="' + utils.url_path_join(
-                    base_url, "static", "images", "generic_appicon_128.png") +
-                '" class="col-sm-2 va" />';
-        } else {
+        if (info.image.icon_128) {
             html += '<img src="data:image/png;base64,'+info.image.icon_128+'" class="col-sm-2 va" />';
+        } else {
+            html += '<img src="' + utils.url_path_join(
+                    this.base_url, "static", "images", "generic_appicon_128.png") +
+                '" class="col-sm-2 va" />';
         }
 
         var name;
-        if (info.image.ui_name !== '') {
+        if (info.image.ui_name) {
             name = info.image.ui_name;
         } else {
             name = info.image.name;
