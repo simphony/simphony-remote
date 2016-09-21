@@ -82,8 +82,6 @@ testdb: db
         remoteappdb --db=remoteappmanager.db user create test; \
         remoteappdb --db=remoteappmanager.db app create simphonyproject/simphonic-mayavi; \
         remoteappdb --db=remoteappmanager.db app grant simphonyproject/simphonic-mayavi test; \
-        remoteappdb --db=remoteappmanager.db app create simphonyproject/simphonic-paraview; \
-        remoteappdb --db=remoteappmanager.db app grant simphonyproject/simphonic-paraview test; \
         popd
 
 .PHONY: testimages
@@ -91,8 +89,8 @@ testimages:
 	@echo "Downloading docker images"
 	@echo "-------------------------"
 	docker pull simphonyproject/simphonic-mayavi:latest
-	docker pull simphonyproject/simphonic-paraview:latest
 	if ! [ $$TRAVIS ]; then \
+		docker pull simphonyproject/simphonic-paraview:latest \
 		docker pull simphonyproject/filetransfer:latest; \
 		docker pull simphonyproject/jupyter:latest; \
 	fi
