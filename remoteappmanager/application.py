@@ -7,7 +7,6 @@ from tornado import web
 import tornado.ioloop
 from jinja2 import Environment, FileSystemLoader
 
-import tornadowebapi
 from tornadowebapi.registry import Registry
 
 from remoteappmanager.db.interfaces import ABCAccounting
