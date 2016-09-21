@@ -47,14 +47,24 @@ define(["jquery", "utils"], function ($, utils) {
                     $(button).find(".fa-spinner").hide();
             });
         };
+        
+        $("#applist").html(
+            '<div class="col-sm-12 text-center">' +
+            '<i class="fa fa-4x fa-spinner fa-spin" aria-hidden="true"></i>' +
+            '</div>');
     };
 
     ApplicationListView.prototype.render = function () {
         // Renders the full application list and adds it to the DOM.
+        var num_entries = this.model.data.length;
         var html = "";
-        for (var i = 0; i < this.model.data.length; i++) {
-            var info = this.model.data[i];
-            html += this.render_applist_entry(i, info);
+        if (num_entries === 0) {
+            html = '<div class="col-sm-12 text-center va"><h4>No applications found</h4></div>';
+        } else {
+            for (var i = 0; i < num_entries; i++) {
+                var info = this.model.data[i];
+                html += this.render_applist_entry(i, info);
+            }
         }
         $("#applist").html(html);
         this.register_button_eventhandlers();
