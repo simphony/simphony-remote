@@ -1,7 +1,6 @@
 from unittest.mock import Mock, patch
 
 from tornado import web, escape, gen
-import tornadowebapi
 from tornadowebapi import registry
 from tornadowebapi.http import httpstatus
 
