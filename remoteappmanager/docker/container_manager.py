@@ -55,7 +55,12 @@ class ContainerManager(LoggingMixin):
         super().__init__(*args, **kwargs)
 
     @gen.coroutine
-    def start_container(self, user_name, image_name, mapping_id, volumes):
+    def start_container(self,
+                        user_name,
+                        image_name,
+                        mapping_id,
+                        volumes,
+                        environment=None):
         """Starts a container using the given image name.
 
         Parameters
@@ -71,6 +76,9 @@ class ContainerManager(LoggingMixin):
             (i.e. configuration).
         volumes: dict or None
             {volume_source: {'bind': volume_target, 'mode': volume_mode}
+        environment: dict or None
+            Contains additional keyvalue pairs that will be exported
+            as environment variables inside the container.
 
         Return
         ------
@@ -80,12 +88,16 @@ class ContainerManager(LoggingMixin):
         if image_name in self._start_pending:
             return None
 
+        if environment is None:
+            environment = {}
+
         try:
             self._start_pending.add(image_name)
             result = yield self._start_container(user_name,
                                                  image_name,
                                                  mapping_id,
-                                                 volumes)
+                                                 volumes,
+                                                 environment)
         finally:
             self._start_pending.remove(image_name)
 
@@ -204,7 +216,12 @@ class ContainerManager(LoggingMixin):
     # Private
 
     @gen.coroutine
-    def _start_container(self, user_name, image_name, mapping_id, volumes):
+    def _start_container(self,
+                         user_name,
+                         image_name,
+                         mapping_id,
+                         volumes,
+                         environment):
         """Helper method that performs the physical operation of starting
         the container.
 
@@ -272,7 +289,9 @@ class ContainerManager(LoggingMixin):
         create_kwargs = dict(
             image=image_name,
             name=container_name,
-            environment=_get_container_env(user_name, container_url_id),
+            environment=_get_container_env(user_name,
+                                           container_url_id,
+                                           environment),
             volumes=volume_targets,
             labels=_get_container_labels(user_name,
                                          mapping_id,
@@ -473,7 +492,7 @@ class ContainerManager(LoggingMixin):
         return AsyncDockerClient(**self.docker_config)
 
 
-def _get_container_env(user_name, url_id):
+def _get_container_env(user_name, url_id, environment):
     """Introduces the environment variables that are available
     at container startup time.
 
@@ -486,12 +505,20 @@ def _get_container_env(user_name, url_id):
         A string containing the container identifier that will be used
         in the user-exposed URL.
 
+    environment: dict
+        Additional environment keys to add to the final result.
+        Note that these will not take precedence.
+
     Return
     ------
     a dictionary containing the envvars to export.
     """
 
-    return dict(
+    result = {}
+    if environment:
+        result.update(environment)
+
+    result.update(dict(
         # Username used to login to jupyterhub. Generally an email address.
         JPY_USER=user_name,
         # The base url. We use this one because the JPY username might
@@ -501,7 +528,8 @@ def _get_container_env(user_name, url_id):
         USER=_unix_user(user_name),
         # The identifier that will be used for the URL.
         URL_ID=url_id,
-    )
+    ))
+    return result
 
 
 def _get_container_labels(user_name, mapping_id, url_id):
