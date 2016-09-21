@@ -218,7 +218,7 @@ class TestContainerManager(AsyncTestCase):
             "FOO": "bar"
         }
 
-        _ = yield self.manager.start_container(
+        yield self.manager.start_container(
             "username",
             "image_name1",
             "mapping_id",
