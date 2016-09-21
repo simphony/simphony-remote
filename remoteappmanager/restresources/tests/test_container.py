@@ -1,8 +1,10 @@
 import os
 from unittest.mock import patch
 
+from tornadowebapi.authenticator import NullAuthenticator
+from tornadowebapi.http import httpstatus
+
 from remoteappmanager.docker.image import Image
-from remoteappmanager.rest.http import httpstatus
 from remoteappmanager.docker.container import Container as DockerContainer
 from remoteappmanager.tests.mocking import dummy
 from remoteappmanager.tests.temp_mixin import TempMixin
@@ -281,3 +283,47 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                    })
 
         self.assertTrue(self._app.reverse_proxy.unregister.called)
+
+
+class TestContainerNoUser(TempMixin, AsyncHTTPTestCase):
+    def get_app(self):
+        app = dummy.create_application()
+        app.registry.authenticator = NullAuthenticator
+        return app
+
+    def test_items_no_user(self):
+        res = self.fetch(
+            "/user/username/api/v1/containers/",
+            headers={
+                "Cookie": "jupyter-hub-token-username=foo"
+            },
+        )
+        self.assertEqual(res.code, httpstatus.NOT_FOUND)
+
+    def test_create_no_user(self):
+        res = self.fetch(
+            "/user/username/api/v1/containers/",
+            method="POST",
+            headers={
+                "Cookie": "jupyter-hub-token-username=foo"
+            },
+            body=escape.json_encode(dict(
+                mapping_id="mapping_id"
+            )))
+
+        self.assertEqual(res.code, httpstatus.NOT_FOUND)
+
+    def test_delete_no_user(self):
+        res = self.fetch("/user/username/api/v1/containers/found/",
+                         method="DELETE",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=foo"
+                         })
+        self.assertEqual(res.code, httpstatus.NOT_FOUND)
+
+    def test_retrieve_no_user(self):
+        res = self.fetch("/user/username/api/v1/containers/found/",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=foo"
+                         })
+        self.assertEqual(res.code, httpstatus.NOT_FOUND)
