@@ -61,7 +61,7 @@ define(["jquery", "utils"], function ($, utils) {
         if (num_entries === 0) {
             html = '<div class="col-sm-12 text-center va"><h4>No applications found</h4></div>';
         } else {
-            for (var i = 0; i < this.model.data.length; i++) {
+            for (var i = 0; i < num_entries; i++) {
                 var info = this.model.data[i];
                 html += this.render_applist_entry(i, info);
             }
