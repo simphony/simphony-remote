@@ -51,5 +51,6 @@ class Image(HasTraits):
             self.ui_name = labels.get(SIMPHONY_NS.ui_name, '')
             self.icon_128 = labels.get(SIMPHONY_NS.icon_128, '')
             self.description = labels.get(SIMPHONY_NS.description, '')
+            self.type = labels.get(SIMPHONY_NS.type, '')
 
         return self
