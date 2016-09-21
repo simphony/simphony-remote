@@ -12,4 +12,4 @@ git+git://github.com/jupyterhub/jupyterhub.git
 jupyter_client>=4.3.0
 click>=6.6
 tabulate>=0.7.5
-git+git://github.com/simphony-remote/tornado-webapi.git
+git+git://github.com/simphony/tornado-webapi.git
