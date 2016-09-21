@@ -2,14 +2,23 @@ define(["jquery", "utils"], function ($, utils) {
     "use strict";
     
     var ApplicationListView = function(model) { 
+        // (Constructor) Represents the application list. In charge of 
+        // rendering in on the div with id #applist
+        // 
+        // Parameters
+        // model : ApplicationListModel
+        //     The data model.
         this.model = model;
         var self = this;
         
         self.base_url = window.apidata.base_url;
 
-        this.stop_button_clicked = function() {};
-        this.start_button_clicked = function() {};
-        this.view_button_clicked = function() {};
+        // Handlers for button clicking.
+        // replace them to override default behavior (doing nothing).
+        // Can return a value or a promise.
+        this.stop_button_clicked = function(index) {};
+        this.start_button_clicked = function(index) {};
+        this.view_button_clicked = function(index) {};
         
         this._x_button_clicked = function () {
             // Triggered when the button X (left side) is clicked

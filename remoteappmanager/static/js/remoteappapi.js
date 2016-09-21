@@ -114,14 +114,14 @@ define(['jquery', 'utils'], function ($, utils) {
                     .done(function (promises) {
                         // Fills the local application model with the results of the
                         // retrieve promises.
-                            var data = [];
-                            for (var i = 0; i < promises.length; i++) {
-                                var result = promises[i];
-                                if (result[2].status === 200) {
-                                    data.push(result[0]);
-                                }
+                        var data = [];
+                        for (var i = 0; i < promises.length; i++) {
+                            var result = promises[i];
+                            if (result[2].status === 200) {
+                                data.push(result[0]);
                             }
-                            promise.resolve(data);
+                        }
+                        promise.resolve(data);
                     });
             
             });
