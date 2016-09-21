@@ -90,7 +90,7 @@ testimages:
 	@echo "-------------------------"
 	docker pull simphonyproject/simphonic-mayavi:latest
 	if ! [ $$TRAVIS ]; then \
-		docker pull simphonyproject/simphonic-paraview:latest
+		docker pull simphonyproject/simphonic-paraview:latest \
 		docker pull simphonyproject/filetransfer:latest; \
 		docker pull simphonyproject/jupyter:latest; \
 	fi
