@@ -3,8 +3,10 @@ from datetime import timedelta
 
 from tornado import gen
 
-from remoteappmanager.rest import exceptions
-from remoteappmanager.rest.resource import Resource
+from tornadowebapi import exceptions
+from tornadowebapi.exceptions import NotFound
+from tornadowebapi.resource import Resource
+
 from remoteappmanager.utils import url_path_join
 from remoteappmanager.netutils import wait_for_http_server_2xx
 
@@ -15,6 +17,9 @@ class Container(Resource):
         """Create the container.
         The representation should accept the application mapping id we
         want to start"""
+        if self.current_user is None:
+            raise NotFound()
+
         try:
             mapping_id = representation["mapping_id"]
         except KeyError:
@@ -65,6 +70,9 @@ class Container(Resource):
     @gen.coroutine
     def retrieve(self, identifier):
         """Return the representation of the running container."""
+        if self.current_user is None:
+            raise NotFound()
+
         container_manager = self.application.container_manager
         container = yield container_manager.container_from_url_id(identifier)
 
@@ -81,6 +89,9 @@ class Container(Resource):
     @gen.coroutine
     def delete(self, identifier):
         """Stop the container."""
+        if self.current_user is None:
+            raise NotFound()
+
         container_manager = self.application.container_manager
         container = yield container_manager.container_from_url_id(identifier)
 
@@ -112,6 +123,9 @@ class Container(Resource):
     @gen.coroutine
     def items(self):
         """"Return the list of containers we are currently running."""
+        if self.current_user is None:
+            raise NotFound()
+
         container_manager = self.application.container_manager
 
         apps = self.application.db.get_apps_for_user(

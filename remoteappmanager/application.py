@@ -1,10 +1,14 @@
 import importlib
 import os
 
+from remoteappmanager.handlers.handler_authenticator import HubAuthenticator
 from traitlets import Instance, default
 from tornado import web
 import tornado.ioloop
 from jinja2 import Environment, FileSystemLoader
+
+import tornadowebapi
+from tornadowebapi.registry import Registry
 
 from remoteappmanager.db.interfaces import ABCAccounting
 from remoteappmanager.handlers.api import HomeHandler
@@ -15,8 +19,6 @@ from remoteappmanager.user import User
 from remoteappmanager.traitlets import as_dict
 from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
-from remoteappmanager import rest
-from remoteappmanager.rest import registry
 from remoteappmanager import restresources
 from remoteappmanager.utils import url_path_join
 
@@ -33,6 +35,9 @@ class Application(web.Application, LoggingMixin):
     hub = Instance(Hub)
 
     container_manager = Instance(ContainerManager)
+
+    #: The WebAPI registry
+    registry = Instance(Registry)
 
     def __init__(self,
                  command_line_config,
@@ -60,7 +65,6 @@ class Application(web.Application, LoggingMixin):
         self._jinja_init(settings)
 
         handlers = self._get_handlers()
-        self._register_rest_resources()
 
         super().__init__(handlers, **settings)
 
@@ -126,6 +130,15 @@ class Application(web.Application, LoggingMixin):
         user.account = self.db.get_user_by_name(user_name)
         return user
 
+    @default("registry")
+    def _registry_default(self):
+        reg = Registry()
+        reg.authenticator = HubAuthenticator
+        for resource_class in [restresources.Application,
+                               restresources.Container]:
+            reg.register(resource_class)
+        return reg
+
     # Public
     def start(self):
         """Start the application and the ioloop"""
@@ -160,17 +173,12 @@ class Application(web.Application, LoggingMixin):
         """Returns the registered handlers"""
 
         base_urlpath = self.command_line_config.base_urlpath
-        rest_api = rest.api_handlers(base_urlpath)
-        return rest_api+[
+        web_api = self.registry.api_handlers(base_urlpath)
+        return web_api+[
             (base_urlpath, HomeHandler),
             (base_urlpath.rstrip('/'),
              web.RedirectHandler, {"url": base_urlpath}),
         ]
-
-    def _register_rest_resources(self):
-        for rest_resource_class in [restresources.Application,
-                                    restresources.Container]:
-            registry.registry.register(rest_resource_class)
 
     def _jinja_init(self, settings):
         """Initializes the jinja template system settings.

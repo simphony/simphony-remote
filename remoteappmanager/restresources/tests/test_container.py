@@ -1,8 +1,9 @@
 import os
 from unittest.mock import patch
 
+from tornadowebapi.http import httpstatus
+
 from remoteappmanager.docker.image import Image
-from remoteappmanager.rest.http import httpstatus
 from remoteappmanager.docker.container import Container as DockerContainer
 from remoteappmanager.tests.mocking import dummy
 from remoteappmanager.tests.temp_mixin import TempMixin

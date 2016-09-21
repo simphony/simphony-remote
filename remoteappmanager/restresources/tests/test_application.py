@@ -1,14 +1,25 @@
 from unittest.mock import Mock, patch
 
-from remoteappmanager import rest
+from tornado import web, escape, gen
+import tornadowebapi
+from tornadowebapi import registry
+from tornadowebapi.http import httpstatus
+
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.image import Image
-from remoteappmanager.rest import registry
-from remoteappmanager.rest.http import httpstatus
 from remoteappmanager.restresources import Application
 from remoteappmanager.tests import utils
 from remoteappmanager.tests.utils import AsyncHTTPTestCase, mock_coro_factory
-from tornado import web, escape
+from remoteappmanager.tests.mocking.dummy import create_hub
+
+
+class DummyAuthenticator:
+    @classmethod
+    @gen.coroutine
+    def authenticate(cls, handler):
+        user = Mock()
+        user.account = Mock()
+        return user
 
 
 class TestApplication(AsyncHTTPTestCase):
@@ -16,10 +27,13 @@ class TestApplication(AsyncHTTPTestCase):
         super().setUp()
 
     def get_app(self):
-        handlers = rest.api_handlers('/')
-        registry.registry.register(Application)
+        reg = registry.Registry()
+        reg.register(Application)
+        reg.authenticator = DummyAuthenticator
+        handlers = reg.api_handlers('/')
         app = web.Application(handlers=handlers)
         app.db = Mock()
+        app.hub = create_hub()
         app.container_manager = Mock()
         app.container_manager.image = mock_coro_factory(
             return_value=Image(name="boo", ui_name="foo_ui"))

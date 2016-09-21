@@ -1,11 +1,14 @@
-from remoteappmanager.rest.exceptions import NotFound
-from remoteappmanager.rest.resource import Resource
+from tornadowebapi.exceptions import NotFound
+from tornadowebapi.resource import Resource
 from tornado import gen
 
 
 class Application(Resource):
     @gen.coroutine
     def retrieve(self, identifier):
+        if self.current_user is None:
+            raise NotFound()
+
         apps = self.application.db.get_apps_for_user(
             self.current_user.account
         )
@@ -64,6 +67,9 @@ class Application(Resource):
     def items(self):
         """Retrieves a dictionary containing the image and the associated
         container, if active, as values."""
+        if self.current_user is None:
+            raise NotFound()
+
         apps = self.application.db.get_apps_for_user(self.current_user.account)
 
         container_manager = self.application.container_manager
