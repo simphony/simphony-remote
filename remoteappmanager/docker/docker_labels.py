@@ -46,4 +46,3 @@ SIMPHONY_NS = DockerLabelNamespace(
         # This is a sub-namespace. It will hold keys itself.
         "env",
     ])
-

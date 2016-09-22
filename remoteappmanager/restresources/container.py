@@ -9,6 +9,41 @@ from tornadowebapi.resource import Resource
 
 from remoteappmanager.utils import url_path_join
 from remoteappmanager.netutils import wait_for_http_server_2xx
+from traitlets import Int, HasTraits
+
+
+class UnknownImageTypeStartupOptions(HasTraits):
+    @classmethod
+    def from_options(cls):
+        return cls()
+
+    def as_environment(self):
+        return {}
+
+
+class VNCAppStartupOptions(HasTraits):
+    width = Int(1024)
+    height = Int(768)
+    depth = Int(16)
+
+    @classmethod
+    def from_options(cls, startup_options):
+        return cls(width=int(startup_options["width"]),
+                   height=int(startup_options["height"]))
+        # We don't accept depth from the client, but we want to pass
+        # the default anyway
+
+    def as_environment(self):
+        environment = {
+            "X11_WIDTH": str(self.width),
+            "X11_HEIGHT": str(self.height),
+            "X11_DEPTH": str(self.depth),
+        }
+        return environment
+
+
+class WebAppStartupOptions(UnknownImageTypeStartupOptions):
+    pass
 
 
 class Container(Resource):
@@ -25,8 +60,9 @@ class Container(Resource):
         except KeyError:
             raise exceptions.BadRequest(message="missing mapping_id")
 
+        webapp = self.application
         account = self.current_user.account
-        all_apps = self.application.db.get_apps_for_user(account)
+        all_apps = webapp.db.get_apps_for_user(account)
 
         choice = [(m_id, app, policy)
                   for m_id, app, policy in all_apps
@@ -39,12 +75,19 @@ class Container(Resource):
 
         _, app, policy = choice[0]
 
+        startup_options = (yield self._extract_options_for_app(
+            app,
+            representation))
+
+        # Everything is fine. Start and wait for the container to come online.
         try:
             container = yield self._start_container(
                 self.current_user.name,
                 app,
                 policy,
-                mapping_id)
+                mapping_id,
+                startup_options
+                )
         except Exception as e:
             raise exceptions.Unable(message=str(e))
 
@@ -175,7 +218,12 @@ class Container(Resource):
                     container.docker_id))
 
     @gen.coroutine
-    def _start_container(self, user_name, app, policy, mapping_id):
+    def _start_container(self,
+                         user_name,
+                         app,
+                         policy,
+                         mapping_id,
+                         startup_options):
         """Start the container. This method is a helper method that
         works with low level data and helps in issuing the request to the
         data container.
@@ -219,9 +267,14 @@ class Container(Resource):
             volumes[volume_source] = {'bind': volume_target,
                                       'mode': volume_mode}
 
+        environment = startup_options.as_environment()
         try:
-            f = manager.start_container(user_name, image_name,
-                                        mapping_id, volumes)
+            f = manager.start_container(user_name,
+                                        image_name,
+                                        mapping_id,
+                                        volumes,
+                                        environment
+                                        )
             container = yield gen.with_timeout(
                 timedelta(
                     seconds=self.application.file_config.network_timeout
@@ -268,3 +321,28 @@ class Container(Resource):
         yield wait_for_http_server_2xx(
             server_url,
             self.application.file_config.network_timeout)
+
+    @gen.coroutine
+    def _extract_options_for_app(self, app, representation):
+        # Get the image we want to start and check its type.
+        webapp = self.application
+        container_manager = webapp.container_manager
+
+        image = yield container_manager.image(app.image)
+        if image is None:
+            raise exceptions.BadRequest(message="unrecognized image")
+
+        startup_options_class = {
+            "vncapp": VNCAppStartupOptions,
+            "webapp": WebAppStartupOptions,
+        }
+        startup_options_class.get(image.type, UnknownImageTypeStartupOptions)
+
+        try:
+            startup_options = startup_options_class.from_options(
+                    representation.get("startup_options", {})
+            )
+        except KeyError:
+            raise exceptions.BadRequest(message="invalid startup_options")
+
+        return startup_options
