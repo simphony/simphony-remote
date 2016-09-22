@@ -38,4 +38,8 @@ SIMPHONY_NS = DockerLabelNamespace(
         # practice this is hard to obtain from inside the container,
         # leading to a chicken/egg situation
         "url_id",
+        # The type of the image: at the moment, it can be either
+        # "vncapp", "webapp" or not present (for legacy apps). This will
+        # affect the configurability of the image at startup.
+        "type",
     ])

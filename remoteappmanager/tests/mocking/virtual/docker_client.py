@@ -34,7 +34,9 @@ def get_fake_image_labels(num=2):
     samples = cycle(
         (
             {'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled',  # noqa
-             'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4'},
+             'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4',
+             'eu.simphony-project.docker.type': 'vncapp',
+             },
             {'eu.simphony-project.docker.description': 'A vanilla Ubuntu installation'},  # noqa
         )
     )

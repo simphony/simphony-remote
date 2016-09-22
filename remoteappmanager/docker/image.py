@@ -9,7 +9,7 @@ class Image(HasTraits):
     #: The docker id of the image
     docker_id = Unicode()
 
-    #: The name of the
+    #: The name of the image.
     name = Unicode()
 
     #: The user interface (web) name of the image.
@@ -20,6 +20,10 @@ class Image(HasTraits):
 
     #: A long description of the image.
     description = Unicode()
+
+    #: The type of the image. This allows to differentiate image behavior
+    #: once started.
+    type = Unicode()
 
     @classmethod
     def from_docker_dict(cls, docker_dict):
@@ -47,5 +51,6 @@ class Image(HasTraits):
             self.ui_name = labels.get(SIMPHONY_NS.ui_name, '')
             self.icon_128 = labels.get(SIMPHONY_NS.icon_128, '')
             self.description = labels.get(SIMPHONY_NS.description, '')
+            self.type = labels.get(SIMPHONY_NS.type, '')
 
         return self
