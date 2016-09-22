@@ -209,3 +209,23 @@ class TestContainerManager(AsyncTestCase):
 
         self.assertTrue(self.mock_docker_client.stop.called)
         self.assertTrue(self.mock_docker_client.remove_container.called)
+
+    @gen_test
+    def test_start_container_with_environment(self):
+        mock_client = self.mock_docker_client
+
+        environment = {
+            "FOO": "bar"
+        }
+
+        yield self.manager.start_container(
+            "username",
+            "image_name1",
+            "mapping_id",
+            None,
+            environment
+            )
+
+        self.assertEqual(
+            mock_client.create_container.call_args[1]["environment"]["FOO"],
+            "bar")
