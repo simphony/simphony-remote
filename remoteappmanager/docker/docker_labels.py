@@ -42,4 +42,7 @@ SIMPHONY_NS = DockerLabelNamespace(
         # "vncapp", "webapp" or not present (for legacy apps). This will
         # affect the configurability of the image at startup.
         "type",
+        # environment variables that the container accepts.
+        # This is a sub-namespace. It will hold keys itself.
+        "env",
     ])

@@ -1,5 +1,10 @@
+import string
+from traitlets import Unicode, HasTraits, Dict
+
 from remoteappmanager.docker.docker_labels import SIMPHONY_NS
-from traitlets import Unicode, HasTraits
+
+# Characters that are allowed in the environment variables.
+_ALLOWED_ENVCHARS = set(string.ascii_lowercase + string.digits + "-")
 
 
 class Image(HasTraits):
@@ -21,9 +26,16 @@ class Image(HasTraits):
     #: A long description of the image.
     description = Unicode()
 
-    #: The type of the image. This allows to differentiate image behavior
-    #: once started.
+    #: The type of the image.
     type = Unicode()
+
+    # A dictionary of supported environment variables that the
+    # container can accept as parameters. Note that the labels
+    # use a different notation, so a conversion takes place:
+    # dashes are converted to underscores, and letters are capitalized.
+    # e.g. x11-width -> X11_WIDTH
+    # Only keys are used at the moment.
+    env = Dict()
 
     @classmethod
     def from_docker_dict(cls, docker_dict):
@@ -52,5 +64,17 @@ class Image(HasTraits):
             self.icon_128 = labels.get(SIMPHONY_NS.icon_128, '')
             self.description = labels.get(SIMPHONY_NS.description, '')
             self.type = labels.get(SIMPHONY_NS.type, '')
+
+            env_prefix = SIMPHONY_NS.env+"."
+            for env in [lab[len(env_prefix):]
+                        for lab in labels.keys()
+                        if lab.startswith(env_prefix)]:
+
+                if len(set(env) - _ALLOWED_ENVCHARS) != 0:
+                    # Skip badly formed stuff.
+                    continue
+
+                env = env.upper().replace("-", "_")
+                self.env[env] = None
 
         return self

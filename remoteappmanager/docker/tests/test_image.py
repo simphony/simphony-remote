@@ -23,6 +23,11 @@ class TestImage(TestCase):
     def test_from_docker_dict_inspect_image(self):
         docker_client = create_docker_client()
         image_dict = docker_client.inspect_image('image_id1')
+
+        labels = image_dict['Config']['Labels']
+        # Insert an unpalatable label for the envs.
+        labels['eu.simphony-project.docker.env.x11-height.whatever'] = None
+
         image = Image.from_docker_dict(image_dict)
 
         self.assertEqual(image.docker_id, image_dict["Id"])
@@ -34,6 +39,7 @@ class TestImage(TestCase):
             image.ui_name,
             image_dict['Config']["Labels"][SIMPHONY_NS.ui_name])
         self.assertEqual(image.type, 'vncapp')
+        self.assertEqual(image.env, {"X11_WIDTH": None})
 
     def test_missing_image_type(self):
         docker_client = create_docker_client()
@@ -41,3 +47,4 @@ class TestImage(TestCase):
         image = Image.from_docker_dict(image_dict)
 
         self.assertEqual(image.type, '')
+        self.assertEqual(image.env, {})

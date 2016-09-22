@@ -80,3 +80,9 @@ class Application(Resource):
                 result.append(mapping_id)
 
         return result
+
+    @gen.coroutine
+    def _is_vncapp_image(self, image_name):
+        container_manager = self.application.container_manager
+        image = yield container_manager.image(image_name)
+        return image.type == "vncapp"
