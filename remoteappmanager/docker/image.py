@@ -79,7 +79,11 @@ class Image(HasTraits):
                     continue
 
                 env = env.upper().replace("-", "_")
-                self.env[env] = None
+                # Docker does not allow unexistent values in
+                # labels, but we should not rely on them anyway,
+                # as only presence of the env key has a clear
+                # meaning, hence we force the value to empty.
+                self.env[env] = ""
 
         self.configurables = configurables.for_image(self)
         return self

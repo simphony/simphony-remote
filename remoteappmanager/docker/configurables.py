@@ -11,10 +11,9 @@ class Configurable(metaclass=abc.ABCMeta):
     def supported_by(cls, image):
         """Checks if the passed image supports the configurable.
         Returns True if so, False otherwise"""
-        pass
 
-    @abc.abstractmethod
-    def config_dict_to_env(self, config_dict):
+    @abc.abstractclassmethod
+    def config_dict_to_env(cls, config_dict):
         """
         Extracts the relevant data from a dictionary.
         Returns a dictionary with the environment to transmit to the image
@@ -37,7 +36,8 @@ class Resolution(Configurable):
         return all(x in image.env
                    for x in ["X11_WIDTH", "X11_HEIGHT", "X11_DEPTH"])
 
-    def config_dict_to_env(self, config_dict):
+    @classmethod
+    def config_dict_to_env(cls, config_dict):
         """
         the config dict must contain the following (example)
 
@@ -54,7 +54,7 @@ class Resolution(Configurable):
         return {
             "X11_WIDTH": str(w),
             "X11_HEIGHT": str(h),
-            "X11_DEPTH": 16
+            "X11_DEPTH": "16"
         }
 
 
