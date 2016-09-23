@@ -25,8 +25,10 @@ class Container(Resource):
         except KeyError:
             raise exceptions.BadRequest(message="missing mapping_id")
 
+        webapp = self.application
         account = self.current_user.account
-        all_apps = self.application.db.get_apps_for_user(account)
+        all_apps = webapp.db.get_apps_for_user(account)
+        container_manager = webapp.container_manager
 
         choice = [(m_id, app, policy)
                   for m_id, app, policy in all_apps
@@ -39,12 +41,25 @@ class Container(Resource):
 
         _, app, policy = choice[0]
 
+        image = yield container_manager.image(app.image)
+        if image is None:
+            raise exceptions.BadRequest(message="unrecognized image")
+
+        try:
+            environment = self._environment_from_configurables(image,
+                                                               representation)
+        except Exception:
+            raise exceptions.BadRequest(message="invalid configurables")
+
+        # Everything is fine. Start and wait for the container to come online.
         try:
             container = yield self._start_container(
                 self.current_user.name,
                 app,
                 policy,
-                mapping_id)
+                mapping_id,
+                environment
+                )
         except Exception as e:
             raise exceptions.Unable(message=str(e))
 
@@ -175,7 +190,12 @@ class Container(Resource):
                     container.docker_id))
 
     @gen.coroutine
-    def _start_container(self, user_name, app, policy, mapping_id):
+    def _start_container(self,
+                         user_name,
+                         app,
+                         policy,
+                         mapping_id,
+                         environment):
         """Start the container. This method is a helper method that
         works with low level data and helps in issuing the request to the
         data container.
@@ -190,6 +210,9 @@ class Container(Resource):
 
         policy : ABCApplicationPolicy
             The startup policy for the application
+
+        environment: Dict
+            A dictionary of envvars to pass to the container.
 
         Returns
         -------
@@ -220,8 +243,12 @@ class Container(Resource):
                                       'mode': volume_mode}
 
         try:
-            f = manager.start_container(user_name, image_name,
-                                        mapping_id, volumes)
+            f = manager.start_container(user_name,
+                                        image_name,
+                                        mapping_id,
+                                        volumes,
+                                        environment
+                                        )
             container = yield gen.with_timeout(
                 timedelta(
                     seconds=self.application.file_config.network_timeout
@@ -244,6 +271,19 @@ class Container(Resource):
             raise e
 
         return container
+
+    def _environment_from_configurables(self, image, representation):
+        """Helper routine: extracts the configurables from the
+        image, matches them to the appropriate configurables
+        data in the representation, and returns the resulting environment
+        """
+        env = {}
+
+        for img_conf in image.configurables:
+            config_dict = representation["configurables"][img_conf.tag]
+            env.update(img_conf.config_dict_to_env(config_dict))
+
+        return env
 
     @gen.coroutine
     def _wait_for_container_ready(self, container):

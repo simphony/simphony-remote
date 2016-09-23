@@ -1,7 +1,8 @@
 import string
-from traitlets import Unicode, HasTraits, Dict
+from traitlets import Unicode, HasTraits, Dict, List
 
 from remoteappmanager.docker.docker_labels import SIMPHONY_NS
+from remoteappmanager.docker import configurables
 
 # Characters that are allowed in the environment variables.
 _ALLOWED_ENVCHARS = set(string.ascii_lowercase + string.digits + "-")
@@ -36,6 +37,9 @@ class Image(HasTraits):
     # e.g. x11-width -> X11_WIDTH
     # Only keys are used at the moment.
     env = Dict()
+
+    # A list of configurables that the image supports.
+    configurables = List()
 
     @classmethod
     def from_docker_dict(cls, docker_dict):
@@ -77,4 +81,5 @@ class Image(HasTraits):
                 env = env.upper().replace("-", "_")
                 self.env[env] = None
 
+        self.configurables = configurables.for_image(self)
         return self
