@@ -36,3 +36,9 @@ class TestConfigurables(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             Resolution.config_dict_to_env({"resolution": "1024"})
+
+        with self.assertRaises(ValueError):
+            Resolution.config_dict_to_env({"resolution": "-10x-10"})
+
+        with self.assertRaises(ValueError):
+            Resolution.config_dict_to_env({"resolution": "0x1024"})

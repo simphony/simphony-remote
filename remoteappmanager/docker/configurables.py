@@ -17,7 +17,7 @@ class Configurable(metaclass=abc.ABCMeta):
         """
         Extracts the relevant data from a dictionary.
         Returns a dictionary with the environment to transmit to the image
-        to set this particular configurable.
+        to set this particular configurable. Values must be strings.
 
         Raises if the config_dict is not in the expected format.
 
@@ -48,7 +48,7 @@ class Resolution(Configurable):
         """
         resolution = config_dict["resolution"]
         w, h = [int(value) for value in resolution.split("x")]
-        if w < 0 or h < 0:
+        if w <= 0 or h <= 0:
             raise ValueError("invalid width or height")
 
         return {
