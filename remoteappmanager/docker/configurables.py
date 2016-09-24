@@ -7,13 +7,24 @@ class Configurable(metaclass=abc.ABCMeta):
     Injection of the configurables data is done through a defined
     set of environment variables that the image accepts.
     """
-    #: unique, controlled tag string that identifies the configurable.
+    #: Unique, controlled tag string that identifies the configurable.
     tag = None
 
     @abc.abstractclassmethod
     def supported_by(cls, image):
         """Checks if the passed image supports the configurable.
-        Returns True if so, False otherwise"""
+        Returns True if so, False otherwise.
+
+        Parameters
+        ----------
+        image: remoteappmanager.docker.Image
+            The image to check if it supports this configurable
+
+        Returns
+        -------
+        bool: True if the image supports the configurable.
+
+        """
 
     @abc.abstractclassmethod
     def config_dict_to_env(cls, config_dict):
@@ -22,10 +33,23 @@ class Configurable(metaclass=abc.ABCMeta):
         Returns a dictionary with the environment to transmit to the image
         to set this particular configurable. Values must be strings.
 
-        Raises if the config_dict is not in the expected format.
+        Raises various exceptions if the config_dict is not in the expected
+        format.
 
         IMPORTANT: the received dictionary is likely coming from
-        hostile environment.
+        hostile environment. Validate the contents strictly.
+
+        Parameters
+        ----------
+        config_dict: Dict
+            A dictionary containing data that the Configurable class
+            understands.
+
+        Returns
+        -------
+        Dict(Str, Str):
+            A dictionary of environment variables to pass to the
+            image at startup.
         """
 
 
@@ -41,8 +65,7 @@ class Resolution(Configurable):
 
     @classmethod
     def config_dict_to_env(cls, config_dict):
-        """
-        the config dict must contain the following (example)
+        """the config dict must contain the following (example)
 
         {
             "resolution" : "1024x768"
@@ -65,7 +88,19 @@ class Resolution(Configurable):
 
 def for_image(image):
     """Returns the configurables that are available for a specific
-    image."""
+    image.
+
+    Parameters
+    ----------
+    image: remoteappmanager.docker.Image
+        The image to check.
+
+    Returns
+    -------
+    List
+        A list of Configurable classes supported by the given image.
+
+    """
     # We lack automatic registration. Add here new configurables
     available = [Resolution]
 
