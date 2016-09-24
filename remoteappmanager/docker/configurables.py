@@ -1,9 +1,12 @@
 import abc
-# Contains a controlled dictionary of information
-# that can be configured by the user at startup time.
 
 
 class Configurable(metaclass=abc.ABCMeta):
+    """Base class for Configurables.
+    They describe startup configuration entry points for images.
+    Injection of the configurables data is done through a defined
+    set of environment variables that the image accepts.
+    """
     #: unique, controlled tag string that identifies the configurable.
     tag = None
 
@@ -45,6 +48,8 @@ class Resolution(Configurable):
             "resolution" : "1024x768"
         }
 
+        Observe that the key used has nothing to do with the tag.
+        They are only accidentally the same.
         """
         resolution = config_dict["resolution"]
         w, h = [int(value) for value in resolution.split("x")]
@@ -61,6 +66,7 @@ class Resolution(Configurable):
 def for_image(image):
     """Returns the configurables that are available for a specific
     image."""
+    # We lack automatic registration. Add here new configurables
     available = [Resolution]
 
     return [conf_class
