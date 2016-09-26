@@ -52,6 +52,15 @@ class Configurable(metaclass=abc.ABCMeta):
             image at startup.
         """
 
+    @classmethod
+    def default_env(cls):
+        """Provides a default environment in case the config_dict does not
+        contain anything. Return a fully valid env dict or None for no
+        default. If None is returned, the appropriate course of action
+        is to consider the config dict invalid and raise a ValueError
+        """
+        return None
+
 
 class Resolution(Configurable):
     """Support for images that allow resolution change of the VNC server."""
@@ -74,6 +83,9 @@ class Resolution(Configurable):
         Observe that the key used has nothing to do with the tag.
         They are only accidentally the same.
         """
+        if config_dict is None or len(config_dict) == 0:
+            return cls.default_env()
+
         resolution = config_dict["resolution"]
         w, h = [int(value) for value in resolution.split("x")]
         if w <= 0 or h <= 0:
@@ -82,6 +94,14 @@ class Resolution(Configurable):
         return {
             "X11_WIDTH": str(w),
             "X11_HEIGHT": str(h),
+            "X11_DEPTH": "16"
+        }
+
+    @classmethod
+    def default_env(cls):
+        return {
+            "X11_WIDTH": "1024",
+            "X11_HEIGHT": "768",
             "X11_DEPTH": "16"
         }
 

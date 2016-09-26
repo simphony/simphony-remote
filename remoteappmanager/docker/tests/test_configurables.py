@@ -24,15 +24,22 @@ class TestConfigurables(unittest.TestCase):
 
     def test_config_dict_to_env(self):
         self.assertEqual(
-            Resolution.config_dict_to_env({"resolution": "1024x768"}),
-            {"X11_WIDTH": "1024",
-             "X11_HEIGHT": "768",
+            Resolution.config_dict_to_env({"resolution": "1280x800"}),
+            {"X11_WIDTH": "1280",
+             "X11_HEIGHT": "800",
              "X11_DEPTH": "16"
              }
         )
 
-        with self.assertRaises(KeyError):
-            Resolution.config_dict_to_env({})
+        default = Resolution.default_env()
+        self.assertEqual(default,
+                         {"X11_WIDTH": "1024",
+                          "X11_HEIGHT": "768",
+                          "X11_DEPTH": "16"
+                          }
+                         )
+        self.assertEqual(Resolution.config_dict_to_env(None), default)
+        self.assertEqual(Resolution.config_dict_to_env({}), default)
 
         with self.assertRaises(ValueError):
             Resolution.config_dict_to_env({"resolution": "1024"})
