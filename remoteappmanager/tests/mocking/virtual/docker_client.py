@@ -36,7 +36,9 @@ def get_fake_image_labels(num=2):
             {'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled',  # noqa
              'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4',
              'eu.simphony-project.docker.type': 'vncapp',
-             'eu.simphony-project.docker.env.x11-width': None,
+             'eu.simphony-project.docker.env.x11-width': '',
+             'eu.simphony-project.docker.env.x11-height': '',
+             'eu.simphony-project.docker.env.x11-depth': '',
              },
             {'eu.simphony-project.docker.description': 'A vanilla Ubuntu installation'},  # noqa
         )
