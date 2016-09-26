@@ -30,9 +30,11 @@
     <title>{% block title %}Jupyter Hub{% endblock %}</title>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:600" rel="stylesheet">
     
     {% block stylesheet %}
     <link rel="stylesheet" href="{{ static_url("css/style.min.css") }}" type="text/css"/>
+    <link rel="stylesheet" href="{{ static_url("css/remoteappmanager.css") }}" type="text/css"/>
     {% endblock %}
     <script src="{{static_url("components/requirejs/require.js") }}" type="text/javascript" charset="utf-8"></script>
     <script>

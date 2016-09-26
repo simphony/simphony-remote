@@ -1,0 +1,16 @@
+body {
+    background-color: #f9f9f9;
+}
+
+#applist > .row {
+    background-color: #ffffff;
+    font: 11px/1.8 'Raleway', Helvetica Neue, Helvetica, Arial, sans-serif;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.15);
+    color: #444;
+    -webkit-font-smoothing: antialiased;
+    margin-bottom: 30px;
+}
+#applist > .row > h4 {
+    font-size: 14px;
+    font-weight: 600;
+}
