@@ -49,4 +49,4 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
 
         self.assertGreaterEqual(res.code, 400)
         self.assertIn(self._app.file_config.login_url, res.effective_url)
-        self.assertNotIn("Available Applications", str(res.body))
+        self.assertNotIn("applist", str(res.body))
