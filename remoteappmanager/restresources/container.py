@@ -280,7 +280,8 @@ class Container(Resource):
         env = {}
 
         for img_conf in image.configurables:
-            config_dict = representation["configurables"][img_conf.tag]
+            config_dict = representation.get(
+                "configurables", {}).get(img_conf.tag, {})
             env.update(img_conf.config_dict_to_env(config_dict))
 
         return env
