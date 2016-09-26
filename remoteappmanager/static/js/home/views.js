@@ -1,5 +1,14 @@
 define(["jquery", "utils"], function ($, utils) {
     "use strict";
+
+    function viewport_resolution() {
+        var e = window, a = 'inner';
+        if ( !( 'innerWidth' in window ) ) {
+            a = 'client';
+            e = document.documentElement || document.body;
+        }
+        return e[ a+'Width' ]+"x"+e[ a+'Height' ];
+    }
     
     var ApplicationListView = function(model) { 
         // (Constructor) Represents the application list. In charge of 
@@ -57,17 +66,19 @@ define(["jquery", "utils"], function ($, utils) {
     ApplicationListView.prototype.render = function () {
         // Renders the full application list and adds it to the DOM.
         var num_entries = this.model.data.length;
-        var html = "";
+        var row;
+        var applist = $("#applist");
+        applist.empty();
         if (num_entries === 0) {
-            html = '<div class="col-sm-12 text-center va"><h4>No applications found</h4></div>';
+            row = $('<div class="col-sm-12 text-center va"><h4>No applications found</h4></div>');
+            applist.append(row);
         } else {
             for (var i = 0; i < num_entries; i++) {
                 var info = this.model.data[i];
-                html += this.render_applist_entry(i, info);
+                row = this.render_applist_entry(i, info);
+                applist.append(row);
             }
         }
-        $("#applist").html(html);
-        this.register_button_eventhandlers();
     };
     
     ApplicationListView.prototype.render_applist_entry = function (index, info) {
@@ -77,25 +88,73 @@ define(["jquery", "utils"], function ($, utils) {
         // info:
         //     A dictionary containing the retrieved data about the application
         //     and (possibly) the container.
-        var html = '<div class="row">';
+        var html_template = '' +
+            '<div class="row">' +
+            '  <img src="{icon}" class="col-sm-2 va" />' +
+            '  <div class="col-sm-7 va">' +
+            '    <h4>{image_name}</h4>' +
+            '    <div class="policy">{policy_html}</div>' +
+            '    <div class="configurables"></div>' +
+            '  </div>' +
+            '  <div class="col-sm-1 va">' +
+            '    <button id="bnx_{index}" data-index="{index}" class="{button_x_class} bnx btn"><i class="fa fa-spinner fa-spin" aria-hidden="true" style="display: none;"></i> <span> {button_x_text}</span></button>' +
+            '  </div>' +
+            '  <div class="col-sm-1 va">' + 
+            '    <button id="bny_{index}" data-index="{index}" class="stop-button btn-danger bny btn" style="{button_y_style}"><i class="fa fa-spinner fa-spin" aria-hidden="true" style="display: none;"></i> <span> Stop</span></button>' +
+            '  </div>' +
+            '</div>';
 
-        if (info.image.icon_128) {
-            html += '<img src="data:image/png;base64,'+info.image.icon_128+'" class="col-sm-2 va" />';
+        var icon = info.image.icon_128 ?
+            "data:image/png;base64,"+info.image.icon_128 :
+            utils.url_path_join(this.base_url,
+                "static", "images", "generic_appicon_128.png");
+
+        var image_name = info.image.ui_name ? info.image.ui_name : info.image.name;
+        var policy_html = this._policy_html(info.image.policy);
+        var cls, text, stop_style;
+        if (info.container !== null) {
+            cls = "view-button btn-success";
+            text = " View";
+            stop_style = "";
         } else {
-            html += '<img src="' + utils.url_path_join(
-                    this.base_url, "static", "images", "generic_appicon_128.png") +
-                '" class="col-sm-2 va" />';
+            cls = "start-button btn-primary";
+            text = " Start";
+            stop_style = 'visibility: hidden;';
         }
-
-        var name;
-        if (info.image.ui_name) {
-            name = info.image.ui_name;
-        } else {
-            name = info.image.name;
+        
+        var row = $(html_template
+            .replace(/\{icon\}/g, icon)
+            .replace(/\{image_name\}/g, image_name)
+            .replace(/\{policy\}/g, policy_html)
+            .replace(/\{index\}/g, index)
+            .replace(/\{button_x_class\}/g, cls)
+            .replace(/\{button_x_text\}/g, text)
+            .replace(/\{button_y_style\}/g, stop_style)
+            .replace(/\{policy_html\}/g, policy_html));
+         
+        row.find(".bnx").click(this._x_button_clicked);
+        row.find(".bny").click(this._y_button_clicked);
+        var configurables_widget = this._configurables(info.image.configurables_data);
+        if (configurables_widget && info.container === null) {
+            row.find(".configurables").append(
+                $("<ul>").append(configurables_widget));
         }
-        html += '<div class="col-sm-7 va"><h4>'+name+'</h4>';
+        
+        return row;
+    };
+    
+    ApplicationListView.prototype.reset_buttons_to_start = function (index) {
+        // Used to revert the buttons to their "start" state when the
+        // User clicks on "stop". 
+        $("#bnx_"+index)
+            .removeClass("view-button btn-success")
+            .addClass("start-button btn-primary");
+        $("#bnx_"+index+" > span").text(" Start");
+        $("#bny_"+index).hide();
+    };
+    
 
-        var policy = info.image.policy;
+    ApplicationListView.prototype._policy_html = function(policy) {
         var mount_html = '';
 
         if (policy.allow_home) {
@@ -109,48 +168,40 @@ define(["jquery", "utils"], function ($, utils) {
                 "(" + policy.volume_mode + ")</li>";
         }
         if (mount_html !== '') {
-            html += "<ul>" + mount_html + "</ul>";
+            mount_html = "<ul>" + mount_html + "</ul>";
         }
+        return mount_html;
+    };
 
-        html += '</div>';
-
-        var cls, text, stop_style;
-        if (info.container !== null) {
-            cls = "view-button btn-success";
-            text = " View";
-            stop_style = "";
-        } else {
-            cls = "start-button btn-primary";
-            text = " Start";
-            stop_style = 'style="visibility: hidden;"';
+    ApplicationListView.prototype._configurables = function(configurables_model) {  
+        var widget = null;
+        if (configurables_model.hasOwnProperty("resolution")) {
+            var current_res = viewport_resolution();
+            configurables_model.resolution = current_res;
+            var std_opts = "";
+            var std_res = ["1920x1080", "1280x1024", "1280x800", "1024x768"];
+            for (var i = 0; i < std_res.length; ++i) {
+                std_opts += "<option value='"+std_res[i]+"'>"+std_res[i]+"</option>";
+            }
+            widget = $(
+                "<li>Resolution: " +
+                "<select>" +
+                "   <option value='{current_res}' selected='selected'>Window</option>" +
+                std_opts +
+                "</select>" +
+                "</li>".replace(/\{current_res\}/g, current_res)
+            );
+            widget.find("select").change(function() { 
+                if (this.selectedIndex) {
+                    configurables_model.resolution = this.options[this.selectedIndex].value;
+                }
+            });
         }
-        html += '<div class="col-sm-1 va">';
-        html += '<button id="bnx_'+index+'" data-index="'+index+'" class="'+cls+' btn bnx"><i class="fa fa-spinner fa-spin" aria-hidden="true" style="display: none;"></i> <span>'+text+'</span></button>';
-        html += '</div>';
-        html += '<div class="col-sm-1 va">';
-        html += '<button id="bny_'+index+'" data-index="'+index+'" class="stop-button btn btn-danger bny" '+stop_style+'><i class="fa fa-spinner fa-spin" aria-hidden="true" style="display: none"></i> Stop</button>';
-        html += '</div>';
-        html += '</div>';
-        return html;
+        return widget;
     };
     
-    ApplicationListView.prototype.reset_buttons_to_start = function (index) {
-        // Used to revert the buttons to their "start" state when the
-        // User clicks on "stop". 
-        $("#bnx_"+index)
-            .removeClass("view-button btn-success")
-            .addClass("start-button btn-primary");
-        $("#bnx_"+index+" > span").text(" Start");
-        $("#bny_"+index).hide();
-    };
     
-    ApplicationListView.prototype.register_button_eventhandlers = function () {
-        // Registers the event handlers on the buttons after addition
-        // of the new entries to the list.
-        $(".bnx").click(this._x_button_clicked);
-        $(".bny").click(this._y_button_clicked);
-    };
-
+    
     return {
         ApplicationListView : ApplicationListView
     };

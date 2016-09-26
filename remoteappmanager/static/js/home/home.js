@@ -45,7 +45,8 @@ require(
         view.start_button_clicked = function (index) {
             // The container is not running. This is a start button.
             var mapping_id = model.data[index].mapping_id;
-            return appapi.start_application(mapping_id, {
+            var configurables_data = model.data[index].image.configurables_data;
+            return appapi.start_application(mapping_id, configurables_data, {
                 error: function(jqXHR, status, error) {
                     report_error(jqXHR, status, error);
                 },

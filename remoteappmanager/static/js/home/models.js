@@ -23,6 +23,16 @@ define(['jquery'], function ($) {
             self._appapi.available_applications_info()
         ).done(function (app_data) {
             self.data = app_data;
+            
+            // Add the options for some image types
+            for (var data_idx = 0; data_idx < self.data.length; ++data_idx) {
+                var image = self.data[data_idx].image;
+                image.configurables_data = {};
+                for (var cfg_idx = 0; cfg_idx < image.configurables.length; ++cfg_idx) {
+                    var configurable_flag = image.configurables[cfg_idx];
+                    image.configurables_data[configurable_flag] = null;
+                }
+            }
         });
     };
     

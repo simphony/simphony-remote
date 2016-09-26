@@ -24,17 +24,22 @@ define(['jquery', 'utils'], function ($, utils) {
         return d;
     };
     
-    RemoteAppAPI.prototype.start_application = function(id, options) {
+    RemoteAppAPI.prototype.start_application = function(id, configurables_data, options) {
         // Starts an application with a given id. (async)
         //
         // @param id : the mapping id of the application to start.
+        // @param configurables: a dictionary of values to configure the
+        //                       image startup according to its startup 
+        //                       configurability options.
         // @param options : the options for the request. Optional.
         // @return a deferred object for the request.
+        configurables_data = configurables_data || {};
         options = options || {};
         options = utils.update(options, {
             type: 'POST', 
             data: JSON.stringify({
-                mapping_id: id
+                mapping_id: id,
+                configurables: configurables_data
             })});
         return this._api_request(
             'containers',
