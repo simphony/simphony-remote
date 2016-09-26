@@ -1,15 +1,6 @@
 define(["jquery", "utils"], function ($, utils) {
     "use strict";
 
-    function viewport_resolution() {
-        var e = window, a = 'inner';
-        if ( !( 'innerWidth' in window ) ) {
-            a = 'client';
-            e = document.documentElement || document.body;
-        }
-        return e[ a+'Width' ]+"x"+e[ a+'Height' ];
-    }
-    
     var ApplicationListView = function(model) { 
         // (Constructor) Represents the application list. In charge of 
         // rendering in on the div with id #applist
@@ -35,7 +26,7 @@ define(["jquery", "utils"], function ($, utils) {
             var index = $(button).data("index");
             $(button).find(".fa-spinner").show();
 
-            var app_info = self.model.data[index];
+            var app_info = self.model.app_data[index];
             
             var hide_spinner = function () {
                 $(button).find(".fa-spinner").hide();
@@ -65,7 +56,7 @@ define(["jquery", "utils"], function ($, utils) {
 
     ApplicationListView.prototype.render = function () {
         // Renders the full application list and adds it to the DOM.
-        var num_entries = this.model.data.length;
+        var num_entries = this.model.app_data.length;
         var row;
         var applist = $("#applist");
         applist.empty();
@@ -74,22 +65,22 @@ define(["jquery", "utils"], function ($, utils) {
             applist.append(row);
         } else {
             for (var i = 0; i < num_entries; i++) {
-                var info = this.model.data[i];
-                row = this.render_applist_entry(i, info);
+                row = this.render_applist_entry(i);
                 applist.append(row);
             }
         }
     };
     
-    ApplicationListView.prototype.render_applist_entry = function (index, info) {
+    ApplicationListView.prototype.render_applist_entry = function (index) {
         // Returns a HTML snippet for a single application entry
         // index: 
         //     a progressive index for the entry.
-        // info:
-        //     A dictionary containing the retrieved data about the application
-        //     and (possibly) the container.
+        
+        var app_data = this.model.app_data[index];
+        var configurables = this.model.configurables[index];
+        
         var html_template = '' +
-            '<div class="row">' +
+            '<div class="row" data-index="{index}">' +
             '  <img src="{icon}" class="col-sm-2 va" />' +
             '  <div class="col-sm-7 va">' +
             '    <h4>{image_name}</h4>' +
@@ -104,15 +95,15 @@ define(["jquery", "utils"], function ($, utils) {
             '  </div>' +
             '</div>';
 
-        var icon = info.image.icon_128 ?
-            "data:image/png;base64,"+info.image.icon_128 :
+        var icon = app_data.image.icon_128 ?
+            "data:image/png;base64,"+app_data.image.icon_128 :
             utils.url_path_join(this.base_url,
                 "static", "images", "generic_appicon_128.png");
 
-        var image_name = info.image.ui_name ? info.image.ui_name : info.image.name;
-        var policy_html = this._policy_html(info.image.policy);
+        var image_name = app_data.image.ui_name ? app_data.image.ui_name : app_data.image.name;
+        var policy_html = this._policy_html(app_data.image.policy);
         var cls, text, stop_style;
-        if (info.container !== null) {
+        if (app_data.container !== null) {
             cls = "view-button btn-success";
             text = " View";
             stop_style = "";
@@ -134,26 +125,30 @@ define(["jquery", "utils"], function ($, utils) {
          
         row.find(".bnx").click(this._x_button_clicked);
         row.find(".bny").click(this._y_button_clicked);
-        var configurables_widget = this._configurables(info.image.configurables_data);
-        if (configurables_widget && info.container === null) {
-            row.find(".configurables").append(
-                $("<ul>").append(configurables_widget));
+        
+        if (app_data.container === null) {
+            var ul = $("<ul>");
+            Object.getOwnPropertyNames(configurables).forEach(
+                function(val, idx, array) {
+                    var widget = configurables[val].view();
+                    ul.append($("<li>").append(widget));
+                }
+            );
+            row.find(".configurables").append(ul);
         }
         
         return row;
     };
     
-    ApplicationListView.prototype.reset_buttons_to_start = function (index) {
-        // Used to revert the buttons to their "start" state when the
-        // User clicks on "stop". 
-        $("#bnx_"+index)
-            .removeClass("view-button btn-success")
-            .addClass("start-button btn-primary");
-        $("#bnx_"+index+" > span").text(" Start");
-        $("#bny_"+index).hide();
+    ApplicationListView.prototype.update_entry = function (index) {
+        // Re-renders the entry for a given index, replacing the
+        // current entry.
+        var row = this.render_applist_entry(index);
+        $("#applist")
+            .find(".row[data-index='"+index+"']")
+            .replaceWith(row);
     };
     
-
     ApplicationListView.prototype._policy_html = function(policy) {
         var mount_html = '';
 
@@ -173,35 +168,6 @@ define(["jquery", "utils"], function ($, utils) {
         return mount_html;
     };
 
-    ApplicationListView.prototype._configurables = function(configurables_model) {  
-        var widget = null;
-        if (configurables_model.hasOwnProperty("resolution")) {
-            var current_res = viewport_resolution();
-            configurables_model.resolution = current_res;
-            var std_opts = "";
-            var std_res = ["1920x1080", "1280x1024", "1280x800", "1024x768"];
-            for (var i = 0; i < std_res.length; ++i) {
-                std_opts += "<option value='"+std_res[i]+"'>"+std_res[i]+"</option>";
-            }
-            widget = $(
-                "<li>Resolution: " +
-                "<select>" +
-                "   <option value='{current_res}' selected='selected'>Window</option>" +
-                std_opts +
-                "</select>" +
-                "</li>".replace(/\{current_res\}/g, current_res)
-            );
-            widget.find("select").change(function() { 
-                if (this.selectedIndex) {
-                    configurables_model.resolution = this.options[this.selectedIndex].value;
-                }
-            });
-        }
-        return widget;
-    };
-    
-    
-    
     return {
         ApplicationListView : ApplicationListView
     };

@@ -20,7 +20,7 @@ require(
         };
 
         view.view_button_clicked = function (index) {
-            var app_info = model.data[index];
+            var app_info = model.app_data[index];
 
             window.location = utils.url_path_join(
                 base_url,
@@ -29,13 +29,13 @@ require(
         };
         
         view.stop_button_clicked = function (index) {
-            var app_info = model.data[index];
+            var app_info = model.app_data[index];
 
             var url_id = app_info.container.url_id;
             return appapi.stop_application(url_id, {
                 success: function () {
-                    view.reset_buttons_to_start(index);
                     app_info.container = null;
+                    view.update_entry(index);
                 },
                 error: function (jqXHR, status, error) {
                     report_error(jqXHR, status, error);
@@ -44,8 +44,19 @@ require(
             
         view.start_button_clicked = function (index) {
             // The container is not running. This is a start button.
-            var mapping_id = model.data[index].mapping_id;
-            var configurables_data = model.data[index].image.configurables_data;
+            var mapping_id = model.app_data[index].mapping_id;
+            var configurables_data = {};
+            var configurables = model.configurables[index];
+            configurables_data = {};
+
+            Object.getOwnPropertyNames(configurables).forEach(
+                function(val, idx, array) {
+                    var configurable = configurables[val];
+                    var tag = configurable.tag;
+                    configurables_data[tag] = configurable.as_config_dict();
+                }
+            );
+            
             return appapi.start_application(mapping_id, configurables_data, {
                 error: function(jqXHR, status, error) {
                     report_error(jqXHR, status, error);
