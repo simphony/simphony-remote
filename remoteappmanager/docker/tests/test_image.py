@@ -39,7 +39,11 @@ class TestImage(TestCase):
             image.ui_name,
             image_dict['Config']["Labels"][SIMPHONY_NS.ui_name])
         self.assertEqual(image.type, 'vncapp')
-        self.assertEqual(image.env, {"X11_WIDTH": None})
+        self.assertEqual(image.env, {
+            "X11_WIDTH": "",
+            "X11_DEPTH": "",
+            "X11_HEIGHT": "",
+        })
 
     def test_missing_image_type(self):
         docker_client = create_docker_client()

@@ -44,7 +44,8 @@ class Application(Resource):
                     "volume_source": policy.volume_source,
                     "volume_target": policy.volume_target,
                     "volume_mode": policy.volume_mode,
-                }
+                },
+                "configurables": [conf.tag for conf in image.configurables]
             },
             "mapping_id": identifier,
         }

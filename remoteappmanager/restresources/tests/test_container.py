@@ -75,7 +75,12 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                     "Cookie": "jupyter-hub-token-username=foo"
                 },
                 body=escape.json_encode(dict(
-                    mapping_id="mapping_id"
+                    mapping_id="mapping_id",
+                    configurables={
+                        "resolution": {
+                            "resolution": "1024x768"
+                        }
+                    }
                 )))
 
             self.assertEqual(res.code, httpstatus.CREATED)
@@ -101,7 +106,12 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                     "Cookie": "jupyter-hub-token-username=foo"
                 },
                 body=escape.json_encode(dict(
-                    mapping_id="mapping_id"
+                    mapping_id="mapping_id",
+                    configurables={
+                        "resolution": {
+                            "resolution": "1024x768"
+                        }
+                    }
                 )))
 
             self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
@@ -130,7 +140,12 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                     "Cookie": "jupyter-hub-token-username=foo"
                 },
                 body=escape.json_encode(dict(
-                    mapping_id="mapping_id"
+                    mapping_id="mapping_id",
+                    configurables={
+                        "resolution": {
+                            "resolution": "1024x768"
+                        }
+                    }
                 )))
 
             self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
@@ -159,13 +174,35 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                     "Cookie": "jupyter-hub-token-username=foo"
                 },
                 body=escape.json_encode(dict(
-                    mapping_id="mapping_id"
+                    mapping_id="mapping_id",
+                    configurables={
+                        "resolution": {
+                            "resolution": "1024x768"
+                        }
+                    }
                 )))
 
             self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
             self.assertEqual(escape.json_decode(res.body), {
                 "type": "Unable",
                 "message": "Boom!"})
+
+    def test_create_fails_for_incorrect_configurable(self):
+        res = self.fetch(
+            "/user/username/api/v1/containers/",
+            method="POST",
+            headers={
+                "Cookie": "jupyter-hub-token-username=foo"
+            },
+            body=escape.json_encode(dict(
+                mapping_id="mapping_id",
+                configurables={
+                    "resolution": {
+                    }
+                }
+            )))
+
+        self.assertEqual(res.code, httpstatus.BAD_REQUEST)
 
     def test_create_fails_for_missing_mapping_id(self):
         res = self.fetch(
@@ -256,7 +293,14 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                        headers={
                                 "Cookie": "jupyter-hub-token-username=foo"
                        },
-                       body=escape.json_encode({"mapping_id": "mapping_id"}))
+                       body=escape.json_encode({
+                           "mapping_id": "mapping_id",
+                           "configurables": {
+                                "resolution": {
+                                    "resolution": "1024x768"
+                                }
+                           }
+                       }))
 
             self.assertTrue(self._app.reverse_proxy.register.called)
 

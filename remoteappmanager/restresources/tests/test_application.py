@@ -86,16 +86,19 @@ class TestApplication(AsyncHTTPTestCase):
         self.assertEqual(res.code, httpstatus.OK)
         self.assertEqual(escape.json_decode(res.body),
                          {'container': None,
-                          'image': {'description': '',
-                                    'icon_128': '',
-                                    'name': 'boo',
-                                    'ui_name': 'foo_ui',
-                                    'policy': {
-                                        "allow_home": True,
-                                        "volume_mode": 'ro',
-                                        "volume_source": "foo",
-                                        "volume_target": "bar",
-                                    }},
+                          'image': {
+                              'description': '',
+                              'icon_128': '',
+                              'name': 'boo',
+                              'ui_name': 'foo_ui',
+                              'policy': {
+                                    "allow_home": True,
+                                    "volume_mode": 'ro',
+                                    "volume_source": "foo",
+                                    "volume_target": "bar",
+                              },
+                              'configurables': []
+                          },
                           'mapping_id': 'one'})
 
         self._app.container_manager.containers_from_mapping_id = \
@@ -121,7 +124,9 @@ class TestApplication(AsyncHTTPTestCase):
                                         "volume_mode": 'ro',
                                         "volume_source": "foo",
                                         "volume_target": "bar",
-                                    }},
+                                    },
+                                    'configurables': [],
+                                    },
                           'mapping_id': 'one'})
 
         res = self.fetch("/api/v1/applications/three/")
