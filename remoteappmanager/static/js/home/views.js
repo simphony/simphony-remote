@@ -24,27 +24,39 @@ define(["jquery", "utils"], function ($, utils) {
             // Triggered when the button X (left side) is clicked
             var button = this;
             var index = $(button).data("index");
-            $(button).find(".fa-spinner").show();
+
+            var icon_elem = $(button).find(".x-icon");
+            var icons = ['fa-start', 'fa-eye'];
+            var icon_type;
+
+            for (var i = 0; i < icons.length; ++i) {
+                if (icon_elem.hasClass(icons[i])) {
+                    icon_type = icons[i];
+                }
+            }
+            
+            icon_elem.removeClass(icon_type).addClass("fa-spinner fa-spin");
+                
+            var restore_icon = function () {
+                icon_elem.removeClass("fa-spinner fa-spin").addClass(icon_type);
+            };
 
             var app_info = self.model.app_data[index];
             
-            var hide_spinner = function () {
-                $(button).find(".fa-spinner").hide();
-            };
-            
             if (app_info.container !== null) {
-                self.view_button_clicked(index).done(hide_spinner);
+                self.view_button_clicked(index).done(restore_icon);
             } else {
-                self.start_button_clicked(index).done(hide_spinner);
+                self.start_button_clicked(index).done(restore_icon);
             }
         };
         
         this._y_button_clicked = function () {
             var button = this;
             var index = $(button).data("index");
-            $(button).find(".fa-spinner").show();
+            $(button).find(".y-icon").removeClass("fa-stop").addClass("fa-spinner fa-spin");
+            
             self.stop_button_clicked(index).done(function () {
-                    $(button).find(".fa-spinner").hide();
+                $(button).find(".y-icon").removeClass("fa-spinner fa-spin").addClass("fa-stop");
             });
         };
         
@@ -88,10 +100,10 @@ define(["jquery", "utils"], function ($, utils) {
             '    <div class="configurables"></div>' +
             '  </div>' +
             '  <div class="col-sm-1 va">' +
-            '    <button id="bnx_{index}" data-index="{index}" class="{button_x_class} bnx btn"><i class="fa fa-spinner fa-spin" aria-hidden="true" style="display: none;"></i> <span> {button_x_text}</span></button>' +
+            '    <button id="bnx_{index}" data-index="{index}" class="{button_x_class} bnx btn"><span> <i class="fa {button_x_icon} x-icon"></i> {button_x_text}</span></button>' +
             '  </div>' +
-            '  <div class="col-sm-1 va">' + 
-            '    <button id="bny_{index}" data-index="{index}" class="stop-button btn-danger bny btn" style="{button_y_style}"><i class="fa fa-spinner fa-spin" aria-hidden="true" style="display: none;"></i> <span> Stop</span></button>' +
+            '  <div class="col-sm-1 va" style="padding-left: 30px">' + 
+            '    <button id="bny_{index}" data-index="{index}" class="stop-button btn-danger bny btn" style="{button_y_style}"><span><i class="fa fa-stop y-icon" aria-hidden="true"></i> Stop</span></button>' +
             '  </div>' +
             '</div>';
 
@@ -102,13 +114,15 @@ define(["jquery", "utils"], function ($, utils) {
 
         var image_name = app_data.image.ui_name ? app_data.image.ui_name : app_data.image.name;
         var policy_html = this._policy_html(app_data.image.policy);
-        var cls, text, stop_style;
+        var cls, text, stop_style, x_icon;
         if (app_data.container !== null) {
             cls = "view-button btn-success";
             text = " View";
+            x_icon = "fa-eye";
             stop_style = "";
         } else {
             cls = "start-button btn-primary";
+            x_icon = "fa-play";
             text = " Start";
             stop_style = 'visibility: hidden;';
         }
@@ -119,6 +133,7 @@ define(["jquery", "utils"], function ($, utils) {
             .replace(/\{policy\}/g, policy_html)
             .replace(/\{index\}/g, index)
             .replace(/\{button_x_class\}/g, cls)
+            .replace(/\{button_x_icon\}/g, x_icon)
             .replace(/\{button_x_text\}/g, text)
             .replace(/\{button_y_style\}/g, stop_style)
             .replace(/\{policy_html\}/g, policy_html));
