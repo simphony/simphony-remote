@@ -1,20 +1,19 @@
 define(function (require) {
     "use strict";
     var models = require("home/models");
-
-    var MockApi = function () {
-        this.available_applications_info = function() {
-            return [{}, {}];
-        };
-    };
+    var mock_api = require("../../../../../jstests/tests/home/mock_remoteappapi");
 
     QUnit.module("home.models");
     QUnit.test("instantiation", function (assert) {
-        var mock_api = new MockApi();
-        var model = new models.ApplicationListModel(mock_api);
-        assert.equal(model.data.length, 0);
+        var api = new mock_api.MockApi();
+        var model = new models.ApplicationListModel(api);
+        assert.equal(model.app_data.length, 0);
         model.update().done(function() {
-            assert.equal(model.data.length, 2);
+            assert.equal(model.app_data.length, 2);
+            assert.equal(model.app_data[0].image.configurables[0], "resolution");
+            assert.notEqual(model.configurables[0].resolution, null);
+            assert.equal(model.configurables[0].resolution.resolution, "Window");
         });
     });
 });
+
