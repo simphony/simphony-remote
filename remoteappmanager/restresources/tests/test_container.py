@@ -39,18 +39,31 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
             'server': app.settings['base_urlpath']}
         return app
 
+    def request_containers(self, body=None):
+        """Utility method to reduce repetition.
+        Issues a POST fetch request with the appropriately encoded body if
+        given, otherwise issues a GET request."""
+        kwargs = {}
+
+        if body is not None:
+            kwargs["method"] = "POST"
+            kwargs["body"] = escape.json_encode(body)
+
+        return self.fetch(
+            "/user/username/api/v1/containers/",
+            headers={
+                "Cookie": "jupyter-hub-token-username=foo"
+            },
+            **kwargs
+        )
+
     def test_items(self):
         manager = self._app.container_manager
         manager.image = mock_coro_factory(Image())
         manager.containers_from_mapping_id = mock_coro_factory(
             [DockerContainer()])
 
-        res = self.fetch(
-            "/user/username/api/v1/containers/",
-            headers={
-                "Cookie": "jupyter-hub-token-username=foo"
-            },
-        )
+        res = self.request_containers()
 
         self.assertEqual(res.code, httpstatus.OK)
 
@@ -68,20 +81,14 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
             manager.start_container = mock_coro_factory(DockerContainer(
                 url_id="3456"
             ))
-            res = self.fetch(
-                "/user/username/api/v1/containers/",
-                method="POST",
-                headers={
-                    "Cookie": "jupyter-hub-token-username=foo"
-                },
-                body=escape.json_encode(dict(
+            res = self.request_containers(dict(
                     mapping_id="mapping_id",
                     configurables={
                         "resolution": {
                             "resolution": "1024x768"
                         }
                     }
-                )))
+                ))
 
             self.assertEqual(res.code, httpstatus.CREATED)
 
@@ -99,20 +106,14 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
 
             self._app.container_manager.stop_and_remove_container = \
                 mock_coro_factory()
-            res = self.fetch(
-                "/user/username/api/v1/containers/",
-                method="POST",
-                headers={
-                    "Cookie": "jupyter-hub-token-username=foo"
-                },
-                body=escape.json_encode(dict(
+            res = self.request_containers(dict(
                     mapping_id="mapping_id",
                     configurables={
                         "resolution": {
                             "resolution": "1024x768"
                         }
                     }
-                )))
+                ))
 
             self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
             self.assertTrue(
@@ -133,20 +134,14 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
             self._app.reverse_proxy.register = mock_coro_factory(
                 side_effect=Exception("Boom!"))
 
-            res = self.fetch(
-                "/user/username/api/v1/containers/",
-                method="POST",
-                headers={
-                    "Cookie": "jupyter-hub-token-username=foo"
-                },
-                body=escape.json_encode(dict(
+            res = self.request_containers(dict(
                     mapping_id="mapping_id",
                     configurables={
                         "resolution": {
                             "resolution": "1024x768"
                         }
                     }
-                )))
+                ))
 
             self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
             self.assertTrue(
@@ -167,20 +162,14 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
             self._app.container_manager.start_container = mock_coro_factory(
                 side_effect=Exception("Boom!"))
 
-            res = self.fetch(
-                "/user/username/api/v1/containers/",
-                method="POST",
-                headers={
-                    "Cookie": "jupyter-hub-token-username=foo"
-                },
-                body=escape.json_encode(dict(
+            res = self.request_containers(dict(
                     mapping_id="mapping_id",
                     configurables={
                         "resolution": {
                             "resolution": "1024x768"
                         }
                     }
-                )))
+                ))
 
             self.assertEqual(res.code, httpstatus.INTERNAL_SERVER_ERROR)
             self.assertEqual(escape.json_decode(res.body), {
@@ -188,32 +177,51 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                 "message": "Boom!"})
 
     def test_create_fails_for_incorrect_configurable(self):
-        res = self.fetch(
-            "/user/username/api/v1/containers/",
-            method="POST",
-            headers={
-                "Cookie": "jupyter-hub-token-username=foo"
-            },
-            body=escape.json_encode(dict(
+        res = self.request_containers(dict(
                 mapping_id="mapping_id",
                 configurables={
                     "resolution": {
+                        "wooo": "dsdsa"
                     }
                 }
-            )))
+            ))
 
         self.assertEqual(res.code, httpstatus.BAD_REQUEST)
 
+    def test_create_succeeds_for_empty_configurable(self):
+        with patch("remoteappmanager"
+                   ".restresources"
+                   ".container"
+                   ".wait_for_http_server_2xx",
+                   new_callable=mock_coro_new_callable()):
+            res = self.request_containers(dict(
+                    mapping_id="mapping_id",
+                    configurables={
+                        "resolution": {
+                        }
+                    }
+                ))
+
+            self.assertEqual(res.code, httpstatus.CREATED)
+
+            res = self.request_containers(dict(
+                    mapping_id="mapping_id",
+                    configurables={
+                    }
+                ))
+
+            self.assertEqual(res.code, httpstatus.CREATED)
+
+            res = self.request_containers(dict(
+                mapping_id="mapping_id",
+            ))
+
+            self.assertEqual(res.code, httpstatus.CREATED)
+
     def test_create_fails_for_missing_mapping_id(self):
-        res = self.fetch(
-            "/user/username/api/v1/containers/",
-            method="POST",
-            headers={
-                "Cookie": "jupyter-hub-token-username=foo"
-            },
-            body=escape.json_encode(dict(
+        res = self.request_containers(dict(
                 whatever="123"
-            )))
+            ))
 
         self.assertEqual(res.code, httpstatus.BAD_REQUEST)
         self.assertEqual(escape.json_decode(res.body),
@@ -221,15 +229,8 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                           "message": "missing mapping_id"})
 
     def test_create_fails_for_invalid_mapping_id(self):
-        res = self.fetch(
-            "/user/username/api/v1/containers/",
-            method="POST",
-            headers={
-                "Cookie": "jupyter-hub-token-username=foo"
-            },
-            body=escape.json_encode(dict(
-                mapping_id="whatever"
-            )))
+        res = self.request_containers(
+            dict(mapping_id="whatever"))
 
         self.assertEqual(res.code, httpstatus.BAD_REQUEST)
         self.assertEqual(escape.json_decode(res.body),
