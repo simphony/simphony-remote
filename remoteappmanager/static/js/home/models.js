@@ -44,10 +44,10 @@ define(['jquery', 'home/configurables'], function ($, configurables) {
                     // by the client. skip it and let the server deal with the 
                     // missing data, either by using a default or throwing
                     // an error.
-                    var configurable_model_cls = configurables.from_tag(tag);
+                    var ConfigurableCls = configurables.from_tag(tag);
                     
-                    if (configurable_model_cls !== null) {
-                        self.configurables[data_idx][tag] = new configurable_model_cls();
+                    if (ConfigurableCls !== null) {
+                        self.configurables[data_idx][tag] = new ConfigurableCls();
                     }
                }
             }
