@@ -1,6 +1,6 @@
 import os
-import shutil
-import tempfile
+import escapism
+import string
 
 from traitlets import Any, Unicode
 from tornado import gen
@@ -153,8 +153,15 @@ class VirtualUserSpawner(LocalProcessSpawner):
         # Create the temporary directory as the user's workspace
         if self.workspace_dir and not self._virtual_workspace:
             try:
-                self._virtual_workspace = tempfile.mkdtemp(
-                    dir=self.workspace_dir)
+                workspace = _user_workspace(self.workspace_dir, self.user.name)
+
+                if not (os.path.isdir(workspace) and
+                        os.access(workspace, os.R_OK | os.W_OK | os.X_OK)):
+                    # Let it fail for strange conditions such as unable to
+                    # write or file already there.
+                    os.mkdir(workspace, 0o755)
+
+                self._virtual_workspace = workspace
             except Exception as exception:
                 # A whole lot of reasons why temporary directory cannot
                 # be created. e.g. workspace_dir does not exist
@@ -178,7 +185,6 @@ class VirtualUserSpawner(LocalProcessSpawner):
         try:
             return (yield super().start())
         except Exception:
-            self._clean_up_workspace_dir()
             raise
 
     @gen.coroutine
@@ -188,28 +194,7 @@ class VirtualUserSpawner(LocalProcessSpawner):
         If virtual user has a temporary home directory,
         clean up the directory.
         """
-        self._clean_up_workspace_dir()
         yield super().stop(now=now)
-
-    def _clean_up_workspace_dir(self):
-        """ Clean up the virtual user's temporary directory, if exists
-        """
-        if not self._virtual_workspace:
-            return
-
-        # Clean up the directory
-        # Make sure the temporary directory is not /, ./ or ../
-        if os.path.normpath(self._virtual_workspace) in ('/', '.', '..'):
-            self.log.warning("Virtual workspace is '%s'.  Seriously? "
-                             "Not removing.", self._virtual_workspace)
-        else:
-            try:
-                shutil.rmtree(self._virtual_workspace)
-            except Exception as exception:
-                self.log.error("Failed to remove %s, error %s",
-                               self._virtual_workspace, str(exception))
-            else:
-                self.log.info('Removed %s', self._virtual_workspace)
 
 
 def _docker_envvars():
@@ -223,3 +208,29 @@ def _docker_envvars():
            if envvar in os.environ}
 
     return env
+
+
+# Used by escape
+_ESCAPE_SAFE_CHARS = set(string.ascii_letters + string.digits + '-.')
+_ESCAPE_CHAR = '_'
+
+
+# Note: copied from container_manager.py, but we want to keep the
+# spawners module completely separated from the remoteappmanager.
+def escape(s):
+    """Trivial escaping wrapper for well established stuff.
+    Works for containers, file names. Note that it is not destructive,
+    so it won't generate collisions."""
+    return escapism.escape(s, _ESCAPE_SAFE_CHARS, _ESCAPE_CHAR)
+
+
+def _user_workspace(base_dir, user_name):
+    """Returns the appropriate user workspace for the given username.
+    Raises ValueError if the user_name is only spaces after basenaming.
+    """
+
+    name = os.path.basename(user_name).strip()
+    if len(name) == 0:
+        raise ValueError("User name is invalid")
+
+    return os.path.join(base_dir, escape(name))
