@@ -19,27 +19,40 @@ require(
             $(".spawn-error-msg").text(msg).show();
         };
 
+        var new_container_window = function (url_id) {
+            // Opens a new window for the container at url_id
+            var w = window.open(undefined);
+            if (w !== undefined) {
+                w.location = utils.url_path_join(
+                    base_url,
+                    "containers",
+                    url_id
+                );
+            }
+        };
+
         view.view_button_clicked = function (index) {
             var app_info = model.app_data[index];
-
-            window.location = utils.url_path_join(
-                base_url,
-                "containers",
-                app_info.container.url_id);
+            new_container_window(app_info.container.url_id);
         };
         
         view.stop_button_clicked = function (index) {
+            var promise = $.Deferred();
             var app_info = model.app_data[index];
 
             var url_id = app_info.container.url_id;
-            return appapi.stop_application(url_id, {
+            
+            appapi.stop_application(url_id, {
                 success: function () {
-                    app_info.container = null;
-                    view.update_entry(index);
+                    model.update_idx(index)
+                        .done(promise.resolve)
+                        .fail(promise.reject);
                 },
                 error: function (jqXHR, status, error) {
                     report_error(jqXHR, status, error);
+                    promise.reject();
                 }});
+            return promise;
         };
             
         view.start_button_clicked = function (index) {
@@ -56,10 +69,12 @@ require(
                     configurables_data[tag] = configurable.as_config_dict();
                 }
             );
-            
-            return appapi.start_application(mapping_id, configurables_data, {
+           
+            var promise = $.Deferred();
+            appapi.start_application(mapping_id, configurables_data, {
                 error: function(jqXHR, status, error) {
                     report_error(jqXHR, status, error);
+                    promise.reject();
                 },
                 statusCode: {
                     201: function (data, textStatus, request) {
@@ -68,14 +83,13 @@ require(
                         var arr = url.pathname.replace(/\/$/, "").split('/');
                         var url_id = arr[arr.length-1];
 
-                        window.location = utils.url_path_join(
-                            base_url,
-                            "containers",
-                            url_id
-                        );
+                        new_container_window(url_id);
+                        model.update_idx(index).done(promise.resolve);
                     }
                 }
             });
+            
+            return promise;
         };
 
         $.when(model.update()).done(function () { view.render(); });
