@@ -26,17 +26,17 @@ class TestStartStopContainer(SeleniumTestBase):
             driver.find_element_by_id("bnx_0")
         )
 
-        self.assertEqual(len(driver.window_handles), 2)
-
+        self.wait_for(lambda: len(driver.window_handles) == 2)
         driver.switch_to.window(main_window)
 
+        driver.find_element_by_css_selector(".view-button")
         # Try clicking on View.
         driver.execute_script(
             "arguments[0].click()",
             driver.find_element_by_id("bnx_0")
         )
 
-        self.assertEqual(len(driver.window_handles), 3)
+        self.wait_for(lambda: len(driver.window_handles) == 3)
         driver.switch_to.window(main_window)
 
         # Click on Stop.
