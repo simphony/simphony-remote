@@ -18,8 +18,10 @@ before_install:
 install:
     - make install
 
-script:
+before_script:
     - make devdeps
+
+script:
     - make pythontest
     - make jstest
     - make docs
