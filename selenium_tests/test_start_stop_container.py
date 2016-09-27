@@ -18,30 +18,28 @@ class TestStartStopContainer(SeleniumTestBase):
         wait = WebDriverWait(driver, 10)
         wait.until(EC.element_to_be_clickable((By.ID, 'bnx_0')))
 
+        self.assertEqual(len(driver.window_handles), 1)
+        main_window = driver.window_handles[0]
+
         driver.execute_script(
             "arguments[0].click()",
             driver.find_element_by_id("bnx_0")
         )
-        self.wait_for(lambda: "noVNC" == driver.title)
-        driver.execute_script(
-            "arguments[0].click()",
-            driver.find_element_by_link_text("Close")
-            )
-        self.wait_for(lambda: "noVNC" != driver.title)
+
+        self.assertEqual(len(driver.window_handles), 2)
+
+        driver.switch_to.window(main_window)
 
         # Try clicking on View.
         driver.execute_script(
             "arguments[0].click()",
             driver.find_element_by_id("bnx_0")
         )
-        self.wait_for(lambda: "noVNC" == driver.title)
-        driver.execute_script(
-            "arguments[0].click()",
-            driver.find_element_by_link_text("Close")
-            )
+
+        self.assertEqual(len(driver.window_handles), 3)
+        driver.switch_to.window(main_window)
 
         # Click on Stop.
-        self.wait_for(lambda: "noVNC" != driver.title)
         driver.execute_script(
             "arguments[0].click()",
             driver.find_element_by_id("bny_0")
