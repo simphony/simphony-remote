@@ -154,13 +154,7 @@ class VirtualUserSpawner(LocalProcessSpawner):
         if self.workspace_dir and not self._virtual_workspace:
             try:
                 workspace = _user_workspace(self.workspace_dir, self.user.name)
-
-                if not (os.path.isdir(workspace) and
-                        os.access(workspace, os.R_OK | os.W_OK | os.X_OK)):
-                    # Let it fail for strange conditions such as unable to
-                    # write or file already there.
-                    os.mkdir(workspace, 0o755)
-
+                os.makedirs(workspace, 0o755, exist_ok=True)
                 self._virtual_workspace = workspace
             except Exception as exception:
                 # A whole lot of reasons why temporary directory cannot
