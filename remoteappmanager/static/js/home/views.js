@@ -157,7 +157,6 @@ define(["jquery", "utils"], function ($, utils) {
     ApplicationListView.prototype.update_entry = function (index) {
         // Re-renders the entry for a given index, replacing the
         // current entry.
-        console.log("updating entry");
         var row = this.render_applist_entry(index);
         $("#applist")
             .find(".row[data-index='"+index+"']")

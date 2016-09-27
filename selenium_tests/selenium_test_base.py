@@ -27,13 +27,14 @@ class SeleniumTestBase(unittest.TestCase):
         self.accept_next_alert = True
 
         permissions_db_path = os.path.join(ff_profile.profile_dir,
-                                          "permissions.sqlite")
+                                           "permissions.sqlite")
 
         with contextlib.closing(sqlite3.connect(permissions_db_path)) as db:
             cur = db.cursor()
-            cur.execute((
-            "INSERT INTO moz_perms VALUES (1, '{base_url}', "
-            "'popup', 1, 0, 0, 1474977124357)").format(base_url=self.base_url))
+            cur.execute(
+                ("INSERT INTO moz_perms VALUES (1, '{base_url}', "
+                 "'popup', 1, 0, 0, 1474977124357)").format(
+                    base_url=self.base_url))
             db.commit()
 
     def is_element_present(self, how, what):
