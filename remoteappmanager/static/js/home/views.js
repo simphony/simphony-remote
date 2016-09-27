@@ -22,10 +22,10 @@ define(["jquery", "utils"], function ($, utils) {
 
         this._x_button_clicked = function () {
             // Triggered when the button X (left side) is clicked
-            var button = this;
-            var index = $(button).data("index");
+            var button = $(this);
+            var index = button.data("index");
 
-            var icon_elem = $(button).find(".x-icon");
+            var icon_elem = button.find(".x-icon");
             var icons = ['fa-start', 'fa-eye'];
             var icon_type;
 
@@ -37,6 +37,7 @@ define(["jquery", "utils"], function ($, utils) {
             
             var update_entry = function () { self.update_entry(index); };
             icon_elem.removeClass(icon_type).addClass("fa-spinner fa-spin");
+            button.prop("disabled", true);
             
             var app_info = self.model.app_data[index];
             if (app_info.container !== null) {
@@ -47,11 +48,12 @@ define(["jquery", "utils"], function ($, utils) {
         };
         
         this._y_button_clicked = function () {
-            var button = this;
-            var index = $(button).data("index");
-            var icon_elem = $(button).find(".y-icon");
+            var button = $(this);
+            var index = button.data("index");
+            var icon_elem = button.find(".y-icon");
             
             icon_elem.removeClass("fa-stop").addClass("fa-spinner fa-spin");
+            button.prop("disabled", true);
 
             var update_entry = function () { self.update_entry(index); };
             self.stop_button_clicked(index).always(update_entry);

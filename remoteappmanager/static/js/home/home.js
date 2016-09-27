@@ -32,8 +32,11 @@ require(
         };
 
         view.view_button_clicked = function (index) {
+            var promise = $.Deferred();
             var app_info = model.app_data[index];
             new_container_window(app_info.container.url_id);
+            promise.resolve();
+            return promise;
         };
         
         view.stop_button_clicked = function (index) {
