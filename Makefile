@@ -112,6 +112,10 @@ jstest:
 	jshint --config .jshintrc remoteappmanager/static/js/
 	node-qunit-phantomjs jstests/tests.html
 
+.PHONY: seleniumtest
+seleniumtest:
+	python -m unittest discover -s selenium_tests -t . -v
+
 .PHONY: docs
 docs:
 	sphinx-build -W doc/source doc/build/sphinx
