@@ -59,4 +59,5 @@
 # # ----------------
 # # Google Analytics
 # # ----------------
+# # Put your tracking id from Google Analytics here.
 # ga_tracking_id = "UA-XXXXXX-X"
