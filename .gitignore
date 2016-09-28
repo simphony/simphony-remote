@@ -9,4 +9,10 @@ jupyterhub_cookie_secret
 doc/build
 doc/source/api
 doc/source/remoteappmanager_help.txt
+remoteappmanager/static/components/
 node_modules
+.coverage
+build/
+dist/
+jupyterhub/remoteappmanager.db
+jupyterhub/test.key.org
