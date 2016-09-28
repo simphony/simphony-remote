@@ -17,7 +17,7 @@
         "jquery": "components/jquery#~2.0",
         "moment": "~2.7",
         "requirejs": "~2.1"
-    }
+    },
     "devDependencies": {
         "blanket": "jstest/components/blanket#^1.1.7"
     }
