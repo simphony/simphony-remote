@@ -1,11 +1,10 @@
-define([
-    "require", 
-    "home/models",
-    "home/views", 
-    "../../../../../jstests/tests/home/mock_remoteappapi",
-    "jquery"
-], function (require, models, views, mock_api, $) {
+define(function (require) {
     "use strict";
+    var models = require("home/models");
+    var views = require("home/views");
+    var mock_api = require("../../../../../jstests/tests/home/mock_remoteappapi");
+    var $ = require("jquery");
+
     QUnit.module("home.views");
     QUnit.test("rendering", function (assert) {
         var api = new mock_api.MockApi();

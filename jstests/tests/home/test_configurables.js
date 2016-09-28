@@ -1,5 +1,6 @@
-define(["require", "home/configurables"], function (require, configurables) {
+define(function (require) {
     "use strict";
+    var configurables = require("home/configurables");
 
     QUnit.module("home.configurables");
     QUnit.test("instantiation", function (assert) {
