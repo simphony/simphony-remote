@@ -37,10 +37,11 @@ Deployment of the complete system in a single machine/VM.
 
      docker info
    
-#. Create and activate a virtual environment::
+#. Create and activate a virtual environment, then set the appropriate PATH for the node modules::
 
      make venv
-     . venv/bin/activate 
+     . venv/bin/activate
+     export PATH=`node bin`:$PATH
 
 #. Install the python dependencies::
     

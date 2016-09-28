@@ -32,7 +32,7 @@ deps:
 	fi; \
 		sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages npm nodejs-legacy python3-pip 
 	npm install 
-	bower install 
+	`npm bin`/bower install 
 
 .PHONY: pythondeps
 pythondeps:
@@ -107,8 +107,8 @@ pythontest:
 jstest: 
 	@echo "Running javascript testsuite"
 	@echo "----------------------------"
-	jshint --config .jshintrc remoteappmanager/static/js/
-	node-qunit-phantomjs jstests/tests.html
+	`npm bin`/jshint --config .jshintrc remoteappmanager/static/js/
+	`npm bin`/node-qunit-phantomjs jstests/tests.html
 
 .PHONY: seleniumtest
 seleniumtest:
