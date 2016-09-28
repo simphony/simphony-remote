@@ -56,6 +56,10 @@ class FileConfig(HasTraits):
         default_value=paths.static_dir,
         help="The path where to search for static files")
 
+    ga_tracking_id = Unicode(
+        help="The google analytics tracking id"
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Sets the default of the docker configuration options from the
@@ -94,7 +98,6 @@ class FileConfig(HasTraits):
     def parse_config(self, config_file):
         """Parses the config file, and assign their values to our local traits.
         """
-
         # Keep the file line parser isolated, but use the global one
         # so that we can get the help of the command line options.
         file_line_parser = tornado.options.OptionParser()

@@ -64,10 +64,9 @@
         {% if user %}
         user: "{{user.name}}",
         {% endif %}
-        {% if google_analytics %}
+        {% if analytics %}
         analytics: {
-            tracking_id: "{{ google_analytics.tracking_id }}",
-            domain: "{{ google_analytics.domain }}"
+            tracking_id: "{{ analytics.tracking_id }}",
         },
         {% endif %}
       }

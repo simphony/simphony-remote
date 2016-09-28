@@ -24,6 +24,10 @@ accounting_class = "remoteappmanager.db.csv_db.CSVAccounting"
 accounting_kwargs = {"csv_file_path": "file_path.csv"}
 '''
 
+GA_TRACKING = '''
+ga_tracking_id = "UA-12345-6"
+'''
+
 
 @contextlib.contextmanager
 def envvars(envs):
@@ -152,6 +156,15 @@ class TestFileConfig(TempMixin, unittest.TestCase):
         config = FileConfig(tls=True)
         self.assertNotEqual(config.tls_key, '')
         self.assertNotEqual(config.tls_cert, '')
+
+    def test_ga_tracking(self):
+        with open(self.config_file, 'w') as fhandle:
+            print(GA_TRACKING, file=fhandle)
+
+        config = FileConfig()
+        config.parse_config(self.config_file)
+
+        self.assertEqual(config.ga_tracking_id, 'UA-12345-6')
 
     def test_file_parsing_not_overriding_bug_131(self):
         docker_config = textwrap.dedent('''

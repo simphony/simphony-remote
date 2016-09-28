@@ -20,6 +20,10 @@ if setting_mode == 'virtual_user':
     # If unset, no workspace would be available
     c.Spawner.workspace_dir = '/tmp/remoteapp'
 
+    # Uncomment this if you want to enable the use of the configuration
+    # file for the spawned service, instead of using the defaults.
+    # c.Spawner.config_file_path = 'remoteappmanager_config.py'
+
     # FIXME: replace me with other authenticator (e.g. GitHub OAuth...)
     c.JupyterHub.authenticator_class = (
         'remoteappmanager.auth.WorldAuthenticator')
