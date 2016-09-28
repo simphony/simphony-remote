@@ -34,24 +34,44 @@ define(['jquery', 'home/configurables'], function ($, configurables) {
             
             // Add the options for some image types
             for (var data_idx = 0; data_idx < self.app_data.length; ++data_idx) {
-                var image = self.app_data[data_idx].image;
-                self.configurables[data_idx] = {};
-                
-                for (var cfg_idx = 0; cfg_idx < image.configurables.length; ++cfg_idx) {
-                    var tag = image.configurables[cfg_idx];
-                    
-                    // If this returns null, the tag has not been recognized
-                    // by the client. skip it and let the server deal with the 
-                    // missing data, either by using a default or throwing
-                    // an error.
-                    var ConfigurableCls = configurables.from_tag(tag);
-                    
-                    if (ConfigurableCls !== null) {
-                        self.configurables[data_idx][tag] = new ConfigurableCls();
-                    }
-               }
+                self._update_configurables(data_idx);
             }
         });
+    };
+
+    ApplicationListModel.prototype.update_idx = function(index) {
+        // Refetches and updates the entry at the given index.
+        var self = this;
+        
+        var entry = this.app_data[index];
+        var mapping_id = entry.mapping_id;
+        return $.when(
+            self._appapi.application_info(mapping_id)
+        ).done(function(new_data) {
+            self.app_data[index] = new_data;
+            self._update_configurables(index);
+        });
+    };
+
+    ApplicationListModel.prototype._update_configurables = function(index) {
+        // Updates the configurables submodel for a given application index.
+        var self = this;
+        var image = self.app_data[index].image;
+        self.configurables[index] = {};
+
+        for (var cfg_idx = 0; cfg_idx < image.configurables.length; ++cfg_idx) {
+            var tag = image.configurables[cfg_idx];
+
+            // If this returns null, the tag has not been recognized
+            // by the client. skip it and let the server deal with the 
+            // missing data, either by using a default or throwing
+            // an error.
+            var ConfigurableCls = configurables.from_tag(tag);
+
+            if (ConfigurableCls !== null) {
+                self.configurables[index][tag] = new ConfigurableCls();
+            }
+        }
     };
     
     return {

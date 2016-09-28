@@ -171,11 +171,37 @@ class TestVirtualUserSpawner(TestSystemUserSpawner):
             self.assertIn(os.path.basename(virtual_directory),
                           os.listdir(self.tempdir))
 
-        # The temporary directory should be removed upon stop
-        self.assertFalse(os.listdir(self.tempdir))
+        self.assertIn(os.path.basename(virtual_directory),
+                      os.listdir(self.tempdir))
 
         status = self.io_loop.run_sync(self.spawner.poll)
         self.assertEqual(status, 1)
+
+    def test_spawner_with_workspace_dir_already_existent(self):
+        self.spawner.workspace_dir = self.tempdir
+        os.mkdir(os.path.join(self.tempdir, username()))
+
+        with spawner_start_and_stop(self.io_loop, self.spawner):
+            status = self.io_loop.run_sync(self.spawner.poll)
+            self.assertIsNone(status)
+
+            # There should be a temporary directory created
+            # and it should be assigned to _virtual_workspace
+            virtual_directory = self.spawner._virtual_workspace
+            self.assertIn(os.path.basename(virtual_directory),
+                          os.listdir(self.tempdir))
+
+        self.assertIn(os.path.basename(virtual_directory),
+                      os.listdir(self.tempdir))
+
+    def test_spawner_with_workspace_dir_as_file(self):
+        self.spawner.workspace_dir = self.tempdir
+
+        with open(os.path.join(self.tempdir, username()), 'w'):
+            pass
+
+        with spawner_start_and_stop(self.io_loop, self.spawner):
+            self.assertIsNone(self.spawner.get_env().get('HOME'))
 
     def test_env_has_proxy_api_token(self):
         env = self.spawner.get_env()
@@ -212,22 +238,6 @@ class TestVirtualUserSpawner(TestSystemUserSpawner):
         with spawner_start_and_stop(self.io_loop, self.spawner):
             state = self.spawner.get_state()
             self.assertNotIn('virtual_workspace', state)
-
-    def test_clean_up_temporary_dir_if_start_fails(self):
-        self.spawner.workspace_dir = self.tempdir
-
-        # mock LocalProcessSpawner.start to fail
-        def start_fail(instance):
-            raise Exception
-
-        with mock.patch('jupyterhub.spawner.LocalProcessSpawner.start',
-                        start_fail), \
-                self.assertRaises(Exception), \
-                spawner_start_and_stop(self.io_loop, self.spawner):
-            pass
-
-        # The temporary directory should be cleaned up
-        self.assertFalse(os.listdir(self.tempdir))
 
     def test_start_if_workspace_path_not_exists(self):
         self.spawner.workspace_dir = '/no_way/this_exists'

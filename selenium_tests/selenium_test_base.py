@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import time
+import os
+import contextlib
+import sqlite3
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
@@ -22,6 +25,17 @@ class SeleniumTestBase(unittest.TestCase):
         self.base_url = "https://127.0.0.1:8000/"
         self.verificationErrors = []
         self.accept_next_alert = True
+
+        permissions_db_path = os.path.join(ff_profile.profile_dir,
+                                           "permissions.sqlite")
+
+        with contextlib.closing(sqlite3.connect(permissions_db_path)) as db:
+            cur = db.cursor()
+            cur.execute(
+                ("INSERT INTO moz_perms VALUES (1, '{base_url}', "
+                 "'popup', 1, 0, 0, 1474977124357)").format(
+                    base_url=self.base_url))
+            db.commit()
 
     def is_element_present(self, how, what):
         try:

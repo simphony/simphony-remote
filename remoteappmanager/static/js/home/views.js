@@ -19,13 +19,13 @@ define(["jquery", "utils"], function ($, utils) {
         this.stop_button_clicked = function(index) {};
         this.start_button_clicked = function(index) {};
         this.view_button_clicked = function(index) {};
-        
+
         this._x_button_clicked = function () {
             // Triggered when the button X (left side) is clicked
-            var button = this;
-            var index = $(button).data("index");
+            var button = $(this);
+            var index = button.data("index");
 
-            var icon_elem = $(button).find(".x-icon");
+            var icon_elem = button.find(".x-icon");
             var icons = ['fa-start', 'fa-eye'];
             var icon_type;
 
@@ -35,29 +35,28 @@ define(["jquery", "utils"], function ($, utils) {
                 }
             }
             
+            var update_entry = function () { self.update_entry(index); };
             icon_elem.removeClass(icon_type).addClass("fa-spinner fa-spin");
-                
-            var restore_icon = function () {
-                icon_elem.removeClass("fa-spinner fa-spin").addClass(icon_type);
-            };
-
-            var app_info = self.model.app_data[index];
+            button.prop("disabled", true);
             
+            var app_info = self.model.app_data[index];
             if (app_info.container !== null) {
-                self.view_button_clicked(index).done(restore_icon);
+                self.view_button_clicked(index).always(update_entry);
             } else {
-                self.start_button_clicked(index).done(restore_icon);
+                self.start_button_clicked(index).always(update_entry);
             }
         };
         
         this._y_button_clicked = function () {
-            var button = this;
-            var index = $(button).data("index");
-            $(button).find(".y-icon").removeClass("fa-stop").addClass("fa-spinner fa-spin");
+            var button = $(this);
+            var index = button.data("index");
+            var icon_elem = button.find(".y-icon");
             
-            self.stop_button_clicked(index).done(function () {
-                $(button).find(".y-icon").removeClass("fa-spinner fa-spin").addClass("fa-stop");
-            });
+            icon_elem.removeClass("fa-stop").addClass("fa-spinner fa-spin");
+            button.prop("disabled", true);
+
+            var update_entry = function () { self.update_entry(index); };
+            self.stop_button_clicked(index).always(update_entry);
         };
         
         $("#applist").html(
