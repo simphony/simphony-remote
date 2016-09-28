@@ -19,6 +19,6 @@
         "requirejs": "~2.1"
     },
     "devDependencies": {
-        "blanket": "jstest/components/blanket#^1.1.7"
+        "blanket": "^1.1.7"
     }
 }

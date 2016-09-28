@@ -11,7 +11,7 @@
           bootstrap: {
             deps: ["jquery"],
             exports: "bootstrap"
-          },
+          }
         }
     });
 
