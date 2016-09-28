@@ -1,7 +1,8 @@
-define(function (require) {
+define([
+    "home/models", 
+    "../../../../../jstests/tests/home/mock_remoteappapi"
+], function (models, mock_api) {
     "use strict";
-    var models = require("home/models");
-    var mock_api = require("../../../../../jstests/tests/home/mock_remoteappapi");
 
     QUnit.module("home.models");
     QUnit.test("instantiation", function (assert) {
