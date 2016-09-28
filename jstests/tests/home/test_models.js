@@ -1,8 +1,7 @@
 define([
-    "require", 
     "home/models", 
     "../../../../../jstests/tests/home/mock_remoteappapi"
-], function (require, models, mock_api) {
+], function (models, mock_api) {
     "use strict";
 
     QUnit.module("home.models");

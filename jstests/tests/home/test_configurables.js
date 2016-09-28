@@ -1,4 +1,6 @@
-define(["require", "home/configurables"], function (require, configurables) {
+define([
+    "home/configurables"
+], function (configurables) {
     "use strict";
 
     QUnit.module("home.configurables");

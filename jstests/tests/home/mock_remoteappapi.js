@@ -1,4 +1,4 @@
-define(function (require) {
+define(function () {
     "use strict";
     var MockApi = function () {
         this.available_applications_info = function () {
