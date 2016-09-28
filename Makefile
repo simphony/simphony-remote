@@ -31,12 +31,12 @@ deps:
 		plat_packages="docker.io python3-venv"; \
 	fi; \
 		sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages npm nodejs-legacy python3-pip 
+	npm install 
+	`npm bin`/bower install 
 
 .PHONY: pythondeps
 pythondeps:
 	pip3 install --upgrade pip setuptools
-	# Currently set to 1.4.0dev fixing X-Forward behavior
-	npm install "git://github.com/jupyterhub/configurable-http-proxy.git#f54c6a46a235f17cb6c36046a913d37fa45ec95b"
 	pip3 install -r requirements.txt 
 
 .PHONY: devdeps
@@ -45,8 +45,6 @@ devdeps:
 	@echo "----------------------------"
 	pip3 install -r dev-requirements.txt -r doc-requirements.txt
 	sudo apt-get install phantomjs
-	sudo npm install -g jshint
-	sudo npm install -g node-qunit-phantomjs
 
 .PHONY: develop
 develop: 
@@ -109,8 +107,8 @@ pythontest:
 jstest: 
 	@echo "Running javascript testsuite"
 	@echo "----------------------------"
-	jshint --config .jshintrc remoteappmanager/static/js/
-	node-qunit-phantomjs jstests/tests.html
+	`npm bin`/jshint --config .jshintrc remoteappmanager/static/js/
+	`npm bin`/node-qunit-phantomjs jstests/tests.html
 
 .PHONY: seleniumtest
 seleniumtest:
