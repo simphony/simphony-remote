@@ -1,0 +1,24 @@
+{
+    "name": "simphony-remote-deps",
+    "version": "0.0.0",
+    "homepage": "https://github.com/simphony/simphony-remote",
+    "authors": [
+        "Stefano Borini <sborini@enthought.com>"
+    ],
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "bootstrap": "components/bootstrap#~3.1",
+        "font-awesome": "components/font-awesome#~4.1",
+        "jquery": "components/jquery#~2.0",
+        "moment": "~2.7",
+        "requirejs": "~2.1"
+    }
+    "devDependencies": {
+        "blanket": "jstest/components/blanket#^1.1.7",
+    }
+}
