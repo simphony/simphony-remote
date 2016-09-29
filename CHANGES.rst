@@ -1,6 +1,13 @@
 SimPhoNy Remote CHANGELOG
 =========================
 
+What's new in SimPhoNy Remote 0.8.0
+
+Summary
+~~~~~~~
+
+- Introduced Google Analytics support for start of Applications.
+
 What's new in SimPhoNy Remote 0.7.0
 -----------------------------------
 

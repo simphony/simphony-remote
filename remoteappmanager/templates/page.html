@@ -20,10 +20,8 @@
 </div>
 {% endmacro %}
 
-
 <!DOCTYPE HTML>
 <html>
-
 <head>
     <meta charset="utf-8">
 
@@ -36,6 +34,7 @@
     <link rel="stylesheet" href="{{ static_url("css/style.min.css") }}" type="text/css"/>
     <link rel="stylesheet" href="{{ static_url("css/remoteappmanager.css") }}" type="text/css"/>
     {% endblock %}
+
     <script src="{{static_url("components/requirejs/require.js") }}" type="text/javascript" charset="utf-8"></script>
     <script>
       require.config({
@@ -65,56 +64,56 @@
         {% if user %}
         user: "{{user.name}}",
         {% endif %}
+        {% if analytics %}
+        analytics: {
+            tracking_id: "{{ analytics.tracking_id }}",
+        },
+        {% endif %}
       }
     </script>
-
     {% block meta %}
     {% endblock %}
-
 </head>
-
 <body>
+    <noscript>
+      <div id='noscript'>
+        Jupyter Hub requires JavaScript.<br>
+        Please enable it to proceed.
+      </div>
+    </noscript>
 
-<noscript>
-  <div id='noscript'>
-    Jupyter Hub requires JavaScript.<br>
-    Please enable it to proceed.
-  </div>
-</noscript>
+    <div id="header" class="navbar navbar-static-top">
+      <div class="container">
+      <span id="jupyterhub-logo" class="pull-left"><a href="{{logo_url or base_url}}"><img src='{{ static_url("images/header_logo.png") }}' alt='Logo' class='jpy-logo' title='Home'/></a></span>
 
-<div id="header" class="navbar navbar-static-top">
-  <div class="container">
-  <span id="jupyterhub-logo" class="pull-left"><a href="{{logo_url or base_url}}"><img src='{{ static_url("images/header_logo.png") }}' alt='Logo' class='jpy-logo' title='Home'/></a></span>
+      {% block login_widget %}
 
-  {% block login_widget %}
+        <span id="login_widget">
+          {% if user %}
+            <a id="logout" class="navbar-btn btn-sm btn btn-default pull-right" href="{{logout_url}}"> <i class="fa fa-sign-out"></i> Logout</a>
+          {% else %}
+            <a id="login" class="btn-sm btn navbar-btn btn-default pull-right" href="{{login_url}}">Login</a>
+          {% endif %}
+        </span>
 
-    <span id="login_widget">
-      {% if user %}
-        <a id="logout" class="navbar-btn btn-sm btn btn-default pull-right" href="{{logout_url}}"> <i class="fa fa-sign-out"></i> Logout</a>
-      {% else %}
-        <a id="login" class="btn-sm btn navbar-btn btn-default pull-right" href="{{login_url}}">Login</a>
-      {% endif %}
-    </span>
+      {% endblock %}
 
-  {% endblock %}
+      {% block header %}
+      {% endblock %}
+      </div>
+    </div>
 
-  {% block header %}
-  {% endblock %}
-  </div>
-</div>
+    {% block main %}
+    {% endblock %}
 
-{% block main %}
-{% endblock %}
+    {% call modal('Error', btn_label='OK') %}
+      <div class="ajax-error">
+        The error
+      </div>
+    {% endcall %}
 
-{% call modal('Error', btn_label='OK') %}
-  <div class="ajax-error">
-    The error
-  </div>
-{% endcall %}
-
-{% block script %}
-{% endblock %}
+    {% block script %}
+    {% endblock %}
 
 </body>
-
 </html>

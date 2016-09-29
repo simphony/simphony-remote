@@ -55,3 +55,9 @@
 # accounting_class = "remoteappmanager.db.orm.AppAccounting"
 # accounting_kwargs = {
 #     "url": "sqlite:///"+os.path.abspath('./remoteappmanager.db')}
+
+# # ----------------
+# # Google Analytics
+# # ----------------
+# # Put your tracking id from Google Analytics here.
+# ga_tracking_id = "UA-XXXXXX-X"

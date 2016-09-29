@@ -25,15 +25,24 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
         """Reimplements render to pass well known information to the rendering
         context.
         """
+        command_line_config = self.application.command_line_config
+        file_config = self.application.file_config
+
         args = dict(
             user=self.current_user,
-            base_url=self.application.command_line_config.base_urlpath,
-            logout_url=urljoin(
-                self.application.command_line_config.hub_prefix,
-                "logout")
+            base_url=command_line_config.base_urlpath,
+            logout_url=urljoin(command_line_config.hub_prefix, "logout")
         )
 
         args.update(kwargs)
+
+        if file_config.ga_tracking_id:
+            args.update({
+                "analytics": {
+                    "tracking_id": file_config.ga_tracking_id
+                }
+            })
+
         super(BaseHandler, self).render(template_name, **args)
 
     def write_error(self, status_code, **kwargs):

@@ -20,7 +20,8 @@
         "tests/home/test_models.js",
         "tests/home/test_views.js",
         "tests/test_remoteappapi.js",
-        "tests/test_utils.js"
+        "tests/test_utils.js",
+        "tests/test_analytics.js"
         ], function() {
             window.apidata = {
                 base_url: "/",
