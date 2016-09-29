@@ -54,9 +54,9 @@ Container Labels
 When a container is started, the following labels will be added:
 
     - ``url_id``: unique identifier that ends up in the URL when the 
-              user is redirected
+      user is redirected
     - ``mapping_id``: a unique key identifying the combination of image 
-                  and policy used to start the container.
+      and policy used to start the container.
     - ``user``: the user that started the container
 
 Environment variables
@@ -65,7 +65,7 @@ Environment variables
 The following environment variables are passed at container startup:
 
     - ``JPY_USER``: the username used to login to the Jupyterhub frontend.
-    Can be an email address, or anything else your authenticator accepts.
+      Can be an email address, or anything else your authenticator accepts.
     - ``JPY_BASE_USER_URL``: The base URL _path_ where the user has its service.
     - ``USER``: A unix-likable username to create the container user.
     - ``URL_ID``: a unique key assigned to the container that will end up in
