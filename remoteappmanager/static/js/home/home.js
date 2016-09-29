@@ -3,12 +3,13 @@ require([
     "jquery", 
     "utils", 
     "remoteappapi", 
-    "ga",
+    "analytics",
     "home/models", 
     "home/views"
-], function($, utils, RemoteAppAPI, ga, models, views) {
+], function($, utils, RemoteAppAPI, analytics, models, views) {
     "use strict";
 
+    var ga = analytics.init();
     var base_url = window.apidata.base_url;
     var appapi = new RemoteAppAPI(base_url);
    
