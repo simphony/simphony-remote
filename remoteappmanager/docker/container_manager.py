@@ -67,10 +67,12 @@ class ContainerManager(LoggingMixin):
                         mapping_id,
                         volumes,
                         environment=None):
-        """Starts a container using the given image name.
+        """
+        Starts a container using the given image name.
 
         Parameters
         ----------
+
         user_name: string
             The name of the user
         image_name: string
@@ -89,6 +91,12 @@ class ContainerManager(LoggingMixin):
         Return
         ------
         A container object containing information about the started container.
+
+        Raises
+        ------
+        OperationInProgres:
+            if the requested mapping id is already scheduled for addition
+
         """
 
         if mapping_id in self._start_pending:
@@ -119,6 +127,11 @@ class ContainerManager(LoggingMixin):
         ----------
         container_id : str
             A string containing the container identifier.
+
+        Raises
+        ------
+        OperationInProgres:
+            if the requested container id is already scheduled for removal.
         """
 
         if container_id in self._stop_pending:
