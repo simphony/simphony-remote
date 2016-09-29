@@ -1,12 +1,18 @@
-API reference
-=============
-
+Developer documentation
+=======================
 
 RemoteAppManager
 ----------------
 
 The main tornado web application that manages the containers (docker applications)
 for each user.
+
+.. include::
+    developer/docker.rst
+
+API reference
+-------------
+
 
 .. autosummary::
    :toctree: api
