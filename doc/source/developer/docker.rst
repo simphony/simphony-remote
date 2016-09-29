@@ -69,7 +69,7 @@ The following environment variables are passed at container startup:
     - ``JPY_BASE_USER_URL``: The base URL _path_ where the user has its service.
     - ``USER``: A unix-likable username to create the container user.
     - ``URL_ID``: a unique key assigned to the container that will end up in
-    the user-exposed URL to reach the container.
+      the user-exposed URL to reach the container.
 
 If the image accepts additional envvars (through the env labels mechanism outlined above)
 these variables will be passed through the configurables mechanism: special variables
