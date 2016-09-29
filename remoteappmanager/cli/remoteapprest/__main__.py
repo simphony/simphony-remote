@@ -139,8 +139,7 @@ def available(ctx):
 @click.argument("identifier")
 @click.pass_context
 def start(ctx, identifier):
-    """Starts a container for application identified by IDENTIFIER.
-    If a container is already running, restarts it."""
+    """Starts a container for application identified by IDENTIFIER."""
     cred = ctx.obj.credentials
     url, username, cookies = cred.url, cred.username, cred.cookies
 
