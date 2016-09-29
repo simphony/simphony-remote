@@ -24,6 +24,12 @@ _CONTAINER_SAFE_CHARS = set(string.ascii_letters + string.digits + '-.')
 _CONTAINER_ESCAPE_CHAR = '_'
 
 
+class OperationInProgress(Exception):
+    """Exception raised when the operation for the requested image or
+    container is already in progress."""
+    pass
+
+
 class ContainerManager(LoggingMixin):
     #: The asynchronous docker client.
     docker_client = Instance(AsyncDockerClient)
@@ -33,10 +39,10 @@ class ContainerManager(LoggingMixin):
     #: refer to it.
     container_port = Int(8888)
 
-    #: Tracks if a given container is starting up.
+    #: Tracks if a given mapping id is starting up.
     _start_pending = Set()
 
-    #: Tracks if a given container is stopping down.
+    #: Tracks if a given container id is stopping down.
     _stop_pending = Set()
 
     #: The docker client configuration
@@ -61,10 +67,12 @@ class ContainerManager(LoggingMixin):
                         mapping_id,
                         volumes,
                         environment=None):
-        """Starts a container using the given image name.
+        """
+        Starts a container using the given image name.
 
         Parameters
         ----------
+
         user_name: string
             The name of the user
         image_name: string
@@ -83,23 +91,29 @@ class ContainerManager(LoggingMixin):
         Return
         ------
         A container object containing information about the started container.
+
+        Raises
+        ------
+        OperationInProgres:
+            if the requested mapping id is already scheduled for addition
+
         """
 
-        if image_name in self._start_pending:
-            return None
+        if mapping_id in self._start_pending:
+            raise OperationInProgress("start {}".format(mapping_id))
 
         if environment is None:
             environment = {}
 
         try:
-            self._start_pending.add(image_name)
+            self._start_pending.add(mapping_id)
             result = yield self._start_container(user_name,
                                                  image_name,
                                                  mapping_id,
                                                  volumes,
                                                  environment)
         finally:
-            self._start_pending.remove(image_name)
+            self._start_pending.remove(mapping_id)
 
         return result
 
@@ -113,10 +127,15 @@ class ContainerManager(LoggingMixin):
         ----------
         container_id : str
             A string containing the container identifier.
+
+        Raises
+        ------
+        OperationInProgres:
+            if the requested container id is already scheduled for removal.
         """
 
         if container_id in self._stop_pending:
-            return
+            raise OperationInProgress("stop {}".format(container_id))
 
         try:
             self._stop_pending.add(container_id)
