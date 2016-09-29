@@ -110,6 +110,11 @@ jstest:
 	`npm bin`/jshint --config .jshintrc remoteappmanager/static/js/
 	`npm bin`/node-qunit-phantomjs jstests/tests.html
 
+.PHONY: jscoverage
+jscoverage:
+	python -m http.server 12345 &
+	open http://127.0.0.1:12345/jstests/tests.html?coverage
+
 .PHONY: seleniumtest
 seleniumtest:
 	python -m unittest discover -s selenium_tests -t . -v
