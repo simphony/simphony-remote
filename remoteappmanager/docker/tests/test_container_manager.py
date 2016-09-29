@@ -4,7 +4,8 @@ from unittest import mock
 from tornado.testing import AsyncTestCase, gen_test
 
 from remoteappmanager.docker.container import Container
-from remoteappmanager.docker.container_manager import ContainerManager
+from remoteappmanager.docker.container_manager import ContainerManager, \
+    OperationInProgress
 from remoteappmanager.docker.image import Image
 from remoteappmanager.tests import utils
 from remoteappmanager.tests.mocking.virtual.docker_client import (
@@ -108,9 +109,23 @@ class TestContainerManager(AsyncTestCase):
         # one tries to remove the same key from the list, but it has been
         # already removed by the first one. Race condition.
         yield f1
-        yield f2
+
+        with self.assertRaises(OperationInProgress):
+            yield f2
 
         self.assertEqual(self.mock_docker_client.start.call_count, 1)
+
+    @gen_test
+    def test_race_condition_stopping(self):
+        f1 = self.manager.stop_and_remove_container("12345")
+        f2 = self.manager.stop_and_remove_container("12345")
+
+        yield f1
+
+        with self.assertRaises(OperationInProgress):
+            yield f2
+
+        self.assertEqual(self.mock_docker_client.stop.call_count, 1)
 
     @gen_test
     def test_start_already_present_container(self):
