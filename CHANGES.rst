@@ -6,7 +6,27 @@ What's new in SimPhoNy Remote 0.8.0
 Summary
 ~~~~~~~
 
-- Introduced Google Analytics support for start of Applications.
+- Introduced Google Analytics support for start of Applications (#274).
+- Support for passing configurable data at application startup (#255, #257, #260, #263, #264, #266)
+  Documentation of the resulting docker image protocol (#278)
+- Virtual user workspace is now created once and preserved, with a identifiable name (#270)
+- Launching or viewing application now opens a new window (#269)
+- Makefile rule and documentation for docker upgrade on Ubuntu 14.04 host (#249)
+- Introduced npm/bower package management. Removed now irrelevant files. (#272, #273, #275)
+- UI:
+    - Added spinner during loading of applications. Added message in case of no applications available (#252)
+    - beautification (#265)
+- CI: 
+    - Removed Paraview image retrieval (#256)
+    - Better Travis output using before_script to perform devdeps installation. (#267)
+    - Added test coverage for JavaScript code with Blanket (#276)
+- Refactor: 
+    - Major overhaul of JavaScript layer (#250)
+    - Finalized porting of WebAPI to tornadowebapi (#254)
+- Fix:
+    - Reporting error in case of double start/stop request, removing a potential race condition (#279)
+    - Documented command line start request behavior for already started container (#280)
+
 
 What's new in SimPhoNy Remote 0.7.0
 -----------------------------------
