@@ -29,6 +29,12 @@ class ReverseProxy(LoggingMixin, HasTraits):
             self.log.error(message)
             raise ValueError(message)
 
+        if not self.endpoint_url:
+            message = ("invalid proxy endpoint url to initialise "
+                       "the reverse proxy connection.")
+            self.log.error(message)
+            raise ValueError(message)
+
         # Note, we use jupyterhub orm Proxy, but not for database access,
         # just for interface convenience.
         self._reverse_proxy = jupyterhub_orm.Proxy(
