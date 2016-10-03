@@ -1,5 +1,4 @@
 import importlib
-import os
 
 from remoteappmanager.handlers.handler_authenticator import HubAuthenticator
 from traitlets import Instance, default
@@ -38,9 +37,22 @@ class Application(web.Application, LoggingMixin):
     #: The WebAPI registry
     registry = Instance(Registry)
 
+    @property
+    def command_line_config(self):
+        return self._command_line_config
+
+    @property
+    def file_config(self):
+        return self._file_config
+
+    @property
+    def environment_config(self):
+        return self._environment_config
+
     def __init__(self,
                  command_line_config,
-                 file_config):
+                 file_config,
+                 environment_config):
         """Initializes the application
 
         config: ApplicationConfiguration
@@ -49,6 +61,7 @@ class Application(web.Application, LoggingMixin):
 
         self._command_line_config = command_line_config
         self._file_config = file_config
+        self._environment_config = environment_config
 
         # Observe that settings and config are different things.
         # Config is the external configuration we can change.
@@ -67,14 +80,6 @@ class Application(web.Application, LoggingMixin):
 
         super().__init__(handlers, **settings)
 
-    @property
-    def command_line_config(self):
-        return self._command_line_config
-
-    @property
-    def file_config(self):
-        return self._file_config
-
     # Initializers
     @default("container_manager")
     def _container_manager_default(self):
@@ -87,25 +92,18 @@ class Application(web.Application, LoggingMixin):
     @default("reverse_proxy")
     def _reverse_proxy_default(self):
         """Initializes the reverse proxy connection object."""
-        try:
-            auth_token = os.environ["PROXY_API_TOKEN"]
-        except KeyError:
-            self.log.error("Cannot extract PROXY_API_TOKEN to initialise the "
-                           "reverse proxy connection. Exiting.")
-            raise
-
         # Note, we use jupyterhub orm Proxy, but not for database access,
         # just for interface convenience.
         return ReverseProxy(
             endpoint_url=self.command_line_config.proxy_api_url,
-            auth_token=auth_token,
+            api_token=self.environment_config.proxy_api_token,
         )
 
     @default("hub")
     def _hub_default(self):
         """Initializes the Hub instance."""
         return Hub(endpoint_url=self.command_line_config.hub_api_url,
-                   api_key=os.environ.get('JPY_API_TOKEN', "")
+                   api_token=self.environment_config.jpy_api_token,
                    )
 
     @default("db")

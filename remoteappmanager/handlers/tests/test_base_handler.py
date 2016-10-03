@@ -8,20 +8,6 @@ from remoteappmanager.tests.temp_mixin import TempMixin
 
 
 class TestBaseHandler(TempMixin, utils.AsyncHTTPTestCase):
-    def setUp(self):
-        self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
-        os.environ["PROXY_API_TOKEN"] = "dummy_token"
-
-        def cleanup():
-            if self._old_proxy_api_token is not None:
-                os.environ["PROXY_API_TOKEN"] = self._old_proxy_api_token
-            else:
-                del os.environ["PROXY_API_TOKEN"]
-
-        self.addCleanup(cleanup)
-
-        super().setUp()
-
     def get_file_config(self):
         file_config = FileConfig()
         file_config.accounting_class = \

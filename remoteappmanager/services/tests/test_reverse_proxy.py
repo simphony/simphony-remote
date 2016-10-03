@@ -18,7 +18,7 @@ class TestReverseProxy(testing.AsyncTestCase):
 
         reverse_proxy = ReverseProxy(
             endpoint_url="http://fake/api",
-            auth_token="token")
+            api_token="token")
         reverse_proxy._reverse_proxy = Mock(spec=orm.Proxy)
         reverse_proxy._reverse_proxy.api_request = mock_api_request
 

@@ -6,20 +6,6 @@ from remoteappmanager.tests.temp_mixin import TempMixin
 
 
 class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
-    def setUp(self):
-        self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
-        os.environ["PROXY_API_TOKEN"] = "dummy_token"
-
-        def cleanup():
-            if self._old_proxy_api_token is not None:
-                os.environ["PROXY_API_TOKEN"] = self._old_proxy_api_token
-            else:
-                del os.environ["PROXY_API_TOKEN"]
-
-        self.addCleanup(cleanup)
-
-        super().setUp()
-
     def get_app(self):
         app = dummy.create_application()
         app.hub.verify_token.return_value = {

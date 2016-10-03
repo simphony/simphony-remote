@@ -6,7 +6,9 @@ from remoteappmanager.db import interfaces
 from remoteappmanager.docker.container_manager import ContainerManager
 
 from remoteappmanager.tests.utils import (
-    mock_coro_factory, basic_command_line_config)
+    mock_coro_factory,
+    basic_command_line_config,
+    basic_environment_config)
 from remoteappmanager.tests.mocking.virtual.docker_client import (
     create_docker_client)
 
@@ -54,7 +56,9 @@ def create_reverse_proxy(params=None,
     ReverseProxy : remoteappmanager.services.reverse_proxy.ReverseProxy
     """
     if params is None:
-        params = {}
+        params = {
+            "api_token": "dummy_token"
+        }
 
     revproxy = ReverseProxy(**params)
     revproxy.register = mock_coro_factory(register_result)
@@ -64,7 +68,7 @@ def create_reverse_proxy(params=None,
 
 
 def create_hub(params=None):
-    ''' Return a dummy Hub object
+    """ Return a dummy Hub object
 
     Parameters
     ----------
@@ -74,9 +78,11 @@ def create_hub(params=None):
     Returns
     -------
     hub : remoteappmanager.services.hub.Hub
-    '''
+    """
     if params is None:
-        params = {}
+        params = {
+            "api_token": "dummy_token"
+        }
 
     hub = Hub(**params)
 
@@ -104,8 +110,10 @@ def create_container_manager(params=None):
     return manager
 
 
-def create_application(command_line_config=None, file_config=None):
-    ''' Return a dummy Application object
+def create_application(command_line_config=None,
+                       file_config=None,
+                       environment_config=None):
+    """Return a dummy Application object
 
     Parameters
     ----------
@@ -115,10 +123,14 @@ def create_application(command_line_config=None, file_config=None):
     file_config : FileConfig
        File config for initialising Application
 
+    environment_config: EnvironmentConfig
+        Environment configuration for initialising Application
+
     Returns
     -------
     application : remoteappmanager.application.Application
-    '''
+    """
+
     if file_config is None:
         file_config = FileConfig()
         file_config.accounting_class = \
@@ -128,8 +140,15 @@ def create_application(command_line_config=None, file_config=None):
     if command_line_config is None:
         command_line_config = basic_command_line_config()
 
-    app = Application(command_line_config, file_config)
+    if environment_config is not None:
+        environment_config = basic_environment_config()
+
+    app = Application(command_line_config,
+                      file_config,
+                      environment_config)
+
     app.hub = create_hub()
     app.reverse_proxy = create_reverse_proxy()
     app.container_manager = create_container_manager()
+
     return app
