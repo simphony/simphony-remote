@@ -37,6 +37,13 @@ class TestHub(utils.AsyncHTTPTestCase):
         self.assertEqual(hub.endpoint_url, endpoint_url)
         self.assertEqual(hub.api_token, api_token)
 
+    def test_invalid_init(self):
+        with self.assertRaises(ValueError):
+            Hub(endpoint_url="", api_token="dummy")
+
+        with self.assertRaises(ValueError):
+            Hub(endpoint_url="http://fake.url/", api_token="")
+
     @testing.gen_test
     def test_requests(self):
         endpoint_url = self.get_url("/hub")
