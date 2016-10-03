@@ -77,7 +77,7 @@ define(["jquery", "utils"], function ($, utils) {
         } else {
             for (var i = 0; i < num_entries; i++) {
                 row = this.render_applist_entry(i);
-                applist.append(row);
+                applist.append(row.hide().fadeIn(500));
             }
         }
     };
