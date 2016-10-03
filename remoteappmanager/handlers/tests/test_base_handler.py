@@ -1,5 +1,3 @@
-import os
-
 from remoteappmanager.file_config import FileConfig
 
 from remoteappmanager.tests import utils
