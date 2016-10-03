@@ -17,6 +17,22 @@ class Hub(LoggingMixin, HasTraits):
     #: The api token to authenticate the request
     api_token = Unicode()
 
+    def __init__(self, *args, **kwargs):
+        """Initializes the hub connection object."""
+        super().__init__(*args, **kwargs)
+
+        if not self.api_token:
+            message = ("Invalid API Token to initialise "
+                       "the hub connection.")
+            self.log.error(message)
+            raise ValueError(message)
+
+        if not self.endpoint_url:
+            message = ("Invalid endpoint url to initialise "
+                       "the hub connection.")
+            self.log.error(message)
+            raise ValueError(message)
+
     @gen.coroutine
     def verify_token(self, cookie_name, encrypted_cookie):
         """Verify the authentication token and grants access to the user

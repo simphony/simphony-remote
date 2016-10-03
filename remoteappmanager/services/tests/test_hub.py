@@ -41,7 +41,7 @@ class TestHub(utils.AsyncHTTPTestCase):
     def test_requests(self):
         endpoint_url = self.get_url("/hub")
         api_token = "whatever"
-        hub = Hub(endpoint_url=endpoint_url, api_key=api_token)
+        hub = Hub(endpoint_url=endpoint_url, api_token=api_token)
 
         self.handler.ret_status = 403
         self.assertEqual((yield hub.verify_token("foo", "bar")), {})

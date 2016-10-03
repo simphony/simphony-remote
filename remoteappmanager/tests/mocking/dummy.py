@@ -57,7 +57,8 @@ def create_reverse_proxy(params=None,
     """
     if params is None:
         params = {
-            "api_token": "dummy_token"
+            "api_token": "dummy_token",
+            "endpoint_url": "http://fake.url/"
         }
 
     revproxy = ReverseProxy(**params)
@@ -81,7 +82,8 @@ def create_hub(params=None):
     """
     if params is None:
         params = {
-            "api_token": "dummy_token"
+            "api_token": "dummy_token",
+            "endpoint_url": "http://fake.url/"
         }
 
     hub = Hub(**params)
