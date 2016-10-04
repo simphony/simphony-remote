@@ -10,6 +10,7 @@ This documentation is for simphony-remote |version| (|release|)
    :maxdepth: 1
 
    deployment
+   upgrading
    configuration
    utilities
    design

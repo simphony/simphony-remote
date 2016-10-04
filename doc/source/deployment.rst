@@ -4,7 +4,7 @@ Deployment
 Single Machine
 --------------
 
-Deployment of the complete system in a single machine/VM.
+Deployment of the complete system in a single machine/VM with no previous installation.
 
 .. note::
 
