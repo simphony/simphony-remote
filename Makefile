@@ -69,7 +69,7 @@ db:
 	@echo "Creating database"
 	@echo "-----------------"
 	pushd jupyterhub; \
-        remoteappdb --db=remoteappmanager.db init;\
+        remoteappdb remoteappmanager.db init;\
         popd
 
 .PHONY: testdb
@@ -77,9 +77,9 @@ testdb: db
 	@echo "Creating Test database"
 	@echo "----------------------"
 	pushd jupyterhub; \
-        remoteappdb --db=remoteappmanager.db user create test; \
-        remoteappdb --db=remoteappmanager.db app create simphonyproject/simphonic-mayavi; \
-        remoteappdb --db=remoteappmanager.db app grant simphonyproject/simphonic-mayavi test; \
+        remoteappdb remoteappmanager.db user create test; \
+        remoteappdb remoteappmanager.db app create simphonyproject/simphonic-mayavi; \
+        remoteappdb remoteappmanager.db app grant simphonyproject/simphonic-mayavi test; \
         popd
 
 .PHONY: testimages

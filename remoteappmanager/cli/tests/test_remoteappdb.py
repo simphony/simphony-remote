@@ -20,7 +20,7 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
         runner = CliRunner()
         result = runner.invoke(
             remoteappdb.cli,
-            ("--db="+self.db+" "+argstring).split(),
+            (self.db+" "+argstring).split(),
             catch_exceptions=False
         )
 
