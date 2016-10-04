@@ -17,6 +17,10 @@ class DockerLabelNamespace(HasTraits):
                 self.namespace,
                 str(label)]))
 
+    def __getitem__(self, item):
+        """Returns the string "namespace.item"
+        """
+        return ".".join([self.namespace, str(item)])
 
 # Namespaces for our labels.
 SIMPHONY_NS = DockerLabelNamespace(
@@ -28,6 +32,26 @@ SIMPHONY_NS = DockerLabelNamespace(
         "icon_128",
         # A long description of the image
         "description",
+        # The type of the image: at the moment, it can be either
+        # "vncapp", "webapp" or not present (for legacy apps). This will
+        # affect the configurability of the image at startup.
+        "type",
+    ])
+
+# environment variables that the container accepts.
+# This is a sub-namespace. It will hold keys itself.
+SIMPHONY_NS_ENV = DockerLabelNamespace(
+    SIMPHONY_NS.namespace + ".env",
+    [
+        # These entries are extracted dynamically from the image
+        # and interpreted as an envvar that the container accepts.
+        # anything can be there.
+    ]
+)
+
+SIMPHONY_NS_RUNINFO = DockerLabelNamespace(
+    SIMPHONY_NS.namespace + ".runinfo",
+    [
         # The jupyterhub user a given container is assigned to
         "user",
         # A unique identifier generated to refer uniquely to a given
@@ -38,11 +62,5 @@ SIMPHONY_NS = DockerLabelNamespace(
         # practice this is hard to obtain from inside the container,
         # leading to a chicken/egg situation
         "url_id",
-        # The type of the image: at the moment, it can be either
-        # "vncapp", "webapp" or not present (for legacy apps). This will
-        # affect the configurability of the image at startup.
-        "type",
-        # environment variables that the container accepts.
-        # This is a sub-namespace. It will hold keys itself.
-        "env",
-    ])
+    ],
+)

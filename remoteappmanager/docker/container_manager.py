@@ -7,7 +7,8 @@ from docker.errors import APIError, NotFound
 from escapism import escape
 from remoteappmanager.docker.async_docker_client import AsyncDockerClient
 from remoteappmanager.docker.container import Container
-from remoteappmanager.docker.docker_labels import SIMPHONY_NS
+from remoteappmanager.docker.docker_labels import SIMPHONY_NS_RUNINFO
+
 from remoteappmanager.docker.image import Image
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from tornado import gen
@@ -160,8 +161,8 @@ class ContainerManager(LoggingMixin):
         A list of Container objects, or an empty list if nothing is found.
         """
         labels = {
-            SIMPHONY_NS.user: user_name,
-            SIMPHONY_NS.mapping_id: mapping_id}
+            SIMPHONY_NS_RUNINFO.user: user_name,
+            SIMPHONY_NS_RUNINFO.mapping_id: mapping_id}
         filters = {
             'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]}
 
@@ -173,7 +174,7 @@ class ContainerManager(LoggingMixin):
         """Retrieves and returns the container by its url_id, if present.
         If not present, returns None.
         """
-        labels = {SIMPHONY_NS.url_id: url_id}
+        labels = {SIMPHONY_NS_RUNINFO.url_id: url_id}
         filters = {
             'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]}
 
@@ -557,9 +558,9 @@ def _get_container_labels(user_name, mapping_id, url_id):
     to docker guidelines."""
 
     return {
-        SIMPHONY_NS.user: user_name,
-        SIMPHONY_NS.mapping_id: mapping_id,
-        SIMPHONY_NS.url_id: url_id,
+        SIMPHONY_NS_RUNINFO.user: user_name,
+        SIMPHONY_NS_RUNINFO.mapping_id: mapping_id,
+        SIMPHONY_NS_RUNINFO.url_id: url_id,
     }
 
 
