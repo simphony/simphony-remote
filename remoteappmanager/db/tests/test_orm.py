@@ -13,7 +13,8 @@ from remoteappmanager.tests.temp_mixin import TempMixin
 
 def fill_db(session):
     with transaction(session):
-        users = [orm.User(name="user"+str(i)) for i in range(5)]
+        users = [orm.User(name="user"+str(i),
+                          is_admin=(i == 2)) for i in range(5)]
         session.add_all(users)
 
         # Create a few applications
@@ -133,6 +134,17 @@ class TestOrm(TempMixin, unittest.TestCase):
 
             res = orm.apps_for_user(session, None)
             self.assertEqual(len(res), 0)
+
+    def test_is_admin(self):
+        db = Database(url="sqlite:///"+self.sqlite_file_path)
+        session = db.create_session()
+        fill_db(session)
+        with transaction(session):
+            # verify back population
+            users = session.query(orm.User).all()
+
+            self.assertFalse(users[1].is_admin)
+            self.assertTrue(users[2].is_admin)
 
 
 class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
