@@ -8,6 +8,7 @@ Summary
 ~~~~~~~
 
 - Remoteappdb now accepts the database path as a mandatory argument
+- Provided upgrading functionality for remoteappmanager.db sqlite database via alembic. (#295)
 
 
 What's new in SimPhoNy Remote 0.8.0
