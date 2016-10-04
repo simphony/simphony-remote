@@ -1,7 +1,7 @@
 import string
 from traitlets import Unicode, HasTraits, Dict, List
 
-from remoteappmanager.docker.docker_labels import SIMPHONY_NS
+from remoteappmanager.docker.docker_labels import SIMPHONY_NS, SIMPHONY_NS_ENV
 from remoteappmanager.docker import configurables
 
 # Characters that are allowed in the environment variables.
@@ -69,7 +69,7 @@ class Image(HasTraits):
             self.description = labels.get(SIMPHONY_NS.description, '')
             self.type = labels.get(SIMPHONY_NS.type, '')
 
-            env_prefix = SIMPHONY_NS.env+"."
+            env_prefix = SIMPHONY_NS_ENV.namespace+"."
             for env in [lab[len(env_prefix):]
                         for lab in labels.keys()
                         if lab.startswith(env_prefix)]:

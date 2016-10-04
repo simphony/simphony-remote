@@ -5,6 +5,11 @@ from unittest import mock
 
 import docker
 
+from remoteappmanager.docker.docker_labels import (
+    SIMPHONY_NS,
+    SIMPHONY_NS_ENV,
+    SIMPHONY_NS_RUNINFO)
+
 
 FAKE_IMAGE_IDS = ('image_id1', 'image_id2')
 
@@ -33,14 +38,14 @@ def docker_response(status_code=200, content='',
 def get_fake_image_labels(num=2):
     samples = cycle(
         (
-            {'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled',  # noqa
-             'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4',
-             'eu.simphony-project.docker.type': 'vncapp',
-             'eu.simphony-project.docker.env.x11-width': '',
-             'eu.simphony-project.docker.env.x11-height': '',
-             'eu.simphony-project.docker.env.x11-depth': '',
+            {SIMPHONY_NS.description: 'Ubuntu machine with mayavi preinstalled',  # noqa
+             SIMPHONY_NS.ui_name: 'Mayavi 4.4.4',
+             SIMPHONY_NS.type: 'vncapp',
+             SIMPHONY_NS_ENV['x11-width']: '',
+             SIMPHONY_NS_ENV['x11-height']: '',
+             SIMPHONY_NS_ENV['x11-depth']: '',
              },
-            {'eu.simphony-project.docker.description': 'A vanilla Ubuntu installation'},  # noqa
+            {SIMPHONY_NS.description: 'A vanilla Ubuntu installation'},  # noqa
         )
     )
     return tuple(next(samples) for _ in range(num))
@@ -69,10 +74,10 @@ def get_fake_container_states(num=3):
 
 
 def get_fake_container_labels(num=3):
-    samples = cycle(({'eu.simphony-project.docker.user': 'user_name',
-                      'eu.simphony-project.docker.mapping_id': 'mapping_id',
-                      'eu.simphony-project.docker.url_id': 'url_id'},
-                     {'eu.simphony-project.docker.user': 'user_name'},
+    samples = cycle(({SIMPHONY_NS_RUNINFO.user: 'user_name',
+                      SIMPHONY_NS_RUNINFO.mapping_id: 'mapping_id',
+                      SIMPHONY_NS_RUNINFO.url_id: 'url_id'},
+                     {SIMPHONY_NS_RUNINFO.user: 'user_name'},
                      {}))
     return tuple(next(samples) for _ in range(num))
 

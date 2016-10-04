@@ -1,6 +1,8 @@
 from unittest import TestCase
 
 from remoteappmanager.docker.container import Container
+from remoteappmanager.docker.docker_labels import (
+    SIMPHONY_NS, SIMPHONY_NS_RUNINFO)
 from remoteappmanager.tests.utils import assert_containers_equal
 from remoteappmanager.tests.mocking.virtual.docker_client import (
     create_docker_client)
@@ -32,9 +34,9 @@ class TestContainer(TestCase):
             'Id': '248e45e717cd740ae763a1c565',
             'Image': 'empty-ubuntu:latest',
             'ImageID': 'sha256:f4610c7580b8f0a9a25086b6287d0069fb8a',
-            'Labels': {'eu.simphony-project.docker.ui_name': 'Empty Ubuntu',
-                       'eu.simphony-project.docker.user': 'user',
-                       'eu.simphony-project.docker.url_id': "8e2fe66d5de74db9bbab50c0d2f92b33"},  # noqa
+            'Labels': {SIMPHONY_NS.ui_name: 'Empty Ubuntu',
+                       SIMPHONY_NS_RUNINFO.user: 'user',
+                       SIMPHONY_NS_RUNINFO.url_id: "8e2fe66d5de74db9bbab50c0d2f92b33"},  # noqa
             'Names': ['/remoteexec-user-empty-ubuntu_3Alatest'],
             'Ports': [{'IP': '0.0.0.0',
                        'PrivatePort': 8888,

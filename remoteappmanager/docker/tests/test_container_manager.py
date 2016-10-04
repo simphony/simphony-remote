@@ -4,6 +4,7 @@ from unittest import mock
 from tornado.testing import AsyncTestCase, gen_test
 
 from remoteappmanager.docker.container import Container
+from remoteappmanager.docker.docker_labels import SIMPHONY_NS_RUNINFO
 from remoteappmanager.docker.container_manager import ContainerManager, \
     OperationInProgress
 from remoteappmanager.docker.image import Image
@@ -32,6 +33,15 @@ class TestContainerManager(AsyncTestCase):
             "new_mapping_id",
             None)
         self.assertTrue(mock_client.start.called)
+        self.assertTrue(mock_client.create_container.called)
+
+        runinfo_labels = mock_client.create_container.call_args[1]["labels"]
+
+        self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.user], "username")
+        self.assertIn(SIMPHONY_NS_RUNINFO.url_id, runinfo_labels)
+        self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.mapping_id],
+                         "new_mapping_id")
+
         self.assertIsInstance(result, Container)
         self.assertFalse(mock_client.stop.called)
         self.assertFalse(mock_client.remove_container.called)
