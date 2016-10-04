@@ -32,16 +32,23 @@ class TestHub(utils.AsyncHTTPTestCase):
 
     def test_initialization(self):
         endpoint_url = "http://example.com/"
-        api_key = "whatever"
-        hub = Hub(endpoint_url=endpoint_url, api_key=api_key)
+        api_token = "whatever"
+        hub = Hub(endpoint_url=endpoint_url, api_token=api_token)
         self.assertEqual(hub.endpoint_url, endpoint_url)
-        self.assertEqual(hub.api_key, api_key)
+        self.assertEqual(hub.api_token, api_token)
+
+    def test_invalid_init(self):
+        with self.assertRaises(ValueError):
+            Hub(endpoint_url="", api_token="dummy")
+
+        with self.assertRaises(ValueError):
+            Hub(endpoint_url="http://fake.url/", api_token="")
 
     @testing.gen_test
     def test_requests(self):
         endpoint_url = self.get_url("/hub")
-        api_key = "whatever"
-        hub = Hub(endpoint_url=endpoint_url, api_key=api_key)
+        api_token = "whatever"
+        hub = Hub(endpoint_url=endpoint_url, api_token=api_token)
 
         self.handler.ret_status = 403
         self.assertEqual((yield hub.verify_token("foo", "bar")), {})

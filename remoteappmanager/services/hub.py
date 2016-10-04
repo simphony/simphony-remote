@@ -14,8 +14,24 @@ class Hub(LoggingMixin, HasTraits):
     #: The url at which the Hub can be reached
     endpoint_url = Unicode()
 
-    #: The api key to authenticate the request
-    api_key = Unicode()
+    #: The api token to authenticate the request
+    api_token = Unicode()
+
+    def __init__(self, *args, **kwargs):
+        """Initializes the hub connection object."""
+        super().__init__(*args, **kwargs)
+
+        if not self.api_token:
+            message = ("Invalid API Token to initialise "
+                       "the hub connection.")
+            self.log.error(message)
+            raise ValueError(message)
+
+        if not self.endpoint_url:
+            message = ("Invalid endpoint url to initialise "
+                       "the hub connection.")
+            self.log.error(message)
+            raise ValueError(message)
 
     @gen.coroutine
     def verify_token(self, cookie_name, encrypted_cookie):
@@ -37,7 +53,7 @@ class Hub(LoggingMixin, HasTraits):
             cookie.  Otherwise the dictionary is empty.
         """
 
-        # URL for the authorization requiest
+        # URL for the authorization request
         request_url = url_path_join(self.endpoint_url,
                                     "authorizations/cookie",
                                     cookie_name,
@@ -46,7 +62,7 @@ class Hub(LoggingMixin, HasTraits):
         client = AsyncHTTPClient()
         r = yield client.fetch(
                 request_url,
-                headers={'Authorization': 'token %s' % self.api_key},
+                headers={'Authorization': 'token %s' % self.api_token},
                 raise_error=False)
 
         if r.code < 400:

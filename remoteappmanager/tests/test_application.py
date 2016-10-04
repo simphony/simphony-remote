@@ -17,21 +17,10 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
     def setUp(self):
         super().setUp()
 
-        self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
-
-        os.environ["PROXY_API_TOKEN"] = "dummy_token"
-
         # File config with orm.AppAccounting
         self.file_config = utils.basic_file_config()
         self.command_line_config = utils.basic_command_line_config()
-
-    def tearDown(self):
-        if self._old_proxy_api_token is not None:
-            os.environ["PROXY_API_TOKEN"] = self._old_proxy_api_token
-        else:
-            del os.environ["PROXY_API_TOKEN"]
-
-        super().tearDown()
+        self.environment_config = utils.basic_environment_config()
 
     def test_initialization_with_sqlite_db(self):
         # Initialise database
@@ -43,10 +32,13 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
         self.file_config.accounting_kwargs = {
             "url": "sqlite:///"+sqlite_file_path}
 
-        app = Application(self.command_line_config, self.file_config)
+        app = Application(self.command_line_config,
+                          self.file_config,
+                          self.environment_config)
 
         self.assertIsNotNone(app.command_line_config)
         self.assertIsNotNone(app.file_config)
+        self.assertIsNotNone(app.environment_config)
 
         self.assertIsNotNone(app.db)
         self.assertIsNotNone(app.user)
@@ -58,7 +50,9 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
 
     def test_error_default_value_with_unimportable_accounting(self):
         self.file_config.accounting_class = "not.importable.Class"
-        app = Application(self.command_line_config, self.file_config)
+        app = Application(self.command_line_config,
+                          self.file_config,
+                          self.environment_config)
 
         with self.assertRaises(ImportError):
             app.db
@@ -66,32 +60,12 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
     def test_db_default_value_with_accounting_wrong_subclass(self):
         self.file_config.accounting_class = (
             "remoteappmanager.tests.test_application.DummyAccounting")
-        app = Application(self.command_line_config, self.file_config)
+        app = Application(self.command_line_config,
+                          self.file_config,
+                          self.environment_config)
 
         with self.assertRaises(TraitError):
             app.db
-
-
-# FIXME: Some of these tests are the same and should be refactored
-# Not doing it now to prevent more merge conflict with PR #52
-class TestApplicationWithCSV(TempMixin, testing.AsyncTestCase):
-    def setUp(self):
-        super().setUp()
-
-        self._old_proxy_api_token = os.environ.get("PROXY_API_TOKEN", None)
-
-        os.environ["PROXY_API_TOKEN"] = "dummy_token"
-
-        self.command_line_config = utils.basic_command_line_config()
-        self.file_config = utils.basic_file_config()
-
-    def tearDown(self):
-        if self._old_proxy_api_token is not None:
-            os.environ["PROXY_API_TOKEN"] = self._old_proxy_api_token
-        else:
-            del os.environ["PROXY_API_TOKEN"]
-
-        super().tearDown()
 
     def test_initialization(self):
         self.file_config.accounting_class = (
@@ -104,7 +78,9 @@ class TestApplicationWithCSV(TempMixin, testing.AsyncTestCase):
                                    test_csv_db.GoodTable.headers,
                                    test_csv_db.GoodTable.records)
 
-        app = Application(self.command_line_config, self.file_config)
+        app = Application(self.command_line_config,
+                          self.file_config,
+                          self.environment_config)
 
         self.assertIsNotNone(app.command_line_config)
         self.assertIsNotNone(app.file_config)

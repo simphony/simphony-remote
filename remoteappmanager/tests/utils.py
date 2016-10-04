@@ -8,6 +8,7 @@ from tornado import gen
 
 from remoteappmanager.command_line_config import CommandLineConfig
 from remoteappmanager.file_config import FileConfig
+from remoteappmanager.environment_config import EnvironmentConfig
 from remoteappmanager.db.orm import Database
 from remoteappmanager.tests import fixtures
 
@@ -44,6 +45,14 @@ def basic_command_line_config():
 
 def basic_file_config():
     return FileConfig()
+
+
+def basic_environment_config():
+    config = EnvironmentConfig()
+    config.proxy_api_token = "dummy_token"
+    config.jpy_api_token = "dummy_token"
+
+    return config
 
 
 @contextlib.contextmanager

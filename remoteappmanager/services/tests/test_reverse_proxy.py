@@ -18,7 +18,7 @@ class TestReverseProxy(testing.AsyncTestCase):
 
         reverse_proxy = ReverseProxy(
             endpoint_url="http://fake/api",
-            auth_token="token")
+            api_token="token")
         reverse_proxy._reverse_proxy = Mock(spec=orm.Proxy)
         reverse_proxy._reverse_proxy.api_request = mock_api_request
 
@@ -30,3 +30,10 @@ class TestReverseProxy(testing.AsyncTestCase):
         yield reverse_proxy.unregister("/hello/from/me/")
 
         self.assertEqual(coroutine_out["kwargs"]["method"], "DELETE")
+
+    def test_incorrect_init(self):
+        with self.assertRaises(ValueError):
+            ReverseProxy(endpoint_url="http://fake/api", api_token="")
+
+        with self.assertRaises(ValueError):
+            ReverseProxy(endpoint_url="", api_token="foo")
