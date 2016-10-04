@@ -14,7 +14,7 @@ from remoteappmanager.tests.temp_mixin import TempMixin
 def fill_db(session):
     with transaction(session):
         users = [orm.User(name="user"+str(i),
-                          is_admin=(i==2)) for i in range(5)]
+                          is_admin=(i == 2)) for i in range(5)]
         session.add_all(users)
 
         # Create a few applications
