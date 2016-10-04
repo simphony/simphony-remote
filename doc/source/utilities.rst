@@ -19,26 +19,26 @@ a sqlite database) to perform accounting of users and applications.
 
 The database must be first initialized with the `init` command::
 
-     remoteappdb --db=~/remoteappmanager.db init
+     remoteappdb ~/remoteappmanager.db init
 
 Once initialized, the database content is ready to be configured.
 New applications are registered with `app create`. The image name
 must match the image name in docker::
 
-     remoteappdb --db=~/remoteappmanager.db app create myimage
+     remoteappdb ~/remoteappmanager.db app create myimage
 
 The option `--verify` can be used to validate the image name against
 docker.
 
 You can also create users with the `user create` command::
     
-     remoteappdb --db=~/remoteappmanager.db user create myuser
+     remoteappdb ~/remoteappmanager.db user create myuser
 
 An application will not be visible not can be started by a user
 until permission is granted. To grant permission, use the `app grant`
 command::
 
-     remoteappdb --db=~/remoteappmanager.db app create myimage myuser
+     remoteappdb ~/remoteappmanager.db app create myimage myuser
 
 By default, this command will grant no special options. It is however
 possible to specify a different running policy, like for example mounting

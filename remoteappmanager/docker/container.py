@@ -1,4 +1,4 @@
-from remoteappmanager.docker.docker_labels import SIMPHONY_NS
+from remoteappmanager.docker.docker_labels import SIMPHONY_NS_RUNINFO
 from traitlets import Unicode, HasTraits, Int
 
 
@@ -133,7 +133,7 @@ class Container(HasTraits):
             names = docker_dict.get("Names") or ('', )
             kwargs["name"] = names[0]
 
-        kwargs["mapping_id"] = labels.get(SIMPHONY_NS.mapping_id) or ""
-        kwargs["url_id"] = labels.get(SIMPHONY_NS.url_id) or ""
+        kwargs["mapping_id"] = labels.get(SIMPHONY_NS_RUNINFO.mapping_id) or ""
+        kwargs["url_id"] = labels.get(SIMPHONY_NS_RUNINFO.url_id) or ""
 
         return cls(**kwargs)
