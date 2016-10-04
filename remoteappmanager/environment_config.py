@@ -6,10 +6,10 @@ class EnvironmentConfig(HasTraits):
     """Configuration options for the application server,
     originating from environment variables."""
 
-    #: Token for JupyterHub API. Originates from JPY_API_TOKEN  
+    #: Token for JupyterHub API. Originates from JPY_API_TOKEN
     jpy_api_token = Unicode(help="The JupyterHub API token")
 
-    #: Token for the ReverseProxy API. Originates from 
+    #: Token for the ReverseProxy API. Originates from
     #: PROXY_API_TOKEN
     proxy_api_token = Unicode(help="The Reverse Proxy API token")
 
