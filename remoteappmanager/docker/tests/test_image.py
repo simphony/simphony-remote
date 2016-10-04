@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from remoteappmanager.docker.docker_labels import SIMPHONY_NS
+from remoteappmanager.docker.docker_labels import SIMPHONY_NS, SIMPHONY_NS_ENV
 from remoteappmanager.docker.image import Image
 from remoteappmanager.tests.mocking.virtual.docker_client import (
     create_docker_client)
@@ -26,7 +26,7 @@ class TestImage(TestCase):
 
         labels = image_dict['Config']['Labels']
         # Insert an unpalatable label for the envs.
-        labels['eu.simphony-project.docker.env.x11-height.whatever'] = None
+        labels[SIMPHONY_NS_ENV["x11-height"]+".whatever"] = None
 
         image = Image.from_docker_dict(image_dict)
 
