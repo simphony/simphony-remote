@@ -9,10 +9,12 @@ from tornadowebapi.resource import Resource
 
 from remoteappmanager.utils import url_path_join
 from remoteappmanager.netutils import wait_for_http_server_2xx
+from remoteappmanager.restresources.decorators import authenticated
 
 
 class Container(Resource):
     @gen.coroutine
+    @authenticated
     def create(self, representation):
         """Create the container.
         The representation should accept the application mapping id we
@@ -83,11 +85,9 @@ class Container(Resource):
         return container.url_id
 
     @gen.coroutine
+    @authenticated
     def retrieve(self, identifier):
         """Return the representation of the running container."""
-        if self.current_user is None:
-            raise NotFound()
-
         container_manager = self.application.container_manager
         container = yield container_manager.container_from_url_id(identifier)
 
@@ -102,11 +102,9 @@ class Container(Resource):
         )
 
     @gen.coroutine
+    @authenticated
     def delete(self, identifier):
         """Stop the container."""
-        if self.current_user is None:
-            raise NotFound()
-
         container_manager = self.application.container_manager
         container = yield container_manager.container_from_url_id(identifier)
 
@@ -136,11 +134,9 @@ class Container(Resource):
                                "for id {}".format(identifier))
 
     @gen.coroutine
+    @authenticated
     def items(self):
         """"Return the list of containers we are currently running."""
-        if self.current_user is None:
-            raise NotFound()
-
         container_manager = self.application.container_manager
 
         apps = self.application.db.get_apps_for_user(
