@@ -35,6 +35,9 @@ class User(IdMixin, Base):
     #: a primary key.
     name = Column(Unicode, index=True, unique=True)
 
+    def is_admin(self):
+        return True
+
 
 class Application(IdMixin, Base):
     """ Describes an application that should be available for startup """

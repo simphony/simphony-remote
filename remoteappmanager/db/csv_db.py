@@ -66,6 +66,9 @@ class CSVUser(object):
     def __init__(self, name):
         self.name = name
 
+    def is_admin(self):
+        return self.name == "admin"
+
 
 # Required headers of the CSV files
 _HEADERS = ('user.name',
