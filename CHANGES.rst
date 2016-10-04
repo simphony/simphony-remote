@@ -1,7 +1,17 @@
 SimPhoNy Remote CHANGELOG
 =========================
 
+What's new in SimPhoNy Remote 0.9.0
+-----------------------------------
+
+Summary
+~~~~~~~
+
+- Remoteappdb now accepts the database path as a mandatory argument
+
+
 What's new in SimPhoNy Remote 0.8.0
+-----------------------------------
 
 Summary
 ~~~~~~~

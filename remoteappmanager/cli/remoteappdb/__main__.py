@@ -119,11 +119,9 @@ class RemoteAppDBContext(object):
 
 
 @click.group()
-@click.option("--db",
-              type=click.STRING,
-              help='The database sqlalchemy string to connect to, '
-                   'or an absolute or relative disk path.',
-              default="sqlite:///sqlite.db")
+@click.argument("db",
+                type=click.STRING,
+                default="sqlite:///sqlite.db")
 @click.pass_context
 def cli(ctx, db):
     """Remote application database manager.
