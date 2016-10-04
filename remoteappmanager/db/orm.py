@@ -35,6 +35,9 @@ class User(IdMixin, Base):
     #: a primary key.
     name = Column(Unicode, index=True, unique=True)
 
+    #: True if the user is recognized as administrator
+    is_admin = Column(Boolean)
+
 
 class Application(IdMixin, Base):
     """ Describes an application that should be available for startup """

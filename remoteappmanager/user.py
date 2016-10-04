@@ -8,5 +8,11 @@ class User(HasTraits):
     # The username as passed at the config line
     name = Unicode()
 
-    #: Can be none if the username cannot be found in the database.
+    #: Can be None if the username cannot be found in the database.
     account = Any()
+
+    @property
+    def is_admin(self):
+        """Returns True if the user is recognized and is also an admin
+        as indicated by the underlying accounting mechanism"""
+        return self.account and self.account.is_admin
