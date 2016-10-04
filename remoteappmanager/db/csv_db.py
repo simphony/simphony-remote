@@ -62,13 +62,9 @@ class CSVApplicationPolicy(ABCApplicationPolicy):
 # We need this because HomeHandler._start_container takes an object with
 # the username in its `name` attribute
 class CSVUser(object):
-
-    def __init__(self, name):
+    def __init__(self, name, is_admin=False):
         self.name = name
-
-    @property
-    def is_admin(self):
-        return self.name == "admin"
+        self.is_admin = is_admin
 
 
 # Required headers of the CSV files
@@ -87,7 +83,7 @@ class CSVAccounting(ABCAccounting):
     remoteappmanager.  Currently only accepts one csv file.
     """
 
-    def __init__(self, csv_file_path, **kwargs):
+    def __init__(self, csv_file_path, admin_list=None, **kwargs):
         """ Initialiser
 
         Parameters
@@ -95,10 +91,14 @@ class CSVAccounting(ABCAccounting):
         csv_file_path : str
             File path for the CSV file
 
+        admin_list: list
+            a list of usernames that are considered administrators.
+
         **kwargs
             optional keyword arguments for open(csv_file_path)
         """
         self.csv_file_path = csv_file_path
+        self.admin_list = admin_list if admin_list is not None else []
 
         # Let's keep everything in memory for now
         self.all_records = {}
@@ -156,7 +156,9 @@ class CSVAccounting(ABCAccounting):
         user : CSVUser
         """
         if user_name in self.all_records:
-            return CSVUser(name=user_name)
+            return CSVUser(
+                name=user_name,
+                is_admin=(user_name in self.admin_list))
         else:
             return None
 

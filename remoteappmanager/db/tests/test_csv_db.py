@@ -140,4 +140,8 @@ class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
         self.assertFalse(user.is_admin)
 
         user = accounting.get_user_by_name('admin')
+        self.assertFalse(user.is_admin)
+
+        accounting = CSVAccounting(self.csv_file, admin_list=["admin"])
+        user = accounting.get_user_by_name('admin')
         self.assertTrue(user.is_admin)
