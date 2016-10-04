@@ -66,6 +66,7 @@ class CSVUser(object):
     def __init__(self, name):
         self.name = name
 
+    @property
     def is_admin(self):
         return self.name == "admin"
 

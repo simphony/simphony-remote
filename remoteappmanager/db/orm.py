@@ -35,8 +35,8 @@ class User(IdMixin, Base):
     #: a primary key.
     name = Column(Unicode, index=True, unique=True)
 
-    def is_admin(self):
-        return True
+    #: True if the user is recognized as administrator
+    is_admin = Column(Boolean)
 
 
 class Application(IdMixin, Base):
