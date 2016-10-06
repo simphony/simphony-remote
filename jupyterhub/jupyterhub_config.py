@@ -28,6 +28,7 @@ if setting_mode == 'virtual_user':
     # FIXME: replace me with other authenticator (e.g. GitHub OAuth...)
     c.JupyterHub.authenticator_class = (
         'remoteappmanager.jupyterhub.auth.WorldAuthenticator')
+    c.Authenticator.admin_users = ["test"]
 
 elif setting_mode == 'system_user':
     c.JupyterHub.spawner_class = ('remoteappmanager.jupyterhub.spawners.' +

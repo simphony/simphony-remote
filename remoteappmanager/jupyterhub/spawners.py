@@ -8,18 +8,11 @@ from tornado import gen
 from jupyterhub.spawner import LocalProcessSpawner
 from jupyterhub import orm
 
-# TODO: Both Spawner and VirtualUserSpawner have `get_args` that
-# are identical and they need to be updated when the remoteappmanager
-# config is updated.  Refactoring would mitigate potential risk
-# of not updating one of them.
 
-
-class SystemUserSpawner(LocalProcessSpawner):
-    ''' Start remoteappmanager as a local process for a system user.
-
-    The user identifier of the process is set to be the system user.
-    The current directory is set to the system user's home directory.
-    '''
+class BaseSpawner(LocalProcessSpawner):
+    """Base class that provides common infrastructure to
+    the actual spawners
+    """
 
     #: The instance of the orm Proxy.
     #: We use Any in agreement with base class practice.
@@ -57,7 +50,16 @@ class SystemUserSpawner(LocalProcessSpawner):
         return env
 
 
-class VirtualUserSpawner(LocalProcessSpawner):
+class SystemUserSpawner(BaseSpawner):
+    """
+    Start remoteappmanager as a local process for a system user.
+
+    The user identifier of the process is set to be the system user.
+    The current directory is set to the system user's home directory.
+    """
+
+
+class VirtualUserSpawner(BaseSpawner):
     ''' Start remoteappmanager as a local process for a virtual user.
 
     A virtual user is not recognised as a system user, even if the
@@ -68,13 +70,6 @@ class VirtualUserSpawner(LocalProcessSpawner):
     local process are the same as the one that is running jupyterhub.
     '''
 
-    #: The instance of the orm Proxy.
-    #: We use Any in agreement with base class practice.
-    proxy = Any()
-
-    #: The path of the configuration file for the cmd executable
-    config_file_path = Unicode(config=True)
-
     #: Directory in which temporary home directory for the virtual
     #: user is created.  No directory is created if this is not
     #: defined and HOME directory would not be available.
@@ -82,15 +77,6 @@ class VirtualUserSpawner(LocalProcessSpawner):
 
     #: The path to the temporary workspace directory
     _virtual_workspace = Unicode()
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        # We get the first one. Strangely enough, jupyterhub has a table
-        # containing potentially multiple proxies, but it's enforced to
-        # contain only one.
-        self.proxy = self.db.query(orm.Proxy).first()
-        self.cmd = ['remoteappmanager']
 
     def make_preexec_fn(self, name):
         # We don't set user uid for virtual user
@@ -117,32 +103,12 @@ class VirtualUserSpawner(LocalProcessSpawner):
         super().clear_state()
         self._virtual_workspace = ''
 
-    def get_args(self):
-        args = super().get_args()
-
-        for iarg, arg in enumerate(args):
-            args[iarg] = arg.replace('--base-url=', '--base-urlpath=')
-
-        args.append("--proxy-api-url={}".format(self.proxy.api_server.url))
-
-        if self.config_file_path:
-            args.append("--config-file={}".format(self.config_file_path))
-
-        return args
-
     def user_env(self, env):
         env['USER'] = self.user.name
 
         if self._virtual_workspace:
             env['HOME'] = self._virtual_workspace
 
-        return env
-
-    def get_env(self):
-        # LocalProcessSpawner.get_env calls user_env as well
-        env = super().get_env()
-        env["PROXY_API_TOKEN"] = self.proxy.auth_token
-        env.update(_docker_envvars())
         return env
 
     @gen.coroutine
