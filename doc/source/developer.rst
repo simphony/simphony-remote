@@ -19,12 +19,10 @@ API reference
    :template: module_template.rst
 
    remoteappmanager.application
-   remoteappmanager.auth
    remoteappmanager.command_line_config
    remoteappmanager.file_config
    remoteappmanager.jinja2_adapters
    remoteappmanager.netutils
-   remoteappmanager.spawners
    remoteappmanager.traitlets
    remoteappmanager.user
    remoteappmanager.utils
@@ -37,6 +35,8 @@ API reference
    remoteappmanager.docker.container
    remoteappmanager.docker.container_manager
    remoteappmanager.docker.image
+   remoteappmanager.jupyterhub.auth
+   remoteappmanager.jupyterhub.spawners
    remoteappmanager.handlers.base_handler
    remoteappmanager.handlers.home_handler
    remoteappmanager.logging.logging_mixin
