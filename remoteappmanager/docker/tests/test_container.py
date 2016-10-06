@@ -52,6 +52,7 @@ class TestContainer(TestCase):
             name='/remoteexec-user-empty-ubuntu_3Alatest',
             image_name='empty-ubuntu:latest',
             image_id='sha256:f4610c7580b8f0a9a25086b6287d0069fb8a',
+            user="user",
             ip='0.0.0.0',
             port=32823,
             url_id="8e2fe66d5de74db9bbab50c0d2f92b33")
@@ -74,6 +75,7 @@ class TestContainer(TestCase):
             name='/container_name1',
             image_name='image_name1',
             image_id='image_id1',
+            user="user_name",
             ip='0.0.0.0',
             port=80,
             url_id="url_id",
@@ -91,6 +93,7 @@ class TestContainer(TestCase):
             name='/remoteexec-username-mapping_5Fid',
             image_name='image_name1',
             image_id='image_id1',
+            user="user_name",
             ip='0.0.0.0',
             port=666,
             url_id="url_id",
