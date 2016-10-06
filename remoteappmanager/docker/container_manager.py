@@ -181,6 +181,7 @@ class ContainerManager(LoggingMixin):
         containers = yield self.containers_from_filters(filters=filters)
         return containers[0] if len(containers) else None
 
+    @gen.coroutine
     def running_containers(self):
         """Returns all the running containers"""
         containers = yield self.containers_from_filters({})
