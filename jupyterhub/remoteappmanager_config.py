@@ -48,9 +48,7 @@
 #
 # accounting_class = "remoteappmanager.db.csv_db.CSVAccounting"
 # accounting_kwargs = {
-#     "csv_file_path": os.path.abspath("./remoteappmanager.csv")
-#     "admin_list" : ["admin@example.com"]
-# }
+#     "csv_file_path": os.path.abspath("./remoteappmanager.csv")}
 #
 # # Sqlite database support
 #
