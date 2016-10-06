@@ -20,19 +20,32 @@ from remoteappmanager.utils import url_path_join
 
 
 class BaseApplication(web.Application, LoggingMixin):
-    """Tornado main application"""
+    """Base application provides the common infrastructure
+    to our tornado applications.
+    Derived classes generally override _webapi_resources() and
+    _web_handlers().
+    """
 
+    #: The user currently obtained from the command line. It
+    #: is well established at startup and passed to the request
+    #: handler _only_ when authencation is passed, otherwise Null
+    #: will be passed.
     user = Instance(User)
 
+    #: An accounting system that knows the allowed users, what applications
+    #: they can run etc.
     db = Instance(ABCAccounting, allow_none=True)
 
+    #: API access to the configurable-http-proxy
     reverse_proxy = Instance(ReverseProxy)
 
+    #: API access to jupyterhub (for auth requests)
     hub = Instance(Hub)
 
+    #: Manages the docker interface
     container_manager = Instance(ContainerManager)
 
-    #: The WebAPI registry
+    #: The WebAPI registry for resources.
     registry = Instance(Registry)
 
     @property
