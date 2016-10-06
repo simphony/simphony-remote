@@ -1,4 +1,6 @@
 import os
+from unittest import mock
+from unittest.mock import patch
 
 from remoteappmanager.application import Application
 from remoteappmanager.db.tests import test_csv_db
@@ -88,3 +90,21 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
         self.assertIsNotNone(app.user)
         self.assertEqual(app.user.name, "username")
         self.assertIsInstance(app.user.account, test_csv_db.CSVUser)
+
+    def test_start(self):
+        with patch(
+                "remoteappmanager.application.Application.listen"
+        ) as listen, \
+             patch("tornado.ioloop.IOLoop.current") as current:
+
+            current_io = mock.Mock()
+            current.return_value = current_io
+
+            app = Application(self.command_line_config,
+                              self.file_config,
+                              self.environment_config)
+
+            app.start()
+
+            self.assertTrue(listen.called)
+            self.assertTrue(current_io.start.called)
