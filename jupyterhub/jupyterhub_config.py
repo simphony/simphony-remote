@@ -12,7 +12,8 @@ c.JupyterHub.hub_ip = public_ips()[0]
 setting_mode = ('system_user', 'virtual_user')[1]
 
 if setting_mode == 'virtual_user':
-    c.JupyterHub.spawner_class = 'remoteappmanager.spawners.VirtualUserSpawner'
+    c.JupyterHub.spawner_class = 'remoteappmanager.jupyterhub.spawners.'+
+                                 'VirtualUserSpawner'
 
     # Parent directory in which temporary directory is created for
     # each virtual user
@@ -26,7 +27,8 @@ if setting_mode == 'virtual_user':
 
     # FIXME: replace me with other authenticator (e.g. GitHub OAuth...)
     c.JupyterHub.authenticator_class = (
-        'remoteappmanager.auth.WorldAuthenticator')
+        'remoteappmanager.jupyterhub.auth.WorldAuthenticator')
 
 elif setting_mode == 'system_user':
-    c.JupyterHub.spawner_class = 'remoteappmanager.spawners.SystemUserSpawner'
+    c.JupyterHub.spawner_class = 'remoteappmanager.jupyterhub.spawners.'+
+                                 'SystemUserSpawner'
