@@ -60,6 +60,7 @@ class TestContainerManager(AsyncTestCase):
                              mapping_id="mapping_id",
                              name='/remoteexec-username-mapping_5Fid',
                              image_name='image_name1',  # noqa
+                             user="user_name",
                              image_id='image_id1',
                              ip='127.0.0.1',
                              port=666,
@@ -76,6 +77,7 @@ class TestContainerManager(AsyncTestCase):
                              mapping_id="mapping_id",
                              name='/remoteexec-username-mapping_5Fid',
                              image_name='image_name1',  # noqa
+                             user="user_name",
                              image_id='image_id1',
                              ip='127.0.0.1',
                              port=666,
