@@ -108,4 +108,3 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
 
             self.assertTrue(listen.called)
             self.assertTrue(current_io.start.called)
-
