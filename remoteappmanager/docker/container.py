@@ -32,6 +32,9 @@ class Container(HasTraits):
     #: the id that will go in the URL of the container
     url_id = Unicode()
 
+    #: The user currently running the container
+    user = Unicode()
+
     @property
     def urlpath(self):
         """Returns the relative url of the Container."""
@@ -135,5 +138,6 @@ class Container(HasTraits):
 
         kwargs["mapping_id"] = labels.get(SIMPHONY_NS_RUNINFO.mapping_id) or ""
         kwargs["url_id"] = labels.get(SIMPHONY_NS_RUNINFO.url_id) or ""
+        kwargs["user"] = labels.get(SIMPHONY_NS_RUNINFO.user) or ""
 
         return cls(**kwargs)
