@@ -9,7 +9,9 @@ from unittest import mock
 from tornado import testing
 from jupyterhub import orm
 
-from remoteappmanager.spawners import SystemUserSpawner, VirtualUserSpawner
+from remoteappmanager.jupyterhub.spawners import (
+    SystemUserSpawner,
+    VirtualUserSpawner)
 from remoteappmanager.tests import fixtures
 from remoteappmanager.tests.temp_mixin import TempMixin
 
