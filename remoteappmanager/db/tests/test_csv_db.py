@@ -18,9 +18,7 @@ class GoodTable:
     records = [
         ('foo', 'image_1', '1', '1', '0', '', '', ''),
         ('foo', 'image_2', '1', '1', '1', '/src', '/target', 'ro'),
-        ('username', 'image_1', '0', '0', '0', '/src', '/target', 'ro'),
-        ('admin', 'image_1', '0', '0', '0', '', '', '')
-    ]
+        ('username', 'image_1', '0', '0', '0', '/src', '/target', 'ro')]
 
 
 class BadTableMissingHeaders:
@@ -132,16 +130,3 @@ class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
                        GoodTableWithDifferentHeaders.headers,
                        GoodTableWithDifferentHeaders.records)
         self.create_accounting()
-
-    def test_is_admin(self):
-        accounting = self.create_accounting()
-
-        user = accounting.get_user_by_name('foo')
-        self.assertFalse(user.is_admin)
-
-        user = accounting.get_user_by_name('admin')
-        self.assertFalse(user.is_admin)
-
-        accounting = CSVAccounting(self.csv_file, admin_list=["admin"])
-        user = accounting.get_user_by_name('admin')
-        self.assertTrue(user.is_admin)
