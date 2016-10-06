@@ -128,6 +128,10 @@ def mock_coro_factory(return_value=None, side_effect=None):
 
 
 def assert_containers_equal(test_case, actual, expected):
+    test_case.assertEqual(
+        set(actual.trait_names()),
+        set(expected.trait_names()))
+
     for name in expected.trait_names():
         if getattr(actual, name) != getattr(expected, name):
             message = '{!r} is not identical to the expected {!r}.'
