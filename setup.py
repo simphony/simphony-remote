@@ -46,6 +46,8 @@ setup(
         'console_scripts': [
             "remoteappmanager = " +
                 "remoteappmanager.cli.remoteappmanager.__main__:main",
+            "remoteappadmin = " +
+                "remoteappmanager.cli.remoteappadmin.__main__:main",
             "remoteappdb = remoteappmanager.cli.remoteappdb.__main__:main",
             "remoteapprest = remoteappmanager.cli.remoteapprest.__main__:main"
             ]

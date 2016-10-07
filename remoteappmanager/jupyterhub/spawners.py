@@ -58,6 +58,16 @@ class SystemUserSpawner(BaseSpawner):
     The current directory is set to the system user's home directory.
     """
 
+    @gen.coroutine
+    def start(self):
+        if self.user.admin:
+            self.cmd = ["remoteappadmin"]
+
+        try:
+            return (yield super().start())
+        except Exception:
+            raise
+
 
 class VirtualUserSpawner(BaseSpawner):
     ''' Start remoteappmanager as a local process for a virtual user.
@@ -116,6 +126,10 @@ class VirtualUserSpawner(BaseSpawner):
         """ Start the process and create the virtual user's
         temporary home directory if `workspace_dir` is set
         """
+
+        if self.user.admin:
+            self.cmd = ["remoteappadmin"]
+
         # Create the temporary directory as the user's workspace
         if self.workspace_dir and not self._virtual_workspace:
             try:
