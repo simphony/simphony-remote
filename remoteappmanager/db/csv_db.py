@@ -201,7 +201,7 @@ class CSVAccounting(ABCAccounting):
         raise UnsupportedOperation()
 
     def list_users(self):
-        return self.users.values()
+        return list(self.users.values())
 
     def create_application(self, app_name):
         raise UnsupportedOperation()
@@ -210,7 +210,7 @@ class CSVAccounting(ABCAccounting):
         raise UnsupportedOperation()
 
     def list_applications(self):
-        return self.applications.values()
+        return list(self.applications.values())
 
     def grant_access(self, app_name, user_name,
                      allow_home, allow_view, volume):

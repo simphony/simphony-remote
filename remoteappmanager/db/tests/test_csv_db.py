@@ -130,3 +130,4 @@ class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
                        GoodTableWithDifferentHeaders.headers,
                        GoodTableWithDifferentHeaders.records)
         self.create_accounting()
+

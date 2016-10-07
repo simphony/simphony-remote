@@ -371,26 +371,29 @@ class AppAccounting(ABCAccounting):
             source, target, mode = parse_volume_string(volume)
 
         with detached_session(self.db) as session:
-            with transaction(session):
-                orm_app = session.query(Application).filter(
-                    Application.image == app_name).one()
+            try:
+                with transaction(session):
+                    orm_app = session.query(Application).filter(
+                        Application.image == app_name).one()
 
-                orm_user = session.query(User).filter(
-                    User.name == user_name).one()
+                    orm_user = session.query(User).filter(
+                        User.name == user_name).one()
 
-                orm_policy = session.query(ApplicationPolicy).filter(
-                    ApplicationPolicy.allow_home == allow_home,
-                    ApplicationPolicy.allow_common == allow_common,
-                    ApplicationPolicy.allow_view == allow_view,
-                    ApplicationPolicy.volume_source == source,
-                    ApplicationPolicy.volume_target == target,
-                    ApplicationPolicy.volume_mode == mode).one()
+                    orm_policy = session.query(ApplicationPolicy).filter(
+                        ApplicationPolicy.allow_home == allow_home,
+                        ApplicationPolicy.allow_common == allow_common,
+                        ApplicationPolicy.allow_view == allow_view,
+                        ApplicationPolicy.volume_source == source,
+                        ApplicationPolicy.volume_target == target,
+                        ApplicationPolicy.volume_mode == mode).one()
 
-                session.query(Accounting).filter(
-                    Accounting.application == orm_app,
-                    Accounting.user == orm_user,
-                    Accounting.application_policy == orm_policy,
-                    ).delete()
+                    session.query(Accounting).filter(
+                        Accounting.application == orm_app,
+                        Accounting.user == orm_user,
+                        Accounting.application_policy == orm_policy,
+                        ).delete()
+            except NoResultFound:
+                raise exceptions.NotFound()
 
 
 @contextlib.contextmanager
@@ -398,7 +401,7 @@ def detached_session(db):
 
     with contextlib.closing(db.create_session()) as session:
 
-        yield
+        yield session
 
         # Removing internal references to the session is
         # required such that the object is detached and
