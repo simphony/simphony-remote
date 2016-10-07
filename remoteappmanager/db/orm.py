@@ -2,8 +2,6 @@ import contextlib
 import hashlib
 import os
 
-from build.lib.remoteappmanager.cli.remoteappdb.__main__ import \
-    _parse_volume_string
 from sqlalchemy import (
     Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum,
     event)
