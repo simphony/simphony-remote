@@ -89,3 +89,41 @@ class ABCAccounting(metaclass=ABCMeta):
            (id, ABCApplication, ABCApplicationPolicy) where id is a string
            used for identifying (ABCApplication, ABCApplicationPolicy)
         """
+
+    @abstractmethod
+    def create_user(self, user_name):
+        """Creates a new user, if the backend allows it.
+        """
+
+    @abstractmethod
+    def remove_user(self, user_name):
+        """Removes a user, if the backend allows it.
+        """
+
+    @abstractmethod
+    def list_users(self):
+        """Returns a list of all available users.
+        """
+
+    @abstractmethod
+    def create_application(self, app_name):
+        """Create a new application.
+         if the backend allows it."""
+
+    @abstractmethod
+    def remove_application(self, app_name):
+        """Remove an existing application"""
+
+    @abstractmethod
+    def list_applications(self):
+        """List all available applications."""
+
+    @abstractmethod
+    def grant_access(self, app_name, user_name,
+                     allow_home, allow_view, volume):
+        """Grant access for user to application."""
+
+    @abstractmethod
+    def revoke_access(self, app_name, user_name,
+                      allow_home, allow_view, volume):
+        """Revoke access for user to application"""

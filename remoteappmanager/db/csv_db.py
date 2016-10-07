@@ -48,6 +48,7 @@ import hashlib
 
 from remoteappmanager.db.interfaces import (
     ABCAccounting, ABCApplication, ABCApplicationPolicy)
+from remoteappmanager.db.exceptions import UnsupportedOperation
 
 
 class CSVApplication(ABCApplication):
@@ -98,6 +99,9 @@ class CSVAccounting(ABCAccounting):
 
         # Let's keep everything in memory for now
         self.all_records = {}
+        self.users = {}
+        self.applications = {}
+        self.application_policies = {}
 
         with open(self.csv_file_path, **kwargs) as csv_file:
             reader = csv.reader(csv_file)
@@ -115,26 +119,44 @@ class CSVAccounting(ABCAccounting):
                                (headers.index(header) for header in _HEADERS)))
 
             for count, record in enumerate(reader):
-                username = record[indices['user.name']]
+                user_name = record[indices['user.name']]
+                user = self.users.setdefault(user_name,
+                                             CSVUser(name=user_name))
 
-                application = CSVApplication(
-                    image=record[indices['application.image']])
+                image = record[indices['application.image']]
+                application = self.applications.setdefault(
+                    image,
+                    CSVApplication(image=image))
 
-                application_policy = CSVApplicationPolicy(
-                    allow_home=record[indices['policy.allow_home']] == '1',
-                    allow_view=record[indices['policy.allow_view']] == '1',
-                    allow_common=record[indices['policy.allow_common']] == '1',
-                    volume_source=(record[indices['policy.volume_source']] or
-                                   None),
-                    volume_target=(record[indices['policy.volume_target']] or
-                                   None),
-                    volume_mode=(record[indices['policy.volume_mode']] or
-                                 None))
+                allow_home = record[indices['policy.allow_home']] == '1'
+                allow_view = record[indices['policy.allow_view']] == '1'
+                allow_common = record[indices['policy.allow_common']] == '1'
+                volume_source = (record[indices['policy.volume_source']] or
+                                 None)
+                volume_target = (record[indices['policy.volume_target']] or
+                                 None)
+                volume_mode = (record[indices['policy.volume_mode']] or
+                               None)
+
+                application_policy = self.application_policies.setdefault(
+                    (allow_home,
+                     allow_view,
+                     allow_common,
+                     volume_source,
+                     volume_target,
+                     volume_mode),
+                    CSVApplicationPolicy(
+                        allow_home=allow_home,
+                        allow_view=allow_view,
+                        allow_common=allow_common,
+                        volume_source=volume_source,
+                        volume_target=volume_target,
+                        volume_mode=volume_mode))
 
                 # Save the configuration
                 # Note that we don't filter existing duplicate entry
                 mapping_id_prehex = '_'.join((application.image, str(count)))
-                self.all_records.setdefault(username, []).append(
+                self.all_records.setdefault(user.name, []).append(
                     (hashlib.md5(mapping_id_prehex.encode('u8')).hexdigest(),
                      application,
                      application_policy))
@@ -151,10 +173,7 @@ class CSVAccounting(ABCAccounting):
         -------
         user : CSVUser
         """
-        if user_name in self.all_records:
-            return CSVUser(name=user_name)
-        else:
-            return None
+        return self.users.get(user_name, None)
 
     def get_apps_for_user(self, user):
         """ Return a tuple of application configurations for a given user
@@ -174,3 +193,29 @@ class CSVAccounting(ABCAccounting):
             return tuple(self.all_records.get(user.name, ()))
         else:
             return ()
+
+    def create_user(self, user_name):
+        raise UnsupportedOperation()
+
+    def remove_user(self, user_name):
+        raise UnsupportedOperation()
+
+    def list_users(self):
+        return self.users.values()
+
+    def create_application(self, app_name):
+        raise UnsupportedOperation()
+
+    def remove_application(self, app_name):
+        raise UnsupportedOperation()
+
+    def list_applications(self):
+        return self.applications.values()
+
+    def grant_access(self, app_name, user_name,
+                     allow_home, allow_view, volume):
+        raise UnsupportedOperation()
+
+    def revoke_access(self, app_name, user_name,
+                      allow_home, allow_view, volume):
+        raise UnsupportedOperation()
