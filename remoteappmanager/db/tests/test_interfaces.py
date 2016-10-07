@@ -9,6 +9,7 @@ from collections import namedtuple
 
 from remoteappmanager.db.interfaces import (
     ABCApplication, ABCApplicationPolicy, ABCAccounting)
+from remoteappmanager.db import exceptions
 from remoteappmanager.db.tests.abc_test_interfaces import (
     ABCTestDatabaseInterface)
 
@@ -33,6 +34,32 @@ class Accounting(ABCAccounting):
                  Application(image=user.name+'1'), ApplicationPolicy()),
                 ('abc2',
                  Application(image=user.name+'2'), ApplicationPolicy()))
+
+    def create_user(self, user_name):
+        raise exceptions.UnsupportedOperation()
+
+    def remove_user(self, user_name):
+        raise exceptions.UnsupportedOperation()
+
+    def list_users(self):
+        return []
+
+    def create_application(self, app_name):
+        raise exceptions.UnsupportedOperation()
+
+    def remove_application(self, app_name):
+        raise exceptions.UnsupportedOperation()
+
+    def list_applications(self):
+        return []
+
+    def grant_access(self, app_name, user_name,
+                     allow_home, allow_view, volume):
+        raise exceptions.UnsupportedOperation()
+
+    def revoke_access(self, app_name, user_name,
+                      allow_home, allow_view, volume):
+        raise exceptions.UnsupportedOperation()
 
 
 class TestDatabaseInterface(ABCTestDatabaseInterface, unittest.TestCase):

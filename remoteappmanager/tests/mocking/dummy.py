@@ -3,6 +3,7 @@ from remoteappmanager.services.reverse_proxy import ReverseProxy
 from remoteappmanager.file_config import FileConfig
 from remoteappmanager.application import Application
 from remoteappmanager.db import interfaces
+from remoteappmanager.db import exceptions
 from remoteappmanager.docker.container_manager import ContainerManager
 
 from remoteappmanager.tests.utils import (
@@ -33,6 +34,32 @@ class DummyDBAccounting(interfaces.ABCAccounting):
                 ('id678',
                  DummyDBApplication(image='image_id1'),
                  DummyDBApplicationPolicy()))
+
+    def create_user(self, user_name):
+        raise exceptions.UnsupportedOperation()
+
+    def remove_user(self, user_name):
+        raise exceptions.UnsupportedOperation()
+
+    def list_users(self):
+        return []
+
+    def create_application(self, app_name):
+        raise exceptions.UnsupportedOperation()
+
+    def remove_application(self, app_name):
+        raise exceptions.UnsupportedOperation()
+
+    def list_applications(self):
+        return []
+
+    def grant_access(self, app_name, user_name,
+                     allow_home, allow_view, volume):
+        raise exceptions.UnsupportedOperation()
+
+    def revoke_access(self, app_name, user_name,
+                      allow_home, allow_view, volume):
+        raise exceptions.UnsupportedOperation()
 
 
 def create_reverse_proxy(params=None,
