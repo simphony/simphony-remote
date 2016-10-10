@@ -89,3 +89,141 @@ class ABCAccounting(metaclass=ABCMeta):
            (id, ABCApplication, ABCApplicationPolicy) where id is a string
            used for identifying (ABCApplication, ABCApplicationPolicy)
         """
+
+    @abstractmethod
+    def create_user(self, user_name):
+        """Creates a user with the specified username, if the backend
+        allows it. Does _not_ return the created user.
+
+        Parameters
+        ----------
+        user_name: str
+            The user name
+        """
+
+    @abstractmethod
+    def remove_user(self, user_name):
+        """Removes a user by name, if the backend allows it.
+        If the user is not present, does nothing.
+
+        Parameters
+        ----------
+        user_name: str
+            The user name
+        """
+
+    @abstractmethod
+    def list_users(self):
+        """Returns a list of all available users.
+
+        Returns
+        -------
+        users: list
+            A list of users.
+        """
+
+    @abstractmethod
+    def create_application(self, app_name):
+        """Creates a new application with the specified name.
+        Raises if an application with the same name already exists
+
+        Parameters
+        ----------
+        app_name: str
+            The name of the application
+
+        Raises
+        ------
+        exceptions.Exists
+            If the application already exists.
+        """
+
+    @abstractmethod
+    def remove_application(self, app_name):
+        """Remove an existing application by name.
+        If the application is not present, does nothing.
+
+        Parameters
+        ----------
+        app_name: str
+            The name of the application
+
+        Raises
+        ------
+        exception.NotFound
+            If the application is not found.
+        """
+
+    @abstractmethod
+    def list_applications(self):
+        """List all available applications
+
+        Returns
+        -------
+        applications: list
+            A list of the available apps.
+        """
+
+    @abstractmethod
+    def grant_access(self, app_name, user_name,
+                     allow_home, allow_view, volume):
+        """Grant access for user to application.
+
+        Parameters
+        ----------
+        app_name: str
+            The name of the application
+
+        user_name: str
+            The name of the user
+
+        allow_home: bool
+            If the home workspace should be mounted.
+
+        allow_view: bool
+            If the session should be visible by others.
+
+        volume: str
+            A volume to mount in the format source_path:target_path:mode
+            mode being "ro" or "rw".
+            (e.g. "/host/path:/container/path:ro").
+
+        Raises
+        ------
+        exception.NotFound:
+            if the app or user are not found.
+        ValueError:
+            if the volume string is invalid.
+        """
+
+    @abstractmethod
+    def revoke_access(self, app_name, user_name,
+                      allow_home, allow_view, volume):
+        """Revoke access for user to application.
+
+        Parameters
+        ----------
+        app_name: str
+            The name of the application
+
+        user_name: str
+            The name of the user
+
+        allow_home: bool
+            If the home workspace should be mounted.
+
+        allow_view: bool
+            If the session should be visible by others.
+
+        volume: str
+            A volume to mount in the format source_path:target_path:mode
+            mode being "ro" or "rw".
+            (e.g. "/host/path:/container/path:ro").
+
+        Raises
+        ------
+        exception.NotFound:
+            if the app or user are not found.
+        ValueError:
+            if the volume string is invalid.
+        """

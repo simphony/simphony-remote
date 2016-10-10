@@ -15,3 +15,15 @@ class TestUtils(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             utils.parse_volume_string("/foo:/bar:xc")
+
+    def test_mergedocs(self):
+        class Base:
+            def foo(self):
+                """one"""
+
+        @utils.mergedocs(Base)
+        class Derived(Base):
+            def foo(self):
+                """two"""
+
+        self.assertEqual(Derived.foo.__doc__, "one\ntwo")
