@@ -234,14 +234,9 @@ class AppAccounting(ABCAccounting):
 
     def remove_user(self, user_name):
         with detached_session(self.db) as session:
-            try:
-                with transaction(session):
-                    orm_user = session.query(User).filter(
-                        User.name == user_name).one()
-
-                    session.delete(orm_user)
-            except NoResultFound:
-                raise exceptions.NotFound()
+            with transaction(session):
+                session.query(User).filter(
+                    User.name == user_name).delete()
 
     def list_users(self):
         with detached_session(self.db) as session:
@@ -260,14 +255,9 @@ class AppAccounting(ABCAccounting):
 
     def remove_application(self, app_name):
         with detached_session(self.db) as session:
-            try:
-                with transaction(session):
-                    app = session.query(Application).filter(
-                        Application.image == app_name).one()
-
-                    session.delete(app)
-            except NoResultFound:
-                raise exceptions.NotFound()
+            with transaction(session):
+                session.query(Application).filter(
+                    Application.image == app_name).delete()
 
     def list_applications(self):
         with detached_session(self.db) as session:
@@ -357,14 +347,11 @@ class AppAccounting(ABCAccounting):
             except NoResultFound:
                 raise exceptions.NotFound()
 
-            try:
-                session.query(Accounting).filter(
-                    Accounting.application == orm_app,
-                    Accounting.user == orm_user,
-                    Accounting.application_policy == orm_policy,
-                    ).delete()
-            except NoResultFound:
-                pass
+            session.query(Accounting).filter(
+                Accounting.application == orm_app,
+                Accounting.user == orm_user,
+                Accounting.application_policy == orm_policy,
+                ).delete()
 
 
 @contextlib.contextmanager

@@ -230,8 +230,9 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
 
         self.assertIsNone(accounting.get_user_by_name("ciccio"))
         self.assertEqual(len(accounting.list_users()), prev_length - 1)
-        with self.assertRaises(exceptions.NotFound):
-            accounting.remove_user("user1")
+
+        # This should be neutral
+        accounting.remove_user("user1")
 
     def test_create_application(self):
         accounting = self.create_accounting()
@@ -251,8 +252,8 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
 
         self.assertEqual(len(accounting.list_applications()), prev_length - 1)
 
-        with self.assertRaises(exceptions.NotFound):
-            accounting.remove_application("docker/image0")
+        # This should be neutral
+        accounting.remove_application("docker/image0")
 
     def test_grant_revoke_access(self):
         accounting = self.create_accounting()

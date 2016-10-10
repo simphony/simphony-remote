@@ -104,16 +104,12 @@ class ABCAccounting(metaclass=ABCMeta):
     @abstractmethod
     def remove_user(self, user_name):
         """Removes a user by name, if the backend allows it.
+        If the user is not present, does nothing.
 
         Parameters
         ----------
         user_name: str
             The user name
-
-        Raises
-        ------
-        exceptions.NotFound
-            If the username is not found.
         """
 
     @abstractmethod
@@ -145,7 +141,7 @@ class ABCAccounting(metaclass=ABCMeta):
     @abstractmethod
     def remove_application(self, app_name):
         """Remove an existing application by name.
-        Raises if the application is not found
+        If the application is not present, does nothing.
 
         Parameters
         ----------
