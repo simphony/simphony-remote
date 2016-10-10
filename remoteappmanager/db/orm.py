@@ -14,7 +14,7 @@ from sqlalchemy.orm.exc import DetachedInstanceError, NoResultFound
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.db.interfaces import ABCAccounting
 from remoteappmanager.db import exceptions
-from remoteappmanager.utils import parse_volume_string
+from remoteappmanager.utils import parse_volume_string, mergedocs
 
 Base = declarative_base()
 
@@ -156,6 +156,7 @@ class Database(LoggingMixin):
         Base.metadata.create_all(self.engine)
 
 
+@mergedocs(ABCAccounting)
 class AppAccounting(ABCAccounting):
 
     def __init__(self, url, **kwargs):
@@ -192,9 +193,6 @@ class AppAccounting(ABCAccounting):
                     'Sqlite database {} is not readable'.format(file_path))
 
     def get_user_by_name(self, user_name):
-        """ Return an orm.User given a user name.  Return None
-        if the user name is not found in the database
-        """
         # We create a session here to make sure it is only
         # used in one thread
         with contextlib.closing(self.db.create_session()) as session:
@@ -212,22 +210,6 @@ class AppAccounting(ABCAccounting):
         return user
 
     def get_apps_for_user(self, user):
-        """ Return a tuple of tuples, each containing an application
-        and the associated policy that a user, defined by the user_name,
-        is allowed to run.  If user is None, an empty tuple is returned.
-
-        Parameters
-        ----------
-        user : orm.User
-
-        Returns
-        -------
-        tuple
-           tuples of tuples
-           (mapping_id, orm.Application, orm.ApplicationPolicy)
-           The mapping_id is a unique string identifying the combination
-           of application and policy. It is not unique per user.
-        """
         # We create a session here to make sure it is only
         # used in one thread
         with contextlib.closing(self.db.create_session()) as session:
@@ -251,8 +233,6 @@ class AppAccounting(ABCAccounting):
                 raise exceptions.Exists()
 
     def remove_user(self, user_name):
-        """Removes a user, if the backend allows it.
-        """
         with detached_session(self.db) as session:
             try:
                 with transaction(session):
@@ -264,15 +244,12 @@ class AppAccounting(ABCAccounting):
                 raise exceptions.NotFound()
 
     def list_users(self):
-        """Returns a list of all available users.
-        """
         with detached_session(self.db) as session:
             users = session.query(User).all()
 
         return users
 
     def create_application(self, app_name):
-        """Create a new application"""
         with detached_session(self.db) as session:
             try:
                 with transaction(session):
@@ -282,8 +259,6 @@ class AppAccounting(ABCAccounting):
                 raise exceptions.Exists()
 
     def remove_application(self, app_name):
-        """Create a new application"""
-
         with detached_session(self.db) as session:
             try:
                 with transaction(session):
@@ -295,8 +270,6 @@ class AppAccounting(ABCAccounting):
                 raise exceptions.NotFound()
 
     def list_applications(self):
-        """List all available applications"""
-
         with detached_session(self.db) as session:
             applications = session.query(Application).all()
 
@@ -304,7 +277,6 @@ class AppAccounting(ABCAccounting):
 
     def grant_access(self, app_name, user_name,
                      allow_home, allow_view, volume):
-        """Grant access for user to application."""
         allow_common = False
         source = target = mode = None
 
@@ -362,7 +334,6 @@ class AppAccounting(ABCAccounting):
 
     def revoke_access(self, app_name, user_name,
                       allow_home, allow_view, volume):
-        """Revoke access for user to application"""
         allow_common = False
         source = target = mode = None
 
@@ -398,6 +369,8 @@ class AppAccounting(ABCAccounting):
 
 @contextlib.contextmanager
 def detached_session(db):
+    """Creates a session where at the end, the objects retrieved
+    are detached from the session itself"""
 
     with contextlib.closing(db.create_session()) as session:
 

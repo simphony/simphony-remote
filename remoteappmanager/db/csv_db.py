@@ -49,6 +49,7 @@ import hashlib
 from remoteappmanager.db.interfaces import (
     ABCAccounting, ABCApplication, ABCApplicationPolicy)
 from remoteappmanager.db.exceptions import UnsupportedOperation
+from remoteappmanager.utils import mergedocs
 
 
 class CSVApplication(ABCApplication):
@@ -79,6 +80,7 @@ _HEADERS = ('user.name',
             'policy.volume_mode')
 
 
+@mergedocs(ABCAccounting)
 class CSVAccounting(ABCAccounting):
     """ Accounting class that reads a CSV file and is used by the
     remoteappmanager.  Currently only accepts one csv file.
@@ -162,33 +164,9 @@ class CSVAccounting(ABCAccounting):
                      application_policy))
 
     def get_user_by_name(self, user_name):
-        """ Return a CSVUser for a given user_name, or return
-        None if the user name is not found.
-
-        Parameters
-        ----------
-        user_name : str
-
-        Returns
-        -------
-        user : CSVUser
-        """
-        return self.users.get(user_name, None)
+        return self.users.get(user_name)
 
     def get_apps_for_user(self, user):
-        """ Return a tuple of application configurations for a given user
-
-        Parameters
-        ----------
-        user : CSVUser
-           Same type as the result of `get_user_by_name`
-
-        Returns
-        -------
-        application_spec: tuple
-           each item of the tuple is a tuple of
-           (id, CSVApplication, CSVApplicationPolicy) where id is a string
-        """
         if user:
             return tuple(self.all_records.get(user.name, ()))
         else:
