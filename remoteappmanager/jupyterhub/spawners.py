@@ -21,6 +21,16 @@ class BaseSpawner(LocalProcessSpawner):
     #: The path of the configuration file for the cmd executable
     config_file_path = Unicode(config=True)
 
+    @property
+    def cmd(self):
+        """Overrides the base class traitlet so that we take full control
+        of the spawned command according to user admin status"""
+
+        if self.user.admin is True:
+            return ["remoteappadmin"]
+
+        return ["remoteappmanager"]
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -28,7 +38,6 @@ class BaseSpawner(LocalProcessSpawner):
         # containing potentially multiple proxies, but it's enforced to
         # contain only one.
         self.proxy = self.db.query(orm.Proxy).first()
-        self.cmd = ['remoteappmanager']
 
     def get_args(self):
         args = super().get_args()
@@ -57,16 +66,6 @@ class SystemUserSpawner(BaseSpawner):
     The user identifier of the process is set to be the system user.
     The current directory is set to the system user's home directory.
     """
-
-    @gen.coroutine
-    def start(self):
-        if self.user.admin:
-            self.cmd = ["remoteappadmin"]
-
-        try:
-            return (yield super().start())
-        except Exception:
-            raise
 
 
 class VirtualUserSpawner(BaseSpawner):
@@ -127,9 +126,6 @@ class VirtualUserSpawner(BaseSpawner):
         temporary home directory if `workspace_dir` is set
         """
 
-        if self.user.admin:
-            self.cmd = ["remoteappadmin"]
-
         # Create the temporary directory as the user's workspace
         if self.workspace_dir and not self._virtual_workspace:
             try:
@@ -155,11 +151,7 @@ class VirtualUserSpawner(BaseSpawner):
                 self.log.info("Created %s's temporary workspace in: %s",
                               self.user.name, self._virtual_workspace)
 
-        # Make sure we clean up in case `start` fails
-        try:
-            return (yield super().start())
-        except Exception:
-            raise
+        return (yield super().start())
 
     @gen.coroutine
     def stop(self, now=False):
