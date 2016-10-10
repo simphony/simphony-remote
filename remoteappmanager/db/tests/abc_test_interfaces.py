@@ -7,10 +7,13 @@ from remoteappmanager.db import exceptions
 
 
 class ABCTestDatabaseInterface(metaclass=ABCMeta):
-
     def assertApplicationEqual(self, app1, app2, msg=None):
         args = _inspect.getargs(ABCApplication.__init__.__code__).args[1:]
         for arg in args:
+            if arg == 'id':
+                # Skip the id because our comparison objects may not have them.
+                continue
+
             if getattr(app1, arg) != getattr(app2, arg):
                 raise self.failureException(msg)
 

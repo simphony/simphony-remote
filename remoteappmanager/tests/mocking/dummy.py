@@ -29,10 +29,10 @@ class DummyDBAccounting(interfaces.ABCAccounting):
 
     def get_apps_for_user(self, account):
         return (('mapping_id',
-                 DummyDBApplication(image='image_id1'),
+                 DummyDBApplication(id=0, image='image_id1'),
                  DummyDBApplicationPolicy()),
                 ('id678',
-                 DummyDBApplication(image='image_id1'),
+                 DummyDBApplication(id=0, image='image_id1'),
                  DummyDBApplicationPolicy()))
 
     def create_user(self, user_name):
