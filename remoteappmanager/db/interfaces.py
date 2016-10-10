@@ -5,7 +5,9 @@ import inspect as _inspect
 class ABCApplication(metaclass=ABCMeta):
     """ Description of an application """
 
-    def __init__(self, image):
+    def __init__(self, id, image):
+        #: Numerical id
+        self.id = id
 
         #: Name of the image
         self.image = image

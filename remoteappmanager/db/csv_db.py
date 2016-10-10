@@ -64,9 +64,9 @@ class CSVApplicationPolicy(ABCApplicationPolicy):
 # We need this because HomeHandler._start_container takes an object with
 # the username in its `name` attribute
 class CSVUser(object):
-
-    def __init__(self, name):
+    def __init__(self, id, name):
         self.name = name
+        self.id = id
 
 
 # Required headers of the CSV files
@@ -122,13 +122,22 @@ class CSVAccounting(ABCAccounting):
 
             for count, record in enumerate(reader):
                 user_name = record[indices['user.name']]
-                user = self.users.setdefault(user_name,
-                                             CSVUser(name=user_name))
+                user = self.users.setdefault(
+                    user_name,
+                    CSVUser(
+                        id=len(self.users),
+                        name=user_name
+                    )
+                )
 
                 image = record[indices['application.image']]
                 application = self.applications.setdefault(
                     image,
-                    CSVApplication(image=image))
+                    CSVApplication(
+                        id=len(self.applications),
+                        image=image
+                    )
+                )
 
                 allow_home = record[indices['policy.allow_home']] == '1'
                 allow_view = record[indices['policy.allow_view']] == '1'

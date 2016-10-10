@@ -28,6 +28,9 @@ def main():    # pragma: no cover
         print("Error: {}".format(e))
         sys.exit(1)
 
-    app = AdminApplication(command_line_config, file_config,
+    app = AdminApplication(
+        command_line_config,
+        file_config,
         environment_config)
+
     app.start()

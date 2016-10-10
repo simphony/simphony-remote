@@ -1,0 +1,35 @@
+{% extends "admin/page.html" %}
+
+
+{% block center_table %}
+<div class="container">
+  <table id="datatable" class="display">
+    <thead>
+      <tr>
+        {% for h in headers %}
+          <th>{{ h }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+  {% for r in table %}
+    <tr>
+      {% for c in r %}
+        <td>{{ c }}</td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+  </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block script_init %}
+    {{ super() }}
+        <script type="text/javascript">
+            require(["admin/tabular/controller"]);
+            {% if controller %}
+                require(["admin/{{ controller }}/controller"]);
+            {% endif %}
+        </script>
+{% endblock %}

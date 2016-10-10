@@ -72,19 +72,19 @@ class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
                                  self.assertApplicationPolicyEqual)
 
     def create_expected_users(self):
-        return (CSVUser('foo'), CSVUser('username'))
+        return (CSVUser(0, 'foo'), CSVUser(1, 'username'))
 
     def create_expected_configs(self, user):
         mappings = {
             'foo': (
-                (CSVApplication(image='image_1'),
+                (CSVApplication(id=0, image='image_1'),
                  CSVApplicationPolicy(allow_home=True,
                                       allow_view=True,
                                       allow_common=False,
                                       volume_source=None,
                                       volume_target=None,
                                       volume_mode=None)),
-                (CSVApplication(image='image_2'),
+                (CSVApplication(id=1, image='image_2'),
                  CSVApplicationPolicy(allow_home=True,
                                       allow_view=True,
                                       allow_common=True,
@@ -93,7 +93,7 @@ class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
                                       volume_mode='ro'))
                 ),
             'username': (
-                (CSVApplication(image='image_1'),
+                (CSVApplication(id=0, image='image_1'),
                  CSVApplicationPolicy(allow_home=False,
                                       allow_view=False,
                                       allow_common=False,

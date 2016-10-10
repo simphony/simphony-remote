@@ -1,6 +1,5 @@
-define(["jquery", "datatables.net"], 
-    function ($, dt) {
+define([
+    "admin/tabular/controller"
+], function (tabular) {
     "use strict";
-   
-    $("#datatable").DataTable();
 });

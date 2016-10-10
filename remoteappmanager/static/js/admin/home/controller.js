@@ -1,6 +1,6 @@
 /*globals: require, console*/
-require([
-    "jquery",
+define([
+    "jquery"
 ], function($) {
     "use strict";
 });
