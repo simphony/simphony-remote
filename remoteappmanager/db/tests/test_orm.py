@@ -3,6 +3,7 @@ import os
 import unittest
 
 from remoteappmanager.db import orm
+from remoteappmanager.db import exceptions
 from remoteappmanager.db.orm import (Database, transaction, Accounting,
                                      AppAccounting)
 from remoteappmanager.db.tests.abc_test_interfaces import (
@@ -209,3 +210,109 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
                 url="sqlite:///"+temp_file_path)
 
         self.assertFalse(os.path.exists(temp_file_path))
+
+    def test_create_user(self):
+        accounting = self.create_accounting()
+        prev_length = len(accounting.list_users())
+
+        accounting.create_user("ciccio")
+        self.assertIsNotNone(accounting.get_user_by_name("ciccio"))
+        self.assertEqual(len(accounting.list_users()), prev_length + 1)
+
+        with self.assertRaises(exceptions.Exists):
+            accounting.create_user("ciccio")
+
+    def test_remove_user(self):
+        accounting = self.create_accounting()
+        prev_length = len(accounting.list_users())
+
+        accounting.remove_user("user1")
+
+        self.assertIsNone(accounting.get_user_by_name("ciccio"))
+        self.assertEqual(len(accounting.list_users()), prev_length - 1)
+
+        # This should be neutral
+        accounting.remove_user("user1")
+
+    def test_create_application(self):
+        accounting = self.create_accounting()
+        prev_length = len(accounting.list_applications())
+
+        accounting.create_application("simphonyremote/amazing")
+        self.assertEqual(len(accounting.list_applications()), prev_length + 1)
+
+        with self.assertRaises(exceptions.Exists):
+            accounting.create_application("simphonyremote/amazing")
+
+    def test_remove_application(self):
+        accounting = self.create_accounting()
+        prev_length = len(accounting.list_applications())
+
+        accounting.remove_application("docker/image0")
+
+        self.assertEqual(len(accounting.list_applications()), prev_length - 1)
+
+        # This should be neutral
+        accounting.remove_application("docker/image0")
+
+    def test_grant_revoke_access(self):
+        accounting = self.create_accounting()
+
+        with self.assertRaises(exceptions.NotFound):
+            accounting.grant_access("simphonyremote/amazing", "ciccio",
+                                    True, False, "/foo:/bar:ro")
+        accounting.create_user("ciccio")
+
+        with self.assertRaises(exceptions.NotFound):
+            accounting.grant_access("simphonyremote/amazing", "ciccio",
+                                    True, False, "/foo:/bar:ro")
+
+        accounting.create_application("simphonyremote/amazing")
+
+        accounting.grant_access("simphonyremote/amazing", "ciccio",
+                                True, False, "/foo:/bar:ro")
+
+        user = accounting.get_user_by_name("ciccio")
+        apps = accounting.get_apps_for_user(user)
+        self.assertEqual(apps[0][1].image, "simphonyremote/amazing")
+        self.assertEqual(apps[0][2].allow_home, True)
+        self.assertEqual(apps[0][2].allow_view, False)
+        self.assertEqual(apps[0][2].volume_source, "/foo")
+        self.assertEqual(apps[0][2].volume_target, "/bar")
+        self.assertEqual(apps[0][2].volume_mode, "ro")
+
+        accounting.revoke_access("simphonyremote/amazing", "ciccio",
+                                 True, False, "/foo:/bar:ro")
+
+        self.assertEqual(len(accounting.get_apps_for_user(user)), 0)
+
+        with self.assertRaises(exceptions.NotFound):
+            accounting.revoke_access("simphonyremote/amazing", "hello",
+                                     True, False, "/foo:/bar:ro")
+
+    def test_grant_revoke_access_volume(self):
+        accounting = self.create_accounting()
+
+        accounting.create_user("ciccio")
+        accounting.create_application("simphonyremote/amazing")
+        accounting.grant_access("simphonyremote/amazing", "ciccio",
+                                True, False, None)
+
+        user = accounting.get_user_by_name("ciccio")
+        apps = accounting.get_apps_for_user(user)
+        self.assertEqual(apps[0][1].image, "simphonyremote/amazing")
+        self.assertEqual(apps[0][2].allow_home, True)
+        self.assertEqual(apps[0][2].allow_view, False)
+        self.assertEqual(apps[0][2].volume_source, None)
+        self.assertEqual(apps[0][2].volume_target, None)
+        self.assertEqual(apps[0][2].volume_mode, None)
+
+        accounting.revoke_access("simphonyremote/amazing", "ciccio",
+                                 True, False, None)
+
+        self.assertEqual(len(accounting.get_apps_for_user(user)), 0)
+
+    def test_unsupported_ops(self):
+        """Override to silence the base class assumption that most of
+        our backends are unable to create."""
+        pass

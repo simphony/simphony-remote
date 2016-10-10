@@ -10,6 +10,7 @@ import click
 import tabulate
 
 from remoteappmanager.db import orm
+from remoteappmanager.utils import parse_volume_string
 
 
 def sqlite_url_to_path(url):
@@ -356,7 +357,10 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
 
     if volume is not None:
         allow_common = True
-        source, target, mode = _parse_volume_string(volume)
+        try:
+            source, target, mode = parse_volume_string(volume)
+        except ValueError as e:
+            raise click.BadOptionUsage("volume", str(e))
 
     session = ctx.obj.session
     with orm.transaction(session):
@@ -435,7 +439,10 @@ def revoke(ctx, image, user, revoke_all, allow_home, allow_view, volume):
 
     if volume is not None:
         allow_common = True
-        source, target, mode = _parse_volume_string(volume)
+        try:
+            source, target, mode = parse_volume_string(volume)
+        except ValueError as e:
+            raise click.BadOptionUsage("volume", str(e))
 
     session = ctx.obj.session
     with orm.transaction(session):
@@ -470,24 +477,6 @@ def revoke(ctx, image, user, revoke_all, allow_home, allow_view, volume):
 def main():
     cli(obj={})
 
-
-def _parse_volume_string(volume_string):
-    """Parses a volume specification string SOURCE:TARGET:MODE into
-    its components, or raises click.BadOptionUsage if not according
-    to format."""
-    try:
-        source, target, mode = volume_string.split(":")
-    except ValueError:
-        raise click.BadOptionUsage(
-            "volume",
-            "Volume string must be in the form source:target:mode")
-
-    if mode not in ('rw', 'ro'):
-        raise click.BadOptionUsage(
-            "volume",
-            "Volume mode must be either 'ro' or 'rw'")
-
-    return source, target, mode
 
 if __name__ == '__main__':
     main()

@@ -6,13 +6,15 @@ from sqlalchemy import (
     Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum,
     event)
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-from sqlalchemy.orm.exc import DetachedInstanceError
+from sqlalchemy.orm.exc import DetachedInstanceError, NoResultFound
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.db.interfaces import ABCAccounting
+from remoteappmanager.db import exceptions
+from remoteappmanager.utils import parse_volume_string, mergedocs
 
 Base = declarative_base()
 
@@ -154,6 +156,7 @@ class Database(LoggingMixin):
         Base.metadata.create_all(self.engine)
 
 
+@mergedocs(ABCAccounting)
 class AppAccounting(ABCAccounting):
 
     def __init__(self, url, **kwargs):
@@ -190,9 +193,6 @@ class AppAccounting(ABCAccounting):
                     'Sqlite database {} is not readable'.format(file_path))
 
     def get_user_by_name(self, user_name):
-        """ Return an orm.User given a user name.  Return None
-        if the user name is not found in the database
-        """
         # We create a session here to make sure it is only
         # used in one thread
         with contextlib.closing(self.db.create_session()) as session:
@@ -210,22 +210,6 @@ class AppAccounting(ABCAccounting):
         return user
 
     def get_apps_for_user(self, user):
-        """ Return a tuple of tuples, each containing an application
-        and the associated policy that a user, defined by the user_name,
-        is allowed to run.  If user is None, an empty tuple is returned.
-
-        Parameters
-        ----------
-        user : orm.User
-
-        Returns
-        -------
-        tuple
-           tuples of tuples
-           (mapping_id, orm.Application, orm.ApplicationPolicy)
-           The mapping_id is a unique string identifying the combination
-           of application and policy. It is not unique per user.
-        """
         # We create a session here to make sure it is only
         # used in one thread
         with contextlib.closing(self.db.create_session()) as session:
@@ -237,6 +221,152 @@ class AppAccounting(ABCAccounting):
             session.expunge_all()
 
         return result
+
+    def create_user(self, user_name):
+        with detached_session(self.db) as session:
+
+            try:
+                with transaction(session):
+                    orm_user = User(name=user_name)
+                    session.add(orm_user)
+            except IntegrityError:
+                raise exceptions.Exists()
+
+    def remove_user(self, user_name):
+        with detached_session(self.db) as session:
+            with transaction(session):
+                session.query(User).filter(
+                    User.name == user_name).delete()
+
+    def list_users(self):
+        with detached_session(self.db) as session:
+            users = session.query(User).all()
+
+        return users
+
+    def create_application(self, app_name):
+        with detached_session(self.db) as session:
+            try:
+                with transaction(session):
+                    orm_app = Application(image=app_name)
+                    session.add(orm_app)
+            except IntegrityError:
+                raise exceptions.Exists()
+
+    def remove_application(self, app_name):
+        with detached_session(self.db) as session:
+            with transaction(session):
+                session.query(Application).filter(
+                    Application.image == app_name).delete()
+
+    def list_applications(self):
+        with detached_session(self.db) as session:
+            applications = session.query(Application).all()
+
+        return applications
+
+    def grant_access(self, app_name, user_name,
+                     allow_home, allow_view, volume):
+        allow_common = False
+        source = target = mode = None
+
+        if volume is not None:
+            allow_common = True
+            source, target, mode = parse_volume_string(volume)
+
+        with detached_session(self.db) as session:
+            with transaction(session):
+                try:
+                    orm_app = session.query(Application).filter(
+                        Application.image == app_name).one()
+
+                    orm_user = session.query(User).filter(
+                        User.name == user_name).one()
+                except NoResultFound:
+                    raise exceptions.NotFound()
+
+                orm_policy = session.query(ApplicationPolicy).filter(
+                    ApplicationPolicy.allow_home == allow_home,
+                    ApplicationPolicy.allow_common == allow_common,
+                    ApplicationPolicy.allow_view == allow_view,
+                    ApplicationPolicy.volume_source == source,
+                    ApplicationPolicy.volume_target == target,
+                    ApplicationPolicy.volume_mode == mode).one_or_none()
+
+                if orm_policy is None:
+                    orm_policy = ApplicationPolicy(
+                        allow_home=allow_home,
+                        allow_common=allow_common,
+                        allow_view=allow_view,
+                        volume_source=source,
+                        volume_target=target,
+                        volume_mode=mode,
+                    )
+                    session.add(orm_policy)
+
+                # Check if we already have the entry
+                acc = session.query(Accounting).filter(
+                    Accounting.user == orm_user,
+                    Accounting.application == orm_app,
+                    Accounting.application_policy == orm_policy
+                ).one_or_none()
+
+                if acc is None:
+                    accounting = Accounting(
+                        user=orm_user,
+                        application=orm_app,
+                        application_policy=orm_policy,
+                    )
+                    session.add(accounting)
+
+    def revoke_access(self, app_name, user_name,
+                      allow_home, allow_view, volume):
+        allow_common = False
+        source = target = mode = None
+
+        if volume is not None:
+            allow_common = True
+            source, target, mode = parse_volume_string(volume)
+
+        with detached_session(self.db) as session, \
+                transaction(session):
+            try:
+                orm_app = session.query(Application).filter(
+                    Application.image == app_name).one()
+
+                orm_user = session.query(User).filter(
+                    User.name == user_name).one()
+
+                orm_policy = session.query(ApplicationPolicy).filter(
+                    ApplicationPolicy.allow_home == allow_home,
+                    ApplicationPolicy.allow_common == allow_common,
+                    ApplicationPolicy.allow_view == allow_view,
+                    ApplicationPolicy.volume_source == source,
+                    ApplicationPolicy.volume_target == target,
+                    ApplicationPolicy.volume_mode == mode).one()
+            except NoResultFound:
+                raise exceptions.NotFound()
+
+            session.query(Accounting).filter(
+                Accounting.application == orm_app,
+                Accounting.user == orm_user,
+                Accounting.application_policy == orm_policy,
+                ).delete()
+
+
+@contextlib.contextmanager
+def detached_session(db):
+    """Creates a session where at the end, the objects retrieved
+    are detached from the session itself"""
+
+    with contextlib.closing(db.create_session()) as session:
+
+        yield session
+
+        # Removing internal references to the session is
+        # required such that the object is detached and
+        # can be reused in a different thread
+        session.expunge_all()
 
 
 @contextlib.contextmanager

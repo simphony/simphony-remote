@@ -3,6 +3,7 @@ import inspect as _inspect
 import string
 
 from remoteappmanager.db.interfaces import ABCApplication, ABCApplicationPolicy
+from remoteappmanager.db import exceptions
 
 
 class ABCTestDatabaseInterface(metaclass=ABCMeta):
@@ -97,3 +98,42 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
                     set(mapping_id) - allowed_chars,
                     "mapping id should contain these characters only: {} "
                     "Got : {}".format(allowed_chars, mapping_id))
+
+    def test_list_users(self):
+        accounting = self.create_accounting()
+
+        expected_names = sorted([user.name
+                                 for user in self.create_expected_users()])
+        obtained_names = sorted([user.name
+                                 for user in accounting.list_users()])
+        self.assertEqual(expected_names, obtained_names)
+
+    def test_list_applications(self):
+        accounting = self.create_accounting()
+
+        expected_images = set()
+        for user in self.create_expected_users():
+            expected_images.update(
+                set([app.image
+                     for app, _ in self.create_expected_configs(user)])
+            )
+
+        obtained_images = set(
+            [app.image for app in accounting.list_applications()]
+        )
+
+        self.assertEqual(expected_images, obtained_images)
+
+    def test_unsupported_ops(self):
+        db = self.create_accounting()
+
+        for method in [db.create_user,
+                       db.remove_user,
+                       db.create_application,
+                       db.remove_application]:
+            with self.assertRaises(exceptions.UnsupportedOperation):
+                method("bonkers")
+
+        for method in [db.grant_access, db.revoke_access]:
+            with self.assertRaises(exceptions.UnsupportedOperation):
+                method("bonkers", "uuu", True, False, "/a:/b:ro")
