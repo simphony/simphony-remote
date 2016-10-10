@@ -42,7 +42,7 @@ class Accounting(ABCAccounting):
         raise exceptions.UnsupportedOperation()
 
     def list_users(self):
-        return []
+        return [User('foo'), User('bar')]
 
     def create_application(self, app_name):
         raise exceptions.UnsupportedOperation()
@@ -51,7 +51,11 @@ class Accounting(ABCAccounting):
         raise exceptions.UnsupportedOperation()
 
     def list_applications(self):
-        return []
+        return [Application(image="foo1"),
+                Application(image="foo2"),
+                Application(image="bar1"),
+                Application(image="bar2")
+                ]
 
     def grant_access(self, app_name, user_name,
                      allow_home, allow_view, volume):
