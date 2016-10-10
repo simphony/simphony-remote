@@ -2,6 +2,7 @@ from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
 from remoteappmanager.file_config import FileConfig
 from remoteappmanager.application import Application
+from remoteappmanager.admin_application import AdminApplication
 from remoteappmanager.db import interfaces
 from remoteappmanager.db import exceptions
 from remoteappmanager.docker.container_manager import ContainerManager
@@ -159,6 +160,44 @@ def create_application(command_line_config=None,
     -------
     application : remoteappmanager.application.Application
     """
+    return _create_application_from_class(Application,
+                                          command_line_config,
+                                          file_config,
+                                          environment_config)
+
+
+def create_admin_application(command_line_config=None,
+                             file_config=None,
+                             environment_config=None):
+    """Return a dummy Admin Application object
+
+    Parameters
+    ----------
+    command_line_config : CommandLineConfig
+       Command line config for initialising Application
+
+    file_config : FileConfig
+       File config for initialising Application
+
+    environment_config: EnvironmentConfig
+        Environment configuration for initialising Application
+
+    Returns
+    -------
+    application : remoteappmanager.application.Application
+    """
+
+    return _create_application_from_class(AdminApplication,
+                                          command_line_config,
+                                          file_config,
+                                          environment_config)
+
+
+def _create_application_from_class(
+        application_class,
+        command_line_config=None,
+        file_config=None,
+        environment_config=None):
 
     if file_config is None:
         file_config = FileConfig()
@@ -172,9 +211,10 @@ def create_application(command_line_config=None,
     if environment_config is not None:
         environment_config = basic_environment_config()
 
-    app = Application(command_line_config,
-                      file_config,
-                      environment_config)
+    app = application_class(
+        command_line_config,
+        file_config,
+        environment_config)
 
     app.hub = create_hub()
     app.reverse_proxy = create_reverse_proxy()
