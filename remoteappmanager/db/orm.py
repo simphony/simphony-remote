@@ -286,17 +286,14 @@ class AppAccounting(ABCAccounting):
 
         with detached_session(self.db) as session:
             with transaction(session):
-                orm_app = session.query(Application).filter(
-                    Application.image == app_name).one_or_none()
+                try:
+                    orm_app = session.query(Application).filter(
+                        Application.image == app_name).one()
 
-                if orm_app is None:
-                    raise exceptions.NotFound("application")
-
-                orm_user = session.query(User).filter(
-                    User.name == user_name).one_or_none()
-
-                if orm_user is None:
-                    raise exceptions.NotFound("user")
+                    orm_user = session.query(User).filter(
+                        User.name == user_name).one()
+                except NoResultFound:
+                    raise exceptions.NotFound()
 
                 orm_policy = session.query(ApplicationPolicy).filter(
                     ApplicationPolicy.allow_home == allow_home,
@@ -341,30 +338,33 @@ class AppAccounting(ABCAccounting):
             allow_common = True
             source, target, mode = parse_volume_string(volume)
 
-        with detached_session(self.db) as session:
+        with detached_session(self.db) as session, \
+                transaction(session):
             try:
-                with transaction(session):
-                    orm_app = session.query(Application).filter(
-                        Application.image == app_name).one()
+                orm_app = session.query(Application).filter(
+                    Application.image == app_name).one()
 
-                    orm_user = session.query(User).filter(
-                        User.name == user_name).one()
+                orm_user = session.query(User).filter(
+                    User.name == user_name).one()
 
-                    orm_policy = session.query(ApplicationPolicy).filter(
-                        ApplicationPolicy.allow_home == allow_home,
-                        ApplicationPolicy.allow_common == allow_common,
-                        ApplicationPolicy.allow_view == allow_view,
-                        ApplicationPolicy.volume_source == source,
-                        ApplicationPolicy.volume_target == target,
-                        ApplicationPolicy.volume_mode == mode).one()
-
-                    session.query(Accounting).filter(
-                        Accounting.application == orm_app,
-                        Accounting.user == orm_user,
-                        Accounting.application_policy == orm_policy,
-                        ).delete()
+                orm_policy = session.query(ApplicationPolicy).filter(
+                    ApplicationPolicy.allow_home == allow_home,
+                    ApplicationPolicy.allow_common == allow_common,
+                    ApplicationPolicy.allow_view == allow_view,
+                    ApplicationPolicy.volume_source == source,
+                    ApplicationPolicy.volume_target == target,
+                    ApplicationPolicy.volume_mode == mode).one()
             except NoResultFound:
                 raise exceptions.NotFound()
+
+            try:
+                session.query(Accounting).filter(
+                    Accounting.application == orm_app,
+                    Accounting.user == orm_user,
+                    Accounting.application_policy == orm_policy,
+                    ).delete()
+            except NoResultFound:
+                pass
 
 
 @contextlib.contextmanager

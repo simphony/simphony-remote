@@ -230,6 +230,8 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
 
         self.assertIsNone(accounting.get_user_by_name("ciccio"))
         self.assertEqual(len(accounting.list_users()), prev_length - 1)
+        with self.assertRaises(exceptions.NotFound):
+            accounting.remove_user("user1")
 
     def test_create_application(self):
         accounting = self.create_accounting()
@@ -255,8 +257,17 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
     def test_grant_revoke_access(self):
         accounting = self.create_accounting()
 
+        with self.assertRaises(exceptions.NotFound):
+            accounting.grant_access("simphonyremote/amazing", "ciccio",
+                                    True, False, "/foo:/bar:ro")
         accounting.create_user("ciccio")
+
+        with self.assertRaises(exceptions.NotFound):
+            accounting.grant_access("simphonyremote/amazing", "ciccio",
+                                    True, False, "/foo:/bar:ro")
+
         accounting.create_application("simphonyremote/amazing")
+
         accounting.grant_access("simphonyremote/amazing", "ciccio",
                                 True, False, "/foo:/bar:ro")
 
@@ -277,3 +288,30 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
         with self.assertRaises(exceptions.NotFound):
             accounting.revoke_access("simphonyremote/amazing", "hello",
                                      True, False, "/foo:/bar:ro")
+
+    def test_grant_revoke_access_volume(self):
+        accounting = self.create_accounting()
+
+        accounting.create_user("ciccio")
+        accounting.create_application("simphonyremote/amazing")
+        accounting.grant_access("simphonyremote/amazing", "ciccio",
+                                True, False, None)
+
+        user = accounting.get_user_by_name("ciccio")
+        apps = accounting.get_apps_for_user(user)
+        self.assertEqual(apps[0][1].image, "simphonyremote/amazing")
+        self.assertEqual(apps[0][2].allow_home, True)
+        self.assertEqual(apps[0][2].allow_view, False)
+        self.assertEqual(apps[0][2].volume_source, None)
+        self.assertEqual(apps[0][2].volume_target, None)
+        self.assertEqual(apps[0][2].volume_mode, None)
+
+        accounting.revoke_access("simphonyremote/amazing", "ciccio",
+                                 True, False, None)
+
+        self.assertEqual(len(accounting.get_apps_for_user(user)), 0)
+
+    def test_unsupported_ops(self):
+        """Override to silence the base class assumption that most of
+        our backends are unable to create."""
+        pass

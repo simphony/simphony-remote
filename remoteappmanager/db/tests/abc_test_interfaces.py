@@ -3,6 +3,7 @@ import inspect as _inspect
 import string
 
 from remoteappmanager.db.interfaces import ABCApplication, ABCApplicationPolicy
+from remoteappmanager.db import exceptions
 
 
 class ABCTestDatabaseInterface(metaclass=ABCMeta):
@@ -122,3 +123,17 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
         )
 
         self.assertEqual(expected_images, obtained_images)
+
+    def test_unsupported_ops(self):
+        db = self.create_accounting()
+
+        for method in [db.create_user,
+                       db.remove_user,
+                       db.create_application,
+                       db.remove_application]:
+            with self.assertRaises(exceptions.UnsupportedOperation):
+                method("bonkers")
+
+        for method in [db.grant_access, db.revoke_access]:
+            with self.assertRaises(exceptions.UnsupportedOperation):
+                method("bonkers", "uuu", True, False, "/a:/b:ro")
