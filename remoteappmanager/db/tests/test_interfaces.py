@@ -38,7 +38,7 @@ class Accounting(ABCAccounting):
     def create_user(self, user_name):
         raise exceptions.UnsupportedOperation()
 
-    def remove_user(self, user_name):
+    def remove_user(self, *, user_name=None, id=None):
         raise exceptions.UnsupportedOperation()
 
     def list_users(self):
@@ -47,7 +47,7 @@ class Accounting(ABCAccounting):
     def create_application(self, app_name):
         raise exceptions.UnsupportedOperation()
 
-    def remove_application(self, app_name):
+    def remove_application(self, *, app_name=None, id=None):
         raise exceptions.UnsupportedOperation()
 
     def list_applications(self):

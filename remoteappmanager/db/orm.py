@@ -205,6 +205,7 @@ class AppAccounting(ABCAccounting):
             # required such that the object is detached and
             # can be reused in a different thread
             if user:
+                session.refresh(user)
                 session.expunge(user)
 
         return user
@@ -224,7 +225,6 @@ class AppAccounting(ABCAccounting):
 
     def create_user(self, user_name):
         with detached_session(self.db) as session:
-
             try:
                 with transaction(session):
                     orm_user = User(name=user_name)
@@ -232,11 +232,26 @@ class AppAccounting(ABCAccounting):
             except IntegrityError:
                 raise exceptions.Exists()
 
-    def remove_user(self, user_name):
+            return orm_user.id
+
+    def remove_user(self, *, user_name=None, id=None):
+        if not one([user_name, id]):
+            raise ValueError("Strictly one argument allowed")
+
+        if user_name:
+            filter = (User.name == user_name)
+        elif id:
+            filter = (User.id == id)
+        else:
+            # Just in case
+            return
+
         with detached_session(self.db) as session:
             with transaction(session):
-                session.query(User).filter(
-                    User.name == user_name).delete()
+                user = session.query(User).filter(filter).one_or_none()
+
+                if user:
+                    session.delete(user)
 
     def list_users(self):
         with detached_session(self.db) as session:
@@ -253,11 +268,25 @@ class AppAccounting(ABCAccounting):
             except IntegrityError:
                 raise exceptions.Exists()
 
-    def remove_application(self, app_name):
+            return orm_app.id
+
+    def remove_application(self, *, app_name=None, id=None):
+        if not one([app_name, id]):
+            raise ValueError("Strictly one argument allowed")
+
+        if app_name:
+            filter = (Application.image == app_name)
+        elif id:
+            filter = (Application.id == id)
+        else:
+            return
+
         with detached_session(self.db) as session:
             with transaction(session):
-                session.query(Application).filter(
-                    Application.image == app_name).delete()
+                app = session.query(Application).filter(filter).one_or_none()
+
+                if app:
+                    session.delete(app)
 
     def list_applications(self):
         with detached_session(self.db) as session:
@@ -424,3 +453,8 @@ def apps_for_user(session, user):
                   ).hexdigest(),
                   acc.application,
                   acc.application_policy) for acc in res)
+
+
+def one(elements):
+    """Returns True if only one element is 'truthy', false otherwise"""
+    return sum([bool(e) for e in elements]) == 1

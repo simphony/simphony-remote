@@ -131,11 +131,16 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
         db = self.create_accounting()
 
         for method in [db.create_user,
-                       db.remove_user,
                        db.create_application,
-                       db.remove_application]:
+                       ]:
             with self.assertRaises(exceptions.UnsupportedOperation):
                 method("bonkers")
+
+        for method in [db.remove_user,
+                       db.remove_application
+                       ]:
+            with self.assertRaises(exceptions.UnsupportedOperation):
+                method(id=12345)
 
         for method in [db.grant_access, db.revoke_access]:
             with self.assertRaises(exceptions.UnsupportedOperation):

@@ -95,16 +95,26 @@ class ABCAccounting(metaclass=ABCMeta):
     @abstractmethod
     def create_user(self, user_name):
         """Creates a user with the specified username, if the backend
-        allows it. Does _not_ return the created user.
+        allows it.
 
         Parameters
         ----------
         user_name: str
             The user name
+
+        Returns
+        -------
+        id: int
+            The unique id of the user
+
+        Raises
+        ------
+        exceptions.Exists
+            If the user with that name already exists.
         """
 
     @abstractmethod
-    def remove_user(self, user_name):
+    def remove_user(self, *, user_name=None, id=None):
         """Removes a user by name, if the backend allows it.
         If the user is not present, does nothing.
 
@@ -134,6 +144,11 @@ class ABCAccounting(metaclass=ABCMeta):
         app_name: str
             The name of the application
 
+        Returns
+        -------
+        id: int
+            The id of the created application
+
         Raises
         ------
         exceptions.Exists
@@ -141,14 +156,18 @@ class ABCAccounting(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def remove_application(self, app_name):
-        """Remove an existing application by name.
+    def remove_application(self, *, app_name=None, id=None):
+        """Remove an existing application by name or id, depending
+        what is provided. Only one argument is allowed.
         If the application is not present, does nothing.
 
         Parameters
         ----------
         app_name: str
             The name of the application
+
+        id: int
+            The id of the application
 
         Raises
         ------
