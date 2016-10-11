@@ -215,31 +215,61 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
         accounting = self.create_accounting()
         prev_length = len(accounting.list_users())
 
-        accounting.create_user("ciccio")
-        self.assertIsNotNone(accounting.get_user_by_name("ciccio"))
+        id = accounting.create_user("ciccio")
+
+        user = accounting.get_user_by_name("ciccio")
+        self.assertIsNotNone(user)
+        self.assertIsNotNone(id)
         self.assertEqual(len(accounting.list_users()), prev_length + 1)
 
         with self.assertRaises(exceptions.Exists):
             accounting.create_user("ciccio")
 
-    def test_remove_user(self):
+    def test_remove_user_by_name(self):
         accounting = self.create_accounting()
         prev_length = len(accounting.list_users())
 
-        accounting.remove_user("user1")
+        accounting.remove_user(user_name="user1")
 
         self.assertIsNone(accounting.get_user_by_name("ciccio"))
         self.assertEqual(len(accounting.list_users()), prev_length - 1)
 
         # This should be neutral
-        accounting.remove_user("user1")
+        accounting.remove_user(user_name="user1")
+
+    def test_remove_user_by_id(self):
+        accounting = self.create_accounting()
+        user = accounting.get_user_by_name("user1")
+        id = user.id
+        prev_length = len(accounting.list_users())
+
+        accounting.remove_user(id=id)
+        self.assertIsNone(accounting.get_user_by_name("user1"))
+        self.assertEqual(len(accounting.list_users()), prev_length - 1)
+
+        # This should be neutral
+        accounting.remove_user(id=id)
+
+    def test_remove_user_one_arg(self):
+        accounting = self.create_accounting()
+
+        with self.assertRaises(ValueError):
+            accounting.remove_user(user_name="foo", id=3)
+
+        with self.assertRaises(ValueError):
+            accounting.remove_user()
 
     def test_create_application(self):
         accounting = self.create_accounting()
         prev_length = len(accounting.list_applications())
 
-        accounting.create_application("simphonyremote/amazing")
-        self.assertEqual(len(accounting.list_applications()), prev_length + 1)
+        id = accounting.create_application("simphonyremote/amazing")
+        self.assertIsNotNone(id)
+        app_list = accounting.list_applications()
+        self.assertEqual(len(app_list), prev_length + 1)
+
+        apps = [a for a in app_list if a.id == id]
+        self.assertEqual(len(apps), 1)
 
         with self.assertRaises(exceptions.Exists):
             accounting.create_application("simphonyremote/amazing")
@@ -248,12 +278,34 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
         accounting = self.create_accounting()
         prev_length = len(accounting.list_applications())
 
-        accounting.remove_application("docker/image0")
+        accounting.remove_application(app_name="docker/image0")
 
         self.assertEqual(len(accounting.list_applications()), prev_length - 1)
 
         # This should be neutral
-        accounting.remove_application("docker/image0")
+        accounting.remove_application(app_name="docker/image0")
+
+    def test_remove_application_by_id(self):
+        accounting = self.create_accounting()
+        app_list = accounting.list_applications()
+        id = app_list[0].id
+        prev_length = len(app_list)
+
+        accounting.remove_application(id=id)
+
+        self.assertEqual(len(accounting.list_applications()), prev_length - 1)
+
+        # This should be neutral
+        accounting.remove_application(id=id)
+
+    def test_remove_application_one_arg(self):
+        accounting = self.create_accounting()
+
+        with self.assertRaises(ValueError):
+            accounting.remove_application(app_name="foo", id=3)
+
+        with self.assertRaises(ValueError):
+            accounting.remove_application()
 
     def test_grant_revoke_access(self):
         accounting = self.create_accounting()

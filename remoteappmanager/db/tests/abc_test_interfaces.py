@@ -7,10 +7,13 @@ from remoteappmanager.db import exceptions
 
 
 class ABCTestDatabaseInterface(metaclass=ABCMeta):
-
     def assertApplicationEqual(self, app1, app2, msg=None):
         args = _inspect.getargs(ABCApplication.__init__.__code__).args[1:]
         for arg in args:
+            if arg == 'id':
+                # Skip the id because our comparison objects may not have them.
+                continue
+
             if getattr(app1, arg) != getattr(app2, arg):
                 raise self.failureException(msg)
 
@@ -128,11 +131,16 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
         db = self.create_accounting()
 
         for method in [db.create_user,
-                       db.remove_user,
                        db.create_application,
-                       db.remove_application]:
+                       ]:
             with self.assertRaises(exceptions.UnsupportedOperation):
                 method("bonkers")
+
+        for method in [db.remove_user,
+                       db.remove_application
+                       ]:
+            with self.assertRaises(exceptions.UnsupportedOperation):
+                method(id=12345)
 
         for method in [db.grant_access, db.revoke_access]:
             with self.assertRaises(exceptions.UnsupportedOperation):

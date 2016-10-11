@@ -12,6 +12,7 @@ doc/source/remoteappmanager_help.txt
 remoteappmanager/static/components/
 node_modules
 .coverage
+coverage/
 build/
 dist/
 jupyterhub/remoteappmanager.db

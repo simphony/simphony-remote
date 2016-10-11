@@ -35,7 +35,11 @@
     <link rel="stylesheet" href="{{ static_url("css/remoteappmanager.css") }}" type="text/css"/>
     {% endblock %}
 
+    {% block script %}
     <script src="{{static_url("components/requirejs/require.js") }}" type="text/javascript" charset="utf-8"></script>
+    {% endblock %}
+
+    {% block script_init %}
     <script>
       require.config({
           {% if version_hash %}
@@ -47,12 +51,16 @@
             jquery: '../components/jquery/jquery.min',
             bootstrap: '../components/bootstrap/js/bootstrap.min',
             moment: "../components/moment/moment",
+            "datatables.net": "../components/datatables.net/js/jquery.dataTables"
           },
           shim: {
             bootstrap: {
               deps: ["jquery"],
               exports: "bootstrap"
-            }
+            },
+            "datatables.net": {
+              deps: ["jquery"]
+            },
           }
       });
     </script>
@@ -71,6 +79,8 @@
         {% endif %}
       }
     </script>
+    {% endblock %}
+
     {% block meta %}
     {% endblock %}
 </head>
@@ -111,9 +121,6 @@
         The error
       </div>
     {% endcall %}
-
-    {% block script %}
-    {% endblock %}
 
 </body>
 </html>

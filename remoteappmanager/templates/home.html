@@ -8,8 +8,9 @@
 
 {% endblock %}
 
-{% block script %}
-<script type="text/javascript">
-require(["home/home"]);
-</script>
+{% block script_init %}
+    {{  super() }}
+    <script type="text/javascript">
+    require(["home/home"]);
+    </script>
 {% endblock %}

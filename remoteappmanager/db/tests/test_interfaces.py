@@ -31,14 +31,14 @@ class Accounting(ABCAccounting):
 
     def get_apps_for_user(self, user):
         return (('abc1',
-                 Application(image=user.name+'1'), ApplicationPolicy()),
+                 Application(id=0, image=user.name+'1'), ApplicationPolicy()),
                 ('abc2',
-                 Application(image=user.name+'2'), ApplicationPolicy()))
+                 Application(id=1, image=user.name+'2'), ApplicationPolicy()))
 
     def create_user(self, user_name):
         raise exceptions.UnsupportedOperation()
 
-    def remove_user(self, user_name):
+    def remove_user(self, *, user_name=None, id=None):
         raise exceptions.UnsupportedOperation()
 
     def list_users(self):
@@ -47,14 +47,14 @@ class Accounting(ABCAccounting):
     def create_application(self, app_name):
         raise exceptions.UnsupportedOperation()
 
-    def remove_application(self, app_name):
+    def remove_application(self, *, app_name=None, id=None):
         raise exceptions.UnsupportedOperation()
 
     def list_applications(self):
-        return [Application(image="foo1"),
-                Application(image="foo2"),
-                Application(image="bar1"),
-                Application(image="bar2")
+        return [Application(id=0, image="foo1"),
+                Application(id=1, image="foo2"),
+                Application(id=2, image="bar1"),
+                Application(id=3, image="bar2")
                 ]
 
     def grant_access(self, app_name, user_name,
@@ -77,8 +77,8 @@ class TestDatabaseInterface(ABCTestDatabaseInterface, unittest.TestCase):
         return [User('foo'), User('bar')]
 
     def create_expected_configs(self, user):
-        return [(Application(image=user.name+'1'), ApplicationPolicy()),
-                (Application(image=user.name+'2'), ApplicationPolicy())]
+        return [(Application(id=0, image=user.name+'1'), ApplicationPolicy()),
+                (Application(id=1, image=user.name+'2'), ApplicationPolicy())]
 
     def create_accounting(self):
         return Accounting()

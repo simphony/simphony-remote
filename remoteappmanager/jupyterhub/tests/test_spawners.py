@@ -57,6 +57,7 @@ def new_spawner(spawner_class):
     # Mock user
     user = mock.Mock()
     user.name = username()
+    user.admin = False
     user.state = None
     user.server = generic_server
 
@@ -141,6 +142,19 @@ class TestSystemUserSpawner(TempMixin, testing.AsyncTestCase):
 
         status = self.io_loop.run_sync(self.spawner.poll)
         self.assertEqual(status, 1)
+
+
+class TestSystemUserSpawnerAsAdmin(TestSystemUserSpawner):
+    # We expect the same tests above to pass.
+    # admin is a full replacement application that should accept and behave
+    # exactly in the same way.
+
+    def setUp(self):
+        super().setUp()
+        self.spawner.user.admin = True
+
+    def test_cmd(self):
+        self.assertEqual(self.spawner.cmd, ['remoteappadmin'])
 
 
 class TestVirtualUserSpawner(TestSystemUserSpawner):
@@ -252,3 +266,12 @@ class TestVirtualUserSpawner(TestSystemUserSpawner):
         # Stopped running
         status = self.io_loop.run_sync(self.spawner.poll)
         self.assertEqual(status, 1)
+
+
+class TestVirtualUserSpawnerAsAdmin(TestSystemUserSpawner):
+    def setUp(self):
+        super().setUp()
+        self.spawner.user.admin = True
+
+    def test_cmd(self):
+        self.assertEqual(self.spawner.cmd, ['remoteappadmin'])
