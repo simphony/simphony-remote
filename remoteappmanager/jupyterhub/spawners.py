@@ -25,9 +25,9 @@ class BaseSpawner(LocalProcessSpawner):
     def cmd(self):
         """Overrides the base class traitlet so that we take full control
         of the spawned command according to user admin status"""
-        
-        return (["remoteappadmin"] 
-                if self.user.admin is True 
+
+        return (["remoteappadmin"]
+                if self.user.admin is True
                 else ["remoteappmanager"])
 
     def __init__(self, **kwargs):
