@@ -31,7 +31,7 @@ User = namedtuple('User', ('id', 'name'))
 class DummyDBAccounting(interfaces.ABCAccounting):
 
     def get_user(self, *, user_name=None, id=None):
-        user_name = user_name or "username"
+        user_name = user_name if user_name is not None else "username"
         id = 0 if id is None else id
         return User(id, user_name)
 
@@ -47,27 +47,27 @@ class DummyDBAccounting(interfaces.ABCAccounting):
         raise exceptions.UnsupportedOperation()
 
     def remove_user(self, *, user_name=None, id=None):
-        raise exceptions.UnsupportedOperation()  # noqa
+        raise exceptions.UnsupportedOperation()  # pragma: no cover
 
     def list_users(self):
         return []
 
     def create_application(self, app_name):
-        raise exceptions.UnsupportedOperation()  # noqa
+        raise exceptions.UnsupportedOperation()  # pragma: no cover
 
     def remove_application(self, *, app_name=None, id=None):
-        raise exceptions.UnsupportedOperation()  # noqa
+        raise exceptions.UnsupportedOperation()  # pragma: no cover
 
     def list_applications(self):
         return []
 
     def grant_access(self, app_name, user_name,
                      allow_home, allow_view, volume):
-        raise exceptions.UnsupportedOperation()  # noqa
+        raise exceptions.UnsupportedOperation()  # pragma: no cover
 
     def revoke_access(self, app_name, user_name,
                       allow_home, allow_view, volume):
-        raise exceptions.UnsupportedOperation()  # noqa
+        raise exceptions.UnsupportedOperation()  # pragma: no cover
 
 
 def create_reverse_proxy(params=None,
