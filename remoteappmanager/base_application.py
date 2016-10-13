@@ -134,7 +134,7 @@ class BaseApplication(web.Application, LoggingMixin):
         """Initializes the user at the database level."""
         user_name = self.command_line_config.user
         user = User(name=user_name)
-        user.account = self.db.get_user_by_name(user_name)
+        user.account = self.db.get_user(user_name=user_name)
         return user
 
     @default("registry")

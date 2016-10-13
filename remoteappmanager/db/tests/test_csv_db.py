@@ -106,14 +106,18 @@ class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
     def create_accounting(self):
         return CSVAccounting(self.csv_file)
 
-    def test_get_user_by_name(self):
+    def test_get_user(self):
         accounting = self.create_accounting()
 
-        user = accounting.get_user_by_name('foo')
+        user = accounting.get_user(user_name='foo')
         self.assertIsInstance(user, CSVUser)
         self.assertEqual(user.name, 'foo')
 
-        user = accounting.get_user_by_name('unknown')
+        user = accounting.get_user(id=0)
+        self.assertIsInstance(user, CSVUser)
+        self.assertEqual(user.name, 'foo')
+
+        user = accounting.get_user(user_name='unknown')
         self.assertIsNone(user)
 
     def test_error_with_missing_headers(self):

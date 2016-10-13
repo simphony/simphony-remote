@@ -14,7 +14,7 @@ from sqlalchemy.orm.exc import DetachedInstanceError, NoResultFound
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.db.interfaces import ABCAccounting
 from remoteappmanager.db import exceptions
-from remoteappmanager.utils import parse_volume_string, mergedocs
+from remoteappmanager.utils import parse_volume_string, mergedocs, one
 
 Base = declarative_base()
 
@@ -192,14 +192,24 @@ class AppAccounting(ABCAccounting):
                 raise IOError(
                     'Sqlite database {} is not readable'.format(file_path))
 
-    def get_user_by_name(self, user_name):
+    def get_user(self, *, user_name=None, id=None):
+        if not one([user_name, id]):
+            raise ValueError("Strictly one argument allowed")
+
+        if user_name:
+            filter = (User.name == user_name)
+        elif id:
+            filter = (User.id == id)
+        else:
+            # Just in case
+            return
+
         # We create a session here to make sure it is only
         # used in one thread
         with contextlib.closing(self.db.create_session()) as session:
 
             with transaction(session):
-                user = session.query(User).filter_by(
-                    name=user_name).one_or_none()
+                user = session.query(User).filter(filter).one_or_none()
 
             # Removing internal references to the session is
             # required such that the object is detached and
@@ -453,8 +463,3 @@ def apps_for_user(session, user):
                   ).hexdigest(),
                   acc.application,
                   acc.application_policy) for acc in res)
-
-
-def one(elements):
-    """Returns True if only one element is 'truthy', false otherwise"""
-    return sum([bool(e) for e in elements]) == 1

@@ -39,8 +39,8 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
         """ Create an object that complies with ABCAccounting """
 
     @abstractmethod
-    def test_get_user_by_name(self):
-        """ Test ABCDatabase.get_user_by_name """
+    def test_get_user(self):
+        """ Test ABCDatabase.get_user """
 
     def test_get_apps_for_user(self):
         """ Test get_apps_for_user returns an iterable of ApplicationConfig
