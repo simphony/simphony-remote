@@ -47,27 +47,27 @@ class DummyDBAccounting(interfaces.ABCAccounting):
         raise exceptions.UnsupportedOperation()
 
     def remove_user(self, *, user_name=None, id=None):
-        raise exceptions.UnsupportedOperation()
+        raise exceptions.UnsupportedOperation()  # noqa
 
     def list_users(self):
         return []
 
     def create_application(self, app_name):
-        raise exceptions.UnsupportedOperation()
+        raise exceptions.UnsupportedOperation()  # noqa
 
     def remove_application(self, *, app_name=None, id=None):
-        raise exceptions.UnsupportedOperation()
+        raise exceptions.UnsupportedOperation()  # noqa
 
     def list_applications(self):
         return []
 
     def grant_access(self, app_name, user_name,
                      allow_home, allow_view, volume):
-        raise exceptions.UnsupportedOperation()
+        raise exceptions.UnsupportedOperation()  # noqa
 
     def revoke_access(self, app_name, user_name,
                       allow_home, allow_view, volume):
-        raise exceptions.UnsupportedOperation()
+        raise exceptions.UnsupportedOperation()  # noqa
 
 
 def create_reverse_proxy(params=None,

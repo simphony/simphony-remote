@@ -30,6 +30,9 @@ class Accounting(ABCAccounting):
         return User(id=0, name=user_name)
 
     def get_apps_for_user(self, user):
+        if user is None:
+            return ()
+
         return (('abc1',
                  Application(id=0, image=user.name+'1'), ApplicationPolicy()),
                 ('abc2',

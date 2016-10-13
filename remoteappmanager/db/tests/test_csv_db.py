@@ -120,6 +120,9 @@ class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
         user = accounting.get_user(user_name='unknown')
         self.assertIsNone(user)
 
+        with self.assertRaises(ValueError):
+            accounting.get_user(user_name='unknown', id=123)
+
     def test_error_with_missing_headers(self):
         write_csv_file(self.csv_file,
                        BadTableMissingHeaders.headers,

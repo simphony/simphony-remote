@@ -47,6 +47,8 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
         """
         accounting = self.create_accounting()
 
+        self.assertEqual(accounting.get_apps_for_user(None), ())
+
         for user in self.create_expected_users():
             expected_configs = self.create_expected_configs(user)
 
