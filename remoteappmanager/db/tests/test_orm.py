@@ -184,9 +184,18 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
         user = accounting.get_user(user_name='user1')
         self.assertIsInstance(user, orm.User)
 
+        user = accounting.get_user(id=1)
+        self.assertIsInstance(user, orm.User)
+
         # user not found, result should be None
         user = accounting.get_user(user_name='foo')
         self.assertIsNone(user)
+
+        user = accounting.get_user(id=124)
+        self.assertIsNone(user)
+
+        with self.assertRaises(ValueError):
+            accounting.get_user(id=1, user_name="foo")
 
     def test_get_apps_for_user_across_sessions(self):
         accounting = self.create_accounting()

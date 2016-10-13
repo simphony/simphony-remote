@@ -196,9 +196,9 @@ class AppAccounting(ABCAccounting):
         if not one([user_name, id]):
             raise ValueError("Strictly one argument allowed")
 
-        if user_name:
+        if user_name is not None:
             filter = (User.name == user_name)
-        elif id:
+        elif id is not None:
             filter = (User.id == id)
         else:
             # Just in case
@@ -248,9 +248,9 @@ class AppAccounting(ABCAccounting):
         if not one([user_name, id]):
             raise ValueError("Strictly one argument allowed")
 
-        if user_name:
+        if user_name is not None:
             filter = (User.name == user_name)
-        elif id:
+        elif id is not None:
             filter = (User.id == id)
         else:
             # Just in case
@@ -284,9 +284,9 @@ class AppAccounting(ABCAccounting):
         if not one([app_name, id]):
             raise ValueError("Strictly one argument allowed")
 
-        if app_name:
+        if app_name is not None:
             filter = (Application.image == app_name)
-        elif id:
+        elif id is not None:
             filter = (Application.id == id)
         else:
             return

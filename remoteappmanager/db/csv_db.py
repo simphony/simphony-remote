@@ -184,7 +184,7 @@ class CSVAccounting(ABCAccounting):
             return self.users_by_id.get(id)
 
     def get_apps_for_user(self, user):
-        if user:
+        if user is not None:
             return tuple(self.all_records.get(user.name, ()))
         else:
             return ()
