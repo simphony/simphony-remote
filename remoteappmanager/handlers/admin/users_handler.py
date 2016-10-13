@@ -11,10 +11,5 @@ class UsersHandler(BaseHandler):
     def get(self):
         db = self.application.db
         users = db.list_users()
-        headers = ["id", "user"]
 
-        table = [(user.id, user.name) for user in users]
-
-        self.render('admin/tabular.html',
-                    table=table,
-                    headers=headers)
+        self.render('admin/users.html', users=users)

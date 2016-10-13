@@ -47,6 +47,15 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
 
     def write_error(self, status_code, **kwargs):
         """Render error page for uncaught errors"""
+
+        # if it's a 404, just report it as such
+        if status_code == 404:
+            self.render('error.html',
+                        status_code=status_code,
+                        status_message="Not found",
+                        message="Not found")
+            return
+
         status_message = responses.get(status_code, 'Unknown HTTP Error')
         message = ""
 

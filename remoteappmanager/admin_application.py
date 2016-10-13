@@ -5,6 +5,7 @@ from remoteappmanager.handlers.api import (
     AdminHomeHandler,
     ContainersHandler,
     UsersHandler,
+    UserApplicationsHandler,
     ApplicationsHandler)
 from remoteappmanager.utils import url_path_join, with_end_slash
 
@@ -25,6 +26,9 @@ class AdminApplication(BaseApplication):
             (with_end_slash(
                 url_path_join(base_urlpath, "users")
             ), UsersHandler),
+            (with_end_slash(
+                url_path_join(base_urlpath, "users", "(.*)")
+            ), UserApplicationsHandler),
             (with_end_slash(
                 url_path_join(base_urlpath, "applications")
             ), ApplicationsHandler),
