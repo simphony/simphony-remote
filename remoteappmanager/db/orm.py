@@ -201,7 +201,7 @@ class AppAccounting(ABCAccounting):
         elif id is not None:
             filter = (User.id == id)
         else:
-            raise RuntimeError("Impossible condition")  # noqa
+            raise RuntimeError("Impossible condition")  # pragma: no cover
 
         # We create a session here to make sure it is only
         # used in one thread
@@ -252,7 +252,7 @@ class AppAccounting(ABCAccounting):
         elif id is not None:
             filter = (User.id == id)
         else:
-            raise RuntimeError("Impossible condition")  # noqa
+            raise RuntimeError("Impossible condition")  # pragma: no cover
 
         with detached_session(self.db) as session:
             with transaction(session):
@@ -287,7 +287,7 @@ class AppAccounting(ABCAccounting):
         elif id is not None:
             filter = (Application.id == id)
         else:
-            raise RuntimeError("Impossible condition")  # noqa
+            raise RuntimeError("Impossible condition")  # pragma: no cover
 
         with detached_session(self.db) as session:
             with transaction(session):

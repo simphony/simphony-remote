@@ -44,7 +44,7 @@ class DummyDBAccounting(interfaces.ABCAccounting):
                  DummyDBApplicationPolicy()))
 
     def create_user(self, user_name):
-        raise exceptions.UnsupportedOperation()
+        raise exceptions.UnsupportedOperation()  # pragma: no cover
 
     def remove_user(self, *, user_name=None, id=None):
         raise exceptions.UnsupportedOperation()  # pragma: no cover

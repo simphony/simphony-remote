@@ -179,9 +179,10 @@ class CSVAccounting(ABCAccounting):
 
         if user_name is not None:
             return self.users.get(user_name)
-
-        if id is not None:
+        elif id is not None:
             return self.users_by_id.get(id)
+        else:
+            raise RuntimeError("Impossible condition")  # pragma: no cover
 
     def get_apps_for_user(self, user):
         if user is not None:
