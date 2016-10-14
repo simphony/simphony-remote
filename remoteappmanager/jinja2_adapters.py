@@ -1,7 +1,5 @@
 from tornado.template import Template
 
-from remoteappmanager.webutils import Link
-
 
 class Jinja2LoaderAdapter:
     """Adapts the Jinja2 environment to act as a loader
@@ -73,7 +71,3 @@ class Jinja2TemplateAdapter(Template):
     def generate(self, **kwargs):
         """Generate this template with the given arguments."""
         return self._template.render(**kwargs)
-
-
-def is_link(obj):
-    return isinstance(obj, Link)
