@@ -54,3 +54,8 @@ class TestUsersHandler(TestBaseAccess):
 class TestContainersHandler(TestBaseAccess):
     url = "/user/username/containers/"
     body_string = "datatable"
+
+
+class TestUserApplicationsHandler(TestBaseAccess):
+    url = "/user/username/users/0/"
+    body_string = "datatable"

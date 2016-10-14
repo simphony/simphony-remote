@@ -11,7 +11,8 @@ from tornadowebapi.registry import Registry
 from remoteappmanager.db.interfaces import ABCAccounting
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.docker.container_manager import ContainerManager
-from remoteappmanager.jinja2_adapters import Jinja2LoaderAdapter, is_link
+from remoteappmanager.jinja2_adapters import Jinja2LoaderAdapter
+from remoteappmanager.webutils import is_link
 from remoteappmanager.user import User
 from remoteappmanager.traitlets import as_dict
 from remoteappmanager.services.hub import Hub
