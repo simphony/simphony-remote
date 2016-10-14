@@ -3,6 +3,9 @@
 
 {% block center_table %}
 <div class="container">
+  {% if table_title %}
+    <h3>{{ table_title }}</h3>
+  {% endif %}
   <table id="datatable" class="display">
     <thead>
       <tr>
@@ -15,7 +18,11 @@
   {% for r in table %}
     <tr>
       {% for c in r %}
-          <td>{{ c }}</td>
+          {% if c is link %}
+            <td><a href="{{ base_url }}{{ c.rel_urlpath }}">{{ c.text }}</a></td>
+          {% else %}
+            <td>{{ c }}</td>
+          {% endif %}
       {% endfor %}
     </tr>
   {% endfor %}

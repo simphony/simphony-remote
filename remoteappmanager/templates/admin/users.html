@@ -16,7 +16,7 @@
     <tr>
         <td>{{ u.id }}</td>
         <td>{{ u.name }}</td>
-        <td><a href="{{ base_url }}/users/{{ u.id }}/">Show</a></td>
+        <td><a href="{{ base_url }}users/{{ u.id }}/">Show</a></td>
     </tr>
   {% endfor %}
   </tbody>
@@ -26,7 +26,7 @@
 
 {% block script_init %}
     {{ super() }}
-        <script type="text/javascript">
-            require(["admin/tabular/controller"]);
-        </script>
+    <script type="text/javascript">
+        require(["admin/tabular/controller"]);
+    </script>
 {% endblock %}

@@ -8,22 +8,22 @@ class UserApplicationsHandler(BaseHandler):
 
     @web.authenticated
     @gen.coroutine
-    def get(self, user_name):
+    def get(self, id):
         db = self.application.db
-        user = db.get_user_by_name(user_name)
+        user = db.get_user(id=id)
 
         if user is None:
             raise web.HTTPError(404)
 
         apps = db.get_apps_for_user(user)
 
-        headers = ["mapping_id",
-                   "application",
-                   "home",
-                   "view",
-                   "vol. source",
-                   "vol. target",
-                   "vol. mode"]
+        headers = ["Mapping ID",
+                   "Application",
+                   "Home",
+                   "View",
+                   "Vol. source",
+                   "Vol. target",
+                   "Vol. mode"]
 
         table = [(mapping_id,
                   app.image,
@@ -36,4 +36,7 @@ class UserApplicationsHandler(BaseHandler):
 
         self.render('admin/tabular.html',
                     table=table,
-                    headers=headers)
+                    headers=headers,
+                    table_title="Applications for User: {}".format(
+                        user.name
+                    ))

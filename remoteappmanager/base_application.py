@@ -11,7 +11,7 @@ from tornadowebapi.registry import Registry
 from remoteappmanager.db.interfaces import ABCAccounting
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.docker.container_manager import ContainerManager
-from remoteappmanager.jinja2_adapters import Jinja2LoaderAdapter
+from remoteappmanager.jinja2_adapters import Jinja2LoaderAdapter, is_link
 from remoteappmanager.user import User
 from remoteappmanager.traitlets import as_dict
 from remoteappmanager.services.hub import Hub
@@ -190,7 +190,8 @@ class BaseApplication(web.Application, LoggingMixin):
             loader=FileSystemLoader(
                 settings["template_path"]
             ),
-            autoescape=True
+            autoescape=True,
         )
 
+        jinja_env.tests["link"] = is_link
         settings["template_loader"] = Jinja2LoaderAdapter(jinja_env)
