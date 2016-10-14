@@ -30,9 +30,14 @@ User = namedtuple('User', ('id', 'name'))
 
 class DummyDBAccounting(interfaces.ABCAccounting):
 
+    # To test the case where the user with a given id does not exist
+    unexistent_user_id = None
+
     def get_user(self, *, user_name=None, id=None):
         user_name = user_name if user_name is not None else "username"
         id = 0 if id is None else id
+        if id == self.unexistent_user_id:
+            return None
         return User(id, user_name)
 
     def get_apps_for_user(self, account):

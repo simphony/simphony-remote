@@ -11,10 +11,11 @@ class ApplicationsHandler(BaseHandler):
     def get(self):
         db = self.application.db
         apps = db.list_applications()
-        headers = ["id", "image"]
+        headers = ["ID", "Image"]
 
         table = [(app.id, app.image) for app in apps]
 
         self.render('admin/tabular.html',
                     table=table,
-                    headers=headers)
+                    headers=headers,
+                    table_title="Registered Applications")
