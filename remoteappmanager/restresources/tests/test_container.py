@@ -325,7 +325,6 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
         self.assertGreaterEqual(res.code, 400)
 
 
-
 class TestContainerNoUser(TempMixin, AsyncHTTPTestCase):
     def get_app(self):
         app = dummy.create_application()
