@@ -9,6 +9,11 @@ class UserApplicationsHandler(BaseHandler):
     @web.authenticated
     @gen.coroutine
     def get(self, id):
+        try:
+            id = int(id)
+        except ValueError:
+            raise web.HTTPError(404)
+
         db = self.application.db
         user = db.get_user(id=id)
 

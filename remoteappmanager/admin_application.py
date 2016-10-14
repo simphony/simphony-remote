@@ -27,7 +27,7 @@ class AdminApplication(BaseApplication):
                 url_path_join(base_urlpath, "users")
             ), UsersHandler),
             (with_end_slash(
-                url_path_join(base_urlpath, "users", "(.*)")
+                url_path_join(base_urlpath, "users", "(\d+)")
             ), UserApplicationsHandler),
             (with_end_slash(
                 url_path_join(base_urlpath, "applications")
