@@ -178,21 +178,30 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
 
         return accounting
 
-    def test_get_user_by_name(self):
+    def test_get_user(self):
         accounting = self.create_accounting()
 
-        user = accounting.get_user_by_name('user1')
+        user = accounting.get_user(user_name='user1')
+        self.assertIsInstance(user, orm.User)
+
+        user = accounting.get_user(id=1)
         self.assertIsInstance(user, orm.User)
 
         # user not found, result should be None
-        user = accounting.get_user_by_name('foo')
+        user = accounting.get_user(user_name='foo')
         self.assertIsNone(user)
+
+        user = accounting.get_user(id=124)
+        self.assertIsNone(user)
+
+        with self.assertRaises(ValueError):
+            accounting.get_user(id=1, user_name="foo")
 
     def test_get_apps_for_user_across_sessions(self):
         accounting = self.create_accounting()
 
         # user is retrieved from one session
-        user = accounting.get_user_by_name('user1')
+        user = accounting.get_user(user_name='user1')
 
         # apps is retrieved from another sessions
         actual_app, actual_policy = accounting.get_apps_for_user(user)[0][1:]
@@ -217,7 +226,7 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
 
         id = accounting.create_user("ciccio")
 
-        user = accounting.get_user_by_name("ciccio")
+        user = accounting.get_user(user_name="ciccio")
         self.assertIsNotNone(user)
         self.assertIsNotNone(id)
         self.assertEqual(len(accounting.list_users()), prev_length + 1)
@@ -231,7 +240,7 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
 
         accounting.remove_user(user_name="user1")
 
-        self.assertIsNone(accounting.get_user_by_name("ciccio"))
+        self.assertIsNone(accounting.get_user(user_name="ciccio"))
         self.assertEqual(len(accounting.list_users()), prev_length - 1)
 
         # This should be neutral
@@ -239,12 +248,12 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
 
     def test_remove_user_by_id(self):
         accounting = self.create_accounting()
-        user = accounting.get_user_by_name("user1")
+        user = accounting.get_user(user_name="user1")
         id = user.id
         prev_length = len(accounting.list_users())
 
         accounting.remove_user(id=id)
-        self.assertIsNone(accounting.get_user_by_name("user1"))
+        self.assertIsNone(accounting.get_user(user_name="user1"))
         self.assertEqual(len(accounting.list_users()), prev_length - 1)
 
         # This should be neutral
@@ -324,7 +333,7 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
         accounting.grant_access("simphonyremote/amazing", "ciccio",
                                 True, False, "/foo:/bar:ro")
 
-        user = accounting.get_user_by_name("ciccio")
+        user = accounting.get_user(user_name="ciccio")
         apps = accounting.get_apps_for_user(user)
         self.assertEqual(apps[0][1].image, "simphonyremote/amazing")
         self.assertEqual(apps[0][2].allow_home, True)
@@ -350,7 +359,7 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
         accounting.grant_access("simphonyremote/amazing", "ciccio",
                                 True, False, None)
 
-        user = accounting.get_user_by_name("ciccio")
+        user = accounting.get_user(user_name="ciccio")
         apps = accounting.get_apps_for_user(user)
         self.assertEqual(apps[0][1].image, "simphonyremote/amazing")
         self.assertEqual(apps[0][2].allow_home, True)

@@ -13,7 +13,7 @@ from remoteappmanager.db import exceptions
 from remoteappmanager.db.tests.abc_test_interfaces import (
     ABCTestDatabaseInterface)
 
-User = namedtuple('User', ('name',))
+User = namedtuple('User', ('id', 'name'))
 
 
 class Application(ABCApplication):
@@ -26,10 +26,13 @@ class ApplicationPolicy(ABCApplicationPolicy):
 
 class Accounting(ABCAccounting):
 
-    def get_user_by_name(self, username):
-        return User(name=username)
+    def get_user(self, *, user_name=None, id=None):
+        return User(id=0, name=user_name)
 
     def get_apps_for_user(self, user):
+        if user is None:
+            return ()
+
         return (('abc1',
                  Application(id=0, image=user.name+'1'), ApplicationPolicy()),
                 ('abc2',
@@ -42,7 +45,7 @@ class Accounting(ABCAccounting):
         raise exceptions.UnsupportedOperation()
 
     def list_users(self):
-        return [User('foo'), User('bar')]
+        return [User(0, 'foo'), User(1, 'bar')]
 
     def create_application(self, app_name):
         raise exceptions.UnsupportedOperation()
@@ -74,7 +77,7 @@ class TestDatabaseInterface(ABCTestDatabaseInterface, unittest.TestCase):
                                  self.assertApplicationPolicyEqual)
 
     def create_expected_users(self):
-        return [User('foo'), User('bar')]
+        return [User(0, 'foo'), User(1, 'bar')]
 
     def create_expected_configs(self, user):
         return [(Application(id=0, image=user.name+'1'), ApplicationPolicy()),
@@ -83,6 +86,6 @@ class TestDatabaseInterface(ABCTestDatabaseInterface, unittest.TestCase):
     def create_accounting(self):
         return Accounting()
 
-    def test_get_user_by_name(self):
+    def test_get_user(self):
         database = self.create_accounting()
-        self.assertEqual(database.get_user_by_name('foo'), User('foo'))
+        self.assertEqual(database.get_user(user_name='foo'), User(0, 'foo'))

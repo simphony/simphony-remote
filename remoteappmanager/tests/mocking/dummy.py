@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
 from remoteappmanager.file_config import FileConfig
@@ -23,10 +25,15 @@ class DummyDBApplicationPolicy(interfaces.ABCApplicationPolicy):
     pass
 
 
+User = namedtuple('User', ('id', 'name'))
+
+
 class DummyDBAccounting(interfaces.ABCAccounting):
 
-    def get_user_by_name(self, user_name):
-        return user_name
+    def get_user(self, *, user_name=None, id=None):
+        user_name = user_name if user_name is not None else "username"
+        id = 0 if id is None else id
+        return User(id, user_name)
 
     def get_apps_for_user(self, account):
         return (('mapping_id',
@@ -37,30 +44,30 @@ class DummyDBAccounting(interfaces.ABCAccounting):
                  DummyDBApplicationPolicy()))
 
     def create_user(self, user_name):
-        raise exceptions.UnsupportedOperation()
+        raise exceptions.UnsupportedOperation()  # pragma: no cover
 
-    def remove_user(self, user_name):
-        raise exceptions.UnsupportedOperation()
+    def remove_user(self, *, user_name=None, id=None):
+        raise exceptions.UnsupportedOperation()  # pragma: no cover
 
     def list_users(self):
         return []
 
     def create_application(self, app_name):
-        raise exceptions.UnsupportedOperation()
+        raise exceptions.UnsupportedOperation()  # pragma: no cover
 
-    def remove_application(self, app_name):
-        raise exceptions.UnsupportedOperation()
+    def remove_application(self, *, app_name=None, id=None):
+        raise exceptions.UnsupportedOperation()  # pragma: no cover
 
     def list_applications(self):
         return []
 
     def grant_access(self, app_name, user_name,
                      allow_home, allow_view, volume):
-        raise exceptions.UnsupportedOperation()
+        raise exceptions.UnsupportedOperation()  # pragma: no cover
 
     def revoke_access(self, app_name, user_name,
                       allow_home, allow_view, volume):
-        raise exceptions.UnsupportedOperation()
+        raise exceptions.UnsupportedOperation()  # pragma: no cover
 
 
 def create_reverse_proxy(params=None,

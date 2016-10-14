@@ -61,28 +61,32 @@ class ABCAccounting(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def get_user_by_name(self, user_name):
-        """ Return a User for a given user_name, or return
-        None if the User name is not found.
+    def get_user(self, *, user_name=None, id=None):
+        """ Return a User for a given user_name or id, or return
+        None if the User is not found. Only one argument is allowed.
 
         Parameters
         ----------
         user_name : str
+            The user name
+
+        id: int
+            An id
 
         Returns
         -------
-        account : opaque-type
-           an object that the database understands
+        user : opaque-type
+           an user object that the database understands
         """
 
     @abstractmethod
-    def get_apps_for_user(self, account):
-        """ Return an iterable of ApplicationConfig for a given account
+    def get_apps_for_user(self, user):
+        """ Return an iterable of ApplicationConfig for a given user
 
         Parameters
         ----------
-        account : opaque-type
-           Same type as the result of `get_user_by_name`
+        user : opaque-type
+           Same type as the result of `get_user`
 
         Returns
         -------
@@ -115,8 +119,9 @@ class ABCAccounting(metaclass=ABCMeta):
 
     @abstractmethod
     def remove_user(self, *, user_name=None, id=None):
-        """Removes a user by name, if the backend allows it.
-        If the user is not present, does nothing.
+        """Removes a user by name or id, if the backend allows it.
+        Only one argument is allowed. If the user is not present,
+        does nothing.
 
         Parameters
         ----------

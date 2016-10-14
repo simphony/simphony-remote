@@ -73,3 +73,8 @@ class mergedocs(object):
                 if new is not None:
                     mergedoc(new, old)
         return cls
+
+
+def one(elements):
+    """Returns True if only one element is not None, false otherwise"""
+    return sum([False if e is None else True for e in elements]) == 1

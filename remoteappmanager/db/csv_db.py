@@ -49,7 +49,7 @@ import hashlib
 from remoteappmanager.db.interfaces import (
     ABCAccounting, ABCApplication, ABCApplicationPolicy)
 from remoteappmanager.db.exceptions import UnsupportedOperation
-from remoteappmanager.utils import mergedocs
+from remoteappmanager.utils import mergedocs, one
 
 
 class CSVApplication(ABCApplication):
@@ -102,6 +102,7 @@ class CSVAccounting(ABCAccounting):
         # Let's keep everything in memory for now
         self.all_records = {}
         self.users = {}
+        self.users_by_id = {}
         self.applications = {}
         self.application_policies = {}
 
@@ -122,13 +123,13 @@ class CSVAccounting(ABCAccounting):
 
             for count, record in enumerate(reader):
                 user_name = record[indices['user.name']]
-                user = self.users.setdefault(
-                    user_name,
-                    CSVUser(
-                        id=len(self.users),
-                        name=user_name
-                    )
-                )
+                user = self.users.get(user_name)
+
+                if user is None:
+                    id = len(self.users)
+                    user = CSVUser(id=id, name=user_name)
+                    self.users[user_name] = user
+                    self.users_by_id[id] = user
 
                 image = record[indices['application.image']]
                 application = self.applications.setdefault(
@@ -172,11 +173,19 @@ class CSVAccounting(ABCAccounting):
                      application,
                      application_policy))
 
-    def get_user_by_name(self, user_name):
-        return self.users.get(user_name)
+    def get_user(self, *, user_name=None, id=None):
+        if not one([user_name, id]):
+            raise ValueError("Strictly one argument allowed")
+
+        if user_name is not None:
+            return self.users.get(user_name)
+        elif id is not None:
+            return self.users_by_id.get(id)
+        else:
+            raise RuntimeError("Impossible condition")  # pragma: no cover
 
     def get_apps_for_user(self, user):
-        if user:
+        if user is not None:
             return tuple(self.all_records.get(user.name, ()))
         else:
             return ()
