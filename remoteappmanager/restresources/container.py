@@ -96,6 +96,9 @@ class Container(Resource):
                 identifier))
             raise exceptions.NotFound()
 
+        if container.user != self.current_user.name:
+            raise exceptions.NotFound()
+
         return dict(
             name=container.name,
             image_name=container.image_name
@@ -111,6 +114,9 @@ class Container(Resource):
         if not container:
             self.log.warning("Could not find container for id {}".format(
                              identifier))
+            raise exceptions.NotFound()
+
+        if container.user != self.current_user.name:
             raise exceptions.NotFound()
 
         urlpath = url_path_join(

@@ -224,11 +224,11 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
 
     def test_retrieve(self):
         self._app.container_manager.container_from_url_id = mock_coro_factory(
-            DockerContainer()
+            DockerContainer(user="username")
         )
         res = self.fetch("/user/username/api/v1/containers/found/",
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-username=username"
                          })
         self.assertEqual(res.code, httpstatus.OK)
 
@@ -240,27 +240,49 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
             mock_coro_factory(return_value=None)
         res = self.fetch("/user/username/api/v1/containers/notfound/",
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-username=username"
+                         })
+        self.assertEqual(res.code, httpstatus.NOT_FOUND)
+
+    def test_prevent_retrieve_from_other_user(self):
+        self._app.container_manager.container_from_url_id = mock_coro_factory(
+            DockerContainer(user="foo")
+        )
+        res = self.fetch("/user/username/api/v1/containers/found/",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=username"
                          })
         self.assertEqual(res.code, httpstatus.NOT_FOUND)
 
     def test_delete(self):
         self._app.container_manager.container_from_url_id = mock_coro_factory(
-            DockerContainer()
+            DockerContainer(user="username")
         )
         res = self.fetch("/user/username/api/v1/containers/found/",
                          method="DELETE",
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-username=username"
                          })
         self.assertEqual(res.code, httpstatus.NO_CONTENT)
+        self.assertTrue(self._app.reverse_proxy.unregister.called)
 
         self._app.container_manager.container_from_url_id = \
             mock_coro_factory(return_value=None)
         res = self.fetch("/user/username/api/v1/containers/notfound/",
                          method="DELETE",
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-username=username"
+                         })
+        self.assertEqual(res.code, httpstatus.NOT_FOUND)
+
+    def test_prevent_delete_from_other_user(self):
+        self._app.container_manager.container_from_url_id = mock_coro_factory(
+            DockerContainer(user="foo")
+        )
+        res = self.fetch("/user/username/api/v1/containers/found/",
+                         method="DELETE",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=username"
                          })
         self.assertEqual(res.code, httpstatus.NOT_FOUND)
 
@@ -301,18 +323,6 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                          body=escape.json_encode({"mapping_id": "12345"}))
 
         self.assertGreaterEqual(res.code, 400)
-
-    def test_stop(self):
-        self._app.container_manager.container_from_url_id = mock_coro_factory(
-            DockerContainer()
-        )
-        self.fetch("/user/username/api/v1/containers/12345/",
-                   method="DELETE",
-                   headers={
-                      "Cookie": "jupyter-hub-token-username=foo"
-                   })
-
-        self.assertTrue(self._app.reverse_proxy.unregister.called)
 
 
 class TestContainerNoUser(TempMixin, AsyncHTTPTestCase):
