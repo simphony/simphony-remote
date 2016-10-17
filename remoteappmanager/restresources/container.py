@@ -60,7 +60,8 @@ class Container(Resource):
                 app,
                 policy,
                 mapping_id,
-                environment
+                self.application.command_line_config.base_urlpath,
+                environment=environment
                 )
         except Exception as e:
             raise exceptions.Unable(message=str(e))
@@ -71,13 +72,10 @@ class Container(Resource):
             self._remove_container_noexcept(container)
             raise exceptions.Unable(message=str(e))
 
-        urlpath = url_path_join(
-            self.application.command_line_config.base_urlpath,
-            container.urlpath)
-
         try:
             yield self.application.reverse_proxy.register(
-                urlpath, container.host_url)
+                container.frontend_urlpath,
+                container.host_url)
         except Exception as e:
             self._remove_container_noexcept(container)
             raise exceptions.Unable(message=str(e))
@@ -119,12 +117,10 @@ class Container(Resource):
         if container.user != self.current_user.name:
             raise exceptions.NotFound()
 
-        urlpath = url_path_join(
-            self.application.command_line_config.base_urlpath,
-            container.urlpath)
-
         try:
-            yield self.application.reverse_proxy.unregister(urlpath)
+            yield self.application.reverse_proxy.unregister(
+                container.frontend_urlpath
+            )
         except Exception:
             # If we can't remove the reverse proxy, we cannot do much more
             # than log the problem and keep going, because we want to stop
