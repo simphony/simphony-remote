@@ -28,6 +28,11 @@ def with_end_slash(url):
     return url.rstrip("/")+"/"
 
 
+def without_end_slash(url):
+    """Makes sure there is no end slash at the end of a url."""
+    return url.rstrip("/")
+
+
 def parse_volume_string(volume_string):
     """Parses a volume specification string SOURCE:TARGET:MODE into
     its components, or raises click.BadOptionUsage if not according

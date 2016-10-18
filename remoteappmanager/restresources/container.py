@@ -7,7 +7,6 @@ from tornadowebapi import exceptions
 from tornadowebapi.exceptions import NotFound
 from tornadowebapi.resource import Resource
 
-from remoteappmanager.utils import url_path_join
 from remoteappmanager.netutils import wait_for_http_server_2xx
 from remoteappmanager.restresources.decorators import authenticated
 
@@ -303,8 +302,7 @@ class Container(Resource):
         server_url = "http://{}:{}{}/".format(
             container.ip,
             container.port,
-            url_path_join(self.application.command_line_config.base_urlpath,
-                          container.urlpath))
+            container.urlpath)
 
         yield wait_for_http_server_2xx(
             server_url,

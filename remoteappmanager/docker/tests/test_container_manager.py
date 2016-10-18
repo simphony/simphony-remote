@@ -67,7 +67,7 @@ class TestContainerManager(AsyncTestCase):
                              ip='127.0.0.1',
                              port=666,
                              url_id='url_id',
-                             urlpath="/user/username/containers/url_id/")
+                             urlpath="/user/username/containers/url_id")
 
         self.assertEqual(len(result), 1)
         utils.assert_containers_equal(self, result[0], expected)
@@ -85,7 +85,7 @@ class TestContainerManager(AsyncTestCase):
                              ip='127.0.0.1',
                              port=666,
                              url_id='url_id',
-                             urlpath="/user/username/containers/url_id/",
+                             urlpath="/user/username/containers/url_id",
                              )
 
         utils.assert_containers_equal(self, result, expected)

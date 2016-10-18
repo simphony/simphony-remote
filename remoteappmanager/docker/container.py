@@ -1,5 +1,5 @@
 from remoteappmanager.docker.docker_labels import SIMPHONY_NS_RUNINFO
-from traitlets import Unicode, HasTraits, Int
+from traitlets import Unicode, HasTraits, Int, validate, TraitError
 
 
 class Container(HasTraits):
@@ -41,8 +41,15 @@ class Container(HasTraits):
     user = Unicode()
 
     #: The url path of the container as it is exported to the user.
-    #: e.g. "/home/test/containers/12345/"
+    #: e.g. "/home/test/containers/12345"
+    #: Must not have an end slash.
     urlpath = Unicode()
+
+    @validate("urlpath")
+    def _urlpath_validate(self, proposal):
+        if proposal['value'].endswith('/'):
+            raise TraitError("urlpath cannot end with a /")
+        return proposal['value']
 
     @property
     def host_url(self):
@@ -145,4 +152,9 @@ class Container(HasTraits):
         kwargs["user"] = labels.get(SIMPHONY_NS_RUNINFO.user) or ""
         kwargs["urlpath"] = labels.get(SIMPHONY_NS_RUNINFO.urlpath) or ""
 
-        return cls(**kwargs)
+        try:
+            return cls(**kwargs)
+        except TraitError as e:
+            raise ValueError(
+                "Data does not satisfy trait constraints. "
+                "{}.".format(e))

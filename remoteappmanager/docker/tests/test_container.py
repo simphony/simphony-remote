@@ -9,6 +9,26 @@ from remoteappmanager.tests.mocking.virtual.docker_client import (
 
 
 class TestContainer(TestCase):
+    def setUp(self):
+        self.good_container_dict = {
+            'Command': '/startup.sh',
+            'Created': 1466756760,
+            'HostConfig': {'NetworkMode': 'default'},
+            'Id': '248e45e717cd740ae763a1c565',
+            'Image': 'empty-ubuntu:latest',
+            'ImageID': 'sha256:f4610c7580b8f0a9a25086b6287d0069fb8a',
+            'Labels': {SIMPHONY_NS.ui_name: 'Empty Ubuntu',
+                       SIMPHONY_NS_RUNINFO.user: 'user',
+                       SIMPHONY_NS_RUNINFO.url_id: "8e2fe66d5de74db9bbab50c0d2f92b33",  # noqa
+                       SIMPHONY_NS_RUNINFO.urlpath: "/user/username/containers/whatever"},  # noqa
+            'Names': ['/remoteexec-user-empty-ubuntu_3Alatest'],
+            'Ports': [{'IP': '0.0.0.0',
+                       'PrivatePort': 8888,
+                       'PublicPort': 32823,
+                       'Type': 'tcp'}],
+            'State': 'running',
+            'Status': 'Up 56 minutes'}
+
     def test_host_url(self):
         container = Container(
             ip="123.45.67.89",
@@ -20,23 +40,7 @@ class TestContainer(TestCase):
     def test_from_docker_dict_with_public_port(self):
         '''Test convertion from "docker ps" to Container with public port'''
         # With public port
-        container_dict = {
-            'Command': '/startup.sh',
-            'Created': 1466756760,
-            'HostConfig': {'NetworkMode': 'default'},
-            'Id': '248e45e717cd740ae763a1c565',
-            'Image': 'empty-ubuntu:latest',
-            'ImageID': 'sha256:f4610c7580b8f0a9a25086b6287d0069fb8a',
-            'Labels': {SIMPHONY_NS.ui_name: 'Empty Ubuntu',
-                       SIMPHONY_NS_RUNINFO.user: 'user',
-                       SIMPHONY_NS_RUNINFO.url_id: "8e2fe66d5de74db9bbab50c0d2f92b33"},  # noqa
-            'Names': ['/remoteexec-user-empty-ubuntu_3Alatest'],
-            'Ports': [{'IP': '0.0.0.0',
-                       'PrivatePort': 8888,
-                       'PublicPort': 32823,
-                       'Type': 'tcp'}],
-            'State': 'running',
-            'Status': 'Up 56 minutes'}
+        container_dict = self.good_container_dict
 
         # Container with public port
         actual = Container.from_docker_dict(container_dict)
@@ -48,9 +52,19 @@ class TestContainer(TestCase):
             user="user",
             ip='0.0.0.0',
             port=32823,
-            url_id="8e2fe66d5de74db9bbab50c0d2f92b33")
+            url_id="8e2fe66d5de74db9bbab50c0d2f92b33",
+            urlpath="/user/username/containers/whatever"
+        )
 
         assert_containers_equal(self, actual, expected)
+
+    def test_failure_for_incorrect_urlpath(self):
+        labels = self.good_container_dict["Labels"]
+        labels[SIMPHONY_NS_RUNINFO.urlpath] = (
+            labels[SIMPHONY_NS_RUNINFO.urlpath] + '/')
+
+        with self.assertRaises(ValueError):
+            Container.from_docker_dict(self.good_container_dict)
 
     def test_from_docker_dict_without_public_port(self):
         '''Test convertion from "docker ps" to Container with public port'''
@@ -73,7 +87,7 @@ class TestContainer(TestCase):
             port=80,
             url_id="url_id",
             mapping_id="mapping_id",
-            urlpath="/user/username/containers/url_id/"
+            urlpath="/user/username/containers/url_id"
         )
 
         assert_containers_equal(self, actual, expected)
@@ -93,7 +107,7 @@ class TestContainer(TestCase):
             port=666,
             url_id="url_id",
             mapping_id="mapping_id",
-            urlpath="/user/username/containers/url_id/"
+            urlpath="/user/username/containers/url_id"
         )
 
         assert_containers_equal(self, actual, expected)
