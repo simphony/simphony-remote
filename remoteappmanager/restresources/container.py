@@ -74,7 +74,7 @@ class Container(Resource):
 
         try:
             yield self.application.reverse_proxy.register(
-                container.frontend_urlpath,
+                container.urlpath,
                 container.host_url)
         except Exception as e:
             self._remove_container_noexcept(container)
@@ -119,7 +119,7 @@ class Container(Resource):
 
         try:
             yield self.application.reverse_proxy.unregister(
-                container.frontend_urlpath
+                container.urlpath
             )
         except Exception:
             # If we can't remove the reverse proxy, we cannot do much more
@@ -193,6 +193,7 @@ class Container(Resource):
                          app,
                          policy,
                          mapping_id,
+                         base_urlpath,
                          environment):
         """Start the container. This method is a helper method that
         works with low level data and helps in issuing the request to the
@@ -244,6 +245,7 @@ class Container(Resource):
             f = manager.start_container(user_name,
                                         image_name,
                                         mapping_id,
+                                        base_urlpath,
                                         volumes,
                                         environment
                                         )

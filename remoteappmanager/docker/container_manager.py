@@ -320,7 +320,7 @@ class ContainerManager(LoggingMixin):
             '\n'.join('{0} -> {1}'.format(source, target['bind'])
                       for source, target in filtered_volumes.items()))
 
-        container_frontend_urlpath = url_path_join(
+        container_urlpath = url_path_join(
             base_urlpath, "containers", container_url_id)
 
         create_kwargs = dict(
@@ -334,7 +334,7 @@ class ContainerManager(LoggingMixin):
             labels=_get_container_labels(user_name,
                                          mapping_id,
                                          container_url_id,
-                                         container_frontend_urlpath))
+                                         container_urlpath))
 
         # build the dictionary of keyword arguments for host_config
         host_config = dict(
@@ -387,7 +387,7 @@ class ContainerManager(LoggingMixin):
             ip=ip,
             port=port,
             url_id=container_url_id,
-            frontend_urlpath=container_frontend_urlpath,
+            urlpath=container_urlpath,
         )
 
         self.log.info(
@@ -575,7 +575,7 @@ def _get_container_env(user_name, url_id, environment, base_urlpath):
     return result
 
 
-def _get_container_labels(user_name, mapping_id, url_id, frontend_urlpath):
+def _get_container_labels(user_name, mapping_id, url_id, urlpath):
     """Returns a dictionary that will become container run-time labels.
     Each of these labels must be namespaced in reverse DNS style, in agreement
     to docker guidelines."""
@@ -584,7 +584,7 @@ def _get_container_labels(user_name, mapping_id, url_id, frontend_urlpath):
         SIMPHONY_NS_RUNINFO.user: user_name,
         SIMPHONY_NS_RUNINFO.mapping_id: mapping_id,
         SIMPHONY_NS_RUNINFO.url_id: url_id,
-        SIMPHONY_NS_RUNINFO.frontend_urlpath: frontend_urlpath,
+        SIMPHONY_NS_RUNINFO.urlpath: urlpath,
     }
 
 
