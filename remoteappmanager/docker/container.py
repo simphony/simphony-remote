@@ -41,7 +41,8 @@ class Container(HasTraits):
     user = Unicode()
 
     #: The url path of the container as it is exported to the user.
-    frontend_urlpath = Unicode()
+    #: e.g. "/home/test/containers/12345/"
+    urlpath = Unicode()
 
     @property
     def host_url(self):
@@ -142,7 +143,6 @@ class Container(HasTraits):
         kwargs["mapping_id"] = labels.get(SIMPHONY_NS_RUNINFO.mapping_id) or ""
         kwargs["url_id"] = labels.get(SIMPHONY_NS_RUNINFO.url_id) or ""
         kwargs["user"] = labels.get(SIMPHONY_NS_RUNINFO.user) or ""
-        kwargs["frontend_urlpath"] = labels.get(
-            SIMPHONY_NS_RUNINFO.frontend_urlpath) or ""
+        kwargs["urlpath"] = labels.get(SIMPHONY_NS_RUNINFO.urlpath) or ""
 
         return cls(**kwargs)

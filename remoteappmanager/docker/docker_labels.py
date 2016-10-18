@@ -67,6 +67,6 @@ SIMPHONY_NS_RUNINFO = DockerLabelNamespace(
         # https://host:8000/user/username/containers/12345/
         # it will be /user/username/containers/12345/.
         # This is also the url that's been added to the reverse proxy.
-        "frontend_urlpath"
+        "urlpath"
     ],
 )

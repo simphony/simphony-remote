@@ -69,8 +69,8 @@ class ContainerManager(LoggingMixin):
                         user_name,
                         image_name,
                         mapping_id,
-                        volumes,
                         base_urlpath,
+                        volumes,
                         environment=None):
         """
         Starts a container using the given image name.
@@ -87,10 +87,10 @@ class ContainerManager(LoggingMixin):
             it is expected to be unique (and persistent) for a specific
             combination of docker image (i.e. application) and setup
             (i.e. configuration).
-        volumes: dict or None
-            {volume_source: {'bind': volume_target, 'mode': volume_mode}
         base_urlpath: str
             The base urlpath for the current user.
+        volumes: dict or None
+            {volume_source: {'bind': volume_target, 'mode': volume_mode}
         environment: dict or None
             Contains additional keyvalue pairs that will be exported
             as environment variables inside the container.
@@ -117,8 +117,8 @@ class ContainerManager(LoggingMixin):
             result = yield self._start_container(user_name,
                                                  image_name,
                                                  mapping_id,
-                                                 volumes,
                                                  base_urlpath,
+                                                 volumes,
                                                  environment)
         finally:
             self._start_pending.remove(mapping_id)
@@ -253,8 +253,8 @@ class ContainerManager(LoggingMixin):
                          user_name,
                          image_name,
                          mapping_id,
-                         volumes,
                          base_urlpath,
+                         volumes,
                          environment):
         """Helper method that performs the physical operation of starting
         the container.
@@ -328,7 +328,8 @@ class ContainerManager(LoggingMixin):
             name=container_name,
             environment=_get_container_env(user_name,
                                            container_url_id,
-                                           environment),
+                                           environment,
+                                           base_urlpath),
             volumes=volume_targets,
             labels=_get_container_labels(user_name,
                                          mapping_id,
