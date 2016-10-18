@@ -9,13 +9,6 @@ from remoteappmanager.tests.mocking.virtual.docker_client import (
 
 
 class TestContainer(TestCase):
-    def test_url(self):
-        container = Container(
-            url_id="12345"
-        )
-
-        self.assertEqual(container.urlpath, "containers/12345")
-
     def test_host_url(self):
         container = Container(
             ip="123.45.67.89",
@@ -79,7 +72,9 @@ class TestContainer(TestCase):
             ip='0.0.0.0',
             port=80,
             url_id="url_id",
-            mapping_id="mapping_id")
+            mapping_id="mapping_id",
+            urlpath="/user/username/containers/url_id/"
+        )
 
         assert_containers_equal(self, actual, expected)
 
@@ -97,7 +92,9 @@ class TestContainer(TestCase):
             ip='0.0.0.0',
             port=666,
             url_id="url_id",
-            mapping_id="mapping_id")
+            mapping_id="mapping_id",
+            urlpath="/user/username/containers/url_id/"
+        )
 
         assert_containers_equal(self, actual, expected)
 

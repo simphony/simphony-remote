@@ -31,6 +31,8 @@ class TestContainerManager(AsyncTestCase):
             "username",
             'image_id1',
             "new_mapping_id",
+            None,
+            "/base/url/",
             None)
         self.assertTrue(mock_client.start.called)
         self.assertTrue(mock_client.create_container.called)
@@ -115,12 +117,14 @@ class TestContainerManager(AsyncTestCase):
         f1 = self.manager.start_container("username",
                                           "image_id1",
                                           "mapping_id",
-                                          None)
+                                          None,
+                                          "/foo/bar")
 
         f2 = self.manager.start_container("username",
                                           "image_id1",
                                           "mapping_id",
-                                          None)
+                                          None,
+                                          "/foo/baz")
 
         # If these yielding raise a KeyError, it is because the second
         # one tries to remove the same key from the list, but it has been
@@ -152,6 +156,8 @@ class TestContainerManager(AsyncTestCase):
             "username",
             "image_name1",
             "mapping_id",
+            None,
+            "/base/url/",
             None)
         self.assertTrue(mock_client.start.called)
         self.assertIsInstance(result, Container)
@@ -189,7 +195,8 @@ class TestContainerManager(AsyncTestCase):
         yield self.manager.start_container("username",
                                            "image_id1",
                                            "mapping_id",
-                                           volumes)
+                                           volumes,
+                                           "/foo/bar")
 
         # Call args and keyword args that create_container receives
         docker_client = self.manager.docker_client
@@ -217,6 +224,8 @@ class TestContainerManager(AsyncTestCase):
             yield self.manager.start_container("username",
                                                "image_id1",
                                                "mapping_id",
+                                               None,
+                                               "/base/url/",
                                                None)
 
         self.assertTrue(self.mock_docker_client.stop.called)
@@ -237,6 +246,8 @@ class TestContainerManager(AsyncTestCase):
             yield self.manager.start_container("username",
                                                "image_id1",
                                                "mapping_id",
+                                               None,
+                                               "/base/url/",
                                                None)
 
         self.assertTrue(self.mock_docker_client.stop.called)
@@ -255,8 +266,8 @@ class TestContainerManager(AsyncTestCase):
             "image_name1",
             "mapping_id",
             None,
-            environment
-            )
+            "/base/url/",
+            environment)
 
         self.assertEqual(
             mock_client.create_container.call_args[1]["environment"]["FOO"],
