@@ -31,7 +31,7 @@ class TestContainerManager(AsyncTestCase):
             "username",
             'image_id1',
             "new_mapping_id",
-            "/base/url/",
+            "/base/url",
             None,
             None)
         self.assertTrue(mock_client.start.called)
@@ -161,7 +161,7 @@ class TestContainerManager(AsyncTestCase):
             "username",
             "image_name1",
             "mapping_id",
-            "/base/url/",
+            "/base/url",
             None,
             None)
         self.assertTrue(mock_client.start.called)
@@ -200,7 +200,7 @@ class TestContainerManager(AsyncTestCase):
         yield self.manager.start_container("username",
                                            "image_id1",
                                            "mapping_id",
-                                           "/foo/bar/",
+                                           "/foo/bar",
                                            volumes,
                                            )
 
@@ -230,7 +230,7 @@ class TestContainerManager(AsyncTestCase):
             yield self.manager.start_container("username",
                                                "image_id1",
                                                "mapping_id",
-                                               "/base/url/",
+                                               "/base/url",
                                                None,
                                                None)
 
@@ -252,7 +252,7 @@ class TestContainerManager(AsyncTestCase):
             yield self.manager.start_container("username",
                                                "image_id1",
                                                "mapping_id",
-                                               "/base/url/",
+                                               "/base/url",
                                                None,
                                                None)
 
@@ -271,7 +271,7 @@ class TestContainerManager(AsyncTestCase):
             "username",
             "image_name1",
             "mapping_id",
-            "/base/url/",
+            "/base/url",
             None,
             environment)
 
