@@ -1,7 +1,8 @@
 define([
     "jquery",
+    "bootstrap",   // unused by module, but needed for binding modal dialog
     "admin/adminapi"
-], function ($, adminapi) {
+], function ($, bootstrap, adminapi) {
     "use strict";
     var base_url = window.apidata.base_url;
     var appapi = new adminapi.AdminAPI(base_url);
