@@ -41,6 +41,34 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
                          })
         self.assertEqual(res.code, httpstatus.NOT_FOUND)
 
+    def test_delete_failure_reverse_proxy(self):
+        self._app.container_manager.container_from_url_id = mock_coro_factory(
+            DockerContainer(user="username")
+        )
+        self._app.reverse_proxy.unregister.side_effect = Exception()
+
+        res = self.fetch("/user/username/api/v1/containers/found/",
+                         method="DELETE",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=username"
+                         })
+        self.assertEqual(res.code, httpstatus.NO_CONTENT)
+
+    def test_delete_failure_stop_container(self):
+        manager = self._app.container_manager
+        manager.container_from_url_id = mock_coro_factory(
+            DockerContainer(user="username")
+        )
+        manager.stop_and_remove_container = mock_coro_factory(
+            side_effect=Exception())
+
+        res = self.fetch("/user/username/api/v1/containers/found/",
+                         method="DELETE",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=username"
+                         })
+        self.assertEqual(res.code, httpstatus.NO_CONTENT)
+
     def test_post_failed_auth(self):
         self._app.hub.verify_token.return_value = {}
 
