@@ -1,5 +1,5 @@
 from remoteappmanager.docker.docker_labels import SIMPHONY_NS_RUNINFO
-from traitlets import Unicode, HasTraits, Int
+from traitlets import Unicode, HasTraits, Int, validate, TraitError
 
 
 class Container(HasTraits):
@@ -29,16 +29,27 @@ class Container(HasTraits):
     #: ...and port where the container service will be listening
     port = Int(80)
 
-    #: the id that will go in the URL of the container
+    #: The id that will go in the URL of the container.
+    #: This is a de-facto replacement for the container docker id. The reason
+    #: why we don't use that instead is because the container id is difficult
+    #: to obtain reliably from inside the container, and because we want more
+    #: flexibility in the form of the user-exposed id.
+    #: Important: must be globally unique, not just per-user unique.
     url_id = Unicode()
 
     #: The user currently running the container
     user = Unicode()
 
-    @property
-    def urlpath(self):
-        """Returns the relative url of the Container."""
-        return "containers/{}".format(self.url_id)
+    #: The url path of the container as it is exported to the user.
+    #: e.g. "/home/test/containers/12345"
+    #: Must not have an end slash.
+    urlpath = Unicode()
+
+    @validate("urlpath")
+    def _urlpath_validate(self, proposal):
+        if proposal['value'].endswith('/'):
+            raise TraitError("urlpath cannot end with a /")
+        return proposal['value']
 
     @property
     def host_url(self):
@@ -139,5 +150,11 @@ class Container(HasTraits):
         kwargs["mapping_id"] = labels.get(SIMPHONY_NS_RUNINFO.mapping_id) or ""
         kwargs["url_id"] = labels.get(SIMPHONY_NS_RUNINFO.url_id) or ""
         kwargs["user"] = labels.get(SIMPHONY_NS_RUNINFO.user) or ""
+        kwargs["urlpath"] = labels.get(SIMPHONY_NS_RUNINFO.urlpath) or ""
 
-        return cls(**kwargs)
+        try:
+            return cls(**kwargs)
+        except TraitError as e:
+            raise ValueError(
+                "Data does not satisfy trait constraints. "
+                "{}.".format(e))

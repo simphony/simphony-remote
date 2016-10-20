@@ -76,7 +76,8 @@ def get_fake_container_states(num=3):
 def get_fake_container_labels(num=3):
     samples = cycle(({SIMPHONY_NS_RUNINFO.user: 'user_name',
                       SIMPHONY_NS_RUNINFO.mapping_id: 'mapping_id',
-                      SIMPHONY_NS_RUNINFO.url_id: 'url_id'},
+                      SIMPHONY_NS_RUNINFO.url_id: 'url_id',
+                      SIMPHONY_NS_RUNINFO.urlpath: '/user/username/containers/url_id'},  # noqa
                      {SIMPHONY_NS_RUNINFO.user: 'user_name'},
                      {}))
     return tuple(next(samples) for _ in range(num))

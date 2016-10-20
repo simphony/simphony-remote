@@ -11,6 +11,10 @@ from remoteappmanager.docker.docker_labels import SIMPHONY_NS_RUNINFO
 
 from remoteappmanager.docker.image import Image
 from remoteappmanager.logging.logging_mixin import LoggingMixin
+from remoteappmanager.utils import (
+    url_path_join,
+    without_end_slash)
+
 from tornado import gen
 from traitlets import (
     Int,
@@ -21,6 +25,7 @@ from traitlets import (
 
 
 #: Set of characters that are safe to use and should not be escaped by escapism
+
 _CONTAINER_SAFE_CHARS = set(string.ascii_letters + string.digits + '-.')
 _CONTAINER_ESCAPE_CHAR = '_'
 
@@ -66,6 +71,7 @@ class ContainerManager(LoggingMixin):
                         user_name,
                         image_name,
                         mapping_id,
+                        base_urlpath,
                         volumes,
                         environment=None):
         """
@@ -83,6 +89,8 @@ class ContainerManager(LoggingMixin):
             it is expected to be unique (and persistent) for a specific
             combination of docker image (i.e. application) and setup
             (i.e. configuration).
+        base_urlpath: str
+            The base urlpath for the current user.
         volumes: dict or None
             {volume_source: {'bind': volume_target, 'mode': volume_mode}
         environment: dict or None
@@ -111,6 +119,7 @@ class ContainerManager(LoggingMixin):
             result = yield self._start_container(user_name,
                                                  image_name,
                                                  mapping_id,
+                                                 base_urlpath,
                                                  volumes,
                                                  environment)
         finally:
@@ -246,6 +255,7 @@ class ContainerManager(LoggingMixin):
                          user_name,
                          image_name,
                          mapping_id,
+                         base_urlpath,
                          volumes,
                          environment):
         """Helper method that performs the physical operation of starting
@@ -312,16 +322,23 @@ class ContainerManager(LoggingMixin):
             '\n'.join('{0} -> {1}'.format(source, target['bind'])
                       for source, target in filtered_volumes.items()))
 
+        container_urlpath = without_end_slash(
+            url_path_join(base_urlpath,
+                          "containers",
+                          container_url_id))
+
         create_kwargs = dict(
             image=image_name,
             name=container_name,
             environment=_get_container_env(user_name,
                                            container_url_id,
-                                           environment),
+                                           environment,
+                                           base_urlpath),
             volumes=volume_targets,
             labels=_get_container_labels(user_name,
                                          mapping_id,
-                                         container_url_id))
+                                         container_url_id,
+                                         container_urlpath))
 
         # build the dictionary of keyword arguments for host_config
         host_config = dict(
@@ -374,6 +391,7 @@ class ContainerManager(LoggingMixin):
             ip=ip,
             port=port,
             url_id=container_url_id,
+            urlpath=container_urlpath,
         )
 
         self.log.info(
@@ -518,7 +536,7 @@ class ContainerManager(LoggingMixin):
         return AsyncDockerClient(**self.docker_config)
 
 
-def _get_container_env(user_name, url_id, environment):
+def _get_container_env(user_name, url_id, environment, base_urlpath):
     """Introduces the environment variables that are available
     at container startup time.
 
@@ -535,6 +553,9 @@ def _get_container_env(user_name, url_id, environment):
         Additional environment keys to add to the final result.
         Note that these will not take precedence.
 
+    base_urlpath: str
+        the user's base urlpath
+
     Return
     ------
     a dictionary containing the envvars to export.
@@ -549,7 +570,7 @@ def _get_container_env(user_name, url_id, environment):
         JPY_USER=user_name,
         # The base url. We use this one because the JPY username might
         # have been escaped.
-        JPY_BASE_USER_URL="/user/"+user_name,
+        JPY_BASE_USER_URL=without_end_slash(base_urlpath),
         # A unix username. used in the container to create the user.
         USER=_unix_user(user_name),
         # The identifier that will be used for the URL.
@@ -558,7 +579,7 @@ def _get_container_env(user_name, url_id, environment):
     return result
 
 
-def _get_container_labels(user_name, mapping_id, url_id):
+def _get_container_labels(user_name, mapping_id, url_id, urlpath):
     """Returns a dictionary that will become container run-time labels.
     Each of these labels must be namespaced in reverse DNS style, in agreement
     to docker guidelines."""
@@ -567,6 +588,7 @@ def _get_container_labels(user_name, mapping_id, url_id):
         SIMPHONY_NS_RUNINFO.user: user_name,
         SIMPHONY_NS_RUNINFO.mapping_id: mapping_id,
         SIMPHONY_NS_RUNINFO.url_id: url_id,
+        SIMPHONY_NS_RUNINFO.urlpath: urlpath,
     }
 
 

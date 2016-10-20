@@ -62,5 +62,11 @@ SIMPHONY_NS_RUNINFO = DockerLabelNamespace(
         # practice this is hard to obtain from inside the container,
         # leading to a chicken/egg situation
         "url_id",
+        # The URL path where the container is exposed.
+        # For example, if the user accesses it at
+        # https://host:8000/user/username/containers/12345/
+        # it will be /user/username/containers/12345/.
+        # This is also the url that's been added to the reverse proxy.
+        "urlpath"
     ],
 )
