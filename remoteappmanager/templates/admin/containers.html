@@ -23,7 +23,11 @@
         <td>{{ c.docker_id|truncate(12) }}</td>
         <td>{{ c.mapping_id|truncate(12) }}</td>
         <td>{{ c.url_id|truncate(12) }}</td>
-        <td><button class="btn btn-danger" data-value="{{ c.url_id }}">Stop</button></td>
+        <td><button
+                class="btn btn-danger stop-container"
+                data-value="{{ c.url_id }}"
+                data-toggle="modal"
+                data-target=".modal" >Stop</button></td>
     </tr>
   {% endfor %}
   </tbody>
