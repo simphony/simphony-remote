@@ -1,14 +1,12 @@
 define([
     "jquery",
-    "bootstrap",
     "admin/tabular/controller",
     "remoteappapi"
-], function ($, bootstrap, tabular, RemoteAppAPI) {
+], function ($, tabular, RemoteAppAPI) {
     "use strict";
     var base_url = window.apidata.base_url;
     var appapi = new RemoteAppAPI(base_url);
     
-    //$(".stop-container").click(function() { $(".modal").modal(); });
     $('.modal').on('show.bs.modal', function (event) {
       var button = $(event.relatedTarget);
       var url_id = button.data('value');
