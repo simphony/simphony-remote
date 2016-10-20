@@ -44,4 +44,5 @@ class UserApplicationsHandler(BaseHandler):
                     headers=headers,
                     table_title="Applications for User: {}".format(
                         user.name
-                    ))
+                    ),
+                    tab="users")

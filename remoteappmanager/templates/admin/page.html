@@ -6,10 +6,10 @@
 {% endblock %}
 
 {% block main %}
-    <ul id="adminoptions">
-        <li><a href="{{ base_url }}containers/">Containers</a></li>
-        <li><a href="{{ base_url }}users/">Users</a></li>
-        <li><a href="{{ base_url }}applications/">Applications</a></li>
+    <ul id="adminoptions" class="nav nav-tabs">
+        <li {% if tab == "containers" %}class="active"{% endif %}><a href="{{ base_url }}containers/">Containers</a></li>
+        <li {% if tab == "users" %}class="active"{% endif %}><a href="{{ base_url }}users/">Users</a></li>
+        <li {% if tab == "applications" %}class="active"{% endif %}><a href="{{ base_url }}applications/">Applications</a></li>
     </ul>
     {% block center_table %}{% endblock %}
 {% endblock %}
