@@ -18,4 +18,5 @@ class ApplicationsHandler(BaseHandler):
         self.render('admin/tabular.html',
                     table=table,
                     headers=headers,
-                    table_title="Registered Applications")
+                    table_title="Registered Applications",
+                    tab="applications")

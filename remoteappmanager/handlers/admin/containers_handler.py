@@ -23,4 +23,5 @@ class ContainersHandler(BaseHandler):
                     headers=headers,
                     table=table,
                     controller="containers",
-                    table_title="Currently Running Containers")
+                    table_title="Currently Running Containers",
+                    tab="containers")

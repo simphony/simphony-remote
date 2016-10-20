@@ -24,4 +24,5 @@ class UsersHandler(BaseHandler):
         self.render('admin/tabular.html',
                     headers=headers,
                     table=table,
-                    table_title="Users")
+                    table_title="Users",
+                    tab="users")
