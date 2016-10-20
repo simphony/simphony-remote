@@ -11,7 +11,9 @@
         <li {% if tab == "users" %}class="active"{% endif %}><a href="{{ base_url }}users/">Users</a></li>
         <li {% if tab == "applications" %}class="active"{% endif %}><a href="{{ base_url }}applications/">Applications</a></li>
     </ul>
+    <div class="container admintable">
     {% block center_table %}{% endblock %}
+    </div>
 {% endblock %}
 
 {% block script_init %}
