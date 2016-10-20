@@ -1,9 +1,6 @@
-from unittest.mock import patch
-
 from tornadowebapi.authenticator import NullAuthenticator
 from tornadowebapi.http import httpstatus
 
-from remoteappmanager.docker.image import Image
 from remoteappmanager.docker.container import Container as DockerContainer
 from remoteappmanager.tests.mocking import dummy
 from remoteappmanager.tests.temp_mixin import TempMixin
@@ -70,4 +67,3 @@ class TestContainerNoUser(TempMixin, AsyncHTTPTestCase):
                              "Cookie": "jupyter-hub-token-username=foo"
                          })
         self.assertEqual(res.code, httpstatus.NOT_FOUND)
-
