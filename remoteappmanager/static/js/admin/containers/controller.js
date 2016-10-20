@@ -1,11 +1,11 @@
 define([
     "jquery",
-    "admin/tabular/controller",
-    "remoteappapi"
-], function ($, tabular, RemoteAppAPI) {
+    "bootstrap",   // unused by module, but needed for binding modal dialog
+    "admin/adminapi"
+], function ($, bootstrap, adminapi) {
     "use strict";
     var base_url = window.apidata.base_url;
-    var appapi = new RemoteAppAPI(base_url);
+    var appapi = new adminapi.AdminAPI(base_url);
     
     $('.modal').on('show.bs.modal', function (event) {
       var button = $(event.relatedTarget);
