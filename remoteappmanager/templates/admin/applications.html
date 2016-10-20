@@ -1,0 +1,36 @@
+{% extends "admin/page.html" %}
+
+
+{% block center_table %}
+  <h3>Currently Running Containers</h3>
+  <table id="datatable" class="display">
+    <thead>
+      <tr>
+          <th>ID</th>
+          <th>Image</th>
+          <th>Remove</th>
+      </tr>
+    </thead>
+    <tbody>
+  {% for a in applications %}
+    <tr>
+        <td>{{ a.id }}</td>
+        <td>{{ a.image }}</td>
+        <td><button
+                class="btn btn-danger"
+                data-value="{{ a.id }}"
+                data-toggle="modal"
+                data-target=".modal">Remove</button></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+  </table>
+{% endblock %}
+
+{% block script_init %}
+    {{ super() }}
+        <script type="text/javascript">
+            require(["admin/tabular/controller"]);
+            require(["admin/applications/controller"]);
+        </script>
+{% endblock %}
