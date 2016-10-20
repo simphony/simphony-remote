@@ -7,6 +7,7 @@ from remoteappmanager.handlers.api import (
     UsersHandler,
     UserApplicationsHandler,
     ApplicationsHandler)
+from remoteappmanager.restresources import admin
 from remoteappmanager.utils import url_path_join, with_end_slash
 
 
@@ -14,7 +15,7 @@ class AdminApplication(BaseApplication):
     """Tornado main application"""
 
     def _webapi_resources(self):
-        return []
+        return [admin.Container]
 
     def _web_handlers(self):
         base_urlpath = self.command_line_config.base_urlpath
