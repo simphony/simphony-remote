@@ -20,9 +20,9 @@ class Application(Resource):
 
         try:
             db.remove_application(id=id)
-            self.log.info("Removed application with id {}".format(identifier))
+            self.log.info("Removed application with id {}".format(id))
         except db_exceptions.NotFound:
             self.log.exception("Could not remove application with "
-                               "id {}".format(identifier))
+                               "id {}".format(id))
         except db_exceptions.UnsupportedOperation:
             raise exceptions.Unable()

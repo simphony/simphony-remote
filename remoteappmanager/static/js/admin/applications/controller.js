@@ -1,12 +1,11 @@
 define([
     "jquery",
+    "bootstrap",   // needed for modal operations.
     "admin/adminapi"
-], function ($, adminapi) {
+], function ($, bootstrap, adminapi) {
     "use strict";
     var base_url = window.apidata.base_url;
     var appapi = new adminapi.AdminAPI(base_url);
-
-    console.log($(".modal"));
 
     $('.modal').on('show.bs.modal', function (event) {
       var button = $(event.relatedTarget);
