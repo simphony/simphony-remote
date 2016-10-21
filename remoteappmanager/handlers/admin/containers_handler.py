@@ -12,16 +12,6 @@ class ContainersHandler(BaseHandler):
         manager = self.application.container_manager
         containers = (yield manager.running_containers())
 
-        headers = ["User", "Image", "Docker ID", "Mapping ID"]
-
-        table = [
-            (c.user, c.image_name, c.docker_id, c.mapping_id)
-            for c in containers
-        ]
-
-        self.render('admin/tabular.html',
-                    headers=headers,
-                    table=table,
-                    controller="containers",
-                    table_title="Currently Running Containers",
+        self.render('admin/containers.html',
+                    containers=containers,
                     tab="containers")

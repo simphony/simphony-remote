@@ -1,0 +1,47 @@
+{% extends "admin/page.html" %}
+
+
+{% block center_table %}
+  <h3>Currently Running Containers</h3>
+  <table id="datatable" class="display">
+    <thead>
+      <tr>
+          <th>User</th>
+          <th>Image</th>
+          <th>Docker ID</th>
+          <th>Mapping ID</th>
+          <th>URL ID</th>
+          <th>Stop</th>
+      </tr>
+    </thead>
+    <tbody>
+  {% for c in containers %}
+    <tr>
+        <td>{{ c.user }}</td>
+        <td>{{ c.image_name }}</td>
+        <td>{{ c.docker_id|truncate(12) }}</td>
+        <td>{{ c.mapping_id|truncate(12) }}</td>
+        <td>{{ c.url_id|truncate(12) }}</td>
+        <td><button
+                class="btn btn-danger stop-container"
+                data-value="{{ c.url_id }}"
+                data-toggle="modal"
+                data-target="#action-dialog">Stop</button></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+  </table>
+{% endblock %}
+
+{% block dialogs %}
+    {% call modal('Action', btn_label='OK') %}
+    {% endcall %}
+{% endblock %}
+
+{% block script_init %}
+    {{ super() }}
+        <script type="text/javascript">
+            require(["admin/tabular/controller"]);
+            require(["admin/containers/controller"]);
+        </script>
+{% endblock %}

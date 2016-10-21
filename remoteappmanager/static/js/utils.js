@@ -122,6 +122,13 @@ define(['jquery'], function ($) {
         dialog.modal();
     };
 
+    var set_dialog_content = function(dialog_element, title, body, ok_callback) {
+        var modal = $(dialog_element);
+        modal.find('.modal-title').text(title);
+        modal.find('.modal-body').text(body);
+        modal.find('.modal-footer .primary').click(ok_callback);
+    };
+        
     var all = function (promises) {
         // A form of jQuery.when that handles an array of promises
         // and equalises the behavior regardless if there's one or more than
@@ -161,6 +168,7 @@ define(['jquery'], function ($) {
         ajax_error_msg : ajax_error_msg,
         log_ajax_error : log_ajax_error,
         ajax_error_dialog : ajax_error_dialog,
+        set_dialog_content : set_dialog_content,
         all : all,
         update : update
     };
