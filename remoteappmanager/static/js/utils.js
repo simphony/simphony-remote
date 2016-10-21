@@ -122,7 +122,7 @@ define(['jquery'], function ($) {
         dialog.modal();
     };
 
-    var show_modal_dialog = function(dialog_element, title, body, ok_callback) {
+    var set_dialog_content = function(dialog_element, title, body, ok_callback) {
         var modal = $(dialog_element);
         modal.find('.modal-title').text(title);
         modal.find('.modal-body').text(body);
@@ -168,7 +168,7 @@ define(['jquery'], function ($) {
         ajax_error_msg : ajax_error_msg,
         log_ajax_error : log_ajax_error,
         ajax_error_dialog : ajax_error_dialog,
-        show_modal_dialog : show_modal_dialog,
+        set_dialog_content : set_dialog_content,
         all : all,
         update : update
     };

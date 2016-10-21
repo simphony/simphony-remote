@@ -11,9 +11,9 @@ define([
     $('#action-dialog').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget);
         var url_id = button.data('value');
-        var modal = $(this);
-        utils.show_modal_dialog(
-            modal,
+        var dialog = $(this);
+        utils.set_dialog_content(
+            dialog,
             'Stop ' + url_id + "?",
             "Do you want to stop the container " + url_id + "? " +
             "This will stop the user session in that container.",
