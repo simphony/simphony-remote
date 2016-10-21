@@ -26,3 +26,17 @@ class Application(Resource):
                                "id {}".format(id))
         except db_exceptions.UnsupportedOperation:
             raise exceptions.Unable()
+
+    @gen.coroutine
+    @authenticated
+    def create(self, representation):
+        try:
+            image_name = str(representation["name"])
+        except KeyError:
+            raise exceptions.BadRepresentation()
+
+        db = self.application.db
+        try:
+            db.create_application(image_name)
+        except db_exceptions.UnsupportedOperation:
+            raise exceptions.Unable()

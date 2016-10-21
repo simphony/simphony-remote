@@ -1,7 +1,7 @@
-{% macro modal(title, btn_label=None, btn_class="btn-primary") %}
+{% macro modal(title, btn_label=None, btn_class="btn-primary", modal_class="") %}
 {% set key = title.replace(' ', '-').lower() %}
 {% set btn_label = btn_label or title %}
-<div class="modal fade" id="{{key}}-dialog" tabindex="-1" role="dialog" aria-labelledby="{{key}}-label" aria-hidden="true">
+<div class="modal fade {{ modal_class }}" id="{{key}}-dialog" tabindex="-1" role="dialog" aria-labelledby="{{key}}-label" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">

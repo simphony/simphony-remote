@@ -29,3 +29,8 @@ body {
     padding-bottom: 10px;
     box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
 }
+
+.createnew {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}

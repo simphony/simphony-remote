@@ -2,7 +2,16 @@
 
 
 {% block center_table %}
-  <h3>Applications</h3>
+    <div class="row">
+        <div class="col-lg-2">
+            <h3>Applications</h3>
+        </div>
+        <div class="col-lg-1">
+            <button class="btn btn-primary createnew"
+                    data-toggle="modal"
+                    data-target=".create">Create New</button>
+        </div>
+    </div>
   <table id="datatable" class="display">
     <thead>
       <tr>
@@ -26,6 +35,9 @@
   {% endfor %}
   </tbody>
   </table>
+
+  {% call modal('Create new application', btn_label='OK', btn_class="btn-primary", modal_class="create") %}
+  {% endcall %}
 {% endblock %}
 
 {% block script_init %}

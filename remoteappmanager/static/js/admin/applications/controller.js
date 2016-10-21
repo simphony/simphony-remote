@@ -15,7 +15,7 @@ define([
       modal.find('.modal-title').text('Remove ' + name + "?");
       modal.find('.modal-body').text(
           "Do you want to remove application " +
-          name + 
+          name +
           "? This will also remove the associated user policies."
       );
       modal.find('.modal-footer .primary').click(
