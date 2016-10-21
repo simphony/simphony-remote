@@ -26,11 +26,16 @@
                 class="btn btn-danger stop-container"
                 data-value="{{ c.url_id }}"
                 data-toggle="modal"
-                data-target=".modal" >Stop</button></td>
+                data-target="#action-dialog">Stop</button></td>
     </tr>
   {% endfor %}
   </tbody>
   </table>
+{% endblock %}
+
+{% block dialogs %}
+    {% call modal('Action', btn_label='OK') %}
+    {% endcall %}
 {% endblock %}
 
 {% block script_init %}
