@@ -122,11 +122,20 @@ define(['jquery'], function ($) {
         dialog.modal();
     };
 
-    var set_dialog_content = function(dialog_element, title, body, ok_callback) {
+    var config_dialog = function(dialog_element, title, body, ok_callback, close_callback) {
         var modal = $(dialog_element);
-        modal.find('.modal-title').text(title);
-        modal.find('.modal-body').text(body);
-        modal.find('.modal-footer .primary').click(ok_callback);
+        if (title !== null) {
+            modal.find('.modal-title').text(title);
+        }
+        if (body !== null) {
+            modal.find('.modal-body').text(body);
+        }
+        if (ok_callback !== null) {
+            modal.find('.modal-footer .primary').click(ok_callback);
+        }
+        if (close_callback !== null) {
+            modal.find('.modal-close').click(close_callback);
+        }
     };
         
     var all = function (promises) {
@@ -168,7 +177,7 @@ define(['jquery'], function ($) {
         ajax_error_msg : ajax_error_msg,
         log_ajax_error : log_ajax_error,
         ajax_error_dialog : ajax_error_dialog,
-        set_dialog_content : set_dialog_content,
+        config_dialog : config_dialog,
         all : all,
         update : update
     };

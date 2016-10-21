@@ -16,7 +16,7 @@ class Application(Resource):
         try:
             id = int(identifier)
         except ValueError:
-            raise exceptions.BadRepresentation("id")
+            raise exceptions.BadRequest("id")
 
         try:
             db.remove_application(id=id)
@@ -31,12 +31,15 @@ class Application(Resource):
     @authenticated
     def create(self, representation):
         try:
-            image_name = str(representation["name"])
+            image_name = str(representation["image_name"])
         except KeyError:
-            raise exceptions.BadRepresentation()
+            raise exceptions.BadRequest("image_name")
 
         db = self.application.db
         try:
-            db.create_application(image_name)
-        except db_exceptions.UnsupportedOperation:
+            id = db.create_application(image_name)
+        except (db_exceptions.UnsupportedOperation,
+                db_exceptions.Exists):
             raise exceptions.Unable()
+
+        return str(id)

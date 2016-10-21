@@ -9,7 +9,7 @@
         <div class="col-lg-1">
             <button class="btn btn-primary createnew"
                     data-toggle="modal"
-                    data-target=".create">Create New</button>
+                    data-target="#create-new-dialog">Create New</button>
         </div>
     </div>
   <table id="datatable" class="display">
@@ -30,14 +30,23 @@
                 data-value="{{ a.id }}"
                 data-name="{{ a.image }}"
                 data-toggle="modal"
-                data-target=".modal">Remove</button></td>
+                data-target="#action-dialog">Remove</button></td>
     </tr>
   {% endfor %}
   </tbody>
   </table>
+{% endblock %}
 
-  {% call modal('Create new application', btn_label='OK', btn_class="btn-primary", modal_class="create") %}
-  {% endcall %}
+{% block dialogs %}
+    {% call modal('Action', btn_label='OK') %}
+    {% endcall %}
+    {% call modal('Create New', btn_label='OK', btn_class="btn-primary", buttons_dismiss=false) %}
+        <form>
+            <label for="image-name">Image name</label>
+            <input type="text" class="form-control" id="image-name">
+            <div class="alert alert-danger" role="alert">Image name cannot be empty</div>
+        </form>
+    {% endcall %}
 {% endblock %}
 
 {% block script_init %}

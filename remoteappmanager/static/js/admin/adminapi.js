@@ -46,6 +46,20 @@ define(['jquery', 'utils'], function ($, utils) {
             options
         );
     };
+    
+    AdminAPI.prototype.create_application = function (image_name, options) {
+        options = options || {};
+        options = utils.update(options, {
+            type: 'POST',
+            data: JSON.stringify({
+                image_name: image_name
+            })
+        });
+        return this._api_request(
+            'applications',
+            options
+        );
+    };
 
     // Private
     AdminAPI.prototype._api_request = function (path, options) {
