@@ -24,17 +24,16 @@ define(['jquery', 'utils'], function ($, utils) {
         return d;
     };
     
-    AdminAPI.prototype.stop_application = function (id, options) {
-        // Stops an application with a given container id. (async)
+    AdminAPI.prototype.stop_container = function (url_id, options) {
+        // Stops a container by url id. (async)
         //
-        // @param id : the container id of the started application.
-        //             Note that this is different from the mapping id.
+        // @param url_id : the url id of the started container.
         // @param options : the options for the request. Optional. 
         // @return a deferred object for the request.
         options = options || {};
         options = utils.update(options, {type: 'DELETE'});
         return this._api_request(
-            utils.url_path_join('containers', id),
+            utils.url_path_join('containers', url_id),
             options
         );
     };
