@@ -51,25 +51,25 @@ class DummyDBAccounting(interfaces.ABCAccounting):
             )
         }
 
-    def get_user(self, *, user_name=None, id=None):
+    def get_user(self, *, user_name=None, id=None):  # pragma: no cover
         if id is not None:
             return self.users.get(id)
 
         user = [u for u in self.users.values() if u.name == user_name]
         return user[0] if len(user) else None
 
-    def get_apps_for_user(self, account):
+    def get_apps_for_user(self, account):  # pragma: no cover
         return tuple(
             [(mapping_id, application, policy)
              for mapping_id, (user, application, policy)
              in self.accounting.items()
              if user == account])
 
-    def create_user(self, user_name):
+    def create_user(self, user_name):  # pragma: no cover
         id = len(self.users)
         self.users[id] = User(id, user_name)
 
-    def remove_user(self, *, user_name=None, id=None):
+    def remove_user(self, *, user_name=None, id=None):  # pragma: no cover
         if user_name is not None:
             user = [u for u in self.users.values() if u.name == user_name]
             id = user[0] if len(user) else None
@@ -82,15 +82,16 @@ class DummyDBAccounting(interfaces.ABCAccounting):
         except KeyError:
             raise exceptions.NotFound()
 
-    def list_users(self):
+    def list_users(self):  # pragma: no cover
         return self.users.values()
 
-    def create_application(self, app_name):
+    def create_application(self, app_name):  # pragma: no cover
         id = len(self.applications)
         self.applications[id] = DummyDBApplication(id, app_name)
         return id
 
-    def remove_application(self, *, app_name=None, id=None):
+    def remove_application(self, *,
+                           app_name=None, id=None):  # pragma: no cover
         if app_name is not None:
             app = [a for a in self.applications.values()
                    if a.image == app_name]
@@ -104,7 +105,7 @@ class DummyDBAccounting(interfaces.ABCAccounting):
         except KeyError:
             raise exceptions.NotFound()
 
-    def list_applications(self):
+    def list_applications(self):  # pragma: no cover
         return self.applications.values()
 
     def grant_access(self, app_name, user_name,
