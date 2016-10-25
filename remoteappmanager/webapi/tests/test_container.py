@@ -57,7 +57,7 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
 
     def test_create(self):
         with patch("remoteappmanager"
-                   ".restresources"
+                   ".webapi"
                    ".container"
                    ".wait_for_http_server_2xx",
                    new_callable=mock_coro_new_callable()):
@@ -83,7 +83,7 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
 
     def test_create_fails(self):
         with patch("remoteappmanager"
-                   ".restresources"
+                   ".webapi"
                    ".container"
                    ".wait_for_http_server_2xx",
                    new_callable=mock_coro_new_callable(
@@ -109,7 +109,7 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
 
     def test_create_fails_for_reverse_proxy_failure(self):
         with patch("remoteappmanager"
-                   ".restresources"
+                   ".webapi"
                    ".container"
                    ".wait_for_http_server_2xx",
                    new_callable=mock_coro_new_callable()):
@@ -137,7 +137,7 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
 
     def test_create_fails_for_start_container_failure(self):
         with patch("remoteappmanager"
-                   ".restresources"
+                   ".webapi"
                    ".container"
                    ".wait_for_http_server_2xx",
                    new_callable=mock_coro_new_callable()):
@@ -175,7 +175,7 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
 
     def test_create_succeeds_for_empty_configurable(self):
         with patch("remoteappmanager"
-                   ".restresources"
+                   ".webapi"
                    ".container"
                    ".wait_for_http_server_2xx",
                    new_callable=mock_coro_new_callable()):
@@ -288,7 +288,7 @@ class TestContainer(TempMixin, AsyncHTTPTestCase):
 
     def test_post_start(self):
         with patch("remoteappmanager"
-                   ".restresources"
+                   ".webapi"
                    ".container"
                    ".wait_for_http_server_2xx",
                    new_callable=mock_coro_factory):

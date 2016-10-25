@@ -7,7 +7,7 @@ from tornadowebapi.http import httpstatus
 
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.image import Image
-from remoteappmanager.restresources import Application
+from remoteappmanager.webapi import Application
 from remoteappmanager.tests.utils import AsyncHTTPTestCase, mock_coro_factory
 from remoteappmanager.tests.mocking.dummy import create_hub
 

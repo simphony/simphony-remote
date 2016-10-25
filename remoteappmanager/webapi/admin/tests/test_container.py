@@ -1,3 +1,5 @@
+from tornado import escape
+
 from tornadowebapi.authenticator import NullAuthenticator
 from tornadowebapi.http import httpstatus
 
@@ -7,7 +9,6 @@ from remoteappmanager.tests.temp_mixin import TempMixin
 from remoteappmanager.tests.utils import (
     AsyncHTTPTestCase,
     mock_coro_factory)
-from tornado import escape
 
 
 class TestContainer(TempMixin, AsyncHTTPTestCase):

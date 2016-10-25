@@ -2,15 +2,15 @@ from tornado import web
 
 from remoteappmanager.base_application import BaseApplication
 from remoteappmanager.handlers.api import HomeHandler
-from remoteappmanager import restresources
+from remoteappmanager import webapi
 
 
 class Application(BaseApplication):
     """Tornado main application"""
 
     def _webapi_resources(self):
-        return [restresources.Application,
-                restresources.Container]
+        return [webapi.Application,
+                webapi.Container]
 
     def _web_handlers(self):
         base_urlpath = self.command_line_config.base_urlpath
