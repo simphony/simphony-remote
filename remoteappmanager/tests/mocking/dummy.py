@@ -86,6 +86,9 @@ class DummyDBAccounting(interfaces.ABCAccounting):
         return self.users.values()
 
     def create_application(self, app_name):  # pragma: no cover
+        if app_name in [a.image for a in self.list_applications()]:
+            raise exceptions.Exists()
+
         id = len(self.applications)
         self.applications[id] = DummyDBApplication(id, app_name)
         return id
