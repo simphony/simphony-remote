@@ -8,10 +8,13 @@ from remoteappmanager.db import exceptions as db_exceptions
 
 
 class Application(Resource):
+    def validate(self, representation):
+        representation["image_name"] = str(representation["image_name"])
+
     @gen.coroutine
     @authenticated
     def delete(self, identifier):
-        """Stop the container."""
+        """Removes the application."""
         db = self.application.db
         try:
             id = int(identifier)
@@ -22,24 +25,27 @@ class Application(Resource):
             db.remove_application(id=id)
             self.log.info("Removed application with id {}".format(id))
         except db_exceptions.NotFound:
-            self.log.exception("Could not remove application with "
-                               "id {}".format(id))
+            raise exceptions.NotFound()
         except db_exceptions.UnsupportedOperation:
             raise exceptions.Unable()
+        except Exception as e:
+            self.log.exception("Unrecognized exception {}".format(e))
+            raise
 
     @gen.coroutine
     @authenticated
     def create(self, representation):
-        try:
-            image_name = str(representation["image_name"])
-        except KeyError:
-            raise exceptions.BadRequest("image_name")
+        image_name = representation["image_name"]
 
         db = self.application.db
         try:
             id = db.create_application(image_name)
-        except (db_exceptions.UnsupportedOperation,
-                db_exceptions.Exists):
+        except db_exceptions.Exists:
+            raise exceptions.Exists()
+        except db_exceptions.UnsupportedOperation:
             raise exceptions.Unable()
+        except Exception as e:
+            self.log.exception("Unrecognized exception {}".format(e))
+            raise
 
-        return str(id)
+        return id
