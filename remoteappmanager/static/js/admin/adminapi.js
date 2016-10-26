@@ -37,6 +37,29 @@ define(['jquery', 'utils'], function ($, utils) {
             options
         );
     };
+    
+    AdminAPI.prototype.remove_application = function (id, options) {
+        options = options || {};
+        options = utils.update(options, {type: 'DELETE'});
+        return this._api_request(
+            utils.url_path_join('applications', id),
+            options
+        );
+    };
+    
+    AdminAPI.prototype.create_application = function (image_name, options) {
+        options = options || {};
+        options = utils.update(options, {
+            type: 'POST',
+            data: JSON.stringify({
+                image_name: image_name
+            })
+        });
+        return this._api_request(
+            'applications',
+            options
+        );
+    };
 
     // Private
     AdminAPI.prototype._api_request = function (path, options) {

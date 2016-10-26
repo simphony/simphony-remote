@@ -29,42 +29,87 @@ User = namedtuple('User', ('id', 'name'))
 
 
 class DummyDBAccounting(interfaces.ABCAccounting):
+    def __init__(self):
+        self.users = {
+            0: User(0, "username")
+        }
 
-    # To test the case where the user with a given id does not exist
-    unexistent_user_id = None
+        self.applications = {
+            0: DummyDBApplication(id=0, image='image_id1'),
+        }
 
-    def get_user(self, *, user_name=None, id=None):
-        user_name = user_name if user_name is not None else "username"
-        id = 0 if id is None else id
-        if id == self.unexistent_user_id:
-            return None
-        return User(id, user_name)
+        self.policies = {
+            0: DummyDBApplicationPolicy()
+        }
 
-    def get_apps_for_user(self, account):
-        return (('mapping_id',
-                 DummyDBApplication(id=0, image='image_id1'),
-                 DummyDBApplicationPolicy()),
-                ('id678',
-                 DummyDBApplication(id=0, image='image_id1'),
-                 DummyDBApplicationPolicy()))
+        self.accounting = {
+            'mapping_id': (
+                self.users[0], self.applications[0], self.policies[0]
+            ),
+            'id678': (
+                self.users[0], self.applications[0], self.policies[0]
+            )
+        }
 
-    def create_user(self, user_name):
-        raise exceptions.UnsupportedOperation()  # pragma: no cover
+    def get_user(self, *, user_name=None, id=None):  # pragma: no cover
+        if id is not None:
+            return self.users.get(id)
 
-    def remove_user(self, *, user_name=None, id=None):
-        raise exceptions.UnsupportedOperation()  # pragma: no cover
+        user = [u for u in self.users.values() if u.name == user_name]
+        return user[0] if len(user) else None
 
-    def list_users(self):
-        return []
+    def get_apps_for_user(self, account):  # pragma: no cover
+        return tuple(
+            [(mapping_id, application, policy)
+             for mapping_id, (user, application, policy)
+             in self.accounting.items()
+             if user == account])
 
-    def create_application(self, app_name):
-        raise exceptions.UnsupportedOperation()  # pragma: no cover
+    def create_user(self, user_name):  # pragma: no cover
+        id = len(self.users)
+        self.users[id] = User(id, user_name)
 
-    def remove_application(self, *, app_name=None, id=None):
-        raise exceptions.UnsupportedOperation()  # pragma: no cover
+    def remove_user(self, *, user_name=None, id=None):  # pragma: no cover
+        if user_name is not None:
+            user = [u for u in self.users.values() if u.name == user_name]
+            id = user[0] if len(user) else None
 
-    def list_applications(self):
-        return []
+        if id is None:
+            raise exceptions.NotFound()
+
+        try:
+            del self.users[id]
+        except KeyError:
+            raise exceptions.NotFound()
+
+    def list_users(self):  # pragma: no cover
+        return self.users.values()
+
+    def create_application(self, app_name):  # pragma: no cover
+        if app_name in [a.image for a in self.list_applications()]:
+            raise exceptions.Exists()
+
+        id = len(self.applications)
+        self.applications[id] = DummyDBApplication(id, app_name)
+        return id
+
+    def remove_application(self, *,
+                           app_name=None, id=None):  # pragma: no cover
+        if app_name is not None:
+            app = [a for a in self.applications.values()
+                   if a.image == app_name]
+            id = app[0] if len(app) else None
+
+        if id is None:
+            raise exceptions.NotFound()
+
+        try:
+            del self.applications[id]
+        except KeyError:
+            raise exceptions.NotFound()
+
+    def list_applications(self):  # pragma: no cover
+        return self.applications.values()
 
     def grant_access(self, app_name, user_name,
                      allow_home, allow_view, volume):
