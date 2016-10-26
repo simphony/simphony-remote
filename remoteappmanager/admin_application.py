@@ -7,7 +7,7 @@ from remoteappmanager.handlers.api import (
     UsersHandler,
     UserApplicationsHandler,
     ApplicationsHandler)
-from remoteappmanager.restresources import admin
+from remoteappmanager.webapi import admin
 from remoteappmanager.utils import url_path_join, with_end_slash
 
 

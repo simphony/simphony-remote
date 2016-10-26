@@ -8,7 +8,7 @@ from tornadowebapi.exceptions import NotFound
 from tornadowebapi.resource import Resource
 
 from remoteappmanager.netutils import wait_for_http_server_2xx
-from remoteappmanager.restresources.decorators import authenticated
+from remoteappmanager.webapi.decorators import authenticated
 
 
 class Container(Resource):

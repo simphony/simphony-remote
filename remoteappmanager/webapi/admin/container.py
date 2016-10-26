@@ -3,7 +3,7 @@ from tornado import gen
 from tornadowebapi import exceptions
 from tornadowebapi.resource import Resource
 
-from remoteappmanager.restresources.decorators import authenticated
+from remoteappmanager.webapi.decorators import authenticated
 
 
 class Container(Resource):

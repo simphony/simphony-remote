@@ -40,8 +40,10 @@ API reference
    remoteappmanager.handlers.base_handler
    remoteappmanager.handlers.home_handler
    remoteappmanager.logging.logging_mixin
-   remoteappmanager.restresources.application
-   remoteappmanager.restresources.container
+   remoteappmanager.webapi.application
+   remoteappmanager.webapi.container
+   remoteappmanager.webapi.admin.application
+   remoteappmanager.webapi.admin.container
    remoteappmanager.services.hub
    remoteappmanager.services.reverse_proxy
 

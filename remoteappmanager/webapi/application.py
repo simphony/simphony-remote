@@ -2,7 +2,7 @@ from tornado import gen
 from tornadowebapi.exceptions import NotFound
 from tornadowebapi.resource import Resource
 
-from remoteappmanager.restresources.decorators import authenticated
+from remoteappmanager.webapi.decorators import authenticated
 
 
 class Application(Resource):
