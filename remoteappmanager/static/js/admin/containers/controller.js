@@ -3,7 +3,7 @@ define([
     "bootstrap",   // unused by module, but needed for binding modal dialog
     "utils",
     "jsapi/v1/resources"
-], function ($, bootstrap, adminapi, utils, resources) {
+], function ($, bootstrap, utils, resources) {
     "use strict";
     var base_url = window.apidata.base_url;
     
