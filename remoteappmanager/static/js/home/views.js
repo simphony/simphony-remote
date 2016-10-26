@@ -1,4 +1,7 @@
-define(["jquery", "utils"], function ($, utils) {
+define([
+    "jquery", 
+    "utils"
+], function ($, utils) {
     "use strict";
 
     var ApplicationListView = function(model) { 
@@ -185,6 +188,4 @@ define(["jquery", "utils"], function ($, utils) {
     return {
         ApplicationListView : ApplicationListView
     };
-    
-    
 });

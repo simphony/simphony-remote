@@ -1,4 +1,4 @@
-define([
+require([
     "jquery",
     "bootstrap",   // unused by module, but needed for binding modal dialog
     "utils",
