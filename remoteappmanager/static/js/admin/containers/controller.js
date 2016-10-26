@@ -17,10 +17,9 @@ define([
             "Do you want to stop the container " + url_id + "? " +
             "This will stop the user session in that container.",
             function () {
-                resources.Container.delete(url_id,
-                    function () { window.location.reload(); },
-                    utils.ajax_error_dialog
-                );
+                resources.Container.delete(url_id)
+                    .done(function () { window.location.reload(); })
+                    .fail(utils.ajax_error_dialog);
             }
         );
     });
