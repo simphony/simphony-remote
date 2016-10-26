@@ -12,7 +12,7 @@ define([
         var button = $(event.relatedTarget);
         var url_id = button.data('value');
         var dialog = $(this);
-        utils.set_dialog_content(
+        utils.config_dialog(
             dialog,
             'Stop ' + url_id + "?",
             "Do you want to stop the container " + url_id + "? " +
