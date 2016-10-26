@@ -28,9 +28,6 @@ class Application(Resource):
             raise exceptions.NotFound()
         except db_exceptions.UnsupportedOperation:
             raise exceptions.Unable()
-        except Exception as e:
-            self.log.exception("Unrecognized exception {}".format(e))
-            raise
 
     @gen.coroutine
     @authenticated
@@ -44,8 +41,5 @@ class Application(Resource):
             raise exceptions.Exists()
         except db_exceptions.UnsupportedOperation:
             raise exceptions.Unable()
-        except Exception as e:
-            self.log.exception("Unrecognized exception {}".format(e))
-            raise
 
         return id
