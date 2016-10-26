@@ -1,4 +1,5 @@
 # Configuration file for jupyterhub.
+import os
 from jupyter_client.localinterfaces import public_ips
 
 c = get_config()  # noqa
@@ -28,7 +29,9 @@ if setting_mode == 'virtual_user':
     # FIXME: replace me with other authenticator (e.g. GitHub OAuth...)
     c.JupyterHub.authenticator_class = (
         'remoteappmanager.jupyterhub.auth.WorldAuthenticator')
+    c.Authenticator.admin_users = {"admin"}
 
 elif setting_mode == 'system_user':
     c.JupyterHub.spawner_class = ('remoteappmanager.jupyterhub.spawners.' +
                                   'SystemUserSpawner')
+    c.Authenticator.admin_users = {os.environ["USER"]}

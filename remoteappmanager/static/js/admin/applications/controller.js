@@ -2,11 +2,10 @@ define([
     "jquery",
     "bootstrap",   // needed for modal operations.
     "utils",
-    "admin/adminapi"
-], function ($, bootstrap, utils, adminapi) {
+    "jsapi/v1/resources"
+], function ($, bootstrap, utils, resources) {
     "use strict";
     var base_url = window.apidata.base_url;
-    var appapi = new adminapi.AdminAPI(base_url);
 
     $('#create-new-dialog').on('show.bs.modal', function () {
         var dialog = $(this);
@@ -19,12 +18,9 @@ define([
                 return;
             }
             dialog.modal('hide');
-            appapi.create_application(image_name, {
-                success: function () {
-                    window.location.reload();
-                },
-                error: utils.ajax_error_dialog
-            });
+            resources.Application.create({ image_name: image_name })
+                .done(function() { window.location.reload(); })
+                .fail(utils.ajax_error_dialog);
         };
         
         var cancel_callback = function () {
@@ -60,12 +56,9 @@ define([
             "Do you want to remove application " + name + "? " +
             "This will also remove the associated user policies.",
             function() {
-                appapi.remove_application(id, {
-                    success: function () {
-                      window.location.reload();
-                    },
-                    error: utils.ajax_error_dialog
-                });
+                resources.Application.delete(id)
+                    .done(function() { window.location.reload(); })
+                    .fail(utils.ajax_error_dialog);
             }
         );
     });
