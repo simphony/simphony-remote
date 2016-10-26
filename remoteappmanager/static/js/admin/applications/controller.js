@@ -18,13 +18,9 @@ define([
                 return;
             }
             dialog.modal('hide');
-            resources.Application.create(
-                { image_name: image_name },
-                function () {
-                    window.location.reload();
-                },
-                utils.ajax_error_dialog
-            );
+            resources.Application.create({ image_name: image_name })
+                .done(function() { window.location.reload(); })
+                .fail(utils.ajax_error_dialog);
         };
         
         var cancel_callback = function () {
@@ -60,12 +56,9 @@ define([
             "Do you want to remove application " + name + "? " +
             "This will also remove the associated user policies.",
             function() {
-                resources.Application.delete(id,
-                    function () {
-                      window.location.reload();
-                    },
-                    utils.ajax_error_dialog
-                );
+                resources.Application.delete(id)
+                    .done(function() { window.location.reload(); })
+                    .fail(utils.ajax_error_dialog);
             }
         );
     });
