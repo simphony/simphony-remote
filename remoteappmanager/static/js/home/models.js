@@ -1,4 +1,7 @@
-define(['jquery', 'home/configurables'], function ($, configurables) {
+define([
+    'jquery', 
+    'home/configurables'
+], function ($, configurables) {
     "use strict";
     
     var ApplicationListModel = function(remote_app_api) {
