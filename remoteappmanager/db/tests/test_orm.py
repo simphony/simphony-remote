@@ -332,17 +332,24 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
 
         accounting.create_application("simphonyremote/amazing")
 
-        accounting.grant_access("simphonyremote/amazing", "ciccio",
-                                True, False, "/foo:/bar:ro")
+        id = accounting.grant_access("simphonyremote/amazing", "ciccio",
+                                     True, False, "/foo:/bar:ro")
+        self.assertIsNotNone(id)
 
         user = accounting.get_user(user_name="ciccio")
         apps = accounting.get_apps_for_user(user)
+        self.assertEqual(apps[0][0], id)
         self.assertEqual(apps[0][1].image, "simphonyremote/amazing")
         self.assertEqual(apps[0][2].allow_home, True)
         self.assertEqual(apps[0][2].allow_view, False)
         self.assertEqual(apps[0][2].volume_source, "/foo")
         self.assertEqual(apps[0][2].volume_target, "/bar")
         self.assertEqual(apps[0][2].volume_mode, "ro")
+
+        # Do it twice to check idempotency
+        id2 = accounting.grant_access("simphonyremote/amazing", "ciccio",
+                                      True, False, "/foo:/bar:ro")
+        self.assertEqual(id, id2)
 
         accounting.revoke_access("simphonyremote/amazing", "ciccio",
                                  True, False, "/foo:/bar:ro")
