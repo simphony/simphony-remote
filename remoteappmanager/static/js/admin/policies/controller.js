@@ -12,52 +12,67 @@ define([
         $(dialog).find(".alert").hide();
         
         var ok_callback = function () {
-            var rep = {
-                user_name: $.trim($("#user_name").val()),
-                image_name: $.trim($("#image_name").val()),
-                allow_home: $("#allow_home").prop("checked"),
-                volume_source: $.trim($("#volume_source").val()),
-                volume_target: $.trim($("#volume_target").val()),
-                volume_readonly: $("#volume_readonly").prop("checked")
-            };
-
+            var user_name = $.trim($("#user_name").val());
+            var image_name = $.trim($("#image_name").val());
+            var allow_home = $("#allow_home").prop("checked");
+            var volume_source = $.trim($("#volume_source").val());
+            var volume_target = $.trim($("#volume_target").val());
+            var volume_readonly = $("#volume_readonly").prop("checked");
+           
             $(dialog).find(".alert").hide();
             
-            if (rep.image_name.length === 0) {
+            if (image_name.length === 0) {
                 $(dialog).find("#image_name_alert")
                     .text("Image name cannot be empty")
                     .show();
                 return;
             }
-            if (rep.volume_source.length !== 0 && rep.volume_source[0] !== '/') {
+            if (volume_source.length !== 0 && volume_source[0] !== '/') {
                 $(dialog).find("#volume_source_alert")
                     .text("Must be an absolute path or empty")
                     .show();
                 return;
             }
             
-            if (rep.volume_target.length !== 0 && rep.volume_target[0] !== '/') {
+            if (volume_target.length !== 0 && volume_target[0] !== '/') {
                 $(dialog).find("#volume_target_alert")
                     .text("Must be an absolute path or empty")
                     .show();
                 return;
             }
                 
-            if (rep.volume_source.length === 0 && rep.volume_target.length !== 0) {
+            if (volume_source.length === 0 && volume_target.length !== 0) {
                 $(dialog).find("#volume_source_alert")
                     .text("Must not be empty if target is defined")
                     .show();
                 return;
             }
             
-            if (rep.volume_source.length !== 0 && rep.volume_target.length === 0) {
+            if (volume_source.length !== 0 && volume_target.length === 0) {
                 $(dialog).find("#volume_target_alert")
                     .text("Must not be empty if source is defined")
                     .show();
                 return;
             }
             
+            var volume_string = "";
+            if (volume_source.length !== 0 && volume_target.length !== 0) {
+                var volume_mode;
+                if (volume_readonly) {
+                    volume_mode = "ro";
+                } else {
+                    volume_mode = "rw";
+                }
+                volume_string = volume_source+":"+volume_target+":"+volume_mode;
+            }
+            
             dialog.modal('hide');
+            var rep = {
+                user_name: user_name,
+                image_name: image_name,
+                allow_home: allow_home,
+                volume: volume_string
+            };
             
             resources.Policies.create(rep)
                 .done(function() { window.location.reload(); })
