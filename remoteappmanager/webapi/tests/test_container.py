@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+from remoteappmanager.tests.webapi_test_case import WebAPITestCase
 from tornadowebapi.authenticator import NullAuthenticator
 from tornadowebapi.http import httpstatus
 
@@ -14,7 +15,7 @@ from remoteappmanager.tests.utils import (
 from tornado import escape
 
 
-class TestContainer(TempMixin, AsyncHTTPTestCase):
+class TestContainer(WebAPITestCase):
     def get_app(self):
         app = dummy.create_application()
         app.hub.verify_token.return_value = {

@@ -1,6 +1,8 @@
 from unittest.mock import Mock
 
 from tornado import web, escape, gen
+
+from remoteappmanager.tests.utils import mock_coro_factory
 from tornadowebapi import registry
 from tornadowebapi.authenticator import NullAuthenticator
 from tornadowebapi.http import httpstatus
@@ -8,7 +10,7 @@ from tornadowebapi.http import httpstatus
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.image import Image
 from remoteappmanager.webapi import Application
-from remoteappmanager.tests.utils import AsyncHTTPTestCase, mock_coro_factory
+from remoteappmanager.tests.webapi_test_case import WebAPITestCase
 from remoteappmanager.tests.mocking.dummy import create_hub
 
 
@@ -21,7 +23,7 @@ class DummyAuthenticator:
         return user
 
 
-class TestApplication(AsyncHTTPTestCase):
+class TestApplication(WebAPITestCase):
     def setUp(self):
         super().setUp()
 
@@ -58,33 +60,24 @@ class TestApplication(AsyncHTTPTestCase):
         return app
 
     def test_items(self):
-        res = self.fetch("/api/v1/applications/")
-
-        self.assertEqual(res.code, httpstatus.OK)
-        self.assertEqual(escape.json_decode(res.body),
-                         {"items": ["one", "two"]})
+        _, data = self.get("/api/v1/applications/", httpstatus.OK)
+        self.assertEqual(data, {"items": ["one", "two"]})
 
         # Check if nothing is returned if no images are present
         self._app.container_manager.image = mock_coro_factory(
             return_value=None)
 
-        res = self.fetch("/api/v1/applications/")
-
-        self.assertEqual(res.code, httpstatus.OK)
-        self.assertEqual(escape.json_decode(res.body),
-                         {"items": []})
+        _, data = self.get("/api/v1/applications/", httpstatus.OK)
+        self.assertEqual(data, {"items": []})
 
     def test_items_no_user(self):
         self.reg.authenticator = NullAuthenticator
-        res = self.fetch("/api/v1/applications/")
-
-        self.assertEqual(res.code, httpstatus.NOT_FOUND)
+        self.get("/api/v1/applications/", httpstatus.NOT_FOUND)
 
     def test_retrieve(self):
-        res = self.fetch("/api/v1/applications/one/")
+        _, data = self.get("/api/v1/applications/one/", httpstatus.OK)
 
-        self.assertEqual(res.code, httpstatus.OK)
-        self.assertEqual(escape.json_decode(res.body),
+        self.assertEqual(data,
                          {'container': None,
                           'image': {
                               'description': '',
@@ -107,10 +100,9 @@ class TestApplication(AsyncHTTPTestCase):
                 image_name="xxx",
                 url_id="yyy")])
 
-        res = self.fetch("/api/v1/applications/one/")
+        _, data = self.get("/api/v1/applications/one/", httpstatus.OK)
 
-        self.assertEqual(res.code, httpstatus.OK)
-        self.assertEqual(escape.json_decode(res.body),
+        self.assertEqual(data,
                          {'container':
                              {'image_name': 'xxx',
                               'name': 'container',
@@ -129,18 +121,14 @@ class TestApplication(AsyncHTTPTestCase):
                                     },
                           'mapping_id': 'one'})
 
-        res = self.fetch("/api/v1/applications/three/")
-
-        self.assertEqual(res.code, httpstatus.NOT_FOUND)
+        self.get("/api/v1/applications/three/", httpstatus.NOT_FOUND)
 
         # Check the not found case if the image is not present
         self._app.container_manager.image = mock_coro_factory(None)
 
-        res = self.fetch("/api/v1/applications/one/")
-        self.assertEqual(res.code, httpstatus.NOT_FOUND)
+        self.get("/api/v1/applications/one/", httpstatus.NOT_FOUND)
 
     def test_retrieve_no_user(self):
         self.reg.authenticator = NullAuthenticator
-        res = self.fetch("/api/v1/applications/one/")
+        self.get("/api/v1/applications/one/", httpstatus.NOT_FOUND)
 
-        self.assertEqual(res.code, httpstatus.NOT_FOUND)
