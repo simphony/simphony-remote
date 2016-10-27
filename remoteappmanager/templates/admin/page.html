@@ -7,13 +7,12 @@
 
 {% block main %}
     <ul id="adminoptions" class="nav nav-tabs">
+        <li {% if tab == "home" %}class="active"{% endif %}><a href="{{ base_url }}">Home</a></li>
         <li {% if tab == "containers" %}class="active"{% endif %}><a href="{{ base_url }}containers/">Containers</a></li>
         <li {% if tab == "users" %}class="active"{% endif %}><a href="{{ base_url }}users/">Users</a></li>
         <li {% if tab == "applications" %}class="active"{% endif %}><a href="{{ base_url }}applications/">Applications</a></li>
     </ul>
-    <div class="container admintable">
-    {% block center_table %}{% endblock %}
-    </div>
+    {% block center %}{% endblock %}
     {% block dialogs %}{% endblock %}
 {% endblock %}
 
