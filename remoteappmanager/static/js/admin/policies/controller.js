@@ -55,7 +55,12 @@ define([
                 return;
             }
             
-            var volume_string = "";
+            var rep = {
+                user_name: user_name,
+                image_name: image_name,
+                allow_home: allow_home
+            };
+            
             if (volume_source.length !== 0 && volume_target.length !== 0) {
                 var volume_mode;
                 if (volume_readonly) {
@@ -63,16 +68,10 @@ define([
                 } else {
                     volume_mode = "rw";
                 }
-                volume_string = volume_source+":"+volume_target+":"+volume_mode;
+                rep.volume_string = volume_source+":"+volume_target+":"+volume_mode;
             }
-            
+
             dialog.modal('hide');
-            var rep = {
-                user_name: user_name,
-                image_name: image_name,
-                allow_home: allow_home,
-                volume: volume_string
-            };
             
             resources.Policies.create(rep)
                 .done(function() { window.location.reload(); })
