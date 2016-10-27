@@ -3,8 +3,8 @@ from tornado import gen, web
 from remoteappmanager.handlers.base_handler import BaseHandler
 
 
-class UserApplicationsHandler(BaseHandler):
-    """Render the user list"""
+class PoliciesHandler(BaseHandler):
+    """Render the execution policies for a given user"""
     @web.authenticated
     @gen.coroutine
     def get(self, id):
@@ -26,7 +26,7 @@ class UserApplicationsHandler(BaseHandler):
                  "policy": policy}
                 for mapping_id, app, policy in apps]
 
-        self.render('admin/user_applications.html',
+        self.render('admin/policies.html',
                     info=info,
                     user=user,
                     tab="users")

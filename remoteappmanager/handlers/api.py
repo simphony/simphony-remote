@@ -4,4 +4,4 @@ from .admin.admin_home_handler import AdminHomeHandler  # noqa
 from .admin.containers_handler import ContainersHandler # noqa
 from .admin.users_handler import UsersHandler # noqa
 from .admin.applications_handler import ApplicationsHandler  # noqa
-from .admin.user_applications_handler import UserApplicationsHandler  # noqa
+from .admin.policies_handler import PoliciesHandler  # noqa
