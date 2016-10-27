@@ -1,7 +1,8 @@
 {% extends "admin/page.html" %}
 
 
-{% block center_table %}
+{% block center %}
+  <div class="container admintable">
   <h3>Currently Running Containers</h3>
   <table id="datatable" class="display">
     <thead>
@@ -31,6 +32,7 @@
   {% endfor %}
   </tbody>
   </table>
+  </div>
 {% endblock %}
 
 {% block dialogs %}
