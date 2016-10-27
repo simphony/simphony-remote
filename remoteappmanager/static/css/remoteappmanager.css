@@ -22,7 +22,8 @@ body {
     font-weight: 600;
 }
 
-.admintable {
+/* Used in the admin page as a central element */
+.adminslab {
     background-color: white;
     border-radius: 10px;
     margin-top: 40px;
