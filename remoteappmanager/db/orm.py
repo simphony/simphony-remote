@@ -1,10 +1,10 @@
 import contextlib
-import hashlib
+import uuid
 import os
 
 from sqlalchemy import (
-    Column, Integer, Boolean, Unicode, ForeignKey, create_engine, Enum,
-    event)
+    Column, Integer, Boolean, String, Unicode, ForeignKey, UniqueConstraint,
+    create_engine, Enum, event)
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
@@ -77,24 +77,31 @@ class Accounting(Base):
     """Holds the information about who is allowed to run what."""
     __tablename__ = "accounting"
 
+    # This must be set as a md5 hex from outside, and it's what will
+    # become the mapping id.
+    id = Column(String(32), primary_key=True)
+
     user_id = Column(Integer,
-                     ForeignKey("user.id", ondelete="CASCADE"),
-                     primary_key=True)
+                     ForeignKey("user.id", ondelete="CASCADE"))
 
     application_id = Column(Integer,
                             ForeignKey("application.id", ondelete="CASCADE"),
-                            primary_key=True)
+                            )
 
     application_policy_id = Column(
         Integer,
         ForeignKey("application_policy.id", ondelete="CASCADE"),
-        primary_key=True)
+        )
 
     user = relationship("User")
 
     application = relationship("Application")
 
     application_policy = relationship("ApplicationPolicy")
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'application_id', 'application_policy_id'),
+    )
 
 
 @event.listens_for(Engine, "connect")
@@ -349,12 +356,20 @@ class AppAccounting(ABCAccounting):
                 ).one_or_none()
 
                 if acc is None:
+                    id = uuid.uuid4().hex
+
                     accounting = Accounting(
+                        id=id,
                         user=orm_user,
                         application=orm_app,
                         application_policy=orm_policy,
                     )
                     session.add(accounting)
+
+                else:
+                    id = acc.id
+
+                return id
 
     def revoke_access(self, app_name, user_name,
                       allow_home, allow_view, volume):
@@ -454,10 +469,6 @@ def apps_for_user(session, user):
         Accounting.user, aliased=True).filter_by(
             name=user_name).all()
 
-    return tuple((hashlib.md5(
-                         ("{}_{}".format(
-                             acc.application.image,
-                             acc.application_policy.id)).encode("utf-8")
-                  ).hexdigest(),
-                  acc.application,
-                  acc.application_policy) for acc in res)
+    return tuple(((acc.id,
+                   acc.application,
+                   acc.application_policy) for acc in res))

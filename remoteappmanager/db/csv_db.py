@@ -44,7 +44,7 @@ Note
 """
 
 import csv
-import hashlib
+import uuid
 
 from remoteappmanager.db.interfaces import (
     ABCAccounting, ABCApplication, ABCApplicationPolicy)
@@ -167,9 +167,8 @@ class CSVAccounting(ABCAccounting):
 
                 # Save the configuration
                 # Note that we don't filter existing duplicate entry
-                mapping_id_prehex = '_'.join((application.image, str(count)))
-                self.all_records.setdefault(user.name, []).append(
-                    (hashlib.md5(mapping_id_prehex.encode('u8')).hexdigest(),
+                self.all_records.setdefault(user.name, []).append((
+                     uuid.uuid4().hex,
                      application,
                      application_policy))
 
