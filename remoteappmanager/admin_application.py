@@ -16,7 +16,8 @@ class AdminApplication(BaseApplication):
 
     def _webapi_resources(self):
         return [admin.Container,
-                admin.Application]
+                admin.Application,
+                admin.User]
 
     def _web_handlers(self):
         base_urlpath = self.command_line_config.base_urlpath
