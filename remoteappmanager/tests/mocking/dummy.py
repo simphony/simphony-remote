@@ -66,8 +66,12 @@ class DummyDBAccounting(interfaces.ABCAccounting):
              if user == account])
 
     def create_user(self, user_name):  # pragma: no cover
+        if user_name in [u.name for u in self.list_users()]:
+            raise exceptions.Exists()
+
         id = len(self.users)
         self.users[id] = User(id, user_name)
+        return id
 
     def remove_user(self, *, user_name=None, id=None):  # pragma: no cover
         if user_name is not None:

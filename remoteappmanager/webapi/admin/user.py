@@ -32,11 +32,11 @@ class User(Resource):
     @gen.coroutine
     @authenticated
     def create(self, representation):
-        image_name = representation["name"]
+        name = representation["name"]
 
         db = self.application.db
         try:
-            id = db.create_user(image_name)
+            id = db.create_user(name)
         except db_exceptions.Exists:
             raise exceptions.Exists()
         except db_exceptions.UnsupportedOperation:
