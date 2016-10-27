@@ -60,6 +60,23 @@ class TestUser(AsyncHTTPTestCase):
                          headers={
                              "Cookie": "jupyter-hub-token-username=username"
                          },
+                         body=escape.json_encode({"name": ""}))
+
+        self.assertEqual(res.code, httpstatus.BAD_REQUEST)
+
+        res = self.fetch("/user/username/api/v1/users/",
+                         method="POST",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=username"
+                         },
+                         body=escape.json_encode({}))
+        self.assertEqual(res.code, httpstatus.BAD_REQUEST)
+
+        res = self.fetch("/user/username/api/v1/users/",
+                         method="POST",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=username"
+                         },
                          body=escape.json_encode({"name": "foobar"}))
 
         self.assertEqual(res.code, httpstatus.CREATED)

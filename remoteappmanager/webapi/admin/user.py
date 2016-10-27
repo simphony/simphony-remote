@@ -9,7 +9,9 @@ from remoteappmanager.db import exceptions as db_exceptions
 
 class User(Resource):
     def validate(self, representation):
-        representation["name"] = str(representation["name"])
+        representation["name"] = str(representation["name"]).strip()
+        if len(representation["name"]) == 0:
+            raise ValueError("name cannot be empty")
 
     @gen.coroutine
     @authenticated
