@@ -220,6 +220,11 @@ class ABCAccounting(metaclass=ABCMeta):
             if the app or user are not found.
         ValueError:
             if the volume string is invalid.
+
+        Returns
+        -------
+        id : str
+            A 32 characters id
         """
 
     @abstractmethod

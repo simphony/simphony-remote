@@ -1,4 +1,5 @@
 import contextlib
+import uuid
 import os
 import unittest
 
@@ -31,23 +32,24 @@ def fill_db(session):
         # app 1 to be available only to user 0
         # and app 2 to be available to user 1
 
-        accountings = [
-            orm.Accounting(user=users[1],
-                           application=apps[0],
-                           application_policy=policy),
-            orm.Accounting(user=users[3],
-                           application=apps[0],
-                           application_policy=policy),
-            orm.Accounting(user=users[4],
-                           application=apps[0],
-                           application_policy=policy),
-            orm.Accounting(user=users[0],
-                           application=apps[1],
-                           application_policy=policy),
-            orm.Accounting(user=users[1],
-                           application=apps[2],
-                           application_policy=policy),
-        ]
+        accountings = []
+
+        for user, application in [
+                (users[1], apps[0]),
+                (users[3], apps[0]),
+                (users[4], apps[0]),
+                (users[0], apps[1]),
+                (users[1], apps[2])]:
+
+            id = uuid.uuid4().hex
+
+            accountings.append(
+                orm.Accounting(id=id,
+                               user=user,
+                               application=application,
+                               application_policy=policy)
+            )
+
         session.add_all(accountings)
 
 
@@ -330,17 +332,24 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
 
         accounting.create_application("simphonyremote/amazing")
 
-        accounting.grant_access("simphonyremote/amazing", "ciccio",
-                                True, False, "/foo:/bar:ro")
+        id = accounting.grant_access("simphonyremote/amazing", "ciccio",
+                                     True, False, "/foo:/bar:ro")
+        self.assertIsNotNone(id)
 
         user = accounting.get_user(user_name="ciccio")
         apps = accounting.get_apps_for_user(user)
+        self.assertEqual(apps[0][0], id)
         self.assertEqual(apps[0][1].image, "simphonyremote/amazing")
         self.assertEqual(apps[0][2].allow_home, True)
         self.assertEqual(apps[0][2].allow_view, False)
         self.assertEqual(apps[0][2].volume_source, "/foo")
         self.assertEqual(apps[0][2].volume_target, "/bar")
         self.assertEqual(apps[0][2].volume_mode, "ro")
+
+        # Do it twice to check idempotency
+        id2 = accounting.grant_access("simphonyremote/amazing", "ciccio",
+                                      True, False, "/foo:/bar:ro")
+        self.assertEqual(id, id2)
 
         accounting.revoke_access("simphonyremote/amazing", "ciccio",
                                  True, False, "/foo:/bar:ro")

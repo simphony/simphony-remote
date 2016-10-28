@@ -2,6 +2,7 @@
 """Script to perform operations on the database of our application."""
 import os
 import sys
+import uuid
 from requests.exceptions import ConnectionError
 
 import sqlalchemy.exc
@@ -405,7 +406,9 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
         ).one_or_none()
 
         if acc is None:
+            id = uuid.uuid4().hex
             accounting = orm.Accounting(
+                id=id,
                 user=orm_user,
                 application=orm_app,
                 application_policy=orm_policy,
