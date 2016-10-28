@@ -45,7 +45,7 @@ class TestContainer(WebAPITestCase):
             manager.start_container = mock_coro_factory(DockerContainer(
                 url_id="3456"
             ))
-            res = self.post(
+            self.post(
                 "/user/username/api/v1/containers/",
                 dict(
                     mapping_id="mapping_id",

@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from tornado import web, escape, gen
+from tornado import web, gen
 
 from remoteappmanager.tests.utils import mock_coro_factory
 from tornadowebapi import registry
@@ -131,4 +131,3 @@ class TestApplication(WebAPITestCase):
     def test_retrieve_no_user(self):
         self.reg.authenticator = NullAuthenticator
         self.get("/api/v1/applications/one/", httpstatus.NOT_FOUND)
-

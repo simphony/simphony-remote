@@ -4,13 +4,18 @@ from .utils import AsyncHTTPTestCase
 
 class WebAPITestCase(AsyncHTTPTestCase):
     def get(self, url, expect_code=None):
-        res = self.fetch(url,
-                         headers={
-                             "Cookie": self.cookie_auth_token()
-                         })
+
+        cookie = self.cookie_auth_token()
+        kwargs = {}
+        if cookie:
+            kwargs["headers"] = {
+                "Cookie": cookie
+            }
+        res = self.fetch(url, **kwargs)
+
         try:
             data = escape.json_decode(res.body)
-        except:
+        except Exception:
             data = None
 
         if expect_code:
@@ -19,17 +24,23 @@ class WebAPITestCase(AsyncHTTPTestCase):
         return res.code, data
 
     def post(self, url, data, expect_code=None):
+        cookie = self.cookie_auth_token()
+        kwargs = {}
+        if cookie:
+            kwargs["headers"] = {
+                "Cookie": cookie
+            }
+
         res = self.fetch(
             url,
             method="POST",
-            headers={
-                "Cookie": self.cookie_auth_token()
-            },
-            body=escape.json_encode(data)
+            body=escape.json_encode(data),
+            **kwargs
         )
+
         try:
             ret_data = escape.json_decode(res.body)
-        except:
+        except Exception:
             ret_data = None
 
         if expect_code:
@@ -38,14 +49,20 @@ class WebAPITestCase(AsyncHTTPTestCase):
         return res.code, ret_data
 
     def delete(self, url, expect_code=None):
+        cookie = self.cookie_auth_token()
+        kwargs = {}
+        if cookie:
+            kwargs["headers"] = {
+                "Cookie": cookie
+            }
+
         res = self.fetch(url,
                          method="DELETE",
-                         headers={
-                             "Cookie": self.cookie_auth_token()
-                         })
+                         **kwargs
+                         )
         try:
             ret_data = escape.json_decode(res.body)
-        except:
+        except Exception:
             ret_data = None
 
         if expect_code:
