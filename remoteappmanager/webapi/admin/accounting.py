@@ -38,7 +38,7 @@ class Accounting(Resource):
                 representation.get("volume")
                 )
         except db_exceptions.NotFound:
-            raise exceptions.NotFoundt ()
+            raise exceptions.NotFound()
 
         return id
 
