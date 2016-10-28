@@ -214,3 +214,6 @@ class CSVAccounting(ABCAccounting):
     def revoke_access(self, app_name, user_name,
                       allow_home, allow_view, volume):
         raise UnsupportedOperation()
+
+    def revoke_access_by_id(self, mapping_id):
+        raise UnsupportedOperation()

@@ -405,6 +405,16 @@ class AppAccounting(ABCAccounting):
                 Accounting.application_policy == orm_policy,
                 ).delete()
 
+    def revoke_access_by_id(self, mapping_id):
+        with detached_session(self.db) as session, \
+                transaction(session):
+            try:
+                session.query(Accounting).filter(
+                    Accounting.id == mapping_id,
+                    ).delete()
+            except NoResultFound:
+                raise exceptions.NotFound()
+
 
 @contextlib.contextmanager
 def detached_session(db):

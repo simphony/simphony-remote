@@ -5,7 +5,7 @@
   <div class="container adminslab">
     <div class="row">
         <div class="col-lg-4">
-            <h3>Policies for user: {{ user.name }}</h3>
+            <h3>Accounting policies for user: {{ user.name }}</h3>
         </div>
         <div class="col-lg-1">
             <button class="btn btn-primary createnew"
@@ -86,6 +86,6 @@
     {{ super() }}
         <script type="text/javascript">
             require(["admin/tabular/controller"]);
-            require(["admin/policies/controller"]);
+            require(["admin/accounting/controller"]);
         </script>
 {% endblock %}

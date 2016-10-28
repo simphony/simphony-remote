@@ -73,7 +73,7 @@ define([
 
             dialog.modal('hide');
             
-            resources.Policies.create(rep)
+            resources.Accounting.create(rep)
                 .done(function() { window.location.reload(); })
                 .fail(utils.ajax_error_dialog);
         };
@@ -110,7 +110,7 @@ define([
             'Remove policy ' + name + "?",
             "Do you want to remove policy " + name + "? ",
             function() {
-                resources.Policies.delete(id)
+                resources.Accounting.delete(id)
                    .done(function() { window.location.reload(); })
                     .fail(utils.ajax_error_dialog);
             }

@@ -5,7 +5,7 @@ from remoteappmanager.handlers.api import (
     AdminHomeHandler,
     ContainersHandler,
     UsersHandler,
-    PoliciesHandler,
+    AccountingHandler,
     ApplicationsHandler)
 from remoteappmanager.webapi import admin
 from remoteappmanager.utils import url_path_join, with_end_slash
@@ -17,7 +17,8 @@ class AdminApplication(BaseApplication):
     def _webapi_resources(self):
         return [admin.Container,
                 admin.Application,
-                admin.User]
+                admin.User,
+                admin.Accounting]
 
     def _web_handlers(self):
         base_urlpath = self.command_line_config.base_urlpath
@@ -30,8 +31,8 @@ class AdminApplication(BaseApplication):
                 url_path_join(base_urlpath, "users")
             ), UsersHandler),
             (with_end_slash(
-                url_path_join(base_urlpath, "users", "(\d+)")
-            ), PoliciesHandler),
+                url_path_join(base_urlpath, "users", "(\d+)", 'accounting')
+            ), AccountingHandler),
             (with_end_slash(
                 url_path_join(base_urlpath, "applications")
             ), ApplicationsHandler),

@@ -224,7 +224,7 @@ class ABCAccounting(metaclass=ABCMeta):
         Returns
         -------
         id : str
-            A 32 characters id
+            A 32 characters id (mapping_id)
         """
 
     @abstractmethod
@@ -258,3 +258,7 @@ class ABCAccounting(metaclass=ABCMeta):
         ValueError:
             if the volume string is invalid.
         """
+
+    @abstractmethod
+    def revoke_access_by_id(self, mapping_id):
+        """Like revoke_access, but uses the mapping id instead."""
