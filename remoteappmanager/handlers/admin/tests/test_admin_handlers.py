@@ -56,13 +56,13 @@ class TestContainersHandler(TestBaseAccess):
     body_string = "datatable"
 
 
-class TestUserApplicationsHandler(TestBaseAccess):
-    url = "/user/username/users/0/"
+class TestAccountingHandler(TestBaseAccess):
+    url = "/user/username/users/0/accounting/"
     body_string = "datatable"
 
     def test_unknown_id(self):
         self._app.db.unexistent_user_id = 123422
-        res = self.fetch("/user/username/users/123422/",
+        res = self.fetch("/user/username/users/123422/accounting/",
                          headers={
                              "Cookie": "jupyter-hub-token-username=foo"
                          })

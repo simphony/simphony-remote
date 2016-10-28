@@ -123,6 +123,9 @@ class DummyDBAccounting(interfaces.ABCAccounting):
                       allow_home, allow_view, volume):
         raise exceptions.UnsupportedOperation()  # pragma: no cover
 
+    def revoke_access_by_id(self, mapping_id):
+        raise exceptions.UnsupportedOperation()  # pragma: no cover
+
 
 def create_reverse_proxy(params=None,
                          register_result='',
