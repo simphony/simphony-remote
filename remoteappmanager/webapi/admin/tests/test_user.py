@@ -55,8 +55,8 @@ class TestUser(WebAPITestCase):
     def test_unable_to_create(self):
         with mock.patch("remoteappmanager.tests.mocking."
                         "dummy.DummyDBAccounting.create_user"
-                        ) as mock_create_app:
-            mock_create_app.side_effect = UnsupportedOperation()
+                        ) as mock_create_user:
+            mock_create_user.side_effect = UnsupportedOperation()
             self.post("/user/username/api/v1/users/",
                       {"name": "foobar"},
                       httpstatus.INTERNAL_SERVER_ERROR)

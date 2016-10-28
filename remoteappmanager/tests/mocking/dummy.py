@@ -1,3 +1,4 @@
+import uuid
 from collections import namedtuple
 
 from remoteappmanager.services.hub import Hub
@@ -90,7 +91,7 @@ class DummyDBAccounting(interfaces.ABCAccounting):
         return self.users.values()
 
     def create_application(self, app_name):  # pragma: no cover
-        if app_name in [a.image for a in self.list_applications()]:
+        if self._get_application_id_by_name(app_name) is not None:
             raise exceptions.Exists()
 
         id = len(self.applications)
@@ -99,10 +100,9 @@ class DummyDBAccounting(interfaces.ABCAccounting):
 
     def remove_application(self, *,
                            app_name=None, id=None):  # pragma: no cover
+
         if app_name is not None:
-            app = [a for a in self.applications.values()
-                   if a.image == app_name]
-            id = app[0] if len(app) else None
+            id = self._get_application_id_by_name(app_name)
 
         if id is None:
             raise exceptions.NotFound()
@@ -117,14 +117,38 @@ class DummyDBAccounting(interfaces.ABCAccounting):
 
     def grant_access(self, app_name, user_name,
                      allow_home, allow_view, volume):
-        raise exceptions.UnsupportedOperation()  # pragma: no cover
+        app = self._get_application_id_by_name(app_name)
+        user = self._get_user_id_by_name(user_name)
+
+        source, target, mode = volume.split(':')
+        policy = DummyDBApplicationPolicy(allow_home, allow_view, False,
+                                          source, target, mode)
+
+        self.policies[len(self.policies)] = policy
+        id = str(uuid.uuid4().hex)
+        self.accounting[id] = (user, app, policy)
+
+        return id
 
     def revoke_access(self, app_name, user_name,
                       allow_home, allow_view, volume):
-        raise exceptions.UnsupportedOperation()  # pragma: no cover
+        pass
 
     def revoke_access_by_id(self, mapping_id):
-        raise exceptions.UnsupportedOperation()  # pragma: no cover
+        try:
+            del self.accounting[mapping_id]
+        except KeyError:
+            raise exceptions.NotFound()
+
+    def _get_application_id_by_name(self, app_name):
+        app = [a for a in self.applications.values()
+               if a.image == app_name]
+        return app[0] if len(app) else None
+
+    def _get_user_id_by_name(self, user_name):
+        user = [u for u in self.users.values()
+                if u.name == user_name]
+        return user[0] if len(user) else None
 
 
 def create_reverse_proxy(params=None,
