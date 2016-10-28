@@ -30,7 +30,7 @@
     <tr>
       <td>{{ r.mapping_id|truncate(12) }}</td>
       <td>{{ r.app.image }}</td>
-      <td class="dt-center">{% if r.policy.allow_home %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</td>
+      <td class="dt-center">{% if r.policy.allow_home %}<i class="fa fa-check" aria-hidden="true"></i>{% endif %}</td>
       <td>{{ r.policy.volume_source|default('', true) }}</td>
       <td>{{ r.policy.volume_target|default('', true) }}</td>
       <td class="dt-center">{% if r.policy.volume_mode == 'ro' %}<i class="fa fa-check" aria-hidden="true"></i>{% endif %}</td>
