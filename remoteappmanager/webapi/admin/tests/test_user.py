@@ -37,12 +37,12 @@ class TestUser(WebAPITestCase):
 
     def test_create(self):
         self.post("/user/username/api/v1/users/",
-                        {"name": ""},
-                        httpstatus.BAD_REQUEST)
+                  {"name": ""},
+                  httpstatus.BAD_REQUEST)
 
         self.post("/user/username/api/v1/users/",
-                        {},
-                        httpstatus.BAD_REQUEST)
+                  {},
+                  httpstatus.BAD_REQUEST)
 
         self.post("/user/username/api/v1/users/",
                   {"name": "foobar"},
@@ -65,8 +65,7 @@ class TestUser(WebAPITestCase):
         self._app.hub.verify_token.return_value = {}
 
         self.delete("/user/username/api/v1/users/0/",
-                    httpstatus.BAD_REQUEST)
+                    httpstatus.NOT_FOUND)
 
     def cookie_auth_token(self):
         return "jupyter-hub-token-username=username"
-

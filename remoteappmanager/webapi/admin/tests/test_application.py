@@ -57,7 +57,7 @@ class TestApplication(WebAPITestCase):
         self._app.hub.verify_token.return_value = {}
 
         self.delete("/user/username/api/v1/applications/0/",
-                    httpstatus.BAD_REQUEST)
+                    httpstatus.NOT_FOUND)
 
     def cookie_auth_token(self):
         return "jupyter-hub-token-username=username"

@@ -1,18 +1,13 @@
-from tornado import escape
-
-from remoteappmanager.tests.webapi_test_case import WebAPITestCase
 from tornadowebapi.authenticator import NullAuthenticator
 from tornadowebapi.http import httpstatus
 
+from remoteappmanager.tests.webapi_test_case import WebAPITestCase
 from remoteappmanager.docker.container import Container as DockerContainer
 from remoteappmanager.tests.mocking import dummy
-from remoteappmanager.tests.temp_mixin import TempMixin
-from remoteappmanager.tests.utils import (
-    AsyncHTTPTestCase,
-    mock_coro_factory)
+from remoteappmanager.tests.utils import mock_coro_factory
 
 
-class TestContainer(TempMixin, WebAPITestCase):
+class TestContainer(WebAPITestCase):
     def get_app(self):
         app = dummy.create_admin_application()
         app.hub.verify_token.return_value = {
@@ -56,18 +51,11 @@ class TestContainer(TempMixin, WebAPITestCase):
         self.delete("/user/username/api/v1/containers/found/",
                     httpstatus.NO_CONTENT)
 
-    def test_post_failed_auth(self):
-        self._app.hub.verify_token.return_value = {}
-
-        self.post("/user/username/api/v1/containers/",
-                  {"mapping_id": "12345"},
-                  httpstatus.BAD_REQUEST)
-
     def cookie_auth_token(self):
         return "jupyter-hub-token-username=username"
 
 
-class TestContainerNoUser(TempMixin, AsyncHTTPTestCase):
+class TestContainerNoUser(WebAPITestCase):
     def get_app(self):
         app = dummy.create_admin_application()
         app.registry.authenticator = NullAuthenticator

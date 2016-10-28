@@ -45,20 +45,18 @@ class TestContainer(WebAPITestCase):
             manager.start_container = mock_coro_factory(DockerContainer(
                 url_id="3456"
             ))
-            res = self.post(dict(
+            res = self.post(
+                "/user/username/api/v1/containers/",
+                dict(
                     mapping_id="mapping_id",
                     configurables={
                         "resolution": {
                             "resolution": "1024x768"
                         }
                     }
-                ))
-
-            self.assertEqual(res.code, httpstatus.CREATED)
-
-            # The port is random due to testing env. Check if it's absolute
-            self.assertIn("http://", res.headers["Location"])
-            self.assertIn("/api/v1/containers/3456/", res.headers["Location"])
+                ),
+                httpstatus.CREATED
+            )
 
     def test_create_fails(self):
         with patch("remoteappmanager"
@@ -70,7 +68,7 @@ class TestContainer(WebAPITestCase):
 
             self._app.container_manager.stop_and_remove_container = \
                 mock_coro_factory()
-            _ , data = self.post(
+            _, data = self.post(
                 "/user/username/api/v1/containers/",
                 dict(
                     mapping_id="mapping_id",
@@ -293,7 +291,7 @@ class TestContainer(WebAPITestCase):
 
         self.post("/user/username/api/v1/containers/",
                   {"mapping_id": "12345"},
-                  httpstatus.BAD_REQUEST)
+                  httpstatus.NOT_FOUND)
 
     def cookie_auth_token(self):
         return "jupyter-hub-token-username=username"
