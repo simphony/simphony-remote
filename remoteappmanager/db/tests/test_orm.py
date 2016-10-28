@@ -382,6 +382,25 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
 
         self.assertEqual(len(accounting.get_apps_for_user(user)), 0)
 
+    def test_revoke_by_id(self):
+        accounting = self.create_accounting()
+
+        accounting.create_user("ciccio")
+        accounting.create_application("simphonyremote/amazing")
+        id = accounting.grant_access("simphonyremote/amazing", "ciccio",
+                                     True, False, None)
+
+        user = accounting.get_user(user_name="ciccio")
+        apps = accounting.get_apps_for_user(user)
+        self.assertEqual(len(apps), 1)
+        self.assertIsNotNone(id)
+
+        accounting.revoke_access_by_id(id)
+        user = accounting.get_user(user_name="ciccio")
+        apps = accounting.get_apps_for_user(user)
+        self.assertEqual(len(apps), 0)
+
+
     def test_unsupported_ops(self):
         """Override to silence the base class assumption that most of
         our backends are unable to create."""
