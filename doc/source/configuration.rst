@@ -20,6 +20,26 @@ Please refer to :py:mod:`remoteappmanager.jupyterhub.spawners` for the available
 in this project.
 
 
+Configure the authenticator and the admin user
+----------------------------------------------
+
+Different authenticators can be plugged into jupyterhub. In the configuration
+file, the following entry will change the authenticator::
+
+     c.JupyterHub.authenticator_class = ('remoteappmanager.jupyterhub.auth.WorldAuthenticator')
+
+`WorldAuthenticator` will allow any user to pass authentication. Use this
+authenticator only for testing purposes.
+
+Administration capabilities are decided by jupyterhub, not remoteappmanager.
+`jupyterhub_config.py` allows to setup admin users with the following entry::
+
+    c.Authenticator.admin_users = {"admin"}
+
+Note that the entry must be a python set. Users in this set will, once logged
+in, reach an administrative interface, instead of the docker application
+management.
+
 .. _config_remoteappmanager:
 
 Configure the remoteappmanager

@@ -11,6 +11,7 @@ This documentation is for simphony-remote |version| (|release|)
 
    deployment
    configuration
+   administration
    utilities
    design
    developer

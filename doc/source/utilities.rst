@@ -6,13 +6,16 @@ Utilities
 Simphony remote comes with two utility scripts:
 
   - *remoteappdb*: Allows to add new applications, create new users, and
-    specify permissions between users and applications in a database. 
-    It is targeted at system administrators.
+    specify permissions between users and applications in a database from
+    the command line. It is targeted at system administrators. 
   - *remoteapprest*: Allows to start, stop, inquire running containers
     from the command line.
 
 Remoteappdb
 -----------
+
+**Note: As of version 0.9.0 the management functionality of this utility is
+also covered by the administrative web interface.**
 
 The script is aimed at system administrators using the database (by default,
 a sqlite database) to perform accounting of users and applications.
