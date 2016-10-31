@@ -16,7 +16,7 @@ requirements = [
     "jupyter_client>=4.3.0",
     "click>=6.6",
     "tabulate>=0.7.5",
-    "tornadowebapi>=0.4.1"
+    "tornadowebapi>=0.4.2"
 ]
 
 # Unfortunately RTD cannot install jupyterhub because jupyterhub needs bower,
