@@ -68,6 +68,9 @@ class Accounting(ABCAccounting):
                       allow_home, allow_view, volume):
         raise exceptions.UnsupportedOperation()
 
+    def revoke_access_by_id(self, mapping_id):
+        raise exceptions.UnsupportedOperation()
+
 
 class TestDatabaseInterface(ABCTestDatabaseInterface, unittest.TestCase):
     def setUp(self):

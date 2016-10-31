@@ -263,10 +263,7 @@ class AppAccounting(ABCAccounting):
 
         with detached_session(self.db) as session:
             with transaction(session):
-                user = session.query(User).filter(filter).one_or_none()
-
-                if user:
-                    session.delete(user)
+                session.query(User).filter(filter).delete()
 
     def list_users(self):
         with detached_session(self.db) as session:
@@ -298,10 +295,7 @@ class AppAccounting(ABCAccounting):
 
         with detached_session(self.db) as session:
             with transaction(session):
-                app = session.query(Application).filter(filter).one_or_none()
-
-                if app:
-                    session.delete(app)
+                session.query(Application).filter(filter).delete()
 
     def list_applications(self):
         with detached_session(self.db) as session:
@@ -404,6 +398,13 @@ class AppAccounting(ABCAccounting):
                 Accounting.user == orm_user,
                 Accounting.application_policy == orm_policy,
                 ).delete()
+
+    def revoke_access_by_id(self, mapping_id):
+        with detached_session(self.db) as session, \
+                transaction(session):
+                session.query(Accounting).filter(
+                    Accounting.id == mapping_id
+                    ).delete()
 
 
 @contextlib.contextmanager

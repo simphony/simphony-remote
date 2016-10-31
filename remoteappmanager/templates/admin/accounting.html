@@ -1,0 +1,91 @@
+{% extends "admin/page.html" %}
+
+
+{% block center %}
+  <div class="container adminslab">
+    <div class="row">
+        <div class="col-lg-5">
+            <h3>User applications - {{ user.name }}</h3>
+        </div>
+        <div class="col-lg-1">
+            <button class="btn btn-primary createnew"
+                    data-toggle="modal"
+                    data-target="#create-new-policy-dialog">Create New</button>
+        </div>
+    </div>
+  <table id="datatable" class="display">
+    <thead>
+      <tr>
+        <th>Mapping ID</th>
+        <th>Application</th>
+        <th>Workspace</th>
+        <th>Vol. source</th>
+        <th>Vol. target</th>
+        <th>Readonly</th>
+        <th>Remove</th>
+      </tr>
+    </thead>
+    <tbody>
+  {% for r in info %}
+    <tr>
+      <td>{{ r.mapping_id|truncate(12) }}</td>
+      <td>{{ r.app.image }}</td>
+      <td class="dt-center">{% if r.policy.allow_home %}<i class="fa fa-check" aria-hidden="true"></i>{% endif %}</td>
+      <td>{{ r.policy.volume_source|default('', true) }}</td>
+      <td>{{ r.policy.volume_target|default('', true) }}</td>
+      <td class="dt-center">{% if r.policy.volume_mode == 'ro' %}<i class="fa fa-check" aria-hidden="true"></i>{% endif %}</td>
+      <td><button class="btn btn-danger"
+                  data-value="{{ r.mapping_id }}"
+                  data-name="{{ r.mapping_id }}"
+                  data-toggle="modal"
+                  data-target="#action-dialog">Remove</button></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+  </table>
+  </div>
+{% endblock %}
+
+{% block dialogs %}
+    {% call modal('Action', btn_label='OK') %}
+    {% endcall %}
+    {% call modal('Create New Policy', btn_label='OK', btn_class="btn-primary", buttons_dismiss=false) %}
+        <form>
+          <input type="hidden" id="user_name" value="{{ user.name }}">
+          <div class="form-group">
+            <label for="image_name">App image name</label>
+            <input type="text" class="form-control" id="image_name">
+            <div class="alert alert-danger" role="alert" id="image_name_alert">Error</div>
+          </div>
+          <h4>Mount options</h4>
+          <div class="form-group">
+              <label>
+                <input type="checkbox" id="allow_home" /> Mount home as Workspace
+              </label>
+          </div>
+          <div class="form-group">
+              <label for="volume_source">Volume Source</label>
+              <input type="text" class="form-control" id="volume_source" placeholder="/local/path"/>
+              <div class="alert alert-danger" role="alert" id="volume_source_alert">Error</div>
+          </div>
+          <div class="form-group">
+              <label for="volume_target">Volume Target</label>
+              <input type="text" class="form-control" id="volume_target" placeholder="/container/path"/>
+              <div class="alert alert-danger" role="alert" id="volume_target_alert">Error</div>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="volume_readonly" /> Mount volume readonly
+            </label>
+          </div>
+        </form>
+    {% endcall %}
+{% endblock %}
+
+{% block script_init %}
+    {{ super() }}
+        <script type="text/javascript">
+            require(["admin/tabular/controller"]);
+            require(["admin/accounting/controller"]);
+        </script>
+{% endblock %}
