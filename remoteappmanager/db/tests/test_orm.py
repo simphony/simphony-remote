@@ -400,6 +400,9 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
         apps = accounting.get_apps_for_user(user)
         self.assertEqual(len(apps), 0)
 
+        # Id not present, should do nothing
+        accounting.revoke_access_by_id(3441)
+
     def test_unsupported_ops(self):
         """Override to silence the base class assumption that most of
         our backends are unable to create."""
