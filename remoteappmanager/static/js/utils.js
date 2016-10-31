@@ -126,6 +126,11 @@ define([
 
     var config_dialog = function(dialog_element, title, body, ok_callback, close_callback) {
         var modal = $(dialog_element);
+        
+        // Remove possible already existing handlers
+        modal.find('.modal-footer .primary').off("click");
+        modal.find('.modal-close').off("click");
+        
         if (title !== null) {
             modal.find('.modal-title').text(title);
         }
