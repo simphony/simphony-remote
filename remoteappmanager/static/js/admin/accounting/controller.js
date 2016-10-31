@@ -68,7 +68,7 @@ define([
                 } else {
                     volume_mode = "rw";
                 }
-                rep.volume_string = volume_source+":"+volume_target+":"+volume_mode;
+                rep.volume = volume_source+":"+volume_target+":"+volume_mode;
             }
 
             dialog.modal('hide');
