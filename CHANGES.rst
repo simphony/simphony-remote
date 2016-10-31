@@ -23,11 +23,15 @@ Summary
 - Moved JupyterHub support classes to specific subpackage (#298)
 - Introduced authenticated decorator for resources that does not 
   perform redirection like web.authenticated (#294)
+- Pinned requirements to specific versions (#289)
+- UI:
+  - Added fading in effect when applications are shown
 - Refactoring:
   - Extracted volume string parsing routine (#303)
   - Extracted base application object (#301)
   - Extracted base spawner (#300)
   - remoteappmanager entry point is now part of the CLI package (#299)
+  - Removed test setting of PROXY_API_TOKEN (#288)
 - Security Fix:
     - Prevent another user to stop another user's container through its
       url_id (#310)
