@@ -25,7 +25,7 @@ class TestApplication(WebAPITestCase):
                     httpstatus.NOT_FOUND)
 
         self.delete("/user/username/api/v1/applications/foo/",
-                    httpstatus.BAD_REQUEST)
+                    httpstatus.NOT_FOUND)
 
     def test_unable_to_delete(self):
         with mock.patch("remoteappmanager.tests.mocking."

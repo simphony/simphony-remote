@@ -12,6 +12,15 @@ from remoteappmanager.webapi.decorators import authenticated
 
 
 class Container(Resource):
+
+    def validate_representation(self, representation):
+        try:
+            representation["mapping_id"]
+        except KeyError:
+            raise exceptions.BadRequest(message="missing mapping_id")
+
+        return representation
+
     @gen.coroutine
     @authenticated
     def create(self, representation):
@@ -21,10 +30,7 @@ class Container(Resource):
         if self.current_user is None:
             raise NotFound()
 
-        try:
-            mapping_id = representation["mapping_id"]
-        except KeyError:
-            raise exceptions.BadRequest(message="missing mapping_id")
+        mapping_id = representation["mapping_id"]
 
         webapp = self.application
         account = self.current_user.account

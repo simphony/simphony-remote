@@ -8,22 +8,25 @@ from remoteappmanager.db import exceptions as db_exceptions
 
 
 class Application(Resource):
-    def validate(self, representation):
+    def validate_representation(self, representation):
         representation["image_name"] = str(representation["image_name"])
+        if len(representation["image_name"]) == 0:
+            raise ValueError("image_name cannot be empty")
+
+        return representation
+
+    def validate_identifier(self, identifier):
+        return int(identifier)
 
     @gen.coroutine
     @authenticated
     def delete(self, identifier):
         """Removes the application."""
         db = self.application.db
-        try:
-            id = int(identifier)
-        except ValueError:
-            raise exceptions.BadRequest("id")
 
         try:
-            db.remove_application(id=id)
-            self.log.info("Removed application with id {}".format(id))
+            db.remove_application(id=identifier)
+            self.log.info("Removed application with id {}".format(identifier))
         except db_exceptions.NotFound:
             raise exceptions.NotFound()
         except db_exceptions.UnsupportedOperation:
