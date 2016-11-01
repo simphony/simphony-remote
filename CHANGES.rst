@@ -7,8 +7,34 @@ What's new in SimPhoNy Remote 0.9.0
 Summary
 ~~~~~~~
 
-- Remoteappdb now accepts the database path as a mandatory argument
-
+- Administrative Web interface (#284)
+- Introduced runtime label namespace to differentiate labels added by the docker
+  build process from those added at startup (#292)
+- The associated absolute URL path is now attached to the running container in a
+  runtime label (#311)
+- Remoteappdb now accepts the database path as a mandatory argument, instead of
+  an option entry (#291)
+- Accounting interface change: User can now be obtained by user name or id. (#308)
+- Accounting interface change: Extended accounting to perform administrative actions (#304)
+- Docker container object now provides the user that started the container (#302)
+- Web API resources are now under webapi, instead of restresources (#317)
+- Upgraded dependency to tornado WebAPI 0.4.0 (#328)
+- Cleanup of WebAPI testing (#324) JavaScript (#320), stale code (#319)
+- Moved JupyterHub support classes to specific subpackage (#298)
+- Introduced authenticated decorator for resources that does not 
+  perform redirection like web.authenticated (#294)
+- Pinned requirements to specific versions (#289)
+- UI:
+  - Added fading in effect when applications are shown
+- Refactoring:
+  - Extracted volume string parsing routine (#303)
+  - Extracted base application object (#301)
+  - Extracted base spawner (#300)
+  - remoteappmanager entry point is now part of the CLI package (#299)
+  - Removed test setting of PROXY_API_TOKEN (#288)
+- Security Fix:
+    - Prevent another user to stop another user's container through its
+      url_id (#310)
 
 What's new in SimPhoNy Remote 0.8.0
 -----------------------------------
