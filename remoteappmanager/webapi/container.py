@@ -15,7 +15,7 @@ class Container(Resource):
         try:
             representation["mapping_id"]
         except KeyError:
-            raise exceptions.BadRequest(message="missing mapping_id")
+            raise exceptions.BadRepresentation(message="missing mapping_id")
 
         return representation
 
@@ -40,19 +40,20 @@ class Container(Resource):
         if not choice:
             self.log.warning("Could not find resource "
                              "for mapping id {}".format(mapping_id))
-            raise exceptions.BadRequest(message="unrecognized mapping_id")
+            raise exceptions.BadRepresentation(
+                message="unrecognized mapping_id")
 
         _, app, policy = choice[0]
 
         image = yield container_manager.image(app.image)
         if image is None:
-            raise exceptions.BadRequest(message="unrecognized image")
+            raise exceptions.BadRepresentation(message="unrecognized image")
 
         try:
             environment = self._environment_from_configurables(image,
                                                                representation)
         except Exception:
-            raise exceptions.BadRequest(message="invalid configurables")
+            raise exceptions.BadRepresentation(message="invalid configurables")
 
         # Everything is fine. Start and wait for the container to come online.
         try:
