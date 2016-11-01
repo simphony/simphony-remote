@@ -206,7 +206,7 @@ class TestContainer(WebAPITestCase):
         )
 
         self.assertEqual(data,
-                         {"type": "BadRequest",
+                         {"type": "BadRepresentation",
                           "message": "missing mapping_id"})
 
     def test_create_fails_for_invalid_mapping_id(self):
@@ -217,7 +217,7 @@ class TestContainer(WebAPITestCase):
         )
 
         self.assertEqual(data,
-                         {"type": "BadRequest",
+                         {"type": "BadRepresentation",
                           "message": "unrecognized mapping_id"})
 
     def test_retrieve(self):

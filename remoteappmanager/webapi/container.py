@@ -4,7 +4,6 @@ from datetime import timedelta
 from tornado import gen
 
 from tornadowebapi import exceptions
-from tornadowebapi.exceptions import NotFound
 from tornadowebapi.resource import Resource
 
 from remoteappmanager.netutils import wait_for_http_server_2xx
@@ -12,19 +11,22 @@ from remoteappmanager.webapi.decorators import authenticated
 
 
 class Container(Resource):
+    def validate_representation(self, representation):
+        try:
+            representation["mapping_id"]
+        except KeyError:
+            raise exceptions.BadRepresentation(message="missing mapping_id")
+
+        return representation
+
     @gen.coroutine
     @authenticated
     def create(self, representation):
         """Create the container.
         The representation should accept the application mapping id we
         want to start"""
-        if self.current_user is None:
-            raise NotFound()
 
-        try:
-            mapping_id = representation["mapping_id"]
-        except KeyError:
-            raise exceptions.BadRequest(message="missing mapping_id")
+        mapping_id = representation["mapping_id"]
 
         webapp = self.application
         account = self.current_user.account
@@ -38,19 +40,20 @@ class Container(Resource):
         if not choice:
             self.log.warning("Could not find resource "
                              "for mapping id {}".format(mapping_id))
-            raise exceptions.BadRequest(message="unrecognized mapping_id")
+            raise exceptions.BadRepresentation(
+                message="unrecognized mapping_id")
 
         _, app, policy = choice[0]
 
         image = yield container_manager.image(app.image)
         if image is None:
-            raise exceptions.BadRequest(message="unrecognized image")
+            raise exceptions.BadRepresentation(message="unrecognized image")
 
         try:
             environment = self._environment_from_configurables(image,
                                                                representation)
         except Exception:
-            raise exceptions.BadRequest(message="invalid configurables")
+            raise exceptions.BadRepresentation(message="invalid configurables")
 
         # Everything is fine. Start and wait for the container to come online.
         try:

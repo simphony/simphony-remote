@@ -11,7 +11,7 @@ from remoteappmanager.db import exceptions as db_exceptions
 class Accounting(Resource):
     __collection_name__ = "accounting"
 
-    def validate(self, representation):
+    def validate_representation(self, representation):
         representation["user_name"] = _not_empty_str(
             representation["user_name"])
         representation["image_name"] = _not_empty_str(
@@ -23,6 +23,7 @@ class Accounting(Resource):
             representation["volume"] = _not_empty_str(
                 representation["volume"])
             parse_volume_string(representation["volume"])
+        return representation
 
     @gen.coroutine
     @authenticated
@@ -44,11 +45,11 @@ class Accounting(Resource):
 
     @gen.coroutine
     @authenticated
-    def delete(self, id):
+    def delete(self, identifier):
         db = self.application.db
 
         try:
-            db.revoke_access_by_id(id)
+            db.revoke_access_by_id(identifier)
         except db_exceptions.NotFound:
             raise exceptions.NotFound()
 
