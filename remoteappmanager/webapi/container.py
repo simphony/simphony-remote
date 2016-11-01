@@ -4,7 +4,6 @@ from datetime import timedelta
 from tornado import gen
 
 from tornadowebapi import exceptions
-from tornadowebapi.exceptions import NotFound
 from tornadowebapi.resource import Resource
 
 from remoteappmanager.netutils import wait_for_http_server_2xx
@@ -12,7 +11,6 @@ from remoteappmanager.webapi.decorators import authenticated
 
 
 class Container(Resource):
-
     def validate_representation(self, representation):
         try:
             representation["mapping_id"]
@@ -27,8 +25,6 @@ class Container(Resource):
         """Create the container.
         The representation should accept the application mapping id we
         want to start"""
-        if self.current_user is None:
-            raise NotFound()
 
         mapping_id = representation["mapping_id"]
 

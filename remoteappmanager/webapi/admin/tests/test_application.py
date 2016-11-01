@@ -53,6 +53,15 @@ class TestApplication(WebAPITestCase):
                       {"image_name": "foobar"},
                       httpstatus.INTERNAL_SERVER_ERROR)
 
+    def test_create_invalid_representation(self):
+        self.post("/user/username/api/v1/applications/",
+                  {"image_name": ""},
+                  httpstatus.BAD_REQUEST)
+
+        self.post("/user/username/api/v1/applications/",
+                  {},
+                  httpstatus.BAD_REQUEST)
+
     def test_delete_failed_auth(self):
         self._app.hub.verify_token.return_value = {}
 
