@@ -129,6 +129,9 @@ define(['jquery', 'utils'], function ($, utils) {
                         promise.resolve(data);
                     });
             
+            })
+            .fail(function() {
+                promise.resolve([]);
             });
                 
         return promise;
