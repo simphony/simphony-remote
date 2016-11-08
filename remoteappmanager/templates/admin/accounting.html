@@ -47,9 +47,9 @@
 {% endblock %}
 
 {% block dialogs %}
-    {% call modal('Action', btn_label='OK') %}
+    {% call macros.modal_dlg('Action', btn_label='OK') %}
     {% endcall %}
-    {% call modal('Create New Policy', btn_label='OK', btn_class="btn-primary", buttons_dismiss=false) %}
+    {% call macros.modal_dlg('Create New Policy', btn_label='OK', btn_class="btn-primary", buttons_dismiss=false) %}
         <form>
           <input type="hidden" id="user_name" value="{{ user.name }}">
           <div class="form-group">

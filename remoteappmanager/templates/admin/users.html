@@ -42,9 +42,9 @@
 {% endblock %}
 
 {% block dialogs %}
-    {% call modal('Action', btn_label='OK') %}
+    {% call macros.modal_dlg('Action', btn_label='OK') %}
     {% endcall %}
-    {% call modal('Create New', btn_label='OK', btn_class="btn-primary", buttons_dismiss=false) %}
+    {% call macros.modal_dlg('Create New', btn_label='OK', btn_class="btn-primary", buttons_dismiss=false) %}
         <form>
             <label for="user-name">User name</label>
             <input type="text" class="form-control" id="user-name">
