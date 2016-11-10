@@ -13,29 +13,20 @@
                     data-target="#create-new-dialog">Create New</button>
         </div>
     </div>
-  <table id="datatable" class="display dataTable">
-    <thead>
-      <tr>
-          <th>ID</th>
-          <th>Image</th>
-          <th>Remove</th>
-      </tr>
-    </thead>
-    <tbody>
-  {% for a in applications %}
-    <tr>
-        <td>{{ a.id }}</td>
-        <td>{{ a.image }}</td>
-        <td><button
-                class="btn btn-danger"
-                data-value="{{ a.id }}"
-                data-name="{{ a.image }}"
-                data-toggle="modal"
-                data-target="#action-dialog">Remove</button></td>
-    </tr>
-  {% endfor %}
-  </tbody>
-  </table>
+    {% call macros.table([ "ID", "Image", "Remove"]) %}
+      {% for a in applications %}
+        <tr>
+            <td>{{ a.id }}</td>
+            <td>{{ a.image }}</td>
+            <td><button
+                    class="btn btn-danger"
+                    data-value="{{ a.id }}"
+                    data-name="{{ a.image }}"
+                    data-toggle="modal"
+                    data-target="#action-dialog">Remove</button></td>
+        </tr>
+      {% endfor %}
+    {% endcall %}
   </div>
 {% endblock %}
 

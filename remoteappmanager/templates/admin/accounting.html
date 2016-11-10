@@ -13,36 +13,24 @@
                     data-target="#create-new-policy-dialog">Create New</button>
         </div>
     </div>
-  <table id="datatable" class="display dataTable">
-    <thead>
-      <tr>
-        <th>Mapping ID</th>
-        <th>Application</th>
-        <th>Workspace</th>
-        <th>Vol. source</th>
-        <th>Vol. target</th>
-        <th>Readonly</th>
-        <th>Remove</th>
-      </tr>
-    </thead>
-    <tbody>
-  {% for r in info %}
-    <tr>
-      <td>{{ r.mapping_id|truncate(12) }}</td>
-      <td>{{ r.app.image }}</td>
-      <td class="dt-center">{% if r.policy.allow_home %}<i class="fa fa-check" aria-hidden="true"></i>{% endif %}</td>
-      <td>{{ r.policy.volume_source|default('', true) }}</td>
-      <td>{{ r.policy.volume_target|default('', true) }}</td>
-      <td class="dt-center">{% if r.policy.volume_mode == 'ro' %}<i class="fa fa-check" aria-hidden="true"></i>{% endif %}</td>
-      <td><button class="btn btn-danger"
-                  data-value="{{ r.mapping_id }}"
-                  data-name="{{ r.mapping_id }}"
-                  data-toggle="modal"
-                  data-target="#action-dialog">Remove</button></td>
-    </tr>
-  {% endfor %}
-  </tbody>
-  </table>
+    {% call macros.table([ "Mapping ID", "Application", "Workspace", "Vol. source",
+                           "Vol. target", "Readonly", "Remove"]) %}
+      {% for r in info %}
+        <tr>
+          <td>{{ r.mapping_id|truncate(12) }}</td>
+          <td>{{ r.app.image }}</td>
+          <td class="dt-center">{% if r.policy.allow_home %}<i class="fa fa-check" aria-hidden="true"></i>{% endif %}</td>
+          <td>{{ r.policy.volume_source|default('', true) }}</td>
+          <td>{{ r.policy.volume_target|default('', true) }}</td>
+          <td class="dt-center">{% if r.policy.volume_mode == 'ro' %}<i class="fa fa-check" aria-hidden="true"></i>{% endif %}</td>
+          <td><button class="btn btn-danger"
+                      data-value="{{ r.mapping_id }}"
+                      data-name="{{ r.mapping_id }}"
+                      data-toggle="modal"
+                      data-target="#action-dialog">Remove</button></td>
+        </tr>
+      {% endfor %}
+    {% endcall %}
   </div>
 {% endblock %}
 

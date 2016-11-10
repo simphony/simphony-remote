@@ -20,3 +20,18 @@
   </div>
 {% endmacro %}
 
+{% macro table(headers) %}
+  <table id="datatable" class="display dataTable">
+    <thead>
+    <tr>
+      {% for header in headers %}
+        <th>{{ header }}</th>
+      {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+      {{ caller() }}
+    </tbody>
+  </table>
+  </div>
+{% endmacro %}
