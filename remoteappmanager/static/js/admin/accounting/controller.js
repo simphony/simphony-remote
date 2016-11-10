@@ -74,7 +74,7 @@ define([
             
             resources.Accounting.create(rep)
                 .done(function() { window.location.reload(); })
-                .fail(dialogs.error);
+                .fail(dialogs.webapi_error_dialog);
         };
 
         var cancel_callback = function () {
@@ -111,7 +111,7 @@ define([
             function() {
                 resources.Accounting.delete(id)
                    .done(function() { window.location.reload(); })
-                    .fail(dialogs.error);
+                    .fail(dialogs.webapi_error_dialog);
             }
         );
     });

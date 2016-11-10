@@ -18,7 +18,7 @@ require([
             function () {
                 resources.Container.delete(url_id)
                     .done(function () { window.location.reload(); })
-                    .fail(dialogs.ajax_error_dialog);
+                    .fail(dialogs.webapi_error_dialog);
             }
         );
     });

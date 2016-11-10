@@ -19,7 +19,7 @@ require([
             dialog.modal('hide');
             resources.Application.create({ image_name: image_name })
                 .done(function() { window.location.reload(); })
-                .fail(dialogs.ajax_error_dialog);
+                .fail(dialogs.webapi_error_dialog);
         };
         
         var cancel_callback = function () {
@@ -57,7 +57,7 @@ require([
             function() {
                 resources.Application.delete(id)
                     .done(function() { window.location.reload(); })
-                    .fail(dialogs.ajax_error_dialog);
+                    .fail(dialogs.webapi_error_dialog);
             }
         );
     });
