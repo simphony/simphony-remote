@@ -1,9 +1,9 @@
 define([
     "jquery",
     "bootstrap",   // needed for modal operations.
-    "utils",
+    "dialogs",
     "jsapi/v1/resources"
-], function ($, bootstrap, utils, resources) {
+], function ($, bootstrap, dialogs, resources) {
     "use strict";
     var base_url = window.apidata.base_url;
 
@@ -20,7 +20,7 @@ define([
             dialog.modal('hide');
             resources.User.create({ name: user_name })
                 .done(function() { window.location.reload(); })
-                .fail(utils.ajax_error_dialog);
+                .fail(dialogs.ajax_error_dialog);
         };
 
         var cancel_callback = function () {
@@ -32,7 +32,7 @@ define([
             ok_callback();
         });
 
-        utils.config_dialog(
+        dialogs.config_dialog(
             dialog,
             null,
             null,
@@ -50,7 +50,7 @@ define([
         var id = button.data('value');
         var name = button.data('name');
         var dialog = $(this);
-        utils.config_dialog(
+        dialogs.config_dialog(
             dialog,
             'Remove ' + name + "?",
             "Do you want to remove user " + name + "? " +
@@ -58,7 +58,7 @@ define([
             function() {
                 resources.User.delete(id)
                     .done(function() { window.location.reload(); })
-                    .fail(utils.ajax_error_dialog);
+                    .fail(dialogs.ajax_error_dialog);
             }
         );
     });

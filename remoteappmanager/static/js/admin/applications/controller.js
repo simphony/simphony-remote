@@ -1,9 +1,9 @@
 require([
     "jquery",
     "bootstrap",   // needed for modal operations.
-    "utils",
+    "dialogs",
     "jsapi/v1/resources"
-], function ($, bootstrap, utils, resources) {
+], function ($, bootstrap, dialogs, resources) {
     "use strict";
     var base_url = window.apidata.base_url;
 
@@ -20,7 +20,7 @@ require([
             dialog.modal('hide');
             resources.Application.create({ image_name: image_name })
                 .done(function() { window.location.reload(); })
-                .fail(utils.ajax_error_dialog);
+                .fail(dialogs.ajax_error_dialog);
         };
         
         var cancel_callback = function () {
@@ -32,7 +32,7 @@ require([
             ok_callback();
         });
 
-        utils.config_dialog(
+        dialogs.config_dialog(
             dialog,
             null,
             null,
@@ -50,7 +50,7 @@ require([
         var id = button.data('value');
         var name = button.data('name');
         var dialog = $(this);
-        utils.config_dialog(
+        dialogs.config_dialog(
             dialog,
             'Remove ' + name + "?",
             "Do you want to remove application " + name + "? " +
@@ -58,7 +58,7 @@ require([
             function() {
                 resources.Application.delete(id)
                     .done(function() { window.location.reload(); })
-                    .fail(utils.ajax_error_dialog);
+                    .fail(dialogs.ajax_error_dialog);
             }
         );
     });
