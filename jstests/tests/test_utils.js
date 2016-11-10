@@ -2,7 +2,15 @@ define([
 	"utils"
 ], function (utils) {
 	QUnit.module("Utils");
-	QUnit.test("url_path_join", function (assert) { 
-        assert.equal(utils.url_path_join("foo", "bar", "baz"), "foo/bar/baz");
+	QUnit.test("update", function (assert) {
+		var o1 = {"foo": "bar"};
+		var o2 = {"bar": "baz"};
+		
+		utils.update(o1, o2);
+		
+        assert.deepEqual(o1, {
+			"foo": "bar",
+			"bar": "baz"
+		});
 	});
 });
