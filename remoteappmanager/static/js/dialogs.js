@@ -15,7 +15,7 @@ define([
             msg = "Unknown error";
         }
         var dialog = $("#error-dialog");
-        dialog.find(".ajax-error").text(error.code + " - "+msg);
+        dialog.find(".error-msg").text(error.code + " - "+msg);
         dialog.modal();
     };
 
