@@ -42,7 +42,7 @@ define([
 
     return {
         webapi_error_dialog : webapi_error_dialog,
-        config_dialog : config_dialo
+        config_dialog : config_dialog
     };
 
 }); 
