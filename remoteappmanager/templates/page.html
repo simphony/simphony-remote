@@ -96,11 +96,13 @@
     {% block main %}
     {% endblock %}
 
-    {% call macros.modal_dlg('Error', btn_label='OK') %}
-      <div class="ajax-error">
-        The error
-      </div>
-    {% endcall %}
+    {% block dialogs %}
+      {% call macros.modal_dlg('Error', btn_label='OK') %}
+        <div class="ajax-error">
+          The error
+        </div>
+      {% endcall %}
+    {% endblock %}
 
 </body>
 </html>

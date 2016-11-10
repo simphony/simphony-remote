@@ -42,6 +42,7 @@
 {% endblock %}
 
 {% block dialogs %}
+  {{ super() }}
     {% call macros.modal_dlg('Action', btn_label='OK') %}
     {% endcall %}
     {% call macros.modal_dlg('Create New', btn_label='OK', btn_class="btn-primary", buttons_dismiss=false) %}
