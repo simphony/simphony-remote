@@ -1,12 +1,13 @@
 /*globals: require, console*/
 require([
     "jquery", 
-    "utils", 
+    "urlutils", 
+    "dialogs",
     "remoteappapi", 
     "analytics",
     "home/models", 
     "home/views"
-], function($, utils, RemoteAppAPI, analytics, models, views) {
+], function($, urlutils, dialogs, RemoteAppAPI, analytics, models, views) {
     "use strict";
 
     var ga = analytics.init();
@@ -18,18 +19,11 @@ require([
     var model = new models.ApplicationListModel(appapi);
     var view = new views.ApplicationListView(model);
     
-    var report_error = function (jqXHR, status, error) {
-        // Writes an error message resulting from an incorrect
-        // ajax operation. Parameters are from the resulting ajax.
-        var msg = utils.log_ajax_error(jqXHR, status, error);
-        $(".spawn-error-msg").text(msg).show();
-    };
-
     var new_container_window = function (url_id) {
         // Opens a new window for the container at url_id
         var w = window.open(undefined);
         if (w !== undefined) {
-            w.location = utils.url_path_join(
+            w.location = urlutils.path_join(
                 base_url,
                 "containers",
                 url_id
@@ -58,7 +52,7 @@ require([
                     .fail(promise.reject);
             },
             error: function (jqXHR, status, error) {
-                report_error(jqXHR, status, error);
+                dialogs.ajax_error_dialog(jqXHR, status, error);
                 promise.reject();
             }});
         return promise;
@@ -84,13 +78,12 @@ require([
         var promise = $.Deferred();
         appapi.start_application(mapping_id, configurables_data, {
             error: function(jqXHR, status, error) {
-                report_error(jqXHR, status, error);
                 promise.reject();
             },
             statusCode: {
                 201: function (data, textStatus, request) {
                     var location = request.getResponseHeader('Location');
-                    var url = utils.parse_url(location);
+                    var url = urlutils.parse(location);
                     var arr = url.pathname.replace(/\/$/, "").split('/');
                     var url_id = arr[arr.length-1];
                     

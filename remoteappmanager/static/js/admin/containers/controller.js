@@ -1,9 +1,9 @@
 require([
     "jquery",
     "bootstrap",   // unused by module, but needed for binding modal dialog
-    "utils",
+    "dialogs",
     "jsapi/v1/resources"
-], function ($, bootstrap, utils, resources) {
+], function ($, bootstrap, dialogs, resources) {
     "use strict";
     var base_url = window.apidata.base_url;
     
@@ -11,7 +11,7 @@ require([
         var button = $(event.relatedTarget);
         var url_id = button.data('value');
         var dialog = $(this);
-        utils.config_dialog(
+        dialogs.config_dialog(
             dialog,
             'Stop ' + url_id + "?",
             "Do you want to stop the container " + url_id + "? " +
@@ -19,7 +19,7 @@ require([
             function () {
                 resources.Container.delete(url_id)
                     .done(function () { window.location.reload(); })
-                    .fail(utils.ajax_error_dialog);
+                    .fail(dialogs.ajax_error_dialog);
             }
         );
     });

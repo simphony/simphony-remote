@@ -1,4 +1,4 @@
-define(['jquery', 'utils'], function ($, utils) {
+define(['jquery', 'utils', 'urlutils'], function ($, utils, urlutils) {
     "use strict";
 
     var RemoteAppAPI = function (base_url) {
@@ -57,7 +57,7 @@ define(['jquery', 'utils'], function ($, utils) {
         options = options || {};
         options = utils.update(options, {type: 'DELETE'});
         return this._api_request(
-            utils.url_path_join('containers', id),
+            urlutils.path_join('containers', id),
             options
         );
     };
@@ -69,7 +69,7 @@ define(['jquery', 'utils'], function ($, utils) {
         // @return a deferred object for the request.
         options = options || {};
         return this._api_request(
-            utils.url_path_join('applications'),
+            urlutils.path_join('applications'),
             options
         );
     };
@@ -83,7 +83,7 @@ define(['jquery', 'utils'], function ($, utils) {
         // @return a deferred object for the request.
         options = options || {};
         return this._api_request(
-            utils.url_path_join('applications', id),
+            urlutils.path_join('applications', id),
             options
         );
     };
@@ -145,11 +145,11 @@ define(['jquery', 'utils'], function ($, utils) {
         // @return a deferred object for the request.
         options = options || {};
         options = ajax_defaults(options || {});
-        var url = utils.url_path_join(
+        var url = urlutils.path_join(
                 this.base_url,
                 'api',
                 'v1',
-                utils.encode_uri_components(path)
+                urlutils.encode_uri_components(path)
             )+'/';
 
         return $.ajax(url, options);

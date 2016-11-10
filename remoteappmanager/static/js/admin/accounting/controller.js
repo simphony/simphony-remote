@@ -1,9 +1,9 @@
 define([
     "jquery",
     "bootstrap",   // needed for modal operations.
-    "utils",
+    "dialogs",
     "jsapi/v1/resources"
-], function ($, bootstrap, utils, resources) {
+], function ($, bootstrap, dialogs, resources) {
     "use strict";
     var base_url = window.apidata.base_url;
 
@@ -75,7 +75,7 @@ define([
             
             resources.Accounting.create(rep)
                 .done(function() { window.location.reload(); })
-                .fail(utils.ajax_error_dialog);
+                .fail(dialogs.error);
         };
 
         var cancel_callback = function () {
@@ -87,7 +87,7 @@ define([
             ok_callback();
         });
 
-        utils.config_dialog(
+        dialogs.config_dialog(
             dialog,
             null,
             null,
@@ -105,14 +105,14 @@ define([
         var id = button.data('value');
         var name = button.data('name');
         var dialog = $(this);
-        utils.config_dialog(
+        dialogs.config_dialog(
             dialog,
             'Remove policy ' + name + "?",
             "Do you want to remove policy " + name + "? ",
             function() {
                 resources.Accounting.delete(id)
                    .done(function() { window.location.reload(); })
-                    .fail(utils.ajax_error_dialog);
+                    .fail(dialogs.error);
             }
         );
     });

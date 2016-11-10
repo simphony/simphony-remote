@@ -1,7 +1,7 @@
 define([
     "jquery", 
-    "utils"
-], function ($, utils) {
+    "urlutils"
+], function ($, urlutils) {
     "use strict";
 
     var ApplicationListView = function(model) { 
@@ -111,7 +111,7 @@ define([
 
         var icon = app_data.image.icon_128 ?
             "data:image/png;base64,"+app_data.image.icon_128 :
-            utils.url_path_join(this.base_url,
+            urlutils.path_join(this.base_url,
                 "static", "images", "generic_appicon_128.png");
 
         var image_name = app_data.image.ui_name ? app_data.image.ui_name : app_data.image.name;
