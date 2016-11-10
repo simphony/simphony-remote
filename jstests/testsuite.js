@@ -6,7 +6,7 @@
           jquery: '../components/jquery/jquery.min',
           bootstrap: '../components/bootstrap/js/bootstrap.min',
           moment: "../components/moment/moment",
-          "jsapi/v1/resources": "../../../../../jstests/tests/home/mock_jsapi"
+          "jsapi/v1/resources": "../../../jstests/tests/home/mock_jsapi"
         },
         shim: {
           bootstrap: {
