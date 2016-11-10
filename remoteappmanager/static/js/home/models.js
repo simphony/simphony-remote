@@ -6,12 +6,16 @@ define([
 ], function ($, configurables, utils, resources) {
     "use strict";
 
-    var available_applications_info = function (options) {
+    // This routine will go away when we provide the representation data
+    // inline with the items at tornado-webapi level.
+    
+    var available_applications_info = function () {
         // Retrieve information from the various applications and
         // connect the cascading callbacks.
         // Returns a single promise. When resolved, the attached 
         // callbacks will be passed an array of the promises for the various
         // retrieve operations, successful or not.
+        
         var promise = $.Deferred();
 
         resources.Application.items()
@@ -36,7 +40,7 @@ define([
                     };
                 };
                 var fail_callback = function(index) {
-                    return function(rep) {
+                    return function() {
                         requests[index].resolve(null);
                     };
                 };
@@ -71,7 +75,6 @@ define([
         return promise;
     };
 
-    
     var ApplicationListModel = function() {
         // (constructor) Model for the application list.
         
