@@ -68,7 +68,7 @@ require([
         configurables_data = {};
 
         Object.getOwnPropertyNames(configurables).forEach(
-            function(val, idx, array) {
+            function(val, idx, array) {  // jshint ignore:line
                 var configurable = configurables[val];
                 var tag = configurable.tag;
                 configurables_data[tag] = configurable.as_config_dict();
@@ -77,7 +77,7 @@ require([
        
         var promise = $.Deferred();
         appapi.start_application(mapping_id, configurables_data, {
-            error: function(jqXHR, status, error) {
+            error: function(jqXHR, status, error) {  // jshint ignore:line
                 promise.reject();
             },
             statusCode: {
