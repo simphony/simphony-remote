@@ -5,6 +5,9 @@ Troubleshoot
    :includehidden:
 
 .. include::
+    troubleshoot/general.rst
+
+.. include::
     troubleshoot/database.rst
 
 .. include::
