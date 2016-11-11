@@ -5,7 +5,6 @@ require([
     "jsapi/v1/resources"
 ], function ($, bootstrap, dialogs, resources) {
     "use strict";
-    var base_url = window.apidata.base_url;
     
     $('#action-dialog').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget);
@@ -19,7 +18,7 @@ require([
             function () {
                 resources.Container.delete(url_id)
                     .done(function () { window.location.reload(); })
-                    .fail(dialogs.ajax_error_dialog);
+                    .fail(dialogs.webapi_error_dialog);
             }
         );
     });

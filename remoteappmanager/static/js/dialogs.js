@@ -3,30 +3,19 @@ define([
 ], function ($) {
     "use strict";
 
-    var ajax_error_msg = function (jqXHR) {
-        // Return a JSON error message if there is one,
-        // otherwise the basic HTTP status text.
-        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
-            return jqXHR.responseJSON.message;
-        } else {
-            return jqXHR.statusText;
+    var webapi_error_dialog = function (error) {
+        // Shows the error dialog with a webapi error.
+        // The webapi error is an object with the following props:
+        // - status : HTTP error status
+        // - message: user-readable message from the server via the
+        //            response payload. may be undefined.
+        
+        var msg = error.message;
+        if (!msg) {
+            msg = "Unknown error";
         }
-    };
-
-    var log_ajax_error = function (jqXHR, status, error) {
-        // log ajax failures with informative messages
-        var msg = "API request failed (" + jqXHR.status + "): ";
-        console.log(jqXHR);
-        msg += ajax_error_msg(jqXHR);
-        console.log(msg);
-        return msg;
-    };
-
-    var ajax_error_dialog = function (jqXHR, status, error) {
-        console.log("ajax dialog", arguments);
-        var msg = log_ajax_error(jqXHR, status, error);
         var dialog = $("#error-dialog");
-        dialog.find(".ajax-error").text(msg);
+        dialog.find(".error-msg").text(error.code + " - "+msg);
         dialog.modal();
     };
 
@@ -52,7 +41,7 @@ define([
     };
 
     return {
-        ajax_error_dialog : ajax_error_dialog,
+        webapi_error_dialog : webapi_error_dialog,
         config_dialog : config_dialog
     };
 

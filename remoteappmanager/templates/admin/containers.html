@@ -36,6 +36,7 @@
 {% endblock %}
 
 {% block dialogs %}
+  {{ super() }}
     {% call macros.modal_dlg('Action', btn_label='OK') %}
     {% endcall %}
 {% endblock %}

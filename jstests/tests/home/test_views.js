@@ -1,14 +1,12 @@
 define([
     "home/models",
     "home/views", 
-    "../../../../../jstests/tests/home/mock_remoteappapi",
     "jquery"
-], function (models, views, mock_api, $) {
+], function (models, views, $) {
     "use strict";
     QUnit.module("home.views");
     QUnit.test("rendering", function (assert) {
-        var api = new mock_api.MockApi();
-        var model = new models.ApplicationListModel(api);
+        var model = new models.ApplicationListModel();
         var view = new views.ApplicationListView(model);
         model.update()
             .done(function() { view.render(); } )

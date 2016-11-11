@@ -31,7 +31,8 @@
             jquery: '../components/jquery/jquery.min',
             bootstrap: '../components/bootstrap/js/bootstrap.min',
             moment: "../components/moment/moment",
-            "datatables.net": "../components/datatables.net/js/jquery.dataTables"
+            "datatables.net": "../components/datatables.net/js/jquery.dataTables",
+            "jsapi": "../../jsapi"
           },
           shim: {
             bootstrap: {
@@ -96,11 +97,13 @@
     {% block main %}
     {% endblock %}
 
-    {% call macros.modal_dlg('Error', btn_label='OK') %}
-      <div class="ajax-error">
-        The error
-      </div>
-    {% endcall %}
+    {% block dialogs %}
+      {% call macros.modal_dlg('Error', btn_label='OK') %}
+        <div class="error-msg">
+          The error
+        </div>
+      {% endcall %}
+    {% endblock %}
 
 </body>
 </html>

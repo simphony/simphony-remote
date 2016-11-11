@@ -3,20 +3,19 @@ require([
     "jquery", 
     "urlutils", 
     "dialogs",
-    "remoteappapi", 
     "analytics",
     "home/models", 
-    "home/views"
-], function($, urlutils, dialogs, RemoteAppAPI, analytics, models, views) {
+    "home/views",
+    "jsapi/v1/resources"
+], function($, urlutils, dialogs, analytics, models, views, resources) {
     "use strict";
 
     var ga = analytics.init();
     var base_url = window.apidata.base_url;
-    var appapi = new RemoteAppAPI(base_url);
    
     // This model keeps the retrieved content from the REST query locally.
     // It is only synchronized at initial load.
-    var model = new models.ApplicationListModel(appapi);
+    var model = new models.ApplicationListModel();
     var view = new views.ApplicationListView(model);
     
     var new_container_window = function (url_id) {
@@ -45,16 +44,18 @@ require([
 
         var url_id = app_info.container.url_id;
         
-        appapi.stop_application(url_id, {
-            success: function () {
+        resources.Container.delete(url_id)
+            .done(function () {
                 model.update_idx(index)
                     .done(promise.resolve)
                     .fail(promise.reject);
-            },
-            error: function (jqXHR, status, error) {
-                dialogs.ajax_error_dialog(jqXHR, status, error);
-                promise.reject();
-            }});
+                })
+            .fail(
+                function (error) {
+                    dialogs.webapi_error_dialog(error);
+                    promise.reject();
+                });
+                
         return promise;
     };
         
@@ -68,7 +69,7 @@ require([
         configurables_data = {};
 
         Object.getOwnPropertyNames(configurables).forEach(
-            function(val, idx, array) {
+            function(val, idx, array) {  // jshint ignore:line
                 var configurable = configurables[val];
                 var tag = configurable.tag;
                 configurables_data[tag] = configurable.as_config_dict();
@@ -76,28 +77,20 @@ require([
         );
        
         var promise = $.Deferred();
-        appapi.start_application(mapping_id, configurables_data, {
-            error: function(jqXHR, status, error) {
-                promise.reject();
-            },
-            statusCode: {
-                201: function (data, textStatus, request) {
-                    var location = request.getResponseHeader('Location');
-                    var url = urlutils.parse(location);
-                    var arr = url.pathname.replace(/\/$/, "").split('/');
-                    var url_id = arr[arr.length-1];
-                    
-                    ga("send", "event", {
-                        eventCategory: "Application",
-                        eventAction: "start",
-                        eventLabel: image_name
-                    });
-                    
-                    new_container_window(url_id);
-                    model.update_idx(index).done(promise.resolve);
-                }
-            }
-        });
+        
+        resources.Container.create({
+            mapping_id: mapping_id,
+            configurables: configurables_data
+        }).done(function(id) {
+            ga("send", "event", {
+                eventCategory: "Application",
+                eventAction: "start",
+                eventLabel: image_name
+            });
+
+            new_container_window(id);
+            model.update_idx(index).done(promise.resolve);
+        }).fail(function() { promise.reject(); });
         
         return promise;
     };

@@ -19,9 +19,9 @@ define([
         // Handlers for button clicking.
         // replace them to override default behavior (doing nothing).
         // Can return a value or a promise.
-        this.stop_button_clicked = function(index) {};
-        this.start_button_clicked = function(index) {};
-        this.view_button_clicked = function(index) {};
+        this.stop_button_clicked = function(index) {}; // jshint ignore:line
+        this.start_button_clicked = function(index) {}; // jshint ignore:line
+        this.view_button_clicked = function(index) {}; // jshint ignore:line
 
         this._x_button_clicked = function () {
             // Triggered when the button X (left side) is clicked
@@ -146,7 +146,7 @@ define([
         if (app_data.container === null) {
             var ul = $("<ul>");
             Object.getOwnPropertyNames(configurables).forEach(
-                function(val, idx, array) {
+                function(val, idx, array) {  // jshint ignore:line
                     var widget = configurables[val].view();
                     ul.append($("<li>").append(widget));
                 }

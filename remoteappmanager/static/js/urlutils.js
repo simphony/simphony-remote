@@ -5,9 +5,7 @@
 // Modifications Copyright (c) Juptyer Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-define([
-    'jquery'
-], function ($) {
+define(function () {
     "use strict";
 
     var path_join = function () {

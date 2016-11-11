@@ -1,4 +1,8 @@
-define(function (require) {
+define([
+    "require"
+], function (require) {
+    "use strict";
+    
     function init() {
         var module;
         

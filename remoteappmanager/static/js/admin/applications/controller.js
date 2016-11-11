@@ -5,7 +5,6 @@ require([
     "jsapi/v1/resources"
 ], function ($, bootstrap, dialogs, resources) {
     "use strict";
-    var base_url = window.apidata.base_url;
 
     $('#create-new-dialog').on('show.bs.modal', function () {
         var dialog = $(this);
@@ -20,7 +19,7 @@ require([
             dialog.modal('hide');
             resources.Application.create({ image_name: image_name })
                 .done(function() { window.location.reload(); })
-                .fail(dialogs.ajax_error_dialog);
+                .fail(dialogs.webapi_error_dialog);
         };
         
         var cancel_callback = function () {
@@ -58,7 +57,7 @@ require([
             function() {
                 resources.Application.delete(id)
                     .done(function() { window.location.reload(); })
-                    .fail(dialogs.ajax_error_dialog);
+                    .fail(dialogs.webapi_error_dialog);
             }
         );
     });
