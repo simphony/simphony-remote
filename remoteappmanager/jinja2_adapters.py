@@ -1,3 +1,5 @@
+import hashlib
+
 from tornado.template import Template
 
 
@@ -71,3 +73,9 @@ class Jinja2TemplateAdapter(Template):
     def generate(self, **kwargs):
         """Generate this template with the given arguments."""
         return self._template.render(**kwargs)
+
+
+def gravatar_id(value):
+    """Computes the gravatar identifier for a given value (normally email)
+    Used for jinja filter."""
+    return hashlib.md5(str(value).strip().lower().encode("utf-8")).hexdigest()
