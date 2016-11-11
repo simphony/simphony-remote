@@ -1,13 +1,11 @@
 define([
-    "home/models", 
-    "../../../../../jstests/tests/home/mock_remoteappapi"
-], function (models, mock_api) {
+    "home/models" 
+], function (models) {
     "use strict";
 
     QUnit.module("home.models");
     QUnit.test("instantiation", function (assert) {
-        var api = new mock_api.MockApi();
-        var model = new models.ApplicationListModel(api);
+        var model = new models.ApplicationListModel();
         assert.equal(model.app_data.length, 0);
         model.update().done(function() {
             assert.equal(model.app_data.length, 2);
