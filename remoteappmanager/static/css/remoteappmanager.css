@@ -59,3 +59,15 @@ body {
     margin-bottom: 10px;
 }
 
+.content {
+    padding: 0px;
+}
+
+iframe.application {
+    width: 100%;
+    height: 100%;
+}
+
+.configuration {
+    padding: 20px;
+}

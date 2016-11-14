@@ -4,6 +4,7 @@ define([
     "handlebars"
 ], function ($, urlutils, hb) {
     "use strict";
+    var base_url = window.apidata.base_url;
 
     var templates = {
        app_entries: hb.compile(
@@ -13,6 +14,7 @@ define([
            '    <span>{{image_name}}</span></a>' +
            '</li>'),
        app_start_panel: hb.compile(
+           '<div class="configuration">' +
            '<div class="box box-primary">' +
            '<div class="box-header with-border">' +
            '<h3 class="box-title">{{title}}</h3>' +
@@ -23,6 +25,7 @@ define([
            '</div>' +
            '<div class="box-footer">' +
            '<a href="#" data-index={{index}} class="btn btn-primary pull-right start-button">Start</a>' +
+           '</div>' +
            '</div>' +
            '</div>'
        )
@@ -47,31 +50,26 @@ define([
         this.start_button_clicked = function(index) {}; // jshint ignore:line
         this.view_button_clicked = function(index) {}; // jshint ignore:line
 
-        this._x_button_clicked = function () {
-            // Triggered when the button X (left side) is clicked
+        this._start_button_clicked = function () {
+            // Triggered when the start button is clicked
             var button = $(this);
             var index = button.data("index");
+//
+//            var icon_elem = button.find(".x-icon");
+//            var icons = ['fa-start', 'fa-eye'];
+//            var icon_type;
 
-            var icon_elem = button.find(".x-icon");
-            var icons = ['fa-start', 'fa-eye'];
-            var icon_type;
-
-            for (var i = 0; i < icons.length; ++i) {
-                if (icon_elem.hasClass(icons[i])) {
-                    icon_type = icons[i];
-                }
-            }
+//            for (var i = 0; i < icons.length; ++i) {
+//                if (icon_elem.hasClass(icons[i])) {
+//                    icon_type = icons[i];
+//          
+            //      }//           }
             
-            var update_entry = function () { self.update_entry(index); };
-            icon_elem.removeClass(icon_type).addClass("fa-spinner fa-spin");
-            button.prop("disabled", true);
+//            var update_entry = function () { self.update_entry(index); };
+//            icon_elem.removeClass(icon_type).addClass("fa-spinner fa-spin");
+//            button.prop("disabled", true);
             
-            var app_info = self.model.app_data[index];
-            if (app_info.container !== null) {
-                self.view_button_clicked(index).always(update_entry);
-            } else {
-                self.start_button_clicked(index).always(update_entry);
-            }
+            self.start_button_clicked(index).always(update_entry);
         };
         
         this._y_button_clicked = function () {
@@ -144,39 +142,46 @@ define([
         $("#applist")
             .find(".row[data-index='"+index+"']")
             .replaceWith(row);
+        this._fill_central_area(index);
     };
     
     ApplicationListView.prototype._fill_central_area = function(index) {
         var app_data = this.model.app_data[index];
-        var ul = $("<ul>");
+        var form = $("<form class='configuration'>");
         if (app_data.container === null) {
             var configurables = this.model.configurables[index];
             var properties = Object.getOwnPropertyNames(configurables);
             
             if (properties.length === 0) {
-                ul.append("<li>No configurable options for this image</li>");
+                form.append("No configurable options for this image");
             } else {
                 properties.forEach(
-                    function(val, idx, array) {  // jshint ignore:line
-                        var widget = configurables[val].view();
-                        ul.append($("<li>").append(widget));
+                    function(val) {  // jshint ignore:line
+                        var widget = configurables[val].view(index);
+                        form.append(widget);
                     }
                 );
             }
+            var image_name = app_data.image.ui_name ? app_data.image.ui_name : app_data.image.name;
+
+            var base = $(templates.app_start_panel({
+                title: image_name,
+                index: index
+            }));
+
+            base.find(".box-body").html(form);
+            base.find(".start-button").click(this._start_button_clicked);
+
+            $(".content").html(base);
+        } else {
+            var location = urlutils.path_join(
+                base_url, 
+                "containers", 
+                app_data.container.url_id
+            );
+            $(".content").html('<iframe class="application" frameBorder="0" scrolling="yes" src="' +
+                location + '"></iframe>');
         }
-
-        var image_name = app_data.image.ui_name ? app_data.image.ui_name : app_data.image.name;
-        
-        var base = $(templates.app_start_panel({
-            title: image_name,
-            index: index
-        }));
-       
-        base.find(".box-body").html(ul);
-        base.find(".start-button").click(this._x_button_clicked);
-
-        $(".content").html(base);
-        
     };
 
     return {

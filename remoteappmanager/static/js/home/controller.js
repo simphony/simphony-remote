@@ -88,7 +88,6 @@ require([
                 eventLabel: image_name
             });
 
-            new_container_window(id);
             model.update_idx(index).done(promise.resolve);
         }).fail(function() { promise.reject(); });
         
