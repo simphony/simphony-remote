@@ -11,7 +11,21 @@ define([
            '<a href="#">' +
            '  <img src="{{icon}}" class="app-icon">' +
            '    <span>{{image_name}}</span></a>' +
-           '</li>')
+           '</li>'),
+       app_start_panel: hb.compile(
+           '<div class="box box-primary">' +
+           '<div class="box-header with-border">' +
+           '<h3 class="box-title">{{title}}</h3>' +
+           '<div class="box-tools pull-right">' +
+           '</div>' +
+           '</div>' +
+           '<div class="box-body">' +
+           '</div>' +
+           '<div class="box-footer">' +
+           '<a href="#" data-index={{index}} class="btn btn-primary pull-right start-button">Start</a>' +
+           '</div>' +
+           '</div>'
+       )
     };
 
     var ApplicationListView = function(model) { 
@@ -98,7 +112,7 @@ define([
         // Returns a HTML snippet for a single application entry
         // index: 
         //     a progressive index for the entry.
-        
+        var self = this;
         var app_data = this.model.app_data[index];
 
         var icon = app_data.image.icon_128 ?
@@ -115,9 +129,14 @@ define([
         });
         
         var jq_row = $(row);
+        jq_row.click(function() {
+            var row = $(this);
+            var index = row.attr("data-index");
+            self._fill_central_area(index);
+        });
         return jq_row;
     };
-    
+   
     ApplicationListView.prototype.update_entry = function (index) {
         // Re-renders the entry for a given index, replacing the
         // current entry.
@@ -125,6 +144,39 @@ define([
         $("#applist")
             .find(".row[data-index='"+index+"']")
             .replaceWith(row);
+    };
+    
+    ApplicationListView.prototype._fill_central_area = function(index) {
+        var app_data = this.model.app_data[index];
+        var ul = $("<ul>");
+        if (app_data.container === null) {
+            var configurables = this.model.configurables[index];
+            var properties = Object.getOwnPropertyNames(configurables);
+            
+            if (properties.length === 0) {
+                ul.append("<li>No configurable options for this image</li>");
+            } else {
+                properties.forEach(
+                    function(val, idx, array) {  // jshint ignore:line
+                        var widget = configurables[val].view();
+                        ul.append($("<li>").append(widget));
+                    }
+                );
+            }
+        }
+
+        var image_name = app_data.image.ui_name ? app_data.image.ui_name : app_data.image.name;
+        
+        var base = $(templates.app_start_panel({
+            title: image_name,
+            index: index
+        }));
+       
+        base.find(".box-body").html(ul);
+        base.find(".start-button").click(this._x_button_clicked);
+
+        $(".content").html(base);
+        
     };
 
     return {
