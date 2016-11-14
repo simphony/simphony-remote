@@ -1,7 +1,8 @@
 define([
     "jquery",
-    "handlebars"
-], function($, hb) {
+    "handlebars",
+    "utils"
+], function($, hb, utils) {
     "use strict";
 
     var view_template = hb.compile(
@@ -50,7 +51,8 @@ define([
         var resolution = this.resolution;
         
         if (resolution === 'Window') {
-            resolution = this._viewport_resolution();
+            var max_size = utils.max_iframe_size();
+            resolution = max_size[0]+"x"+max_size[1];
         }
         
         return {
@@ -58,16 +60,6 @@ define([
         };
     };
    
-    ResolutionModel.prototype._viewport_resolution = function () {
-        // Returns the current viewport resolution as a "WxH" string
-        var e = window, a = 'inner';
-        if ( !( 'innerWidth' in window ) ) {
-            a = 'client';
-            e = document.documentElement || document.body;
-        }
-        return e[ a+'Width' ]+"x"+e[ a+'Height' ];
-    };
-    
     // Define all your configurables here.
     var configurables = {
         ResolutionModel: ResolutionModel
