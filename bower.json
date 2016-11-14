@@ -18,8 +18,9 @@
         "moment": "~2.7",
         "requirejs": "~2.1",
         "datatables.net": "~1.10.12",
-        "datatables.net-dt": "~1.10.12"
+        "datatables.net-dt": "~1.10.12",
         "admin-lte": "~2.3.8"
+        "handlebars": "~4.0.5"
     },
     "devDependencies": {
         "blanket": "^1.1.7"

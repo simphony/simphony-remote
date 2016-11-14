@@ -22,6 +22,24 @@ body {
     font-weight: 600;
 }
 
+#applist > li > a > div {
+    float: left;
+}
+
+#applist img.app-icon {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border-color: black;
+    border-width: 1px;
+    border-style: solid;
+    margin-right: 5px;
+    margin-top: -2px;
+    background-color: white;
+}
+
+
 /* Used in the admin page as a central element */
 .adminslab {
     background-color: white;
@@ -35,3 +53,4 @@ body {
     margin-top: 20px;
     margin-bottom: 10px;
 }
+
