@@ -1,7 +1,18 @@
 define([
-    "jquery"
-], function($) {
+    "jquery",
+    "handlebars"
+], function($, hb) {
     "use strict";
+
+    var view_template = hb.compile(
+        '<div class="form-group">' +
+        '<label for="resolution-model-{{index}}">Resolution</label>' +
+        '<select class="form-control" id="resolution-model-{{ index }}">' +
+        '{{#each options}}' +
+           '<option value="{{this}}">{{this}}</option>' +
+        '{{/each}}' +
+        '</div>'
+    );
 
     var ResolutionModel = function () {
         // Model for the resolution configurable.
@@ -9,19 +20,12 @@ define([
         this.resolution = "Window";
         this.resolution_options = ["Window", "1920x1080", "1280x1024", "1280x800", "1024x768"];
        
-        self.view = function () {
+        self.view = function (index) {
             // Creates the View to add to the application entry.
-            var opts = "";
-            for (var i = 0; i < self.resolution_options.length; ++i) {
-                var opt = self.resolution_options[i];
-                opts += "<option value='" + opt + "'>" + opt + "</option>";
-            }
-            var widget = $("<p>" +
-                "Resolution: " +
-                "<select>" +
-                opts +
-                "</select></p>"
-            );
+            var widget = $(view_template({
+                options: self.resolution_options,
+                index: index
+            }));
             
             widget.find("select").change(function() {
                 if (this.selectedIndex) {
@@ -30,7 +34,6 @@ define([
             });
             
             return widget;
-
         };
     };
     
