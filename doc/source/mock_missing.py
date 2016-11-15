@@ -59,6 +59,18 @@ def mock_modules():
     else:
         del docker
 
+    try:
+        import tornadowebapi
+    except ImportError:
+        MOCK_MODULES.append('tornadowebapi')
+        MOCK_MODULES.append('tornadowebapi.authenticator')
+        MOCK_MODULES.append('tornadowebapi.exceptions')
+        MOCK_MODULES.append('tornadowebapi.http')
+        MOCK_MODULES.append('tornadowebapi.registry')
+        MOCK_MODULES.append('tornadowebapi.resource')
+    else:
+        del docker
+
     TYPES = {
         mock_type: type(mock_type, bases, {'__module__': path})
         for path, mock_type, bases in MOCK_TYPES}
