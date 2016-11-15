@@ -4,17 +4,6 @@ define([
     "handlebars",
 ], function ($, urlutils, hb) {
     "use strict";
-    
-    hb.registerHelper('icon_src', function(app_data) {
-        var icon_data = app_data.image.icon_128;
-        return (icon_data ? "data:image/png;base64,"+icon_data :
-                urlutils.path_join(this.base_url, "static", "images", "generic_appicon_128.png"))
-        }
-    );
-    hb.registerHelper('image_name', function(app_data) {
-        return (app_data.image.ui_name ? app_data.image.ui_name : app_data.image.name);
-    });
-    
     var templates = {
        app_entries: hb.compile(
            '<li data-index="{{index}}">' +
@@ -67,10 +56,20 @@ define([
         // current entry.
         var row = this._render_applist_entry(index);
         $("#applist")
-            .find(".li[data-index='"+index+"']")
+            .find("li[data-index='"+index+"']")
             .replaceWith(row);
     };
 
+    ApplicationListView.prototype.update_selected = function() {
+        var self = this;
+        var applist = $("#applist");
+        var selected_index = self.model.selected_index;
+        applist.find("li").removeClass("active");
+        if (selected_index !== null) {
+            applist.find("li[data-index='"+selected_index+"']")
+                .addClass("active");
+        }
+    };
 
     ApplicationListView.prototype._render_applist_entry = function (index) {
         // Returns a HTML snippet for a single application entry
