@@ -22,6 +22,7 @@ class DockerLabelNamespace(HasTraits):
         """
         return ".".join([self.namespace, str(item)])
 
+
 # Namespaces for our labels.
 SIMPHONY_NS = DockerLabelNamespace(
     "eu.simphony-project.docker",
