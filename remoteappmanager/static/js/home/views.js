@@ -1,8 +1,9 @@
 define([
     "jquery", 
     "urlutils",
-    "handlebars"
-], function ($, urlutils, hb) {
+    "handlebars",
+    "utils"
+], function ($, urlutils, hb, utils) {
     "use strict";
     var base_url = window.apidata.base_url;
 
@@ -15,18 +16,16 @@ define([
            '</li>'),
        app_start_panel: hb.compile(
            '<div class="configuration">' +
-           '<div class="box box-primary">' +
-           '<div class="box-header with-border">' +
-           '<h3 class="box-title">{{title}}</h3>' +
-           '<div class="box-tools pull-right">' +
-           '</div>' +
-           '</div>' +
-           '<div class="box-body">' +
-           '</div>' +
-           '<div class="box-footer">' +
-           '<a href="#" data-index={{index}} class="btn btn-primary pull-right start-button">Start</a>' +
-           '</div>' +
-           '</div>' +
+           '  <div class="box box-primary">' +
+           '    <div class="box-header with-border">' +
+           '      <h3 class="box-title">{{title}}</h3>' +
+           '      <div class="box-tools pull-right"></div>' +
+           '    </div>' +
+           '    <div class="box-body"></div>' +
+           '    <div class="box-footer">' +
+           '      <a href="#" data-index={{index}} class="btn btn-primary pull-right start-button">Start</a>' +
+           '    </div>' +
+           '  </div>' +
            '</div>'
        )
     };
@@ -54,30 +53,17 @@ define([
             // Triggered when the start button is clicked
             var button = $(this);
             var index = button.data("index");
-//
-//            var icon_elem = button.find(".x-icon");
-//            var icons = ['fa-start', 'fa-eye'];
-//            var icon_type;
-
-//            for (var i = 0; i < icons.length; ++i) {
-//                if (icon_elem.hasClass(icons[i])) {
-//                    icon_type = icons[i];
-//          
-            //      }//           }
             
-//            var update_entry = function () { self.update_entry(index); };
-//            icon_elem.removeClass(icon_type).addClass("fa-spinner fa-spin");
-//            button.prop("disabled", true);
+            var update_entry = function () { self.update_entry(index); };
+            button.prop("disabled", true);
             
             self.start_button_clicked(index).always(update_entry);
         };
         
-        this._y_button_clicked = function () {
+        this._stop_button_clicked = function () {
             var button = $(this);
             var index = button.data("index");
-            var icon_elem = button.find(".y-icon");
             
-            icon_elem.removeClass("fa-stop").addClass("fa-spinner fa-spin");
             button.prop("disabled", true);
 
             var update_entry = function () { self.update_entry(index); };
@@ -130,7 +116,7 @@ define([
         jq_row.click(function() {
             var row = $(this);
             var index = row.attr("data-index");
-            self._fill_central_area(index);
+            self._fill_central_area(index, true);
         });
         return jq_row;
     };
@@ -142,10 +128,10 @@ define([
         $("#applist")
             .find(".row[data-index='"+index+"']")
             .replaceWith(row);
-        this._fill_central_area(index);
+        this._fill_central_area(index, false);
     };
     
-    ApplicationListView.prototype._fill_central_area = function(index) {
+    ApplicationListView.prototype._fill_central_area = function(index, direct_url) {
         var app_data = this.model.app_data[index];
         var form = $("<form class='configuration'>");
         if (app_data.container === null) {
@@ -153,7 +139,7 @@ define([
             var properties = Object.getOwnPropertyNames(configurables);
             
             if (properties.length === 0) {
-                form.append("No configurable options for this image");
+                form.html("No configurable options for this image");
             } else {
                 properties.forEach(
                     function(val) {  // jshint ignore:line
@@ -179,8 +165,14 @@ define([
                 "containers", 
                 app_data.container.url_id
             );
-            $(".content").html('<iframe class="application" frameBorder="0" scrolling="yes" src="' +
-                location + '"></iframe>');
+            if (direct_url) {
+                location = location+'/';
+            }
+            var iframe_size = utils.max_iframe_size();
+            var iframe = $('<iframe class="application" frameBorder="0" ' +
+                'src="' + location + '" ' +
+                'style="min-width: '+iframe_size[0]+'px; min-height: '+iframe_size[1]+'px;"></iframe>');
+            $(".content").html(iframe);
         }
     };
 

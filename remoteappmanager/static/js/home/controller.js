@@ -5,38 +5,17 @@ require([
     "dialogs",
     "analytics",
     "home/models", 
-    "home/views",
+    "home/views/application_list_view",
     "jsapi/v1/resources"
-], function($, urlutils, dialogs, analytics, models, views, resources) {
+], function($, urlutils, dialogs, analytics, models, application_list_view, resources) {
     "use strict";
 
     var ga = analytics.init();
-    var base_url = window.apidata.base_url;
-   
+
     // This model keeps the retrieved content from the REST query locally.
     // It is only synchronized at initial load.
     var model = new models.ApplicationListModel();
-    var view = new views.ApplicationListView(model);
-    
-    var new_container_window = function (url_id) {
-        // Opens a new window for the container at url_id
-        var w = window.open(undefined);
-        if (w !== undefined) {
-            w.location = urlutils.path_join(
-                base_url,
-                "containers",
-                url_id
-            );
-        }
-    };
-
-    view.view_button_clicked = function (index) {
-        var promise = $.Deferred();
-        var app_info = model.app_data[index];
-        new_container_window(app_info.container.url_id);
-        promise.resolve();
-        return promise;
-    };
+    var view = new application_list_view.ApplicationListView(model);
     
     view.stop_button_clicked = function (index) {
         var promise = $.Deferred();
@@ -81,7 +60,7 @@ require([
         resources.Container.create({
             mapping_id: mapping_id,
             configurables: configurables_data
-        }).done(function(id) {
+        }).done(function() {
             ga("send", "event", {
                 eventCategory: "Application",
                 eventAction: "start",

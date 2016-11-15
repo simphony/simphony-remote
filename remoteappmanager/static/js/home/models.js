@@ -86,6 +86,11 @@ define([
         // a dictionary that maps a supported (by the image) configurable tag 
         // to its client-side model.
         this.configurables = [];
+        
+        // Selection index for when we click on one entry.
+        // Should be the index of the selected app_data, 
+        // or null if no selection.
+        this.selected_index = null;
     };
 
     ApplicationListModel.prototype.update = function() {
@@ -142,7 +147,7 @@ define([
             }
         }
     };
-    
+   
     return {
         ApplicationListModel: ApplicationListModel
     };
