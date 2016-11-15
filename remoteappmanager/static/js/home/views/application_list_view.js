@@ -36,6 +36,7 @@ define([
     
     ApplicationListView.prototype.render = function () {
         // Renders the full application list and adds it to the DOM.
+        var self = this;
         var num_entries = this.model.app_data.length;
         var row;
         var applist = $("#applist");
@@ -45,10 +46,11 @@ define([
             applist.append(row);
         } else {
             for (var i = 0; i < num_entries; i++) {
-                row = this._render_applist_entry(i);
+                row = self._render_applist_entry(i);
                 applist.append(row.hide().fadeIn(500));
             }
         }
+        self.update_selected();
     };
 
     ApplicationListView.prototype.update_entry = function (index) {

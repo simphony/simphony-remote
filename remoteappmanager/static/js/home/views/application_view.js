@@ -36,7 +36,12 @@ define([
 
     ApplicationView.prototype.start_button_clicked = function(index) {}; // jshint ignore:line
 
-    ApplicationView.prototype.render = function () {
+    ApplicationView.prototype.render = function (delayed) {
+        // Renders the ApplicationView.
+        // delayed:
+        //    When true, if the application is running it will redirect to
+        //    the waiting spinner, rather than the application itself.
+        //    Temporary measure. Will go away.
         var self = this;
         var index = self.model.selected_index;
         
@@ -50,7 +55,7 @@ define([
         if (app_data.container === null) {
             self._render_form(index);
         } else {
-            self._render_app(index);
+            self._render_app(index, delayed);
         }
     };
     
@@ -86,13 +91,18 @@ define([
         $(".content").html(base.hide().fadeIn(200));
     };
     
-    ApplicationView.prototype._render_app = function(index) {
+    ApplicationView.prototype._render_app = function(index, delayed) {
         var self = this;
         var app_data = self.model.app_data[index];
         var location = urlutils.path_join(self.base_url, 
             "containers", 
             app_data.container.url_id
-        )+"/";
+        );
+        
+        if (!delayed) {
+            location = location+"/";
+        }    
+        
         var iframe_size = utils.max_iframe_size();
         var iframe = $('<iframe class="application" frameBorder="0" ' +
             'src="' + location + '" ' +

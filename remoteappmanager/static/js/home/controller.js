@@ -96,7 +96,7 @@ require([
                 .done(function() {
                     app_list_view.update_entry(index);
                     app_list_view.update_selected();
-                    app_view.render();
+                    app_view.render(true);
                 })
                 .fail(function(error) {
                     dialogs.webapi_error_dialog(error);
