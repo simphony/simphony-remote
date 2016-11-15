@@ -23,8 +23,7 @@ def mock_modules():
     try:
         import pwd
     except ImportError:
-        MOCK_MODULES = ['pwd']
-        MOCK_TYPES = []
+        MOCK_MODULES.append('pwd')
     else:
         del pwd
 
@@ -46,8 +45,12 @@ def mock_modules():
         import jupyterhub
     except ImportError:
         MOCK_MODULES.append('jupyterhub')
+        MOCK_MODULES.append('jupyterhub.orm')
         MOCK_MODULES.append('jupyterhub.auth')
         MOCK_MODULES.append('jupyterhub.spawner')
+        MOCK_TYPES.append(
+            ("jupyterhub.orm", "Proxy", (object, ))
+        )
     else:
         del jupyterhub
 
@@ -69,7 +72,7 @@ def mock_modules():
         MOCK_MODULES.append('tornadowebapi.registry')
         MOCK_MODULES.append('tornadowebapi.resource')
     else:
-        del docker
+        del tornadowebapi
 
     TYPES = {
         mock_type: type(mock_type, bases, {'__module__': path})
