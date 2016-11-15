@@ -71,6 +71,9 @@ def mock_modules():
         MOCK_MODULES.append('tornadowebapi.http')
         MOCK_MODULES.append('tornadowebapi.registry')
         MOCK_MODULES.append('tornadowebapi.resource')
+        MOCK_TYPES.append(
+            ("tornadowebapi.registry.orm", "Registry", (object, ))
+        )
     else:
         del tornadowebapi
 
