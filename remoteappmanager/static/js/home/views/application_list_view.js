@@ -7,9 +7,11 @@ define([
     var templates = {
        app_entries: hb.compile(
            '<li data-index="{{index}}">' +
+           '  {{#if running}}<span class="start-badge"></span>{{/if}}' +
            '<a href="#">' +
            '  <img src="{{icon_src app_data}}" class="app-icon">' +
-           '    <span>{{image_name app_data}}</span></a>' +
+           '  <span>{{image_name app_data}}</span>' +
+           '</a>' +
            '</li>')
     };
 
@@ -20,9 +22,9 @@ define([
         // Parameters
         // model : ApplicationListModel
         //     The data model.
-        this.model = model;
         var self = this;
         
+        self.model = model;
         self.base_url = window.apidata.base_url;
 
         $("#applist").html(
@@ -78,11 +80,12 @@ define([
         // index: 
         //     a progressive index for the entry.
         var self = this;
-        var app_data = this.model.app_data[index];
+        var app_data = self.model.app_data[index];
 
         var row = templates.app_entries({
             index: index,
-            app_data: app_data
+            app_data: app_data,
+            running: (app_data.container !== null) 
         });
         
         var jq_row = $(row);
