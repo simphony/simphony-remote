@@ -10,12 +10,12 @@ define([
         // - message: user-readable message from the server via the
         //            response payload. may be undefined.
         
-        var msg = error.message;
+        var msg = error.status_text;
         if (!msg) {
             msg = "Unknown error";
         }
         var dialog = $("#error-dialog");
-        dialog.find(".error-msg").text(error.code + " - "+msg);
+        dialog.find(".error-msg").text(error.status + " - "+msg);
         dialog.modal();
     };
 
