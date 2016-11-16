@@ -3,7 +3,7 @@ define([
     "urlutils",
     "handlebars",
     "underscore"
-], function ($, urlutils, hb, _) {
+], function ($, urlutils, hb) {
     "use strict";
     var templates = {
        app_entries: hb.compile(
@@ -25,9 +25,7 @@ define([
         // model : ApplicationListModel
         //     The data model.
         var self = this;
-        
         self.model = model;
-        self.base_url = window.apidata.base_url;
 
         $("#applist").html(
             '<li><a href="#"><i class="fa fa-spinner fa-spin"></i> <span>Loading</span></a></li>'
@@ -64,10 +62,15 @@ define([
     ApplicationListView.prototype.update_entry = function (index) {
         // Re-renders the entry for a given index, replacing the
         // current entry.
+        var self = this;
         var row = this._render_applist_entry(index);
         $("#applist")
             .find("li[data-index='"+index+"']")
             .replaceWith(row);
+        
+        if (self.model.selected_index === index) {
+            self.update_selected();
+        }
     };
 
     ApplicationListView.prototype.update_selected = function() {
