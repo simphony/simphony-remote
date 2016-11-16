@@ -156,7 +156,7 @@ define([
         }    
         
         var iframe_size = utils.max_iframe_size();
-        var iframe = $('<iframe class="application" frameBorder="0" ' +
+        var iframe = $('<iframe id="application" frameBorder="0" ' +
             'src="' + location + '" ' +
             'style="min-width: '+iframe_size[0]+'px; min-height: '+iframe_size[1]+'px;"></iframe>');
         return iframe;
