@@ -43,9 +43,8 @@ require([
 
     app_list_view.entry_clicked = function (index) {
         model.selected_index = index;
-        app_list_view.update_entry(index);
         app_list_view.update_selected();
-        app_view.render();
+        app_view.render(false, 200);
     };
     
     app_list_view.stop_button_clicked = function(index) {
@@ -92,7 +91,7 @@ require([
         }
         
         model.status[index] = models.Status.STARTING;
-        app_view.update();
+        app_view.render(false, null);
         app_list_view.update_entry(index);
 
         var configurables_data = {};
@@ -121,26 +120,26 @@ require([
                 .always(function() {
                     app_list_view.update_entry(index);
                     app_list_view.update_selected();
-                    app_view.render(true);
+                    app_view.render(true, 200);
                 })
                 .fail(function(error) {
                     model.status[index] = models.Status.STOPPED;
                     app_list_view.update_entry(index);
-                    app_view.render(true);
+                    app_view.render(true, 200);
                     dialogs.webapi_error_dialog(error);
                 });
         }).fail(function(error) {
             model.status[index] = models.Status.STOPPED;
             app_list_view.update_entry(index);
             app_list_view.update_selected();
-            app_view.render(true);
+            app_view.render(true, 200);
             dialogs.webapi_error_dialog(error);
         });
     };
 
     $.when(model.update()).done(function () { 
-        app_list_view.render(); 
-        app_view.render();
+        app_list_view.render();
+        app_view.render(false, 200);
     });
 
 });

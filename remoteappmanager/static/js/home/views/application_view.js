@@ -40,7 +40,7 @@ define([
 
     ApplicationView.prototype.start_button_clicked = function(index) {}; // jshint ignore:line
 
-    ApplicationView.prototype.render = function (delayed) {
+    ApplicationView.prototype.render = function (delayed, fade_in) {
         // Renders the ApplicationView.
         // delayed:
         //    When true, if the application is running it will redirect to
@@ -54,22 +54,13 @@ define([
         var html = self._render_for_model_state(delayed);
         self.visualised_index = self.model.selected_index;
         self.visualised_status = self.model.status[self.visualised_index];
-        $(".content").html(html.hide().fadeIn(200));
+        if (fade_in) {
+            $(".content").html(html.hide().fadeIn(fade_in));
+        } else {
+            $(".content").html(html);
+        }
     };
    
-    ApplicationView.prototype.update = function(delayed) {
-        // Like render, but without fade in effect.
-        var self = this;
-        if (self.visualised_index === self.model.selected_index &&
-            self.visualised_status === self.model.status[self.model.selected_index]) {
-            return;
-        }
-        var html = self._render_for_model_state(delayed);
-        self.visualised_index = self.model.selected_index;
-        self.visualised_status = self.model.status[self.visualised_index];
-        $(".content").html(html);
-    };
-    
     ApplicationView.prototype._render_for_model_state = function(delayed) {
         // Decides what to render according to the current model state
         var self = this;
