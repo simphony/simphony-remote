@@ -9,7 +9,6 @@ require([
     "home/views/application_view",
     "jsapi/v1/resources",
     "handlebars",
-    "underscore"
 ], function(
     $, 
     urlutils, 
@@ -19,8 +18,7 @@ require([
     application_list_view,
     application_view, 
     resources,
-    hb,
-    _) {
+    hb) {
     "use strict";
 
     var ga = analytics.init();
@@ -99,7 +97,7 @@ require([
         configurables_data = {};
 
         Object.getOwnPropertyNames(configurables).forEach(
-            function(val, idx, array) {  // jshint ignore:line
+            function(val, idx, array) {   // jshint ignore:line
                 var configurable = configurables[val];
                 var tag = configurable.tag;
                 configurables_data[tag] = configurable.as_config_dict();

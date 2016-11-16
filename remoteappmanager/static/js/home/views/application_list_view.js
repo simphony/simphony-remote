@@ -32,11 +32,11 @@ define([
         );
     };
 
-    ApplicationListView.prototype.entry_clicked = function(index) {
+    ApplicationListView.prototype.entry_clicked = function(index) {  // jshint ignore:line 
         // handler when entry has been clicked. Override in controller.
     };
     
-    ApplicationListView.prototype.stop_button_clicked = function(index) {
+    ApplicationListView.prototype.stop_button_clicked = function(index) {  // jshint ignore:line 
         // handler when stop has been clicked. Override in controller.
     };
     
