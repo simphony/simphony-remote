@@ -3,8 +3,9 @@ define([
     "urlutils",
     "handlebars",
     "utils",
-    "underscore"
-], function ($, urlutils, hb, utils, _) {
+    "underscore",
+    "home/models"
+], function ($, urlutils, hb, utils, _, models) {
     "use strict";
     var templates = {
        app_start_panel: hb.compile(
@@ -33,6 +34,7 @@ define([
         //     The data model.
         var self = this;
         self.model = model;
+        self.visualised_index = null;
         self.base_url = window.apidata.base_url;
     };
 
@@ -45,14 +47,26 @@ define([
         //    the waiting spinner, rather than the application itself.
         //    Temporary measure. Will go away.
         var self = this;
+        if (self.visualised_index === self.model.selected_index &&
+            self.visualised_status === self.model.status[self.model.selected_index]) {
+            return;
+        }
         var html = self._render_for_model_state(delayed);
+        self.visualised_index = self.model.selected_index;
+        self.visualised_status = self.model.status[self.visualised_index];
         $(".content").html(html.hide().fadeIn(200));
     };
    
     ApplicationView.prototype.update = function(delayed) {
         // Like render, but without fade in effect.
         var self = this;
+        if (self.visualised_index === self.model.selected_index &&
+            self.visualised_status === self.model.status[self.model.selected_index]) {
+            return;
+        }
         var html = self._render_for_model_state(delayed);
+        self.visualised_index = self.model.selected_index;
+        self.visualised_status = self.model.status[self.visualised_index];
         $(".content").html(html);
     };
     
@@ -66,10 +80,10 @@ define([
             return $("<div>");
         }
 
-        var app_data = self.model.app_data[index];
+        var app_status = self.model.status[index];
         var html;
 
-        if (app_data.container === null) {
+        if (app_status === models.Status.STARTING || app_status === models.Status.STOPPED) {
             html = self._render_form(index);
         } else {
             html = self._render_app(index, delayed);
@@ -81,11 +95,13 @@ define([
         // Renders the configuration form
         var self = this;
         var app_data = self.model.app_data[index];
+        var app_status = self.model.status[index];
 
         var configurables = self.model.configurables[index];
         var properties = Object.getOwnPropertyNames(configurables);
 
-        var disabled = _.contains(self.model.starting, index);
+        var disabled = (app_status === models.Status.STARTING);
+        
         var base = $(templates.app_start_panel({
             app_data: app_data,
             index: index,

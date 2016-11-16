@@ -49,14 +49,14 @@ require([
     };
     
     app_list_view.stop_button_clicked = function(index) {
-        if (_.contains(model.stopping, index)) {
+        if (model.status[index] === models.Status.STOPPING) {
             return;
         }
+        model.status[index] = models.Status.STOPPING;
         
         var app_info = model.app_data[index];
         var url_id = app_info.container.url_id;
 
-        model.status[index] = models.Status.STOPPING;
         app_list_view.update_entry(index);
         
         resources.Container.delete(url_id)
@@ -83,7 +83,7 @@ require([
         var mapping_id = model.app_data[index].mapping_id;
         var image_name = model.app_data[index].image.name;
 
-        if (_.contains(model.starting, index)) {
+        if (model.status[index] === models.Status.STARTING) {
             return;
         }
         

@@ -74,6 +74,7 @@ define([
     };
 
     ApplicationListView.prototype.update_selected = function() {
+        // Updates the list against the current selected entry.
         var self = this;
         var applist = $("#applist");
         var selected_index = self.model.selected_index;
@@ -85,7 +86,8 @@ define([
     };
 
     ApplicationListView.prototype._render_applist_entry = function (index) {
-        // Returns a HTML snippet for a single application entry
+        // Returns a jquery HTML snippet for a single application entry
+        // The returned entity has event handlers already installed.
         // index: 
         //     a progressive index for the entry.
         var self = this;
