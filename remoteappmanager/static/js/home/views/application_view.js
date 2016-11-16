@@ -16,6 +16,10 @@ define([
            '      <div class="box-tools pull-right"></div>' +
            '    </div>' +
            '    <div class="box-body">' +
+           '      <h4>Policy</h4>' +
+           '      <ul class="policy">' +
+           '      </ul>' +
+           '      <h4>Configuration</h4>' +
            '      <form class="configuration"><fieldset {{#if disabled}}disabled{{/if}}></fieldset></form>' +
            '    </div>' +
            '    <div class="box-footer">' +
@@ -103,6 +107,25 @@ define([
             self.start_button_clicked($(this).attr("data-index"));
         });
 
+
+        var policy = app_data.image.policy;
+        var policy_ul = base.find(".policy");
+        
+        if (policy.allow_home) {
+            policy_ul.append($("<li>Workspace accessible</li>"));
+        } else {
+            policy_ul.append($("<li>Workspace not accessible</li>"));
+        }
+        
+        if (policy.volume_source && policy.volume_target && policy.volume_mode) {
+            policy_ul.append($(
+                "<li>Volume mounted: " + policy.volume_source +
+                " &#x2192; " + policy.volume_target +
+                " (" + policy.volume_mode + ")</li>"));
+        } else {
+            policy_ul.append($("<li>No volumes mounted</li>"));
+        }
+                
         var fieldset = base.find("fieldset");
         
         if (properties.length === 0) {
