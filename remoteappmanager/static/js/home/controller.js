@@ -62,16 +62,20 @@ require([
         resources.Container.delete(url_id)
             .done(function () {
                 model.update_idx(index)
-                    .always(function() {
+                    .done(function() {
                         app_list_view.update_entry(index);
                         app_view.render(true);
                     })
                     .fail(function(error) {
+                        model.status[index] = models.Status.STOPPED;
+                        app_list_view.update_entry(index);
+                        app_view.render(true);
                         dialogs.webapi_error_dialog(error);
                     });
                 })
             .fail(
                 function (error) {
+                    model.status[index] = models.Status.STOPPED;
                     app_list_view.update_entry(index);
                     app_view.render(true);
                     dialogs.webapi_error_dialog(error);
@@ -120,9 +124,13 @@ require([
                     app_view.render(true);
                 })
                 .fail(function(error) {
+                    model.status[index] = models.Status.STOPPED;
+                    app_list_view.update_entry(index);
+                    app_view.render(true);
                     dialogs.webapi_error_dialog(error);
                 });
         }).fail(function(error) {
+            model.status[index] = models.Status.STOPPED;
             app_list_view.update_entry(index);
             app_list_view.update_selected();
             app_view.render(true);
