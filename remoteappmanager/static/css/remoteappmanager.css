@@ -134,3 +134,19 @@ iframe.application {
     border: 1px solid yellow;
   }
 }
+
+.stop-button {
+    display: block;
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    z-index: 100;
+    width: 32px;
+    height: 32px;
+    padding: 0px;
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.7);
+}

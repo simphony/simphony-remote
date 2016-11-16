@@ -49,13 +49,13 @@ require([
     };
     
     app_list_view.stop_button_clicked = function(index) {
-        var app_info = model.app_data[index];
-        var url_id = app_info.container.url_id;
-        
         if (_.contains(model.stopping, index)) {
             return;
         }
         
+        var app_info = model.app_data[index];
+        var url_id = app_info.container.url_id;
+
         model.stopping.push(index);
         app_list_view.update_entry(index);
         

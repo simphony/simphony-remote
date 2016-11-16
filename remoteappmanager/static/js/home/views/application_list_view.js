@@ -11,9 +11,9 @@ define([
            '  <span class="{{app_status}}-badge"></span>' +
            '  <a href="#">' +
            '    <img src="{{icon_src app_data}}" class="app-icon">' +
+           '    <button class="stop-button" data-index="{{index}}"><i class="fa fa-times"></i></button>' +
            '    <span>{{image_name app_data}}</span>' +
            '  </a>' +
-           '  <button class="stop-button" data-index="{{index}}">X</button>' +
            '</li>')
     };
 
@@ -110,10 +110,22 @@ define([
         jq_row.click(function() {
             self.entry_clicked($(this).attr("data-index"));
         });
-        jq_row.find(".stop-button").click(function(event) {
-            self.stop_button_clicked($(this).attr("data-index"));
-            event.stopPropagation();
-        });
+        jq_row.find(".app-icon").hover(function() {
+            var app_data = self.model.app_data[index];
+            if (app_data.container !== null) {
+                jq_row.find(".stop-button").show();
+            }
+        }, null);
+        
+        jq_row.find(".stop-button")
+            .hide()
+            .click(function(event) {
+                event.stopPropagation();
+                self.stop_button_clicked($(this).attr("data-index"));
+            })
+            .hover(null, function() {
+                jq_row.find(".stop-button").hide();
+            });
         return jq_row;
     };
    
