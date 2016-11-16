@@ -47,27 +47,39 @@ require([
         app_list_view.update_selected();
         app_view.render();
     };
-
-//    app_list_view.entry_clicked = function (index) {
-//        var app_info = model.app_data[index];
-//        var url_id = app_info.container.url_id;
-//        
-//        resources.Container.delete(url_id)
-//            .done(function () {
-//                model.update_idx(index)
-//                    .done(function() {
-//                        app_list_view.update_entry(index);
-//                    })
-//                    .fail(function(error) {
-//                        dialogs.webapi_error_dialog(error);
-//                    });
-//                })
-//            .fail(
-//                function (error) {
-//                    dialogs.webapi_error_dialog(error);
-//                });
-//  };
+    
+    app_list_view.stop_button_clicked = function(index) {
+        var app_info = model.app_data[index];
+        var url_id = app_info.container.url_id;
         
+        if (_.contains(model.stopping, index)) {
+            return;
+        }
+        
+        model.stopping.push(index);
+        app_list_view.update_entry(index);
+        
+        resources.Container.delete(url_id)
+            .done(function () {
+                model.update_idx(index)
+                    .always(function() {
+                        model.stopping = _.without(model.stopping, index);
+                        app_list_view.update_entry(index);
+                        app_view.render(true);
+                    })
+                    .fail(function(error) {
+                        dialogs.webapi_error_dialog(error);
+                    });
+                })
+            .fail(
+                function (error) {
+                    model.stopping = _.without(model.stopping, index);
+                    app_list_view.update_entry(index);
+                    app_view.render(true);
+                    dialogs.webapi_error_dialog(error);
+                });
+    };
+
     app_view.start_button_clicked = function (index) {
         // The container is not running. This is a start button.
         var mapping_id = model.app_data[index].mapping_id;

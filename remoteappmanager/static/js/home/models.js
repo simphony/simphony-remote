@@ -94,7 +94,9 @@ define([
         
         // indexes currently starting
         this.starting = [];
-        
+
+        // indexes currently stopping
+        this.stopping = [];
     };
 
     ApplicationListModel.prototype.update = function() {

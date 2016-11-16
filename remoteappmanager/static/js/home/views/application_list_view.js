@@ -9,10 +9,11 @@ define([
        app_entries: hb.compile(
            '<li data-index="{{index}}">' +
            '  <span class="{{app_status}}-badge"></span>' +
-           '<a href="#">' +
-           '  <img src="{{icon_src app_data}}" class="app-icon">' +
-           '  <span>{{image_name app_data}}</span>' +
-           '</a>' +
+           '  <a href="#">' +
+           '    <img src="{{icon_src app_data}}" class="app-icon">' +
+           '    <span>{{image_name app_data}}</span>' +
+           '  </a>' +
+           '  <button class="stop-button" data-index="{{index}}">X</button>' +
            '</li>')
     };
 
@@ -35,6 +36,10 @@ define([
 
     ApplicationListView.prototype.entry_clicked = function(index) {
         // handler when entry has been clicked. Override in controller.
+    };
+    
+    ApplicationListView.prototype.stop_button_clicked = function(index) {
+        // handler when stop has been clicked. Override in controller.
     };
     
     ApplicationListView.prototype.render = function () {
@@ -89,6 +94,8 @@ define([
             app_status = "running";
         } else if (_.contains(self.model.starting, index)) {
             app_status = "starting";
+        } else if (_.contains(self.model.stopping, index)) {
+            app_status = "stopping";
         } else {
             app_status = "stopped";
         }
@@ -102,6 +109,10 @@ define([
         var jq_row = $(row);
         jq_row.click(function() {
             self.entry_clicked($(this).attr("data-index"));
+        });
+        jq_row.find(".stop-button").click(function(event) {
+            self.stop_button_clicked($(this).attr("data-index"));
+            event.stopPropagation();
         });
         return jq_row;
     };
