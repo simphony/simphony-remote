@@ -9,7 +9,7 @@ define([
        app_entries: hb.compile(
            '<li data-index="{{index}}">' +
            '  <span class="{{app_status}}-badge"></span>' +
-           '  <a href="#">' +
+           '  <a href="#" class="truncate">' +
            '    <img src="{{icon_src app_data}}" class="app-icon">' +
            '    <button class="stop-button" data-index="{{index}}"><i class="fa fa-times"></i></button>' +
            '    <span>{{image_name app_data}}</span>' +
