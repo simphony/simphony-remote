@@ -6,8 +6,12 @@ define([
 ], function ($, configurables, utils, resources) {
     "use strict";
 
-    // This routine will go away when we provide the representation data
-    // inline with the items at tornado-webapi level.
+    var Status = {
+        RUNNING: "RUNNING",
+        STARTING: "STARTING",
+        STOPPING: "STOPPING",
+        STOPPED: "STOPPED"
+    };
     
     var available_applications_info = function () {
         // Retrieve information from the various applications and
@@ -15,6 +19,8 @@ define([
         // Returns a single promise. When resolved, the attached 
         // callbacks will be passed an array of the promises for the various
         // retrieve operations, successful or not.
+        // This routine will go away when we provide the representation data
+        // inline with the items at tornado-webapi level.
         
         var promise = $.Deferred();
 
@@ -93,10 +99,7 @@ define([
         this.selected_index = null;
         
         // indexes currently starting
-        this.starting = [];
-
-        // indexes currently stopping
-        this.stopping = [];
+        this.status = [];
     };
 
     ApplicationListModel.prototype.update = function() {
@@ -116,6 +119,7 @@ define([
             // Add the options for some image types
             for (var data_idx = 0; data_idx < self.app_data.length; ++data_idx) {
                 self._update_configurables(data_idx);
+                self._update_status(data_idx);
             }
         });
     };
@@ -130,6 +134,7 @@ define([
             .done(function(new_data) {
                 self.app_data[index] = new_data;
                 self._update_configurables(index);
+                self._update_status(index);
             });
     };
 
@@ -151,6 +156,17 @@ define([
             if (ConfigurableCls !== null) {
                 self.configurables[index][tag] = new ConfigurableCls();
             }
+        }
+    };
+  
+    ApplicationListModel.prototype._update_status = function(index) {
+        var self = this;
+        var app_data = self.app_data[index];
+        
+        if (app_data.container === null) {
+            self.status[index] = Status.STOPPED;
+        } else {
+            self.status[index] = Status.RUNNING;
         }
     };
    
