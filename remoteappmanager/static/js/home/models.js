@@ -171,6 +171,7 @@ define([
     };
    
     return {
-        ApplicationListModel: ApplicationListModel
+        ApplicationListModel: ApplicationListModel,
+        Status: Status
     };
 });

@@ -56,14 +56,13 @@ require([
         var app_info = model.app_data[index];
         var url_id = app_info.container.url_id;
 
-        model.stopping.push(index);
+        model.status[index] = models.Status.STOPPING;
         app_list_view.update_entry(index);
         
         resources.Container.delete(url_id)
             .done(function () {
                 model.update_idx(index)
                     .always(function() {
-                        model.stopping = _.without(model.stopping, index);
                         app_list_view.update_entry(index);
                         app_view.render(true);
                     })
@@ -73,7 +72,6 @@ require([
                 })
             .fail(
                 function (error) {
-                    model.stopping = _.without(model.stopping, index);
                     app_list_view.update_entry(index);
                     app_view.render(true);
                     dialogs.webapi_error_dialog(error);
@@ -89,7 +87,7 @@ require([
             return;
         }
         
-        model.starting.push(index);
+        model.status[index] = models.Status.STARTING;
         app_view.update();
         app_list_view.update_entry(index);
 
@@ -117,7 +115,6 @@ require([
 
             model.update_idx(index)
                 .always(function() {
-                    model.starting = _.without(model.starting, index);
                     app_list_view.update_entry(index);
                     app_list_view.update_selected();
                     app_view.render(true);
@@ -126,7 +123,6 @@ require([
                     dialogs.webapi_error_dialog(error);
                 });
         }).fail(function(error) {
-            model.starting = _.without(model.starting, index);
             app_list_view.update_entry(index);
             app_list_view.update_selected();
             app_view.render(true);

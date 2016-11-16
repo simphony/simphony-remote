@@ -87,23 +87,12 @@ define([
         //     a progressive index for the entry.
         var self = this;
         var app_data = self.model.app_data[index];
+        var app_status = self.model.status[index];
 
-        
-        var app_status;
-        if (app_data.container !== null) {
-            app_status = "running";
-        } else if (_.contains(self.model.starting, index)) {
-            app_status = "starting";
-        } else if (_.contains(self.model.stopping, index)) {
-            app_status = "stopping";
-        } else {
-            app_status = "stopped";
-        }
-        
         var row = templates.app_entries({
             index: index,
             app_data: app_data,
-            app_status: app_status
+            app_status: app_status.toLowerCase()
         });
         
         var jq_row = $(row);
