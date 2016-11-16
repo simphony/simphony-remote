@@ -2,8 +2,9 @@ define([
     "jquery", 
     "urlutils",
     "handlebars",
-    "utils"
-], function ($, urlutils, hb, utils) {
+    "utils",
+    "underscore"
+], function ($, urlutils, hb, utils, _) {
     "use strict";
     var templates = {
        app_start_panel: hb.compile(
@@ -13,9 +14,11 @@ define([
            '      <h3 class="box-title">{{image_name app_data}}</h3>' +
            '      <div class="box-tools pull-right"></div>' +
            '    </div>' +
-           '    <div class="box-body"></div>' +
+           '    <div class="box-body">' +
+           '      <form class="configuration"><fieldset {{#if disabled}}disabled{{/if}}></fieldset></form>' +
+           '    </div>' +
            '    <div class="box-footer">' +
-           '      <a href="#" data-index={{index}} class="btn btn-primary pull-right start-button">Start</a>' +
+           '      <button data-index={{index}} class="btn btn-primary pull-right start-button" {{#if disabled}}disabled{{/if}}>Start</button>' +
            '    </div>' +
            '  </div>' +
            '</div>'
@@ -23,8 +26,7 @@ define([
     };
 
     var ApplicationView = function(model) {
-        // (Constructor) Represents the application list. In charge of 
-        // rendering in on the div with id #applist
+        // (Constructor) Represents the main view where the application will be
         // 
         // Parameters
         // model : ApplicationListModel
@@ -43,55 +45,75 @@ define([
         //    the waiting spinner, rather than the application itself.
         //    Temporary measure. Will go away.
         var self = this;
+        var html = self._render_for_model_state(delayed);
+        $(".content").html(html.hide().fadeIn(200));
+    };
+   
+    ApplicationView.prototype.update = function(delayed) {
+        // Like render, but without fade in effect.
+        var self = this;
+        var html = self._render_for_model_state(delayed);
+        $(".content").html(html);
+    };
+    
+    ApplicationView.prototype._render_for_model_state = function(delayed) {
+        // Decides what to render according to the current model state
+        var self = this;
         var index = self.model.selected_index;
-        
+
         if (index === null) {
             // render nothing.
-            return;
+            return $("<div>");
         }
-        
+
         var app_data = self.model.app_data[index];
-        
+        var html;
+
         if (app_data.container === null) {
-            self._render_form(index);
+            html = self._render_form(index);
         } else {
-            self._render_app(index, delayed);
+            html = self._render_app(index, delayed);
         }
+        return html;
     };
     
     ApplicationView.prototype._render_form = function(index) {
+        // Renders the configuration form
         var self = this;
         var app_data = self.model.app_data[index];
-        var form = $("<form class='configuration'>");
 
         var configurables = self.model.configurables[index];
         var properties = Object.getOwnPropertyNames(configurables);
-        
-        if (properties.length === 0) {
-            form.html("No configurable options for this image");
-        } else {
-            properties.forEach(
-                function(val) {  // jshint ignore:line
-                    var widget = configurables[val].view(index);
-                    form.append(widget);
-                }
-            );
-        }
 
+        var disabled = _.contains(self.model.starting, index);
         var base = $(templates.app_start_panel({
             app_data: app_data,
-            index: index
+            index: index,
+            disabled: disabled
         }));
-
-        base.find(".box-body").html(form);
+        
         base.find(".start-button").click(function() {
             self.start_button_clicked($(this).attr("data-index"));
         });
 
-        $(".content").html(base.hide().fadeIn(200));
+        var fieldset = base.find("fieldset");
+        
+        if (properties.length === 0) {
+            fieldset.html("No configurable options for this image");
+        } else {
+            properties.forEach(
+                function(val) {  // jshint ignore:line
+                    var widget = configurables[val].view(index);
+                    fieldset.append(widget);
+                }
+            );
+        }
+
+        return base;
     };
     
     ApplicationView.prototype._render_app = function(index, delayed) {
+        // Renders the iframe with the application.
         var self = this;
         var app_data = self.model.app_data[index];
         var location = urlutils.path_join(self.base_url, 
@@ -107,7 +129,7 @@ define([
         var iframe = $('<iframe class="application" frameBorder="0" ' +
             'src="' + location + '" ' +
             'style="min-width: '+iframe_size[0]+'px; min-height: '+iframe_size[1]+'px;"></iframe>');
-        $(".content").html(iframe.hide().fadeIn(200));
+        return iframe;
     };
 
     return {

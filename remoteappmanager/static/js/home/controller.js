@@ -8,7 +8,8 @@ require([
     "home/views/application_list_view",
     "home/views/application_view",
     "jsapi/v1/resources",
-    "handlebars"
+    "handlebars",
+    "underscore"
 ], function(
     $, 
     urlutils, 
@@ -18,7 +19,8 @@ require([
     application_list_view,
     application_view, 
     resources,
-    hb) {
+    hb,
+    _) {
     "use strict";
 
     var ga = analytics.init();
@@ -45,6 +47,7 @@ require([
         app_list_view.update_selected();
         app_view.render();
     };
+
 //    app_list_view.entry_clicked = function (index) {
 //        var app_info = model.app_data[index];
 //        var url_id = app_info.container.url_id;
@@ -69,7 +72,15 @@ require([
         // The container is not running. This is a start button.
         var mapping_id = model.app_data[index].mapping_id;
         var image_name = model.app_data[index].image.name;
+
+        if (_.contains(model.starting, index)) {
+            return;
+        }
         
+        model.starting.push(index);
+        app_view.update();
+        app_list_view.update_entry(index);
+
         var configurables_data = {};
         var configurables = model.configurables[index];
         configurables_data = {};
@@ -93,7 +104,8 @@ require([
             });
 
             model.update_idx(index)
-                .done(function() {
+                .always(function() {
+                    model.starting = _.without(model.starting, index);
                     app_list_view.update_entry(index);
                     app_list_view.update_selected();
                     app_view.render(true);
@@ -102,6 +114,10 @@ require([
                     dialogs.webapi_error_dialog(error);
                 });
         }).fail(function(error) {
+            model.starting = _.without(model.starting, index);
+            app_list_view.update_entry(index);
+            app_list_view.update_selected();
+            app_view.render(true);
             dialogs.webapi_error_dialog(error);
         });
     };

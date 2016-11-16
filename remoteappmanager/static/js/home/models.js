@@ -91,6 +91,10 @@ define([
         // Should be the index of the selected app_data, 
         // or null if no selection.
         this.selected_index = null;
+        
+        // indexes currently starting
+        this.starting = [];
+        
     };
 
     ApplicationListModel.prototype.update = function() {

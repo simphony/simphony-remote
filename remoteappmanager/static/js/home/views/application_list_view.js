@@ -2,12 +2,13 @@ define([
     "jquery", 
     "urlutils",
     "handlebars",
-], function ($, urlutils, hb) {
+    "underscore"
+], function ($, urlutils, hb, _) {
     "use strict";
     var templates = {
        app_entries: hb.compile(
            '<li data-index="{{index}}">' +
-           '  {{#if running}}<span class="start-badge"></span>{{/if}}' +
+           '  <span class="{{app_status}}-badge"></span>' +
            '<a href="#">' +
            '  <img src="{{icon_src app_data}}" class="app-icon">' +
            '  <span>{{image_name app_data}}</span>' +
@@ -82,10 +83,20 @@ define([
         var self = this;
         var app_data = self.model.app_data[index];
 
+        
+        var app_status;
+        if (app_data.container !== null) {
+            app_status = "running";
+        } else if (_.contains(self.model.starting, index)) {
+            app_status = "starting";
+        } else {
+            app_status = "stopped";
+        }
+        
         var row = templates.app_entries({
             index: index,
             app_data: app_data,
-            running: (app_data.container !== null) 
+            app_status: app_status
         });
         
         var jq_row = $(row);
