@@ -22,6 +22,11 @@ before_script:
     - make devdeps
 
 script:
+
+
+    - sudo add-apt-repository -y ppa:mc3man/trusty-media
+    - sudo apt-get update -y
+    - sudo apt-get install ffmpeg
     - flake8 .
     - make pythontest
     - make jstest
@@ -36,8 +41,10 @@ script:
     - chmod 755 `pwd`/start.sh
     - "`pwd`/start.sh &"
     - popd
+    - "ffmpeg -f x11grab -video_size 800x600 -i :99 -codec:v libx264 -r 12 -t 5 video.mp4 &"
     - sleep 3
     - DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
+    - curl --upload-file video.mp4 https://transfer.sh/video.mp4 
 
 after_success:
     - coverage run -m tornado.testing discover
