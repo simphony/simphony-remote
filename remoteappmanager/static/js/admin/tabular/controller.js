@@ -1,6 +1,6 @@
 define([
     "jquery", 
-    "datatables.net"
+    "datatables"
 ], function ($, dt) {  // jshint ignore:line
     "use strict";
    

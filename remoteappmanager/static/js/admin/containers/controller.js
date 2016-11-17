@@ -1,9 +1,8 @@
 require([
     "jquery",
-    "bootstrap",   // unused by module, but needed for binding modal dialog
     "dialogs",
     "jsapi/v1/resources"
-], function ($, bootstrap, dialogs, resources) {
+], function ($, dialogs, resources) {
     "use strict";
     
     $('#action-dialog').on('show.bs.modal', function (event) {
