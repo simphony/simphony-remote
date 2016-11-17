@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium_tests.selenium_test_base import SeleniumTestBase
 from selenium.webdriver.support import expected_conditions as EC
@@ -15,35 +16,18 @@ class TestStartStopContainer(SeleniumTestBase):
         driver.find_element_by_id("password_input").send_keys("test")
         driver.find_element_by_id("login_submit").click()
 
-        wait = WebDriverWait(driver, 10)
-        wait.until(EC.element_to_be_clickable((By.ID, 'bnx_0')))
+        self.wait_for(lambda:
+            driver.find_element_by_css_selector("#applist > li > a").text !=
+            "Loading")
 
-        self.assertEqual(len(driver.window_handles), 1)
-        main_window = driver.window_handles[0]
+        self.click_by_css_selector("#applist > li > a")
+        self.click_by_css_selector(".start-button")
 
-        driver.execute_script(
-            "arguments[0].click()",
-            driver.find_element_by_id("bnx_0")
-        )
+        driver.find_element_by_id("application")
+        ActionChains(driver).move_to_element(
+            driver.find_element_by_css_selector("#applist .app-icon")
+            ).click(driver.find_element_by_css_selector(".stop-button")
+            ).perform()
 
-        self.wait_for(lambda: len(driver.window_handles) == 2)
-        driver.switch_to.window(main_window)
-
-        driver.find_element_by_css_selector(".view-button")
-        # Try clicking on View.
-        driver.execute_script(
-            "arguments[0].click()",
-            driver.find_element_by_id("bnx_0")
-        )
-
-        self.wait_for(lambda: len(driver.window_handles) == 3)
-        driver.switch_to.window(main_window)
-
-        # Click on Stop.
-        driver.execute_script(
-            "arguments[0].click()",
-            driver.find_element_by_id("bny_0")
-        )
-        self.wait_for(
-            lambda: "Start" == driver.find_element_by_id("bnx_0").text)
+        driver.find_element_by_css_selector(".dropdown-toggle").click()
         driver.find_element_by_id("logout").click()

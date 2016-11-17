@@ -74,6 +74,12 @@ class SeleniumTestBase(unittest.TestCase):
         else:
             self.fail("time out")
 
+    def click_by_css_selector(self, css_selector):
+        # Workaround for some unexpected behavior with clicking some elements.
+        self.driver.execute_script(
+            "arguments[0].click()",
+            self.driver.find_element_by_css_selector(css_selector))
+
     def tearDown(self):
         self.driver.quit()
         self.assertEqual([], self.verificationErrors)
