@@ -57,10 +57,6 @@ body {
     height: 100%;
 }
 
-.configuration {
-    padding: 20px;
-}
-
 .running-badge {
     display: block;
     position: absolute;
@@ -176,4 +172,8 @@ body {
 .truncate {
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.no-padding {
+    padding: 0px;
 }

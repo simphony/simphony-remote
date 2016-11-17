@@ -9,24 +9,26 @@ define([
     "use strict";
     var templates = {
        app_start_panel: hb.compile(
-           '<div class="configuration">' +
-           '  <div class="box box-primary">' +
-           '    <div class="box-header with-border">' +
-           '      <h3 class="box-title">{{image_name app_data}}</h3>' +
-           '      <div class="box-tools pull-right"></div>' +
-           '    </div>' +
-           '    <div class="box-body">' +
-           '      <h4>Policy</h4>' +
-           '      <ul class="policy">' +
-           '      </ul>' +
-           '      <h4>Configuration</h4>' +
-           '      <form class="configuration"><fieldset {{#if disabled}}disabled{{/if}}></fieldset></form>' +
-           '    </div>' +
-           '    <div class="box-footer">' +
-           '      <button data-index={{index}} class="btn btn-primary pull-right start-button" {{#if disabled}}disabled{{/if}}>Start</button>' +
+           '<div class="row">' +
+           '  <div class="col-md-offset-2 col-md-8">' +
+           '    <div class="box box-primary">' +
+           '      <div class="box-header with-border">' +
+           '        <h3 class="box-title">{{image_name app_data}}</h3>' +
+           '        <div class="box-tools pull-right"></div>' +
+           '      </div>' +
+           '      <div class="box-body">' +
+           '        <h4>Policy</h4>' +
+           '        <ul class="policy">' +
+           '        </ul>' +
+           '        <h4>Configuration</h4>' +
+           '        <form class="configuration"><fieldset {{#if disabled}}disabled{{/if}}></fieldset></form>' +
+           '      </div>' +
+           '      <div class="box-footer">' +
+           '        <button data-index={{index}} class="btn btn-primary pull-right start-button" {{#if disabled}}disabled{{/if}}>Start</button>' +
+           '      </div>' +
            '    </div>' +
            '  </div>' +
-           '</div>'
+           '  </div>'
        )
     };
 
@@ -79,8 +81,10 @@ define([
         var html;
 
         if (app_status === models.Status.STARTING || app_status === models.Status.STOPPED) {
+            $("section.content").removeClass("no-padding");
             html = self._render_form(index);
         } else {
+            $("section.content").addClass("no-padding");
             html = self._render_app(index, delayed);
         }
         return html;
