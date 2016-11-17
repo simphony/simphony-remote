@@ -80,7 +80,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         {% endif %}
         {% if analytics %}
           analytics: {
-            tracking_id: "{{ analytics.tracking_id }}",
+            tracking_id: "{{ analytics.tracking_id }}"
           },
         {% endif %}
       }
@@ -160,6 +160,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <!-- Main content -->
       <section class="content">
         {% block main %}
+          <div class="row">
+            <div class="col-md-12">
+              <div class="box">
+                <div class="box-header with-border">{% block main_box_title %}{% endblock %}</div>
+                <div class="box-body">
+                  {% block main_box_body %}{% endblock %}
+                </div>
+              </div>
+            </div>
+          </div>
         {% endblock %}
         <!-- Your Page Content Here -->
       </section>

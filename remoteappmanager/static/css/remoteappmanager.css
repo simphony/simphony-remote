@@ -39,17 +39,10 @@ body {
     background-color: white;
 }
 
-.box {
-    width: 50%;
-    margin-left: auto;
-    margin-right: auto;
-}
-
 /* Used in the admin page as a central element */
 .adminslab {
     background-color: white;
     border-radius: 10px;
-    margin-top: 40px;
     padding-bottom: 10px;
     box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
 }
@@ -57,10 +50,6 @@ body {
 .createnew {
     margin-top: 20px;
     margin-bottom: 10px;
-}
-
-.content {
-    padding: 0px;
 }
 
 #application {

@@ -1,9 +1,7 @@
 {% extends "admin/page.html" %}
 
-
-{% block center %}
-  <div class="container adminslab">
-  <h3>Currently Running Containers</h3>
+{% block main_box_title %}Currently Running Containers{% endblock %}
+{% block main_box_body %}
   {% call macros.table(["User", "Image", "Docker ID", "Mapping ID", "URL ID", "Stop"]) %}
     {% for c in containers %}
       <tr>
@@ -20,7 +18,6 @@
       </tr>
     {% endfor %}
   {% endcall %}
-  </div>
 {% endblock %}
 
 {% block dialogs %}
