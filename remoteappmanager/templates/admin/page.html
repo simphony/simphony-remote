@@ -1,59 +1,33 @@
 {% extends "page.html" %}
 
+{% set skin = "skin-red" %}
+
 {% block stylesheet %}
     {{ super() }}
     <link rel="stylesheet" href="{{ static_url("components/datatables.net-dt/css/jquery.dataTables.css") }}" type="text/css"/>
 {% endblock %}
 
-{% block main %}
-    <ul id="adminoptions" class="nav nav-tabs">
+{% block sidebar %}
+  <section class="sidebar">
+    <ul class="sidebar-menu" id="adminoptions">
+      <li class="header">ADMIN</li>
         <li {% if tab == "home" %}class="active"{% endif %}><a href="{{ base_url }}">Home</a></li>
         <li {% if tab == "containers" %}class="active"{% endif %}><a href="{{ base_url }}containers/">Containers</a></li>
         <li {% if tab == "users" %}class="active"{% endif %}><a href="{{ base_url }}users/">Users</a></li>
         <li {% if tab == "applications" %}class="active"{% endif %}><a href="{{ base_url }}applications/">Applications</a></li>
     </ul>
-    {% block center %}{% endblock %}
+  </section>
 {% endblock %}
 
-{% block script_init %}
-    <script>
-        require.config({
-            {% if version_hash %}
-                urlArgs: "v={{version_hash}}",
-            {% endif %}
-            baseUrl: '{{static_url("js", include_version=False)}}',
-            paths: {
-                components: '../components',
-                jquery: '../components/jquery/jquery.min',
-                bootstrap: '../components/bootstrap/js/bootstrap.min',
-                moment: "../components/moment/moment",
-                "datatables.net": "../components/datatables.net/js/jquery.dataTables",
-                "jsapi": "../../jsapi"
-            },
-            shim: {
-                bootstrap: {
-                    deps: ["jquery"],
-                    exports: "bootstrap"
-                },
-                "datatables.net": {
-                    deps: ["jquery"]
-                }
-            }
-        });
-    </script>
-
-    <script type="text/javascript">
-        window.apidata = {
-            base_url: "{{base_url}}",
-            prefix: "{{prefix}}",
-            {% if user %}
-                user: "{{user.name}}",
-            {% endif %}
-            {% if analytics %}
-                analytics: {
-                    tracking_id: "{{ analytics.tracking_id }}",
-                },
-            {% endif %}
-        }
-    </script>
+{% block main %}
+  <div class="row">
+    <div class="col-md-12">
+      <div class="box">
+        <div class="box-header with-border">{% block main_box_title %}{% endblock %}</div>
+        <div class="box-body">
+          {% block main_box_body %}{% endblock %}
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

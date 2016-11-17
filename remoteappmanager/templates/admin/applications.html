@@ -1,33 +1,26 @@
 {% extends "admin/page.html" %}
 
-
-{% block center %}
-  <div class="container adminslab">
-    <div class="row">
-        <div class="col-lg-2">
-            <h3>Applications</h3>
-        </div>
-        <div class="col-lg-1">
-            <button class="btn btn-primary createnew"
-                    data-toggle="modal"
-                    data-target="#create-new-dialog">Create New</button>
-        </div>
-    </div>
-    {% call macros.table([ "ID", "Image", "Remove"]) %}
-      {% for a in applications %}
-        <tr>
-            <td>{{ a.id }}</td>
-            <td>{{ a.image }}</td>
-            <td><button
-                    class="btn btn-danger"
-                    data-value="{{ a.id }}"
-                    data-name="{{ a.image }}"
-                    data-toggle="modal"
-                    data-target="#action-dialog">Remove</button></td>
-        </tr>
-      {% endfor %}
-    {% endcall %}
+{% block main_box_title %}Applications{% endblock %}
+{% block main_box_body %}
+  <div class="pull-right">
+    <button class="btn btn-primary createnew"
+            data-toggle="modal"
+            data-target="#create-new-dialog">Create New</button>
   </div>
+  {% call macros.table([ "ID", "Image", "Remove"]) %}
+    {% for a in applications %}
+      <tr>
+        <td>{{ a.id }}</td>
+        <td>{{ a.image }}</td>
+        <td><button
+          class="btn btn-danger"
+          data-value="{{ a.id }}"
+          data-name="{{ a.image }}"
+          data-toggle="modal"
+          data-target="#action-dialog">Remove</button></td>
+      </tr>
+    {% endfor %}
+  {% endcall %}
 {% endblock %}
 
 {% block dialogs %}

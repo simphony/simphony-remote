@@ -1,37 +1,30 @@
 {% extends "admin/page.html" %}
 
-
-{% block center %}
-  <div class="container adminslab">
-    <div class="row">
-        <div class="col-lg-5">
-            <h3>User applications - {{ user.name }}</h3>
-        </div>
-        <div class="col-lg-1">
-            <button class="btn btn-primary createnew"
-                    data-toggle="modal"
-                    data-target="#create-new-policy-dialog">Create New</button>
-        </div>
-    </div>
-    {% call macros.table([ "Mapping ID", "Application", "Workspace", "Vol. source",
-                           "Vol. target", "Readonly", "Remove"]) %}
-      {% for r in info %}
-        <tr>
-          <td>{{ r.mapping_id|truncate(12) }}</td>
-          <td>{{ r.app.image }}</td>
-          <td class="dt-center">{% if r.policy.allow_home %}<i class="fa fa-check" aria-hidden="true"></i>{% endif %}</td>
-          <td>{{ r.policy.volume_source|default('', true) }}</td>
-          <td>{{ r.policy.volume_target|default('', true) }}</td>
-          <td class="dt-center">{% if r.policy.volume_mode == 'ro' %}<i class="fa fa-check" aria-hidden="true"></i>{% endif %}</td>
-          <td><button class="btn btn-danger"
-                      data-value="{{ r.mapping_id }}"
-                      data-name="{{ r.mapping_id }}"
-                      data-toggle="modal"
-                      data-target="#action-dialog">Remove</button></td>
-        </tr>
-      {% endfor %}
-    {% endcall %}
+{% block main_box_title %}User applications - {{ user.name }}{% endblock %}
+{% block main_box_body %}
+  <div class="pull-right">
+    <button class="btn btn-primary createnew"
+            data-toggle="modal"
+            data-target="#create-new-policy-dialog">Create New</button>
   </div>
+  {% call macros.table([ "Mapping ID", "Application", "Workspace", "Vol. source",
+                         "Vol. target", "Readonly", "Remove"]) %}
+    {% for r in info %}
+      <tr>
+        <td>{{ r.mapping_id|truncate(12) }}</td>
+        <td>{{ r.app.image }}</td>
+        <td class="dt-center">{% if r.policy.allow_home %}<i class="fa fa-check" aria-hidden="true"></i>{% endif %}</td>
+        <td>{{ r.policy.volume_source|default('', true) }}</td>
+        <td>{{ r.policy.volume_target|default('', true) }}</td>
+        <td class="dt-center">{% if r.policy.volume_mode == 'ro' %}<i class="fa fa-check" aria-hidden="true"></i>{% endif %}</td>
+        <td><button class="btn btn-danger"
+                    data-value="{{ r.mapping_id }}"
+                    data-name="{{ r.mapping_id }}"
+                    data-toggle="modal"
+                    data-target="#action-dialog">Remove</button></td>
+      </tr>
+    {% endfor %}
+  {% endcall %}
 {% endblock %}
 
 {% block dialogs %}

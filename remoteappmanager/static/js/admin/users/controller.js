@@ -1,9 +1,8 @@
 define([
     "jquery",
-    "bootstrap",   // needed for modal operations.
     "dialogs",
     "jsapi/v1/resources"
-], function ($, bootstrap, dialogs, resources) {
+], function ($, dialogs, resources) {
     "use strict";
 
     $('#create-new-dialog').on('show.bs.modal', function () {

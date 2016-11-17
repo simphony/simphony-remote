@@ -11,8 +11,7 @@ from tornadowebapi.registry import Registry
 from remoteappmanager.db.interfaces import ABCAccounting
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.docker.container_manager import ContainerManager
-from remoteappmanager.jinja2_adapters import Jinja2LoaderAdapter
-from remoteappmanager.webutils import is_link
+from remoteappmanager.jinja2_adapters import Jinja2LoaderAdapter, gravatar_id
 from remoteappmanager.user import User
 from remoteappmanager.traitlets import as_dict
 from remoteappmanager.services.hub import Hub
@@ -194,5 +193,5 @@ class BaseApplication(web.Application, LoggingMixin):
             autoescape=True,
         )
 
-        jinja_env.tests["link"] = is_link
+        jinja_env.filters["gravatar_id"] = gravatar_id
         settings["template_loader"] = Jinja2LoaderAdapter(jinja_env)
