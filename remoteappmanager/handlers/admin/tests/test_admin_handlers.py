@@ -1,6 +1,6 @@
 from remoteappmanager.tests import utils
 from remoteappmanager.tests.mocking import dummy
-from BeautifulS
+
 
 class TestBaseAccess(utils.AsyncHTTPTestCase):
     #: which url to poke
@@ -68,8 +68,3 @@ class TestAccountingHandler(TestBaseAccess):
                          })
 
         self.assertEqual(res.code, 404)
-
-    def test_correct_username_in_header(self):
-        bs
-
-
