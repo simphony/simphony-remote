@@ -30,7 +30,8 @@ deps:
 	else \
 		plat_packages="docker.io python3-venv"; \
 	fi; \
-		sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages npm python3-pip 
+		sudo dpkg -r nodejs \
+		sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages npm nodejs-legacy python3-pip 
 	npm install 
 	`npm bin`/bower install 
 
