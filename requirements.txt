@@ -8,7 +8,7 @@ requests==2.10.0
 docker-py==1.8
 escapism==0.0.1
 jinja2==2.8
-git+git://github.com/jupyterhub/jupyterhub.git@42a993fd084780ad23e475f27f67ade3ae68d801#egg=jupyterhub
+git+git://github.com/jupyterhub/jupyterhub.git@0.7.2#egg=jupyterhub
 jupyter_client==4.3.0
 click==6.6
 tabulate==0.7.5
