@@ -21,7 +21,16 @@ class FileWhitelistMixin(LoggingConfigurable):
     def whitelist(self):
         try:
             cur_mtime = os.path.getmtime(self.whitelist_file)
-            print(os.path.getsize(self.whitelist_file))
+            if cur_mtime <= self._whitelist_file_last_modified:
+                # File older than last change.
+                # keep using the current cached whitelist
+                return self._whitelist
+
+            self.log.info("Whitelist file more recent than the old one. "
+                          "Updating whitelist.")
+
+            with open(self.whitelist_file, "r") as f:
+                whitelisted_users = set(x.strip() for x in f.readlines())
         except FileNotFoundError:
             # empty set means everybody is allowed
             return {}
@@ -29,25 +38,6 @@ class FileWhitelistMixin(LoggingConfigurable):
             # For other exceptions, assume the file is broken, log it
             # and return what we have.
             self.log.exception("Unable to access whitelist.")
-            return self._whitelist
-
-        if cur_mtime <= self._whitelist_file_last_modified:
-            # File older than last change.
-            # keep using the current cached whitelist
-            return self._whitelist
-
-        self.log.info("Whitelist file more recent than the old one. "
-                      "Updating whitelist.")
-
-        # File has changed, parse its new content and reapply
-        try:
-            with open(self.whitelist_file, "r") as f:
-                whitelisted_users = set(x.strip() for x in f.readlines())
-        except FileNotFoundError:
-            return {}
-        except Exception:
-            self.log.exception("Unable to access whitelist.")
-            # For other exceptions, assume the file is broken
             return self._whitelist
 
         self._whitelist = whitelisted_users
