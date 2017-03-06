@@ -16,6 +16,7 @@ requirements = [
     "jupyter_client>=4.3.0",
     "click>=6.6",
     "tabulate>=0.7.5",
+    "oauthenticator>=0.5",
 ]
 
 # Unfortunately RTD cannot install jupyterhub because jupyterhub needs bower,
