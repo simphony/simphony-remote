@@ -1,6 +1,6 @@
 {% extends "admin/page.html" %}
 
-{% block main_box_title %}User applications - {{ user.name }}{% endblock %}
+{% block main_box_title %}User applications - {{ acc_user.name }}{% endblock %}
 {% block main_box_body %}
   <div class="pull-right">
     <button class="btn btn-primary createnew"
@@ -33,7 +33,7 @@
     {% endcall %}
     {% call macros.modal_dlg('Create New Policy', btn_label='OK', btn_class="btn-primary", buttons_dismiss=false) %}
         <form>
-          <input type="hidden" id="user_name" value="{{ user.name }}">
+          <input type="hidden" id="user_name" value="{{ acc_user.name }}">
           <div class="form-group">
             <label for="image_name">App image name</label>
             <input type="text" class="form-control" id="image_name">
