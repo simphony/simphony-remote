@@ -1,8 +1,5 @@
 from tornado.testing import AsyncTestCase, gen_test
-try:
-    from unittest.mock import Mock
-except ImportError:
-    from mock import Mock
+from unittest.mock import Mock
 
 from remoteappmanager.jupyterhub.auth import WorldAuthenticator
 
