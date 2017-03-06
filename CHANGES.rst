@@ -1,8 +1,13 @@
 SimPhoNy Remote CHANGELOG
 =========================
 
-What's new in SimPhoNy Remote 0.9.0
+What's new in SimPhoNy Remote 1.1.0
 -----------------------------------
+
+- Fix: incorrect user name in top header for admin Accounting panel (#348)
+
+What's new in SimPhoNy Remote 0.9.0/1.0.0
+-----------------------------------------
 
 Summary
 ~~~~~~~
