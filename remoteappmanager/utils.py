@@ -83,3 +83,19 @@ class mergedocs(object):
 def one(elements):
     """Returns True if only one element is not None, false otherwise"""
     return sum([False if e is None else True for e in elements]) == 1
+
+
+def remove_quotes(s):
+    """Removes start/end quotes from a string, if needed.
+    If s is not a string, it is returned untouched.
+    """
+    if not isinstance(s, str):
+        return s
+
+    if len(s) < 2:
+        return s
+
+    if s[0]+s[-1] in ['""', "''"]:
+        return s[1:-1]
+
+    return s

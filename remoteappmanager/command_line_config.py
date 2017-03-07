@@ -3,7 +3,7 @@ from tornado.options import define, options
 
 from traitlets import HasTraits, Int, Unicode
 
-from remoteappmanager.utils import with_end_slash
+from remoteappmanager.utils import with_end_slash, remove_quotes
 from remoteappmanager.traitlets import set_traits_from_dict
 
 
@@ -62,7 +62,13 @@ class CommandLineConfig(HasTraits):
 
         tornado.options.parse_command_line()
 
-        set_traits_from_dict(self, options.as_dict())
+        # Workaround for change in jupyterhub 0.7.0.
+        # Args are passed with quotes, that are preserved in the arguments when
+        # we retrieve them. We just get rid of the quotes, until a better
+        # solution comes along.
+        # See jupyterhub/jupyterhub#836 for details.
+        opts = {k: remove_quotes(v) for k, v in options.as_dict().items()}
+        set_traits_from_dict(self, opts)
 
         # Normalize the base_urlpath to end with a slash
         self.base_urlpath = with_end_slash(self.base_urlpath)
