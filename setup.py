@@ -43,7 +43,7 @@ setup(
     author='SimPhoNy Project',
     description='Remote application manager sub-executable',
     install_requires=requirements,
-    packages=find_packages(),
+    packages=find_packages(exclude=["selenium_tests"]),
     include_package_data=True,
     entry_points={
         'console_scripts': [
