@@ -24,7 +24,7 @@ sys.path.append(os.path.abspath('.'))
 from mock_missing import mock_modules
 mock_modules()
 
-from remoteappmanager import __version__, MAJOR, MINOR
+from remoteappmanager import __version__
 from remoteappmanager.command_line_config import CommandLineConfig
 
 # -- General configuration ------------------------------------------------
@@ -76,7 +76,7 @@ author = 'SimPhoNy Project'
 # built documents.
 #
 # The short X.Y version.
-version = '{}.{}'.format(MAJOR, MINOR)
+version = '{}.{}'.format(*__version__.split(".")[0:2])
 # The full version, including alpha/beta/rc tags.
 release = __version__
 

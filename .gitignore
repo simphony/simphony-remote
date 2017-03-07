@@ -17,3 +17,4 @@ build/
 dist/
 jupyterhub/remoteappmanager.db
 jupyterhub/test.key.org
+remoteappmanager/version.py
