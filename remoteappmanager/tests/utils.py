@@ -11,8 +11,9 @@ from remoteappmanager.file_config import FileConfig
 from remoteappmanager.environment_config import EnvironmentConfig
 from remoteappmanager.db.orm import Database
 from remoteappmanager.tests import fixtures
+from remoteappmanager.utils import remove_quotes
 
-# A set of viable start arguments
+# A set of viable start arguments. As they would arrive from outside
 arguments = {
     "user": "username",
     "port": 57022,
@@ -38,7 +39,8 @@ def basic_command_line_config():
     """Returns a basic application config for testing purposes.
     The database is in memory.
     """
-    options = {k.replace("-", "_"): v for k, v in arguments.items()}
+    options = {k.replace("-", "_"): remove_quotes(v)
+               for k, v in arguments.items()}
 
     return CommandLineConfig(**options)
 
