@@ -27,3 +27,10 @@ class TestUtils(unittest.TestCase):
                 """two"""
 
         self.assertEqual(Derived.foo.__doc__, "one\ntwo")
+
+    def test_remove_quotes(self):
+        self.assertEqual(utils.remove_quotes('"foo bar"'), "foo bar")
+        self.assertEqual(utils.remove_quotes('foo'), "foo")
+        self.assertEqual(utils.remove_quotes('f'), "f")
+        self.assertEqual(utils.remove_quotes(''), "")
+        self.assertEqual(utils.remove_quotes('"'), '"')

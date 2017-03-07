@@ -78,13 +78,13 @@ class TestSystemUserSpawner(TempMixin, testing.AsyncTestCase):
         args = self.spawner.get_args()
         self.assertIn("--proxy-api-url=http://127.0.0.1:12345/foo/bar/", args)
         self.assertIn("--config-file={}".format(path), args)
-        self.assertIn("--base-urlpath=/", args)
+        self.assertIn("--base-urlpath=\"/\"", args)
 
     def test_args_without_config_file_path(self):
         args = self.spawner.get_args()
         self.assertIn("--proxy-api-url=http://127.0.0.1:12345/foo/bar/", args)
         self.assertFalse(any("--config-file=" in arg for arg in args))
-        self.assertIn("--base-urlpath=/", args)
+        self.assertIn("--base-urlpath=\"/\"", args)
 
     def test_cmd(self):
         self.assertEqual(self.spawner.cmd, ['remoteappmanager'])
