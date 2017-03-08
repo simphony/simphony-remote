@@ -96,4 +96,3 @@ class TestGithubWhiteListAuthenticator(TempMixin, AsyncTestCase):
         auth.whitelist_file = whitelist_path
         auth.whitelist = set()
         self.assertNotEqual(auth.whitelist, set())
-
