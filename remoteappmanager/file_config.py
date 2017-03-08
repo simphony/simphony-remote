@@ -30,10 +30,16 @@ class FileConfig(HasTraits):
 
     docker_host = Unicode("", help="The docker host to connect to")
 
-    docker_realm = Unicode("remoteexec",
-                           help="The docker realm. Identifies which "
-                                "containers belong to a specific instance of "
-                                "simphony-remote.")
+    #: Docker realm is a label added to containers started by this deployment
+    #: of simphony-remote. You should change this to something unique only if
+    #: your machine is already running other simphony-remote instances, all
+    #: using the same docker server. Failing to do that would allow different
+    #: simphony-remote instances to see (and interact with) each other's
+    #: containers.
+    docker_realm = Unicode(
+        "remoteexec",
+        help="The docker realm. Identifies which containers belong to a "
+             "specific instance of simphony-remote.")
 
     accounting_class = Unicode(
         default_value="remoteappmanager.db.orm.AppAccounting",
