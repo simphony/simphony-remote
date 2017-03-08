@@ -49,7 +49,7 @@ if on_rtd:
     requirements.extend(["sqlalchemy>=1.0"])
 else:
     requirements.extend([
-        "jupyterhub~=0.7",
+        "jupyterhub>0.7",
         "docker-py==1.8",
         "tornadowebapi>=0.4.2"])
 

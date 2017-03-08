@@ -1,5 +1,4 @@
 setuptools==21.0
-traitlets==4.1
 tornado==4.3
 # Fix to 2.10.0 due to docker-py needs (fails with 2.11.1)
 requests==2.10.0
@@ -8,7 +7,7 @@ requests==2.10.0
 docker-py==1.8
 escapism==0.0.1
 jinja2==2.8
-git+git://github.com/jupyterhub/jupyterhub.git@0.7.2#egg=jupyterhub
+git+git://github.com/jupyterhub/jupyterhub.git@master#egg=jupyterhub
 jupyter_client==4.3.0
 click==6.6
 tabulate==0.7.5
