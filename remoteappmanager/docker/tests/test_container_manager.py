@@ -18,10 +18,10 @@ class TestContainerManager(AsyncTestCase):
         super().setUp()
         self.manager = ContainerManager({})
         self.mock_docker_client = create_docker_client()
-        self.manager.docker_client._sync_client = self.mock_docker_client
+        self.manager._docker_client._sync_client = self.mock_docker_client
 
     def test_instantiation(self):
-        self.assertIsNotNone(self.manager.docker_client)
+        self.assertIsNotNone(self.manager._docker_client)
 
     @gen_test
     def test_start_stop(self):
@@ -102,7 +102,7 @@ class TestContainerManager(AsyncTestCase):
         # Making it so that no valid dictionary is returned.
         docker_client.port = mock.Mock(return_value=1234)
         self.mock_docker_client = docker_client
-        self.manager.docker_client._sync_client = docker_client
+        self.manager._docker_client._sync_client = docker_client
 
         result = yield self.manager.container_from_url_id("url_id")
         self.assertEqual(result, None)
@@ -205,7 +205,7 @@ class TestContainerManager(AsyncTestCase):
                                            )
 
         # Call args and keyword args that create_container receives
-        docker_client = self.manager.docker_client
+        docker_client = self.manager._docker_client
         args = docker_client._sync_client.create_container.call_args
         actual_volume_targets = args[1]['volumes']
 
@@ -224,7 +224,7 @@ class TestContainerManager(AsyncTestCase):
         def raiser(*args, **kwargs):
             raise Exception("Boom!")
 
-        self.manager.docker_client.start = mock.Mock(side_effect=raiser)
+        self.manager._docker_client.start = mock.Mock(side_effect=raiser)
 
         with self.assertRaisesRegex(Exception, 'Boom!'):
             yield self.manager.start_container("username",
@@ -246,7 +246,7 @@ class TestContainerManager(AsyncTestCase):
         def raiser(*args, **kwargs):
             raise Exception("Boom!")
 
-        self.manager.docker_client.port = mock.Mock(side_effect=raiser)
+        self.manager._docker_client.port = mock.Mock(side_effect=raiser)
 
         with self.assertRaisesRegex(Exception, 'Boom!'):
             yield self.manager.start_container("username",

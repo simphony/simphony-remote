@@ -224,7 +224,7 @@ def create_container_manager(params=None):
         params = {'docker_config': {}}
 
     manager = ContainerManager(**params)
-    manager.docker_client._sync_client = create_docker_client()
+    manager._docker_client._sync_client = create_docker_client()
     return manager
 
 

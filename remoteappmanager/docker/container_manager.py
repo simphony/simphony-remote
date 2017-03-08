@@ -37,13 +37,14 @@ class OperationInProgress(Exception):
 
 
 class ContainerManager(LoggingMixin):
-    #: The asynchronous docker client.
-    docker_client = Instance(AsyncDockerClient)
 
     #: The container (not host) port. We decided it's 8888 by default. It will
     #: be mapped to a random port on the host, so that our reverse proxy can
     #: refer to it.
     container_port = Int(8888)
+
+    #: The docker client configuration
+    docker_config = Dict()
 
     #: Tracks if a given mapping id is starting up.
     _start_pending = Set()
@@ -51,8 +52,8 @@ class ContainerManager(LoggingMixin):
     #: Tracks if a given container id is stopping down.
     _stop_pending = Set()
 
-    #: The docker client configuration
-    docker_config = Dict()
+    #: The asynchronous docker client.
+    _docker_client = Instance(AsyncDockerClient)
 
     def __init__(self, docker_config, *args, **kwargs):
         """Initializes the Container manager.
@@ -210,7 +211,7 @@ class ContainerManager(LoggingMixin):
         A list of Container objects, or an empty list if nothing is found.
         """
         containers = []
-        infos = yield self.docker_client.containers(filters=filters)
+        infos = yield self._docker_client.containers(filters=filters)
         for info in infos:
             try:
                 container = Container.from_docker_dict(info)
@@ -241,7 +242,7 @@ class ContainerManager(LoggingMixin):
         """Returns the Image object associated to a given id
         """
         try:
-            image_dict = yield self.docker_client.inspect_image(
+            image_dict = yield self._docker_client.inspect_image(
                 image_id_or_name)
         except NotFound:
             return None
@@ -266,7 +267,7 @@ class ContainerManager(LoggingMixin):
         """
 
         try:
-            image_info = yield self.docker_client.inspect_image(image_name)
+            image_info = yield self._docker_client.inspect_image(image_name)
             image_id = image_info["Id"]
         except NotFound as e:
             self.log.error('Could not find requested image {}'.format(
@@ -349,7 +350,7 @@ class ContainerManager(LoggingMixin):
         )
 
         self.log.debug("Starting host with config: %s", host_config)
-        host_config = yield self.docker_client.create_host_config(
+        host_config = yield self._docker_client.create_host_config(
             **host_config)
 
         # Get the host_config configuration in create_kwargs.
@@ -357,7 +358,7 @@ class ContainerManager(LoggingMixin):
         # Then update it with the current configuration.
         create_kwargs.setdefault('host_config', {}).update(host_config)
 
-        resp = yield self.docker_client.create_container(**create_kwargs)
+        resp = yield self._docker_client.create_container(**create_kwargs)
 
         container_id = resp['Id']
 
@@ -366,7 +367,7 @@ class ContainerManager(LoggingMixin):
 
         # start the container
         try:
-            yield self.docker_client.start(container_id)
+            yield self._docker_client.start(container_id)
         except Exception as e:
             self.log.exception("Could not start container {}".format(
                 container_id))
@@ -432,8 +433,8 @@ class ContainerManager(LoggingMixin):
 
         # retrieve the actual port binding
         try:
-            resp = yield self.docker_client.port(container_id,
-                                                 self.container_port)
+            resp = yield self._docker_client.port(container_id,
+                                                  self.container_port)
         except Exception as e:
             raise RuntimeError("Failed to get port info for {}. "
                                "Exception: {}.".format(container_id,
@@ -483,7 +484,7 @@ class ContainerManager(LoggingMixin):
         self.log.debug("Getting container '%s'", container_id)
 
         try:
-            container_info = yield self.docker_client.inspect_container(
+            container_info = yield self._docker_client.inspect_container(
                 container_id
             )
         except APIError as e:
@@ -508,7 +509,7 @@ class ContainerManager(LoggingMixin):
 
         # Stop the container
         try:
-            yield self.docker_client.stop(container_id)
+            yield self._docker_client.stop(container_id)
         except APIError:
             self.log.exception(
                 "Container '{}' could not be stopped.".format(
@@ -520,7 +521,7 @@ class ContainerManager(LoggingMixin):
 
         # Remove the container from docker
         try:
-            yield self.docker_client.remove_container(container_id)
+            yield self._docker_client.remove_container(container_id)
         except NotFound:
             self.log.error('Could not find requested container {} '
                            'during removal'.format(container_id))
