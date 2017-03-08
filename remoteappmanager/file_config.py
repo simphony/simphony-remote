@@ -30,6 +30,11 @@ class FileConfig(HasTraits):
 
     docker_host = Unicode("", help="The docker host to connect to")
 
+    docker_realm = Unicode("remoteexec",
+                           help="The docker realm. Identifies which "
+                                "containers belong to a specific instance of "
+                                "simphony-remote.")
+
     accounting_class = Unicode(
         default_value="remoteappmanager.db.orm.AppAccounting",
         help="The import path to a subclass of ABCAccounting")
