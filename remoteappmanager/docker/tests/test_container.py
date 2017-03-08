@@ -20,6 +20,7 @@ class TestContainer(TestCase):
             'Labels': {SIMPHONY_NS.ui_name: 'Empty Ubuntu',
                        SIMPHONY_NS_RUNINFO.user: 'user',
                        SIMPHONY_NS_RUNINFO.url_id: "8e2fe66d5de74db9bbab50c0d2f92b33",  # noqa
+                       SIMPHONY_NS_RUNINFO.realm: "myrealm",
                        SIMPHONY_NS_RUNINFO.urlpath: "/user/username/containers/whatever"},  # noqa
             'Names': ['/remoteexec-user-empty-ubuntu_3Alatest'],
             'Ports': [{'IP': '0.0.0.0',
@@ -38,7 +39,7 @@ class TestContainer(TestCase):
         self.assertEqual(container.host_url, "http://123.45.67.89:31337")
 
     def test_from_docker_dict_with_public_port(self):
-        '''Test convertion from "docker ps" to Container with public port'''
+        """Test convertion from "docker ps" to Container with public port"""
         # With public port
         container_dict = self.good_container_dict
 
@@ -53,7 +54,8 @@ class TestContainer(TestCase):
             ip='0.0.0.0',
             port=32823,
             url_id="8e2fe66d5de74db9bbab50c0d2f92b33",
-            urlpath="/user/username/containers/whatever"
+            urlpath="/user/username/containers/whatever",
+            realm="myrealm"
         )
 
         assert_containers_equal(self, actual, expected)
@@ -65,6 +67,14 @@ class TestContainer(TestCase):
 
         with self.assertRaises(ValueError):
             Container.from_docker_dict(self.good_container_dict)
+
+    def test_no_realm(self):
+        labels = self.good_container_dict["Labels"]
+        labels[SIMPHONY_NS_RUNINFO.realm] = ""
+
+        container = Container.from_docker_dict(self.good_container_dict)
+
+        self.assertEqual(container.realm, "")
 
     def test_from_docker_dict_without_public_port(self):
         '''Test convertion from "docker ps" to Container with public port'''
