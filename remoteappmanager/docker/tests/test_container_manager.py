@@ -282,3 +282,13 @@ class TestContainerManager(AsyncTestCase):
         self.assertEqual(
             mock_client.create_container.call_args[1]["environment"]["FOO"],
             "bar")
+
+    @gen_test
+    def test_different_realm(self):
+        manager = ContainerManager(docker_config={},
+                                   realm="anotherrealm")
+        manager._docker_client._sync_client = create_docker_client()
+
+        result = yield manager.containers_from_mapping_id("user_name",
+                                                          "mapping_id")
+        self.assertEqual(result, [])

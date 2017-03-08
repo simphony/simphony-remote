@@ -94,7 +94,6 @@ class BaseApplication(web.Application, LoggingMixin):
     @default("container_manager")
     def _container_manager_default(self):
         """Initializes the docker container manager."""
-
         return ContainerManager(
             realm=self.file_config.docker_realm,
             docker_config=self.file_config.docker_config()

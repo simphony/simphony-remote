@@ -18,7 +18,7 @@
 # # label. You generally should not change this unless you have multiple
 # # installations of simphony-remote all using the same docker host.
 #
-# docker_realm = "remoteexec"
+# docker_realm = "whatever"
 #
 # # TLS configuration
 # # -----------------
