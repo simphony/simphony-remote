@@ -22,7 +22,7 @@ class TestContainer(TestCase):
                        SIMPHONY_NS_RUNINFO.url_id: "8e2fe66d5de74db9bbab50c0d2f92b33",  # noqa
                        SIMPHONY_NS_RUNINFO.realm: "myrealm",
                        SIMPHONY_NS_RUNINFO.urlpath: "/user/username/containers/whatever"},  # noqa
-            'Names': ['/remoteexec-user-empty-ubuntu_3Alatest'],
+            'Names': ['/myrealm-user-empty-ubuntu_3Alatest'],
             'Ports': [{'IP': '0.0.0.0',
                        'PrivatePort': 8888,
                        'PublicPort': 32823,
@@ -47,7 +47,7 @@ class TestContainer(TestCase):
         actual = Container.from_docker_dict(container_dict)
         expected = Container(
             docker_id='248e45e717cd740ae763a1c565',
-            name='/remoteexec-user-empty-ubuntu_3Alatest',
+            name='/myrealm-user-empty-ubuntu_3Alatest',
             image_name='empty-ubuntu:latest',
             image_id='sha256:f4610c7580b8f0a9a25086b6287d0069fb8a',
             user="user",
@@ -77,7 +77,7 @@ class TestContainer(TestCase):
         self.assertEqual(container.realm, "")
 
     def test_from_docker_dict_without_public_port(self):
-        '''Test convertion from "docker ps" to Container with public port'''
+        """Test convertion from "docker ps" to Container with public port"""
         client = create_docker_client(container_ids=('container_id1',),
                                       container_names=('container_name1',),
                                       container_ports=([{'IP': '0.0.0.0',
@@ -97,6 +97,7 @@ class TestContainer(TestCase):
             port=80,
             url_id="url_id",
             mapping_id="mapping_id",
+            realm="myrealm",
             urlpath="/user/username/containers/url_id"
         )
 
@@ -109,7 +110,7 @@ class TestContainer(TestCase):
 
         expected = Container(
             docker_id='container_id1',
-            name='/remoteexec-username-mapping_5Fid',
+            name='/myrealm-username-mapping_5Fid',
             image_name='image_name1',
             image_id='image_id1',
             user="user_name",
@@ -117,6 +118,7 @@ class TestContainer(TestCase):
             port=666,
             url_id="url_id",
             mapping_id="mapping_id",
+            realm="myrealm",
             urlpath="/user/username/containers/url_id"
         )
 
