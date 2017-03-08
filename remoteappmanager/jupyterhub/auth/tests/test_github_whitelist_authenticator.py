@@ -86,3 +86,14 @@ class TestGithubWhiteListAuthenticator(TempMixin, AsyncTestCase):
             response = yield auth.get_authenticated_user(Mock(),
                                                          {"username": "foo"})
             self.assertEqual(response, None)
+
+    def test_dummy_setter(self):
+        whitelist_path = os.path.join(self.tempdir, "whitelist.txt")
+        with open(whitelist_path, "w") as f:
+            f.write("bar\n")
+
+        auth = self.auth
+        auth.whitelist_file = whitelist_path
+        auth.whitelist = set()
+        self.assertNotEqual(auth.whitelist, set())
+
