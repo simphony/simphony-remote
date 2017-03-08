@@ -33,7 +33,6 @@ class TestGithubWhiteListAuthenticator(TempMixin, AsyncTestCase):
 
         auth = self.auth
         auth.whitelist_file = whitelist_path
-        print (auth.whitelist)
         response = yield auth.get_authenticated_user(Mock(),
                                                      {"username": "foo"})
         self.assertEqual(response, "foo")
