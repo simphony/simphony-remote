@@ -4,6 +4,8 @@ SimPhoNy Remote CHANGELOG
 What's new in SimPhoNy Remote 1.1.0
 -----------------------------------
 
+- Use container provenance information to prevent access to unrelated 
+  containers or simphony-remote instances (#361)
 - Fix: incorrect user name in top header for admin Accounting panel (#348)
 
 What's new in SimPhoNy Remote 0.9.0/1.0.0

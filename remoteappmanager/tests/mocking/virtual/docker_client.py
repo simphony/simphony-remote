@@ -17,8 +17,8 @@ FAKE_IMAGE_NAMES = ('image_name1', 'image_name2')
 
 FAKE_CONTAINER_IDS = ('container_id1', 'container_id2', 'container_id3')
 
-FAKE_CONTAINER_NAMES = ('remoteexec-username-mapping_5Fid',
-                        'remoteexec-username-mapping_5Fid_5Fexited',
+FAKE_CONTAINER_NAMES = ('myrealm-username-mapping_5Fid',
+                        'myrealm-username-mapping_5Fid_5Fexited',
                         'remoteexec-username-mapping_5Fid_5Fstopped')
 
 
@@ -77,6 +77,7 @@ def get_fake_container_labels(num=3):
     samples = cycle(({SIMPHONY_NS_RUNINFO.user: 'user_name',
                       SIMPHONY_NS_RUNINFO.mapping_id: 'mapping_id',
                       SIMPHONY_NS_RUNINFO.url_id: 'url_id',
+                      SIMPHONY_NS_RUNINFO.realm: 'myrealm',
                       SIMPHONY_NS_RUNINFO.urlpath: '/user/username/containers/url_id'},  # noqa
                      {SIMPHONY_NS_RUNINFO.user: 'user_name'},
                      {}))

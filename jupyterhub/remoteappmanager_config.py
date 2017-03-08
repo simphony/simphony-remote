@@ -11,6 +11,14 @@
 # # install, the connection uses a unix socket by default.
 #
 # docker_host = "tcp://192.168.99.100:2376"
+
+# # Docker realm is used to identify the containers that are managed by this
+# # particular instance of simphony-remote. It will be the first entry in
+# # the container name, and will also be added as part of a run-time container
+# # label. You generally should not change this unless you have multiple
+# # installations of simphony-remote all using the same docker host.
+#
+# docker_realm = "whatever"
 #
 # # TLS configuration
 # # -----------------

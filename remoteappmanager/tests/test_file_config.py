@@ -17,6 +17,7 @@ tls_ca = '~/.docker/machine/machines/default/ca.pem'
 tls_cert = '~/.docker/machine/machines/default/cert.pem'
 tls_key = '~/.docker/machine/machines/default/key.pem'
 docker_host = "tcp://192.168.99.100:2376"
+docker_realm = "myrealm"
 '''
 
 GOOD_ACCOUNTING_CONFIG = '''
@@ -68,6 +69,9 @@ class TestFileConfig(TempMixin, unittest.TestCase):
 
         config = FileConfig()
         config.parse_config(self.config_file)
+
+        self.assertEqual(config.docker_host, "https://192.168.99.100:2376")
+        self.assertEqual(config.docker_realm, "myrealm")
 
     def test_tls_no_verify(self):
         docker_config_tls = textwrap.dedent('''
@@ -182,6 +186,5 @@ class TestFileConfig(TempMixin, unittest.TestCase):
         config = FileConfig()
         docker_config = config.docker_config()
 
-        client = docker.Client(**docker_config)
-
-        self.assertIsNotNone(client.info())
+        with contextlib.closing(docker.Client(**docker_config)) as client:
+            self.assertIsNotNone(client.info())

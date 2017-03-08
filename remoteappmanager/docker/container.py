@@ -45,6 +45,9 @@ class Container(HasTraits):
     #: Must not have an end slash.
     urlpath = Unicode()
 
+    # The docker realm under which the container is running.
+    realm = Unicode()
+
     @validate("urlpath")
     def _urlpath_validate(self, proposal):
         if proposal['value'].endswith('/'):
@@ -151,6 +154,7 @@ class Container(HasTraits):
         kwargs["url_id"] = labels.get(SIMPHONY_NS_RUNINFO.url_id) or ""
         kwargs["user"] = labels.get(SIMPHONY_NS_RUNINFO.user) or ""
         kwargs["urlpath"] = labels.get(SIMPHONY_NS_RUNINFO.urlpath) or ""
+        kwargs["realm"] = labels.get(SIMPHONY_NS_RUNINFO.realm) or ""
 
         try:
             return cls(**kwargs)

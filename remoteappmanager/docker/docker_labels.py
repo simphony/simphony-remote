@@ -68,6 +68,11 @@ SIMPHONY_NS_RUNINFO = DockerLabelNamespace(
         # https://host:8000/user/username/containers/12345/
         # it will be /user/username/containers/12345/.
         # This is also the url that's been added to the reverse proxy.
-        "urlpath"
+        "urlpath",
+        # The docker realm this container belongs to.
+        # Useful to differentiate docker containers that belong to other
+        # instances of simphony-remote, or simply containers that do not
+        # belong to an instance at all
+        "realm"
     ],
 )
