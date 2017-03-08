@@ -45,6 +45,10 @@ class FileWhitelistMixin(LoggingConfigurable):
 
         return self._whitelist
 
+    @whitelist.setter
+    def whitelist(self, value):
+        print("XXX")
+
 
 class GitHubWhitelistAuthenticator(FileWhitelistMixin, GitHubOAuthenticator):
     """A github authenticator that also verifies that the
