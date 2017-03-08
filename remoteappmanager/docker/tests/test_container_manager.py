@@ -292,3 +292,16 @@ class TestContainerManager(AsyncTestCase):
         result = yield manager.containers_from_mapping_id("user_name",
                                                           "mapping_id")
         self.assertEqual(result, [])
+
+        result = yield manager.running_containers()
+        self.assertEqual(result, [])
+
+    @gen_test
+    def test_not_stopping_if_different_realm(self):
+        manager = ContainerManager(docker_config={},
+                                   realm="anotherrealm")
+        manager._docker_client._sync_client = create_docker_client()
+        yield manager.stop_and_remove_container("container_id1")
+
+        self.assertFalse(self.mock_docker_client.stop.called)
+        self.assertFalse(self.mock_docker_client.remove_container.called)
