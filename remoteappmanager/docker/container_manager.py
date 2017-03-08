@@ -532,7 +532,7 @@ class ContainerManager(LoggingMixin):
         else:
             self.log.info("Container '{}' is removed.".format(container_id))
 
-    @default("docker_client")
+    @default("_docker_client")
     def _docker_client_default(self):
         return AsyncDockerClient(**self.docker_config)
 
