@@ -21,6 +21,7 @@ from traitlets import (
     Dict,
     Set,
     Instance,
+    Unicode,
     default)
 
 
@@ -46,6 +47,10 @@ class ContainerManager(LoggingMixin):
     #: The docker client configuration
     docker_config = Dict()
 
+    # Docker realm this container manager handles. Useful to have
+    # different instances of simphony-remote access the same docker.
+    realm = Unicode("remoteexec")
+
     #: Tracks if a given mapping id is starting up.
     _start_pending = Set()
 
@@ -63,6 +68,8 @@ class ContainerManager(LoggingMixin):
         docker_config: Dict
             A dictionary containing the keywords for the configuration of
             the docker client in agreement to docker py documentation.
+        realm: Unicode
+            The docker realm
         """
         self.docker_config = docker_config
         super().__init__(*args, **kwargs)
@@ -170,13 +177,11 @@ class ContainerManager(LoggingMixin):
         ------
         A list of Container objects, or an empty list if nothing is found.
         """
-        labels = {
-            SIMPHONY_NS_RUNINFO.user: user_name,
-            SIMPHONY_NS_RUNINFO.mapping_id: mapping_id}
-        filters = {
-            'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]}
-
-        containers = yield self.containers_from_filters(filters=filters)
+        containers = yield self.containers_with_labels({
+                SIMPHONY_NS_RUNINFO.user: user_name,
+                SIMPHONY_NS_RUNINFO.mapping_id: mapping_id,
+                SIMPHONY_NS_RUNINFO.realm: self.realm
+            })
         return containers
 
     @gen.coroutine
@@ -184,17 +189,27 @@ class ContainerManager(LoggingMixin):
         """Retrieves and returns the container by its url_id, if present.
         If not present, returns None.
         """
-        labels = {SIMPHONY_NS_RUNINFO.url_id: url_id}
-        filters = {
-            'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]}
-
-        containers = yield self.containers_from_filters(filters=filters)
+        containers = yield self.containers_with_labels({
+                SIMPHONY_NS_RUNINFO.url_id: url_id,
+                SIMPHONY_NS_RUNINFO.realm: self.realm
+            })
         return containers[0] if len(containers) else None
 
     @gen.coroutine
     def running_containers(self):
         """Returns all the running containers"""
-        containers = yield self.containers_from_filters({})
+        containers = yield self.containers_with_labels({
+                SIMPHONY_NS_RUNINFO.realm: self.realm
+            })
+
+        return containers
+
+    @gen.coroutine
+    def containers_with_labels(self, labels):
+        filters = {
+            'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]}
+
+        containers = yield self.containers_from_filters(filters)
         return containers
 
     @gen.coroutine
@@ -281,7 +296,7 @@ class ContainerManager(LoggingMixin):
 
         self.log.info('Got container image: {}'.format(image_name))
         # build the dictionary of keyword arguments for create_container
-        container_name = _generate_container_name("remoteexec",
+        container_name = _generate_container_name(self.realm,
                                                   user_name,
                                                   mapping_id)
         container_url_id = _generate_container_url_id()
@@ -339,7 +354,8 @@ class ContainerManager(LoggingMixin):
             labels=_get_container_labels(user_name,
                                          mapping_id,
                                          container_url_id,
-                                         container_urlpath))
+                                         container_urlpath,
+                                         self.realm))
 
         # build the dictionary of keyword arguments for host_config
         host_config = dict(
@@ -503,9 +519,35 @@ class ContainerManager(LoggingMixin):
     def _stop_and_remove_container(self, container_id):
         """Idempotent removal of a container by id.
         If the container is there, it will be removed. If it's not
-        there, the unexpected conditions will be logged."""
+        there, the unexpected conditions will be logged.
+
+        Note: The container is only stopped if it belongs to the same
+        realm.
+        """
 
         self.log.info("Stopping container {}".format(container_id))
+
+        container_info = yield self._get_container_info(container_id)
+
+        if container_info is None:
+            self.log.error('Could not find requested container {} '
+                           'during removal'.format(container_id))
+            return
+
+        container = Container.from_docker_dict(container_info)
+        if container.realm != self.realm:
+            self.log.error(
+                'Container {} belongs to realm {} '
+                'instead of {}. Refusing to stop.'.format(
+                    container_id,
+                    container.realm,
+                    self.realm)
+            )
+            return
+
+        # Technically, we have a race condition here, but it's pretty much
+        # impossible to solve, and would only affect us if the container
+        # id is identical.
 
         # Stop the container
         try:
@@ -580,7 +622,7 @@ def _get_container_env(user_name, url_id, environment, base_urlpath):
     return result
 
 
-def _get_container_labels(user_name, mapping_id, url_id, urlpath):
+def _get_container_labels(user_name, mapping_id, url_id, urlpath, realm):
     """Returns a dictionary that will become container run-time labels.
     Each of these labels must be namespaced in reverse DNS style, in agreement
     to docker guidelines."""
@@ -590,26 +632,30 @@ def _get_container_labels(user_name, mapping_id, url_id, urlpath):
         SIMPHONY_NS_RUNINFO.mapping_id: mapping_id,
         SIMPHONY_NS_RUNINFO.url_id: url_id,
         SIMPHONY_NS_RUNINFO.urlpath: urlpath,
+        SIMPHONY_NS_RUNINFO.realm: realm
     }
 
 
-def _generate_container_name(prefix, user_name, mapping_id):
+def _generate_container_name(realm, user_name, mapping_id):
     """Generates a proper name for the container.
     It combines the prefix, username and image name after escaping.
 
     Parameters
     ----------
-    prefix : str
-        An arbitrary prefix for the container name.
-    user_name: str
+    realm : string
+        The docker realm
+    user_name: string
         the user name
-    mapping_id: str
+    mapping_id: string
         the mapping id
 
     Return
     ------
     A string combining the three parameters in an appropriate container name
     """
+    escaped_realm = escape(realm,
+                           safe=_CONTAINER_SAFE_CHARS,
+                           escape_char=_CONTAINER_ESCAPE_CHAR)
     escaped_user_name = escape(user_name,
                                safe=_CONTAINER_SAFE_CHARS,
                                escape_char=_CONTAINER_ESCAPE_CHAR)
@@ -617,7 +663,7 @@ def _generate_container_name(prefix, user_name, mapping_id):
                                 safe=_CONTAINER_SAFE_CHARS,
                                 escape_char=_CONTAINER_ESCAPE_CHAR)
 
-    return "{}-{}-{}".format(prefix,
+    return "{}-{}-{}".format(escaped_realm,
                              escaped_user_name,
                              escaped_mapping_id)
 

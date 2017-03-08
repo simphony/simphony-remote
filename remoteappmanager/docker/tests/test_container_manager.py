@@ -16,7 +16,8 @@ from remoteappmanager.tests.mocking.virtual.docker_client import (
 class TestContainerManager(AsyncTestCase):
     def setUp(self):
         super().setUp()
-        self.manager = ContainerManager({})
+        self.manager = ContainerManager(docker_config={},
+                                        realm="myrealm")
         self.mock_docker_client = create_docker_client()
         self.manager._docker_client._sync_client = self.mock_docker_client
 
@@ -40,6 +41,7 @@ class TestContainerManager(AsyncTestCase):
         runinfo_labels = mock_client.create_container.call_args[1]["labels"]
 
         self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.user], "username")
+        self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.realm], "myrealm")
         self.assertIn(SIMPHONY_NS_RUNINFO.url_id, runinfo_labels)
         self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.mapping_id],
                          "new_mapping_id")
@@ -55,18 +57,19 @@ class TestContainerManager(AsyncTestCase):
 
     @gen_test
     def test_containers_from_mapping_id(self):
-        ''' Test containers_for_mapping_id returns a list of Container '''
+        """ Test containers_for_mapping_id returns a list of Container """
         result = yield self.manager.containers_from_mapping_id("user_name",
                                                                "mapping_id")
         expected = Container(docker_id='container_id1',
                              mapping_id="mapping_id",
-                             name='/remoteexec-username-mapping_5Fid',
+                             name='/myrealm-username-mapping_5Fid',
                              image_name='image_name1',  # noqa
                              user="user_name",
                              image_id='image_id1',
                              ip='127.0.0.1',
                              port=666,
                              url_id='url_id',
+                             realm="myrealm",
                              urlpath="/user/username/containers/url_id")
 
         self.assertEqual(len(result), 1)
@@ -74,17 +77,18 @@ class TestContainerManager(AsyncTestCase):
 
     @gen_test
     def test_containers_from_url_id(self):
-        ''' Test containers_for_mapping_id returns a list of Container '''
+        """ Test containers_for_mapping_id returns a list of Container """
         result = yield self.manager.container_from_url_id("url_id")
         expected = Container(docker_id='container_id1',
                              mapping_id="mapping_id",
-                             name='/remoteexec-username-mapping_5Fid',
+                             name='/myrealm-username-mapping_5Fid',
                              image_name='image_name1',  # noqa
                              user="user_name",
                              image_id='image_id1',
                              ip='127.0.0.1',
                              port=666,
                              url_id='url_id',
+                             realm="myrealm",
                              urlpath="/user/username/containers/url_id",
                              )
 
@@ -92,7 +96,7 @@ class TestContainerManager(AsyncTestCase):
 
     @gen_test
     def test_containers_from_url_id_exceptions(self):
-        ''' Test containers_for_mapping_id returns a list of Container '''
+        """ Test containers_for_mapping_id returns a list of Container """
         docker_client = self.mock_docker_client
         docker_client.port = mock.Mock(side_effect=Exception("Boom!"))
 
@@ -143,8 +147,8 @@ class TestContainerManager(AsyncTestCase):
 
     @gen_test
     def test_race_condition_stopping(self):
-        f1 = self.manager.stop_and_remove_container("12345")
-        f2 = self.manager.stop_and_remove_container("12345")
+        f1 = self.manager.stop_and_remove_container("container_id1")
+        f2 = self.manager.stop_and_remove_container("container_id1")
 
         yield f1
 

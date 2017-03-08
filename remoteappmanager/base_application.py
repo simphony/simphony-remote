@@ -96,6 +96,7 @@ class BaseApplication(web.Application, LoggingMixin):
         """Initializes the docker container manager."""
 
         return ContainerManager(
+            realm=self.file_config.docker_realm,
             docker_config=self.file_config.docker_config()
         )
 
