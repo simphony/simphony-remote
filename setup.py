@@ -51,7 +51,7 @@ else:
     requirements.extend([
         "jupyterhub>0.7",
         "docker-py==1.8",
-        "tornadowebapi>=0.4.2"])
+        "tornadowebapi>=0.5.0"])
 
 # main setup configuration class
 setup(
