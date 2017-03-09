@@ -97,6 +97,7 @@ class TestGithubWhiteListAuthenticator(TempMixin, AsyncTestCase):
         auth.whitelist = set()
         self.assertNotEqual(auth.whitelist, set())
 
+    @gen_test
     def test_comment_out(self):
         whitelist_path = os.path.join(self.tempdir, "whitelist.txt")
         with open(whitelist_path, "w") as f:
