@@ -11,5 +11,5 @@ git+git://github.com/jupyterhub/jupyterhub.git@master#egg=jupyterhub
 jupyter_client==4.3.0
 click==6.6
 tabulate==0.7.5
-git+git://github.com/simphony/tornado-webapi.git#egg=tornadowebapi
+git+git://github.com/simphony/tornado-webapi.git@v0.5.0#egg=tornadowebapi
 oauthenticator==0.5.1
