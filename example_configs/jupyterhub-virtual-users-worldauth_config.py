@@ -1,5 +1,3 @@
-# Configuration file for jupyterhub.
-import os
 from jupyter_client.localinterfaces import public_ips
 
 c = get_config()  # noqa

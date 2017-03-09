@@ -1,9 +1,10 @@
+import os
 from jupyter_client.localinterfaces import public_ips
 
 c = get_config()  # noqa
 
-#c.JupyterHub.ssl_key = 'test.key'
-#c.JupyterHub.ssl_cert = 'test.crt'
+# c.JupyterHub.ssl_key = 'test.key'
+# c.JupyterHub.ssl_cert = 'test.crt'
 
 c.JupyterHub.port = 9090
 c.JupyterHub.proxy_api_port = 9091
