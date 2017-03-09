@@ -6,6 +6,7 @@ import sqlite3
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
+from selenium.webdriver.common.action_chains import ActionChains
 import unittest
 
 
@@ -84,5 +85,43 @@ class SeleniumTestBase(unittest.TestCase):
         self.driver.quit()
         self.assertEqual([], self.verificationErrors)
 
-if __name__ == "__main__":
-    unittest.main()
+    @contextlib.contextmanager
+    def login(self, username="test"):
+        driver = self.driver
+        driver.get(self.base_url + "/hub/login")
+
+        driver.find_element_by_id("username_input").clear()
+        driver.find_element_by_id("username_input").send_keys(username)
+        driver.find_element_by_id("password_input").clear()
+        driver.find_element_by_id("password_input").send_keys(username)
+        driver.find_element_by_id("login_submit").click()
+
+        try:
+            yield
+        finally:
+            driver.find_element_by_css_selector(".dropdown-toggle").click()
+            driver.find_element_by_id("logout").click()
+            self.wait_for(
+                lambda: "Sign in" == driver.find_element_by_css_selector(
+                    "div.auth-form-header").text
+            )
+
+    @contextlib.contextmanager
+    def running_container(self):
+        with self.login():
+            driver = self.driver
+            self.wait_for(lambda:
+                          driver.find_element_by_css_selector(
+                              "#applist > li > a").text != "Loading")
+
+            self.click_by_css_selector("#applist > li > a")
+            self.click_by_css_selector(".start-button")
+
+            try:
+                yield
+            finally:
+                driver.find_element_by_id("application")
+                ActionChains(driver).move_to_element(
+                    driver.find_element_by_css_selector("#applist .app-icon")
+                ).click(driver.find_element_by_css_selector(".stop-button")
+                        ).perform()
