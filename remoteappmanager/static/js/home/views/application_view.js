@@ -55,6 +55,7 @@ define([
         var self = this;
         if (self.visualised_index === self.model.selected_index &&
             self.visualised_status === self.model.status[self.model.selected_index]) {
+            $("iframe").focus();
             return;
         }
         var html = self._render_for_model_state(delayed);
@@ -65,6 +66,7 @@ define([
         } else {
             $(".content").html(html);
         }
+        $("iframe").focus();
     };
    
     ApplicationView.prototype._render_for_model_state = function(delayed) {
