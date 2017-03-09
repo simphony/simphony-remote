@@ -1,6 +1,9 @@
 SimPhoNy Remote CHANGELOG
 =========================
 
+What's new in SimPhoNy Remote 1.2.0
+-----------------------------------
+
 What's new in SimPhoNy Remote 1.1.0
 -----------------------------------
 
