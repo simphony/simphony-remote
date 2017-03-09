@@ -6,7 +6,28 @@ What's new in SimPhoNy Remote 1.1.0
 
 - Use container provenance information to prevent access to unrelated 
   containers or simphony-remote instances (#361)
-- Fix: incorrect user name in top header for admin Accounting panel (#348)
+- Upgraded tornado WebAPI to 0.5.0 (#335, #365, #340)
+- Interface overhaul. Introduced Admin-LTE frontend (#346)
+- Upgraded against jupyterhub 0.8.0.dev0 (#355, #358)
+- Introduced "realms" to hold container provenance in case of shared docker 
+  server (#361)
+- Added dynamic whitelist for GitHub login (#351, #359, #364)
+- Fixes: 
+    - forever stuck spinner in case of docker internal failure (#336)
+    - Documented unexpected behavior reported in #305: containers not visible 
+      if the per-user server is already running (#342)
+    - Incorrect username in admin panel has been fixed (#353)
+    - Removed selenium_test from deployment (#356)
+    - Establish correct keyboard focus when canvas is made visible (#362)
+- Refactor: 
+    - Extracted macro in jinja template to a separate file (#337)
+    - Cleaned up javascript utils module into separate files (#339)
+    - Use of table macro to reduce template duplication (#341)
+    - Use setup.py to generate the version.py file (#357)
+    - Made async docker client instance in ContainerManager private (#360)
+- Other:
+    - Fixed changes in ubuntu dependency builds (#352)
+    - Added some basic example configuration files (#363)
 
 What's new in SimPhoNy Remote 0.9.0/1.0.0
 -----------------------------------------
