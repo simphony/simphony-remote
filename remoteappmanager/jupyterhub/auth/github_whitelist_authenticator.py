@@ -35,7 +35,8 @@ class FileWhitelistMixin(LoggingConfigurable):
 
             with open(self.whitelist_file, "r") as f:
                 whitelisted_users = set(self.normalize_username(x.strip())
-                                        for x in f.readlines())
+                                        for x in f.readlines()
+                                        if not x.strip().startswith("#"))
         except FileNotFoundError:
             # empty set means everybody is allowed
             return set()
