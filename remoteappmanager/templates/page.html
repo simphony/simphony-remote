@@ -41,6 +41,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
   {% endblock %}
 
   {% block script %}
+    <script type="text/javascript">
+      // This will always be executed and create the basic ga function that
+      // does nothing
+      window.ga = function () {
+        (window.ga.q = window.ga.q || []).push(arguments);
+      };
+      window.ga.l = 1 * new Date();
+      window.GoogleAnalyticsObject = "ga";
+    </script>
+    {% if analytics %}
+    <script src='https://www.google-analytics.com/analytics.js' async type="text/javascript"></script>
+    {% endif %}
     <script src="{{static_url("components/requirejs/require.js") }}" type="text/javascript" charset="utf-8"></script>
   {% endblock %}
 
