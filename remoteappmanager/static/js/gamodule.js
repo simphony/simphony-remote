@@ -1,3 +1,6 @@
+// This module contains the setup for google analytics.
+// MUST not be renamed to analytics. Some blockers rely on name 
+// matching to prevent loading.
 define([
 ], function () {
     "use strict";
