@@ -162,7 +162,7 @@ class TestContainerManager(AsyncTestCase):
         mock_client = self.mock_docker_client
 
         result = yield self.manager.start_container(
-            "username",
+            "user_name",
             "image_name1",
             "mapping_id",
             "/base/url",
