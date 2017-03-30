@@ -2,7 +2,7 @@ import importlib
 
 from remoteappmanager.handlers.handler_authenticator import HubAuthenticator
 from traitlets import Instance, default
-from tornado import web
+from tornado import web, gen
 import tornado.ioloop
 from jinja2 import Environment, FileSystemLoader
 
@@ -146,25 +146,59 @@ class BaseApplication(web.Application, LoggingMixin):
         return reg
 
     # Public
+
     def start(self):
         """Start the application and the ioloop"""
-
         self.log.info("Starting server with options:")
+
         for trait_name in self._command_line_config.trait_names():
             self.log.info("{}: {}".format(
                 trait_name,
-                getattr(self._command_line_config, trait_name)
-                )
+                getattr(self._command_line_config, trait_name))
             )
+
+        loop = tornado.ioloop.IOLoop.current()
+        loop.add_callback(self._start_async)
+        try:
+            loop.start()
+        except KeyboardInterrupt:
+            print("\nInterrupted")
+
+    # Private
+    @gen.coroutine
+    def _start_async(self):
+        """Does initial setup and starts the server."""
+        yield self._sync_reverse_proxy_with_docker_state()
+
         self.log.info("Listening for connections on {}:{}".format(
             self.command_line_config.ip,
             self.command_line_config.port))
 
         self.listen(self.command_line_config.port)
 
-        tornado.ioloop.IOLoop.current().start()
+    @gen.coroutine
+    def _sync_reverse_proxy_with_docker_state(self):
+        """Executed when this server starts up.
+        Verifies the current state of the docker containers that are
+        running and submits them to the reverse proxy.
+        The reason is that the reverse proxy might have died in the
+        meantime, losing all its state, and we need to reinject this
+        state so that it redirects to the containers that are under
+        our control.
+        """
 
-    # Private
+        self.log.info("Re-registering running containers on the reverse proxy")
+        containers = yield self.container_manager.running_containers_for_user(
+            self.user.name)
+
+        for container in containers:
+            try:
+                yield self.reverse_proxy.register(
+                    container.urlpath,
+                    container.host_url)
+            except Exception:
+                self.log.exception("Unable to register on the reverse proxy")
+
     def _webapi_resources(self):
         """Return a list of resources to be exported by the Web API.
         Reimplement this in subclasses to export specific resources"""
