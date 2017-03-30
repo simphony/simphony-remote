@@ -2,6 +2,7 @@ import os
 import string
 from urllib.parse import urlparse
 import uuid
+import random
 
 from docker.errors import APIError, NotFound
 from escapism import escape
@@ -295,22 +296,21 @@ class ContainerManager(LoggingMixin):
             raise e
 
         self.log.info('Got container image: {}'.format(image_name))
-        # build the dictionary of keyword arguments for create_container
-        container_name = _generate_container_name(self.realm,
-                                                  user_name,
-                                                  mapping_id)
-        container_url_id = _generate_container_url_id()
 
-        # Check if the container is present. If not, create it
-        container_info = yield self._get_container_info(container_name)
+        # Check if the container is present.
+        containers = yield self.containers_from_mapping_id(
+            user_name, mapping_id)
 
-        if container_info is not None:
-            # Make sure we stop and remove the container if by any change
-            # is already there. This will guarantee a fresh start every time.
+        if len(containers) != 0:
+            # we assume only one present. The API is made for potential
+            # of multiple instances.
+            container = containers[0]
+
+            # Make sure we stop and remove it if by any chance is already
+            # there. This will guarantee a fresh start every time.
             self.log.info('Container for image {} '
                           'already present. Stopping.'.format(image_name))
-            container_id = container_info["Id"]
-            yield self.stop_and_remove_container(container_id)
+            yield self.stop_and_remove_container(container.docker_id)
 
         # Data volume binding to be used with Docker Client
         # volumes = {volume_source: {'bind': volume_target,
@@ -332,17 +332,19 @@ class ContainerManager(LoggingMixin):
             self.log.error('Path(s) does not exist, not mounting:\n%s',
                            '\n'.join(volumes.keys() - filtered_volumes.keys()))
 
-        # Info for debugging
         self.log.info(
             'Mounting these volumes: \n%s',
             '\n'.join('{0} -> {1}'.format(source, target['bind'])
                       for source, target in filtered_volumes.items()))
 
+        container_url_id = _generate_container_url_id()
         container_urlpath = without_end_slash(
             url_path_join(base_urlpath,
                           "containers",
                           container_url_id))
-
+        container_name = _generate_container_name(self.realm,
+                                                  user_name,
+                                                  mapping_id)
         create_kwargs = dict(
             image=image_name,
             name=container_name,
@@ -651,7 +653,13 @@ def _generate_container_name(realm, user_name, mapping_id):
 
     Return
     ------
-    A string combining the three parameters in an appropriate container name
+    A string combining the three parameters in an appropriate container name,
+    plus a random token to prevent collisions with a similarly named rogue
+    container.
+
+    NOTE: the container name is not meant for parsing. It's only for human
+    consumption in the docker list. All information and all searching should
+    be extracted from labels.
     """
     escaped_realm = escape(realm,
                            safe=_CONTAINER_SAFE_CHARS,
@@ -662,10 +670,14 @@ def _generate_container_name(realm, user_name, mapping_id):
     escaped_mapping_id = escape(mapping_id,
                                 safe=_CONTAINER_SAFE_CHARS,
                                 escape_char=_CONTAINER_ESCAPE_CHAR)
+    random_token = ''.join(random.choice(string.ascii_lowercase)
+                           for _ in range(10))
 
-    return "{}-{}-{}".format(escaped_realm,
-                             escaped_user_name,
-                             escaped_mapping_id)
+    return "{}-{}-{}-{}".format(escaped_realm,
+                                escaped_user_name,
+                                escaped_mapping_id,
+                                random_token
+                                )
 
 
 def _generate_container_url_id():
