@@ -3,7 +3,7 @@ require([
     "jquery", 
     "urlutils", 
     "dialogs",
-    "analytics",
+    "gamodule",
     "home/models", 
     "home/views/application_list_view",
     "home/views/application_view",
@@ -14,7 +14,7 @@ require([
     $, 
     urlutils, 
     dialogs, 
-    analytics, 
+    gamodule, 
     models, 
     application_list_view,
     application_view, 
@@ -23,7 +23,7 @@ require([
     init) {
     "use strict";
 
-    var ga = analytics.init();
+    var ga = gamodule.init();
     init.handlebars();
 
     // This model keeps the retrieved content from the REST query locally.
