@@ -1,6 +1,6 @@
 define(function(require) {
     "use strict";
-    var analytics = require("analytics");
+    var gamodule = require("gamodule");
     
     QUnit.module("Google Analytics");
     QUnit.test("test without analytics", function (assert) {
@@ -9,7 +9,8 @@ define(function(require) {
             result[0] = [cmd, id, auto];
         };
         window.apidata.analytics = undefined;
-        var ga = analytics.init();
+        var ga = gamodule.init();
+        assert.notEqual(ga, undefined);
         assert.equal(result.length, 0);
     });
     
@@ -19,7 +20,8 @@ define(function(require) {
             result[0] = [cmd, id, auto];
         };
         window.apidata.analytics = {"tracking_id": "X"};
-        var ga = analytics.init();
+        var ga = gamodule.init();
+        assert.notEqual(ga, undefined);
         assert.equal(result[0][0], "create");
         assert.equal(result[0][1], "X");
         assert.equal(result[0][2], "auto");
