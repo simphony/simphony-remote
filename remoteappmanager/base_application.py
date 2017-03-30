@@ -197,6 +197,8 @@ class BaseApplication(web.Application, LoggingMixin):
                     container.urlpath,
                     container.host_url)
             except Exception:
+                # There has been a failure. Log it and try to keep going
+                # with the remaining containers.
                 self.log.exception("Unable to register on the reverse proxy")
 
     def _webapi_resources(self):

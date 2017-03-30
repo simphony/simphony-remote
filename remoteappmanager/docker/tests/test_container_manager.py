@@ -117,6 +117,13 @@ class TestContainerManager(AsyncTestCase):
         self.assertEqual(len(result), 1)
 
     @gen_test
+    def test_running_containers_for_user(self):
+        result = yield self.manager.running_containers_for_user("username")
+        self.assertEqual(len(result), 1)
+        result = yield self.manager.running_containers_for_user("foo")
+        self.assertEqual(len(result), 0)
+
+    @gen_test
     def test_race_condition_spawning(self):
         # Start the operations, and retrieve the future.
         # they will stop at the first yield and not go further until

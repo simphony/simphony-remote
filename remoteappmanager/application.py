@@ -16,6 +16,6 @@ class Application(BaseApplication):
         base_urlpath = self.command_line_config.base_urlpath
         return [
             (base_urlpath, HomeHandler),
-            (base_urlpath.rstrip('/'), 
-                web.RedirectHandler, { "url": base_urlpath}),
+            (base_urlpath.rstrip('/'),
+             web.RedirectHandler, {"url": base_urlpath}),
         ]
