@@ -58,13 +58,13 @@ class TestContainerManager(AsyncTestCase):
     @gen_test
     def test_containers_from_mapping_id(self):
         """ Test containers_for_mapping_id returns a list of Container """
-        result = yield self.manager.containers_from_mapping_id("user_name",
+        result = yield self.manager.containers_from_mapping_id("username",
                                                                "mapping_id")
         expected = Container(docker_id='container_id1',
                              mapping_id="mapping_id",
                              name='/myrealm-username-mapping_5Fid',
                              image_name='image_name1',  # noqa
-                             user="user_name",
+                             user="username",
                              image_id='image_id1',
                              ip='127.0.0.1',
                              port=666,
@@ -83,7 +83,7 @@ class TestContainerManager(AsyncTestCase):
                              mapping_id="mapping_id",
                              name='/myrealm-username-mapping_5Fid',
                              image_name='image_name1',  # noqa
-                             user="user_name",
+                             user="username",
                              image_id='image_id1',
                              ip='127.0.0.1',
                              port=666,
