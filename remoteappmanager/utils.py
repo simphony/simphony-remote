@@ -1,4 +1,6 @@
 import inspect
+from functools import wraps
+import warnings
 
 
 def url_path_join(*pieces):
@@ -99,3 +101,12 @@ def remove_quotes(s):
         return s[1:-1]
 
     return s
+
+
+def deprecated(func):
+    @wraps(func)
+    def _deprecated(*args, **kwargs):
+        warnings.warn("Deprecation warning: {}".format(func.__name__))
+        return func(*args, **kwargs)
+
+    return _deprecated
