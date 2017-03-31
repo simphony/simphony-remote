@@ -32,7 +32,7 @@ class RegisterContainerHandler(BaseHandler):
                     "Could not register reverse "
                     "proxy for id {} in RegisterContainerHandler".format(
                         url_id))
-
-            self.redirect(self.request.uri)
+            else:
+                self.redirect(self.request.uri)
 
         raise web.HTTPError(404)

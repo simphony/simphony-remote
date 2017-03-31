@@ -1,6 +1,7 @@
 from remoteappmanager.tests import utils
 from remoteappmanager.tests.mocking import dummy
 from remoteappmanager.tests.temp_mixin import TempMixin
+from remoteappmanager.tests.utils import mock_coro_factory
 
 
 class TestRegisterContainerHandler(TempMixin, utils.AsyncHTTPTestCase):
@@ -45,3 +46,16 @@ class TestRegisterContainerHandler(TempMixin, utils.AsyncHTTPTestCase):
         # It will be sent to the login instead
         self.assertFalse(self._app.reverse_proxy.register.called)
         self.assertEqual(res.code, 302)
+
+    def test_failure_of_reverse_proxy(self):
+        self._app.reverse_proxy.register = mock_coro_factory(
+            side_effect=Exception("BOOM"))
+
+        res = self.fetch("/user/username/containers/url_id",
+                         headers={
+                             "Cookie": "jupyter-hub-token-username=foo"
+                         },
+                         follow_redirects=False
+                         )
+
+        self.assertEqual(res.code, 404)
