@@ -105,7 +105,6 @@ def mock_containers(container_ids, container_names,
             if 'filters' in kwargs and 'label' in kwargs['filters']:
                 label_filters = kwargs['filters']['label']
 
-                print(label_filters)
                 if not isinstance(label_filters, (list, tuple)):
                     label_filters = [label_filters]
 
