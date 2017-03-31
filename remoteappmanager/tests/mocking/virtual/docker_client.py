@@ -77,7 +77,7 @@ def get_fake_container_labels(num=3):
     samples = cycle(({SIMPHONY_NS_RUNINFO.user: 'username',
                       SIMPHONY_NS_RUNINFO.mapping_id: 'mapping_id',
                       SIMPHONY_NS_RUNINFO.url_id: 'url_id',
-                      SIMPHONY_NS_RUNINFO.realm: 'remoteexec',
+                      SIMPHONY_NS_RUNINFO.realm: 'myrealm',
                       SIMPHONY_NS_RUNINFO.urlpath: '/user/username/containers/url_id'},  # noqa
                      {SIMPHONY_NS_RUNINFO.user: 'username'},
                      {}))
