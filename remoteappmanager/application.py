@@ -18,7 +18,7 @@ class Application(BaseApplication):
         base_urlpath = self.command_line_config.base_urlpath
         return [
             (without_end_slash(
-                url_path_join(base_urlpath, "containers", "([a-z0-9]*)")
+                url_path_join(base_urlpath, "containers", "([a-z0-9_]*)")
             )+"/?", RegisterContainerHandler),
             (base_urlpath, HomeHandler),
             (base_urlpath.rstrip('/'), web.RedirectHandler, {

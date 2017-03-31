@@ -74,12 +74,12 @@ def get_fake_container_states(num=3):
 
 
 def get_fake_container_labels(num=3):
-    samples = cycle(({SIMPHONY_NS_RUNINFO.user: 'user_name',
+    samples = cycle(({SIMPHONY_NS_RUNINFO.user: 'username',
                       SIMPHONY_NS_RUNINFO.mapping_id: 'mapping_id',
                       SIMPHONY_NS_RUNINFO.url_id: 'url_id',
-                      SIMPHONY_NS_RUNINFO.realm: 'myrealm',
+                      SIMPHONY_NS_RUNINFO.realm: 'remoteexec',
                       SIMPHONY_NS_RUNINFO.urlpath: '/user/username/containers/url_id'},  # noqa
-                     {SIMPHONY_NS_RUNINFO.user: 'user_name'},
+                     {SIMPHONY_NS_RUNINFO.user: 'username'},
                      {}))
     return tuple(next(samples) for _ in range(num))
 
@@ -105,6 +105,7 @@ def mock_containers(container_ids, container_names,
             if 'filters' in kwargs and 'label' in kwargs['filters']:
                 label_filters = kwargs['filters']['label']
 
+                print(label_filters)
                 if not isinstance(label_filters, (list, tuple)):
                     label_filters = [label_filters]
 
