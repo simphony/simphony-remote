@@ -24,4 +24,3 @@ class EnvironmentConfig(HasTraits):
             envname = traitlet_name.upper()
             setattr(self, traitlet_name,
                     os.environ.get(envname, ""))
-        print(self.proxy_api_token)

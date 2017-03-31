@@ -104,6 +104,7 @@ def remove_quotes(s):
 
 
 def deprecated(func):
+    """Decorator. Marks a function/method as deprecated."""
     @wraps(func)
     def _deprecated(*args, **kwargs):
         warnings.warn("Deprecation warning: {}".format(func.__name__))
