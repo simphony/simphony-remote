@@ -198,7 +198,9 @@ class ContainerManager(LoggingMixin):
 
     @gen.coroutine
     def running_containers(self):
-        """Returns all the running containers"""
+        """Returns all the running containers that belong to the
+        current realm.
+        """
         containers = yield self.containers_with_labels({
                 SIMPHONY_NS_RUNINFO.realm: self.realm
             })
@@ -206,7 +208,40 @@ class ContainerManager(LoggingMixin):
         return containers
 
     @gen.coroutine
+    def running_containers_for_user(self, user_name):
+        """Returns all the running containers for a given user.
+
+        Parameters
+        ----------
+        user_name: str
+            The username
+
+        Returns
+        -------
+        list
+            A list of running containers
+        """
+        containers = yield self.containers_with_labels({
+            SIMPHONY_NS_RUNINFO.user: user_name,
+            SIMPHONY_NS_RUNINFO.realm: self.realm
+        })
+
+        return containers
+
+    @gen.coroutine
     def containers_with_labels(self, labels):
+        """Returns containers with a given set of labels.
+
+        Parameters
+        ----------
+        labels: dict
+            A dictionary of string to string, from label to its value
+
+        Returns
+        -------
+        list
+            a list of container objects matching the labels and their values.
+        """
         filters = {
             'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]}
 
