@@ -4,25 +4,44 @@
 <!-- sidebar: style can be found in sidebar.less -->
 <section class="sidebar">
 
-  <!-- search form (Optional) -->
-  <form action="#" method="get" class="sidebar-form">
-    <div class="input-group">
-      <input type="text" name="q" class="form-control" placeholder="Search...">
-                <span class="input-group-btn">
-                  <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-                  </button>
-                </span>
-    </div>
-  </form>
-  <!-- /.search form -->
+    <!-- search form (Optional) -->
+    <form action="#" method="get" class="sidebar-form">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Search...">
+            <span class="input-group-btn">
+                <button type="submit" name="search" id="search-btn" class="btn btn-flat">
+                    <i class="fa fa-search"></i>
+                </button>
+            </span>
+        </div>
+    </form>
 
-  <!-- Sidebar Menu -->
-  <ul class="sidebar-menu">
-    <li class="header">APPLICATIONS</li>
-  </ul>
+    <!-- /.search form -->
 
-  <ul class="sidebar-menu" id="applist">
-  </ul>
+    <!-- Sidebar Menu -->
+    <ul class="sidebar-menu">
+        <li class="header">APPLICATIONS</li>
+    </ul>
+
+    <ul class="sidebar-menu" id="applist"></ul>
+
+    {% raw %}
+    <!-- Ember template for the Application list -->
+    <script type="text/x-handlebars" data-template-name="application">
+        <!-- Loading icon -->
+        {{#if loading}}
+            <li>
+                <a href="#">
+                    <i class="fa fa-spinner fa-spin"></i>
+                    <span>Loading</span>
+                </a>
+            </li>
+        {{/if}}
+
+        <!-- Application list -->
+    </script>
+    {% endraw %}
+
   <!-- /.sidebar-menu -->
 </section>
 <!-- /.sidebar -->
