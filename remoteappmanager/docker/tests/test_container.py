@@ -4,8 +4,6 @@ from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.docker_labels import (
     SIMPHONY_NS, SIMPHONY_NS_RUNINFO)
 from remoteappmanager.tests.utils import assert_containers_equal
-from remoteappmanager.tests.mocking.virtual.docker_client import (
-    VirtualDockerClient, )
 
 
 class TestContainer(TestCase):
@@ -21,7 +19,8 @@ class TestContainer(TestCase):
                        SIMPHONY_NS_RUNINFO.user: 'user',
                        SIMPHONY_NS_RUNINFO.url_id: "8e2fe66d5de74db9bbab50c0d2f92b33",  # noqa
                        SIMPHONY_NS_RUNINFO.realm: "myrealm",
-                       SIMPHONY_NS_RUNINFO.urlpath: "/user/username/containers/whatever"},  # noqa
+                       SIMPHONY_NS_RUNINFO.mapping_id: "mapping_id",
+                       SIMPHONY_NS_RUNINFO.urlpath: "/user/username/containers/8e2fe66d5de74db9bbab50c0d2f92b33"},  # noqa
             'Names': ['/myrealm-user-empty-ubuntu_3Alatest'],
             'Ports': [{'IP': '0.0.0.0',
                        'PrivatePort': 8888,
@@ -53,8 +52,9 @@ class TestContainer(TestCase):
             user="user",
             ip='0.0.0.0',
             port=32823,
+            mapping_id="mapping_id",
             url_id="8e2fe66d5de74db9bbab50c0d2f92b33",
-            urlpath="/user/username/containers/whatever",
+            urlpath="/user/username/containers/8e2fe66d5de74db9bbab50c0d2f92b33",  # noqa
             realm="myrealm"
         )
 
@@ -77,70 +77,56 @@ class TestContainer(TestCase):
         self.assertEqual(container.realm, "")
 
     def test_from_docker_dict_without_public_port(self):
-        """Test convertion from "docker ps" to Container with public port"""
-        client = VirtualDockerClient.with_containers()
-        container_dict = client.containers()[0]
+        container_dict = self.good_container_dict
+        del container_dict["Ports"][0]["PublicPort"]
 
         # Container without public port
         actual = Container.from_docker_dict(container_dict)
         expected = Container(
-            docker_id='container_id1',
-            name='/myrealm-username-mapping_5Fid',
-            image_name='image_name1',
-            image_id='image_id1',
-            user="user_name",
+            docker_id='248e45e717cd740ae763a1c565',
+            name='/myrealm-user-empty-ubuntu_3Alatest',
+            image_name='empty-ubuntu:latest',
+            image_id='sha256:f4610c7580b8f0a9a25086b6287d0069fb8a',
+            user="user",
             ip='0.0.0.0',
             port=80,
-            url_id="url_id",
+            url_id="8e2fe66d5de74db9bbab50c0d2f92b33",
             mapping_id="mapping_id",
             realm="myrealm",
-            urlpath="/user/username/containers/url_id"
-        )
-
-        assert_containers_equal(self, actual, expected)
-
-    def test_from_docker_dict_inspect_container(self):
-        client = VirtualDockerClient.with_containers()
-        actual = Container.from_docker_dict(
-            client.inspect_container('container_id1'))
-
-        expected = Container(
-            docker_id='container_id1',
-            name='/myrealm-username-mapping_5Fid',
-            image_name='image_name1',
-            image_id='image_id1',
-            user="user_name",
-            ip='0.0.0.0',
-            port=666,
-            url_id="url_id",
-            mapping_id="mapping_id",
-            realm="myrealm",
-            urlpath="/user/username/containers/url_id"
+            urlpath="/user/username/containers/8e2fe66d5de74db9bbab50c0d2f92b33"  # noqa
         )
 
         assert_containers_equal(self, actual, expected)
 
     def test_multiple_ports_data(self):
-        client = VirtualDockerClient.with_containers()
-        client.add_container_from_raw_info(
-            id='container_id1',
-            name='container_name1',
-            ports=[
-                {'IP': '0.0.0.0',
-                 'PublicPort': 666,
-                 'PrivatePort': 8888,
-                 'Type': 'tcp'},
-                {'IP': '0.0.0.0',
-                 'PublicPort': 667,
-                 'PrivatePort': 8889,
-                 'Type': 'tcp'}
-            ],
-            image="image_id1",
-            labels={},
-            state="running",
-        )
+        docker_dict = {'Id': 'container_id1',
+                       'Config': {
+                           'Labels': {
+                               'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4',
+                               'eu.simphony-project.docker.env.x11-depth': '',
+                               'eu.simphony-project.docker.type': 'vncapp',
+                               'eu.simphony-project.docker.env.x11-height': '',
+                               'eu.simphony-project.docker.env.x11-width': '',
+                               'eu.simphony-project.docker.description':
+                                   'Ubuntu machine with mayavi preinstalled'},
+                           'Image': 'image_name1'
+                       },
+                       'NetworkSettings': {
+                           'Ports': {
+                               '8889/tcp': [
+                                   {'HostPort': '667',
+                                    'HostIp': '0.0.0.0'}
+                               ],
+                               '8888/tcp': [
+                                   {'HostPort': '666', 'HostIp': '0.0.0.0'}
+                               ]
+                           }
+                       },
+                       'Name': '/container_name1',
+                       'State': 'running',
+                       'Image': 'image_id1'
+                       }
 
-        docker_dict = client.inspect_container("container_id1")
         docker_dict["NetworkSettings"]["Ports"] = {
             '8888/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '666'}],
             '8889/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '667'}]
@@ -157,7 +143,28 @@ class TestContainer(TestCase):
         with self.assertRaises(ValueError):
             Container.from_docker_dict(docker_dict)
 
-        docker_dict = client.containers()[0]
+        docker_dict = {
+            'Labels': {
+                'eu.simphony-project.docker.runinfo.user': 'user_name',
+                'eu.simphony-project.docker.env.x11-depth': '',
+                'eu.simphony-project.docker.runinfo.mapping_id': 'mapping_id',
+                'eu.simphony-project.docker.env.x11-height': '',
+                'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4',
+                'eu.simphony-project.docker.runinfo.urlpath': '/user/username/containers/url_id',  # noqa
+                'eu.simphony-project.docker.type': 'vncapp',
+                'eu.simphony-project.docker.runinfo.realm': 'myrealm',
+                'eu.simphony-project.docker.description': 'Ubuntu machine with mayavi preinstalled',  # noqa
+                'eu.simphony-project.docker.env.x11-width': '',
+                'eu.simphony-project.docker.runinfo.url_id': 'url_id'
+            },
+            'Names': ['/myrealm-username-mapping_5Fid'],
+            'Ports': [{'Type': 'tcp', 'IP': '0.0.0.0', 'PublicPort': 666, 'PrivatePort': 8888}],  # noqa
+            'State': 'running',
+            'Command': '/sbin/init -D',
+            'Image': 'image_name1',
+            'Id': 'container_id1', 'ImageID': 'image_id1'
+        }
+
         docker_dict["Ports"] = [
              {
                 'IP': '0.0.0.0',
