@@ -132,7 +132,7 @@ require([
             ).done(function (app_data) {
                 this.set('app_data', app_data);
 
-                var num_entries = this.get('app_data').length;
+                var num_entries = app_data.length;
 
                 if(num_entries == 0) {
                     this.set('empty_list', true);
@@ -149,8 +149,8 @@ require([
 
         _update_image: function(index) {
             // Updates the configurables submodel for a given application index.
-            var image = this.get('app_data')[index].image;
             var app_data = this.get('app_data')[index];
+            var image = app_data.image;
 
             this.get('configurables')[index] = {};
 
@@ -168,11 +168,8 @@ require([
                 }
             }
 
-            if (app_data.container === null) {
-                this.get('status')[index] = Status.STOPPED;
-            } else {
-                this.get('status')[index] = Status.RUNNING;
-            }
+            this.get('status')[index] =
+                app_data.container === null ? Status.STOPPED : Status.RUNNING;
         }
     });
 
