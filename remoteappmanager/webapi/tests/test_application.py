@@ -38,7 +38,7 @@ class TestApplication(WebAPITestCase):
         app.container_manager = Mock()
         app.container_manager.image = mock_coro_factory(
             return_value=Image(name="boo", ui_name="foo_ui"))
-        app.container_manager.containers_from_mapping_id = mock_coro_factory(
+        app.container_manager.find_containers = mock_coro_factory(
             return_value=[])
         application_mock_1 = Mock()
         application_mock_1.image = "hello1"
@@ -94,7 +94,7 @@ class TestApplication(WebAPITestCase):
                           },
                           'mapping_id': 'one'})
 
-        self._app.container_manager.containers_from_mapping_id = \
+        self._app.container_manager.find_containers = \
             mock_coro_factory(return_value=[Container(
                 name="container",
                 image_name="xxx",

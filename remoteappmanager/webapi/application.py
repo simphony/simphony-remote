@@ -29,9 +29,9 @@ class Application(Resource):
             # available in docker.
             raise NotFound()
 
-        containers = yield container_manager.containers_from_mapping_id(
-            self.current_user.name,
-            identifier)
+        containers = yield container_manager.find_containers(
+            user_name=self.current_user.name,
+            mapping_id=identifier)
 
         representation = {
             "image": {

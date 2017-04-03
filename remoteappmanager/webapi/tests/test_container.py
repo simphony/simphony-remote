@@ -25,7 +25,7 @@ class TestContainer(WebAPITestCase):
     def test_items(self):
         manager = self._app.container_manager
         manager.image = mock_coro_factory(Image())
-        manager.containers_from_mapping_id = mock_coro_factory(
+        manager.find_containers = mock_coro_factory(
             [DockerContainer()])
 
         code, data = self.get(
@@ -270,7 +270,7 @@ class TestContainer(WebAPITestCase):
                    ".container"
                    ".wait_for_http_server_2xx",
                    new_callable=mock_coro_factory):
-            self._app.container_manager.containers_from_mapping_id = \
+            self._app.container_manager.find_containers = \
                 mock_coro_factory(return_value=[DockerContainer()])
 
             self.assertFalse(self._app.reverse_proxy.register.called)

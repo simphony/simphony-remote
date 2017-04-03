@@ -156,15 +156,11 @@ class Container(Resource):
                 # available in docker. We just move on.
                 continue
 
-            containers = yield container_manager.containers_from_mapping_id(
-                self.current_user.name,
-                mapping_id)
+            container = yield container_manager.find_container(
+                user_name=self.current_user.name,
+                mapping_id=mapping_id)
 
-            # We assume that we can only run one container only (although the
-            # API considers a broader possibility for future extension.
-            if len(containers):
-                container = containers[0]
-                running_containers.append(container.url_id)
+            running_containers.append(container.url_id)
 
         return running_containers
 

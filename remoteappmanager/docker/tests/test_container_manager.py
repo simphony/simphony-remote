@@ -58,8 +58,10 @@ class TestContainerManager(AsyncTestCase):
     @gen_test
     def test_containers_from_mapping_id(self):
         """ Test containers_for_mapping_id returns a list of Container """
-        result = yield self.manager.containers_from_mapping_id("username",
-                                                               "mapping_id")
+        result = yield self.manager.find_containers(
+            user_name="username",
+            mapping_id="mapping_id")
+
         expected = Container(docker_id='container_id1',
                              mapping_id="mapping_id",
                              name='/myrealm-username-mapping_5Fid',
@@ -78,7 +80,8 @@ class TestContainerManager(AsyncTestCase):
     @gen_test
     def test_containers_from_url_id(self):
         """ Test containers_for_mapping_id returns a list of Container """
-        result = yield self.manager.container_from_url_id("url_id")
+        result = yield self.manager.find_containers(
+            url_id="url_id")
         expected = Container(docker_id='container_id1',
                              mapping_id="mapping_id",
                              name='/myrealm-username-mapping_5Fid',
@@ -100,7 +103,7 @@ class TestContainerManager(AsyncTestCase):
         docker_client = self.mock_docker_client
         docker_client.port = mock.Mock(side_effect=Exception("Boom!"))
 
-        result = yield self.manager.container_from_url_id("url_id")
+        result = yield self.manager.find_containers(url_id="url_id")
         self.assertEqual(result, None)
 
         # Making it so that no valid dictionary is returned.
@@ -108,7 +111,7 @@ class TestContainerManager(AsyncTestCase):
         self.mock_docker_client = docker_client
         self.manager._docker_client._sync_client = docker_client
 
-        result = yield self.manager.container_from_url_id("url_id")
+        result = yield self.manager.find_containers(url_id="url_id")
         self.assertEqual(result, None)
 
     @gen_test
@@ -289,8 +292,8 @@ class TestContainerManager(AsyncTestCase):
                                    realm="anotherrealm")
         manager._docker_client._sync_client = create_docker_client()
 
-        result = yield manager.containers_from_mapping_id("user_name",
-                                                          "mapping_id")
+        result = yield manager.find_container(
+            user_name="user_name", mapping_id="mapping_id")
         self.assertEqual(result, [])
 
         result = yield manager.running_containers()
