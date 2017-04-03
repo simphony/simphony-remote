@@ -102,7 +102,7 @@ class TestContainer(TestCase):
         docker_dict = {'Id': 'container_id1',
                        'Config': {
                            'Labels': {
-                               'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4',
+                               'eu.simphony-project.docker.ui_name': 'Mayavi 4.4.4',  # noqa
                                'eu.simphony-project.docker.env.x11-depth': '',
                                'eu.simphony-project.docker.type': 'vncapp',
                                'eu.simphony-project.docker.env.x11-height': '',

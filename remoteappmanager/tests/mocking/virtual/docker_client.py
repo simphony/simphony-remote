@@ -108,8 +108,7 @@ class VirtualDockerClient(object):
                        'Status': 'exited',
                        'Dead': False,
                        'OOMKilled': False,
-                       'ExitCode': 0}
-                ,
+                       'ExitCode': 0},
             ),
         ]
 
@@ -304,4 +303,3 @@ class VirtualDockerClient(object):
 
     def _new_id(self):
         return uuid.uuid4().hex
-

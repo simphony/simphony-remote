@@ -28,12 +28,12 @@ class TestContainerManager(AsyncTestCase):
         mock_client = self.mock_docker_client
         with mock.patch.object(mock_client, "start",
                                wraps=mock_client.start), \
-             mock.patch.object(mock_client, "stop",
-                               wraps=mock_client.stop), \
-             mock.patch.object(mock_client, "create_container",
-                               wraps=mock_client.create_container), \
-             mock.patch.object(mock_client, "remove_container",
-                               wraps=mock_client.remove_container):
+            mock.patch.object(mock_client, "stop",
+                              wraps=mock_client.stop), \
+            mock.patch.object(mock_client, "create_container",
+                              wraps=mock_client.create_container), \
+            mock.patch.object(mock_client, "remove_container",
+                              wraps=mock_client.remove_container):
 
             result = yield self.manager.start_container(
                 "username",
@@ -46,10 +46,13 @@ class TestContainerManager(AsyncTestCase):
             self.assertTrue(mock_client.start.called)
             self.assertTrue(mock_client.create_container.called)
 
-            runinfo_labels = mock_client.create_container.call_args[1]["labels"]
+            runinfo_labels = mock_client.create_container.call_args[1][
+                "labels"]
 
-            self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.user], "username")
-            self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.realm], "myrealm")
+            self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.user],
+                             "username")
+            self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.realm],
+                             "myrealm")
             self.assertIn(SIMPHONY_NS_RUNINFO.url_id, runinfo_labels)
             self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.mapping_id],
                              "new_mapping_id")
@@ -253,10 +256,10 @@ class TestContainerManager(AsyncTestCase):
 
         with mock.patch.object(docker_client, "stop",
                                wraps=docker_client.stop), \
-             mock.patch.object(docker_client, "remove_container",
-                               wraps=docker_client.remove_container), \
-             mock.patch.object(docker_client, "start",
-                               side_effect=raiser):
+            mock.patch.object(docker_client, "remove_container",
+                              wraps=docker_client.remove_container), \
+            mock.patch.object(docker_client, "start",
+                              side_effect=raiser):
 
             self.assertFalse(self.mock_docker_client.stop.called)
             self.assertFalse(self.mock_docker_client.remove_container.called)
@@ -282,10 +285,10 @@ class TestContainerManager(AsyncTestCase):
 
         with mock.patch.object(docker_client, "stop",
                                wraps=docker_client.stop), \
-             mock.patch.object(docker_client, "remove_container",
-                               wraps=docker_client.remove_container), \
-             mock.patch.object(docker_client, "port",
-                               side_effect=raiser):
+            mock.patch.object(docker_client, "remove_container",
+                              wraps=docker_client.remove_container), \
+            mock.patch.object(docker_client, "port",
+                              side_effect=raiser):
 
             self.manager._docker_client.port = mock.Mock(side_effect=raiser)
 
