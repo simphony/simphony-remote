@@ -10,15 +10,14 @@ from remoteappmanager.docker.container_manager import ContainerManager, \
 from remoteappmanager.docker.image import Image
 from remoteappmanager.tests import utils
 from remoteappmanager.tests.mocking.virtual.docker_client import (
-    create_docker_client)
+    VirtualDockerClient)
 
 
 class TestContainerManager(AsyncTestCase):
     def setUp(self):
         super().setUp()
-        self.manager = ContainerManager(docker_config={},
-                                        realm="myrealm")
-        self.mock_docker_client = create_docker_client()
+        self.manager = ContainerManager(docker_config={}, realm="myrealm")
+        self.mock_docker_client = VirtualDockerClient.with_containers()
         self.manager._docker_client._sync_client = self.mock_docker_client
 
     def test_instantiation(self):
@@ -222,6 +221,8 @@ class TestContainerManager(AsyncTestCase):
 
     @gen_test
     def test_start_container_exception_cleanup(self):
+        self.mock_docker_client.stop = mock.Mock()
+        self.mock_docker_client.remove_container = mock.Mock()
         self.assertFalse(self.mock_docker_client.stop.called)
         self.assertFalse(self.mock_docker_client.remove_container.called)
 
@@ -287,7 +288,8 @@ class TestContainerManager(AsyncTestCase):
     def test_different_realm(self):
         manager = ContainerManager(docker_config={},
                                    realm="anotherrealm")
-        manager._docker_client._sync_client = create_docker_client()
+        manager._docker_client._sync_client = \
+            VirtualDockerClient.with_containers()
 
         result = yield manager.containers_from_mapping_id("user_name",
                                                           "mapping_id")
@@ -300,7 +302,8 @@ class TestContainerManager(AsyncTestCase):
     def test_not_stopping_if_different_realm(self):
         manager = ContainerManager(docker_config={},
                                    realm="anotherrealm")
-        manager._docker_client._sync_client = create_docker_client()
+        manager._docker_client._sync_client = \
+            VirtualDockerClient.with_containers()
         yield manager.stop_and_remove_container("container_id1")
 
         self.assertFalse(self.mock_docker_client.stop.called)

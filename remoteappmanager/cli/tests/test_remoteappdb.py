@@ -7,7 +7,11 @@ from click.testing import CliRunner
 from remoteappmanager.cli.remoteappdb import __main__ as remoteappdb
 from remoteappmanager.tests.temp_mixin import TempMixin
 from remoteappmanager.tests.mocking.virtual.docker_client import (
-    create_docker_client)
+    VirtualDockerClient)
+
+
+def create_docker_client():
+    return VirtualDockerClient.with_containers()
 
 
 class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):

@@ -8,12 +8,15 @@ from remoteappmanager.docker.docker_labels import (
     SIMPHONY_NS,
     SIMPHONY_NS_ENV,
     SIMPHONY_NS_RUNINFO)
+from remoteappmanager.tests.utils import probe
 
+# internal, convenience classes. Do not export (risks name collisions with
+# container manager similarly named entities.
 
-Image = namedtuple("Image",
-                   field_names="id name labels")
-Container = namedtuple("Container",
-                       field_names="id name image labels port state")
+_Image = namedtuple("Image",
+                    field_names="id name labels")
+_Container = namedtuple("Container",
+                        field_names="id name image labels ports state")
 
 
 class VirtualDockerClient(object):
@@ -23,8 +26,15 @@ class VirtualDockerClient(object):
     When created, it provides a predefined set of available images.
     """
     def __init__(self):
+        self._images = []
+        self._containers = []
+
+    @classmethod
+    def with_containers(cls):
+        self = cls()
+
         self._images = [
-            Image(
+            _Image(
                 id="image_id1",
                 name='image_name1',
                 labels={
@@ -36,7 +46,7 @@ class VirtualDockerClient(object):
                     SIMPHONY_NS_ENV['x11-depth']: '',
                 }
             ),
-            Image(
+            _Image(
                 id="image_id2",
                 name='image_name2',
                 labels={
@@ -45,7 +55,7 @@ class VirtualDockerClient(object):
             )]
 
         self._containers = [
-            Container(
+            _Container(
                 id="container_id1",
                 name="myrealm-username-mapping_5Fid",
                 image="image_id1",
@@ -56,38 +66,38 @@ class VirtualDockerClient(object):
                     SIMPHONY_NS_RUNINFO.realm: 'myrealm',
                     SIMPHONY_NS_RUNINFO.urlpath: '/user/username/containers/url_id'  # noqa
                 },
-                port={
+                ports=[{
                     "IP": "0.0.0.0",
                     "PublicPort": 666,
                     "PrivatePort": 8888,
                     "Type": "tcp",
-                },
+                }],
                 state="running",
             ),
-            Container(
+            _Container(
                 id="container_id2",
                 name="myrealm-username-mapping_5Fid_5Fexited",
                 image="image_id2",
                 labels={
                     SIMPHONY_NS_RUNINFO.user: 'user_name'
                 },
-                port={
+                ports=[{
                     "PrivatePort": 8889,
                     "Type": "tcp",
-                },
+                }],
                 state="exited",
             ),
-            Container(
+            _Container(
                 id="container_id3",
                 name="remoteexec-username-mapping_5Fid_5Fstopped",
                 image="image_id1",
                 labels={},
-                port={
+                ports=[{
                     "IP": "0.0.0.0",
                     "PublicPort": 666,
                     "PrivatePort": 8888,
                     "Type": "tcp",
-                },
+                }],
                 state={'Paused': False,
                        'Running': False,
                        'Error': '',
@@ -102,6 +112,10 @@ class VirtualDockerClient(object):
                 ,
             ),
         ]
+
+        return self
+
+    # API of the dockerpy Docker client.
 
     def inspect_image(self, image_name_or_id):
         image = self._find_image(image_name_or_id)
@@ -121,10 +135,10 @@ class VirtualDockerClient(object):
                  'RepoTags': [image.name]}
                 for image in self._images]
 
-    def create_container(self):
+    def create_container(self, *args, **kwargs):
         return {"Id": "12345"}
 
-    def containers(self, **kwargs):
+    def containers(self, *args, **kwargs):
         results = []
 
         for container in self._containers:
@@ -155,7 +169,7 @@ class VirtualDockerClient(object):
                  'ImageID': image.id,
                  'Labels': all_labels,
                  'Names': ['/'+container.name],
-                 'Ports': container.port,
+                 'Ports': container.ports,
                  'State': container.state})
 
         return results
@@ -170,10 +184,10 @@ class VirtualDockerClient(object):
 
         network_settings = {}
 
-        if container.port:
+        if container.ports:
             network_settings['Ports'] = {}
 
-            for port_settings in container.port:
+            for port_settings in container.ports:
                 target = '{}/{}'.format(port_settings.get('PrivatePort', ''),
                                         port_settings.get('Type', 'tcp'))
                 host_ip = port_settings.get('IP', '')
@@ -204,20 +218,28 @@ class VirtualDockerClient(object):
         return [{'HostIp': host_ip,
                  'HostPort': host_port}]
 
-    def start(self):
+    def start(self, *args, **kwargs):
         pass
 
-    def stop(self):
+    def stop(self, *args, **kwargs):
         pass
 
-    def remove_container(self):
+    def remove_container(self, *args, **kwargs):
         pass
 
-    def info(self):
+    def info(self, *args, **kwargs):
         return {"ID": "something"}
 
-    def create_host_config(self):
+    def create_host_config(self, **kwargs):
         return {}
+
+    # Additional API for convenience's sake
+
+    def add_container_from_raw_info(self, id, name,
+                                    image, labels, ports, state):
+        self._containers.append(
+            _Container(id, name, image, labels, ports, state)
+        )
 
     def _find_image(self, image_name_or_id):
         image_ids = {image.id: image for image in self._images}

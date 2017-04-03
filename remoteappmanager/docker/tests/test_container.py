@@ -5,7 +5,7 @@ from remoteappmanager.docker.docker_labels import (
     SIMPHONY_NS, SIMPHONY_NS_RUNINFO)
 from remoteappmanager.tests.utils import assert_containers_equal
 from remoteappmanager.tests.mocking.virtual.docker_client import (
-    create_docker_client)
+    VirtualDockerClient, )
 
 
 class TestContainer(TestCase):
@@ -78,11 +78,7 @@ class TestContainer(TestCase):
 
     def test_from_docker_dict_without_public_port(self):
         """Test convertion from "docker ps" to Container with public port"""
-        client = create_docker_client(container_ids=('container_id1',),
-                                      container_names=('container_name1',),
-                                      container_ports=([{'IP': '0.0.0.0',
-                                                         'PrivatePort': 8888,
-                                                         'Type': 'tcp'}],))
+        client = VirtualDockerClient.with_containers()
         container_dict = client.containers()[0]
 
         # Container without public port
@@ -104,7 +100,7 @@ class TestContainer(TestCase):
         assert_containers_equal(self, actual, expected)
 
     def test_from_docker_dict_inspect_container(self):
-        client = create_docker_client()
+        client = VirtualDockerClient.with_containers()
         actual = Container.from_docker_dict(
             client.inspect_container('container_id1'))
 
@@ -125,17 +121,24 @@ class TestContainer(TestCase):
         assert_containers_equal(self, actual, expected)
 
     def test_multiple_ports_data(self):
-        client = create_docker_client(container_names=('container_name1'),
-                                      container_ids=('container_id1'),
-                                      container_ports=(
-                                          [{'IP': '0.0.0.0',
-                                            'PublicPort': 666,
-                                            'PrivatePort': 8888,
-                                            'Type': 'tcp'},
-                                           {'IP': '0.0.0.0',
-                                            'PublicPort': 667,
-                                            'PrivatePort': 8889,
-                                            'Type': 'tcp'}],))
+        client = VirtualDockerClient.with_containers()
+        client.add_container_from_raw_info(
+            id='container_id1',
+            name='container_name1',
+            ports=[
+                {'IP': '0.0.0.0',
+                 'PublicPort': 666,
+                 'PrivatePort': 8888,
+                 'Type': 'tcp'},
+                {'IP': '0.0.0.0',
+                 'PublicPort': 667,
+                 'PrivatePort': 8889,
+                 'Type': 'tcp'}
+            ],
+            image="image_id1",
+            labels={},
+            state="running",
+        )
 
         docker_dict = client.inspect_container("container_id1")
         docker_dict["NetworkSettings"]["Ports"] = {

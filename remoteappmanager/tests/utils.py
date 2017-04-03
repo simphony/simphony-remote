@@ -1,6 +1,7 @@
 import contextlib
 import sys
 import socket
+import functools
 
 import tornado.netutil
 import tornado.testing
@@ -138,3 +139,21 @@ def assert_containers_equal(test_case, actual, expected):
         if getattr(actual, name) != getattr(expected, name):
             message = '{!r} is not identical to the expected {!r}.'
             test_case.fail(message.format(actual, expected))
+
+
+def probe(f):
+    """Wraps a function/method to add a probe we can check after the call.
+    Kind of like mock, but preserves the current behavior."""
+
+    @functools.wraps(f)
+    def _f(*args, **kwargs):
+        _f.called = True
+        _f.call_count += 1
+
+        return f(*args, **kwargs)
+
+    _f.called = False
+    _f.call_count = 0
+
+    return _f
+

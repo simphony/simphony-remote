@@ -15,7 +15,7 @@ from remoteappmanager.tests.utils import (
     basic_command_line_config,
     basic_environment_config)
 from remoteappmanager.tests.mocking.virtual.docker_client import (
-    create_docker_client)
+    VirtualDockerClient)
 
 
 class DummyDBApplication(interfaces.ABCApplication):
@@ -224,7 +224,7 @@ def create_container_manager(params=None):
         params = {'docker_config': {}}
 
     manager = ContainerManager(**params)
-    manager._docker_client._sync_client = create_docker_client()
+    manager._docker_client._sync_client = VirtualDockerClient.with_containers()
     return manager
 
 
