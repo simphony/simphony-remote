@@ -80,7 +80,7 @@ class TestContainerManager(AsyncTestCase):
     @gen_test
     def test_containers_from_url_id(self):
         """ Test containers_for_mapping_id returns a list of Container """
-        result = yield self.manager.find_containers(
+        result = yield self.manager.find_container(
             url_id="url_id")
         expected = Container(docker_id='container_id1',
                              mapping_id="mapping_id",
@@ -294,7 +294,7 @@ class TestContainerManager(AsyncTestCase):
 
         result = yield manager.find_container(
             user_name="user_name", mapping_id="mapping_id")
-        self.assertEqual(result, [])
+        self.assertIsNone(result)
 
         result = yield manager.find_containers()
         self.assertEqual(result, [])
