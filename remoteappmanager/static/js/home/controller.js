@@ -198,7 +198,6 @@ require([
 
             var application_entry_list = this.get('application_entry_list');
             this.set('application_entry_list', application_entry_list.concat([{
-                index: index,
                 app_data: app_data,
                 app_status: app_status.toLowerCase()
             }]));

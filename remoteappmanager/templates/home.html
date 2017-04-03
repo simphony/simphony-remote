@@ -49,8 +49,8 @@
         {{/if}}
 
         <!-- Application list -->
-        {{#each application_entry_list as |application|}}
-            <li data-index="{{application.index}}">
+        {{#each application_entry_list as |application index|}}
+            <li data-index="{{index}}">
                 <span class="{{application.app_status}}-badge"></span>
                 <a href="#" class="truncate">
                     <img src="{{icon_src application.app_data}}" class="app-icon">
