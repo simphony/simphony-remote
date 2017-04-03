@@ -50,7 +50,7 @@
 
         <!-- Application list -->
         {{#each application_entry_list as |application index|}}
-            <li data-index="{{index}}" class="{{ if (equal selected_app index) 'active' }}">
+            <li {{action "toggle_click" index}} data-index="{{index}}" class="{{ if (equal selected_app index) 'active' }}">
                 <span class="{{application.app_status}}-badge"></span>
                 <a href="#" class="truncate">
                     <img src="{{icon_src application.app_data}}" class="app-icon">

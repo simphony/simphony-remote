@@ -207,6 +207,12 @@ require([
                 app_data: app_data,
                 app_status: app_status.toLowerCase()
             }]));
+        },
+
+        actions: {
+            toggle_click(index) {
+                this.set('selected_app', index);
+            }
         }
     });
 
