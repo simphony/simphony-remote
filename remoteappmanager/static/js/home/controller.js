@@ -128,6 +128,10 @@ require([
         );
     });
 
+    AppList.EqualHelper = Ember.Helper.helper(function(params){
+        return params[0] === params[1];
+    });
+
     AppList.ApplicationListComponent = Ember.Component.extend({
         tagName: 'ul',
 
@@ -143,6 +147,8 @@ require([
             this._super(...arguments);
 
             this.set('list_loading', true);
+
+            this.set('selected_app', null);
 
             this.set('app_data', null);
             this.set('configurables', []);
