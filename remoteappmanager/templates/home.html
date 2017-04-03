@@ -28,6 +28,10 @@
     {% raw %}
     <!-- Ember template for the Application list -->
     <script type="text/x-handlebars" data-template-name="application">
+        {{ application-list }}
+    </script>
+
+    <script type="text/x-handlebars" data-template-name="components/application-list">
         <!-- Loading icon -->
         {{#if list_loading}}
             <li>

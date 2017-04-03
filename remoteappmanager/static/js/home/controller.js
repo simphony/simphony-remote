@@ -27,12 +27,24 @@ require([
     init.handlebars();
 
     var AppList = Ember.Application.create({
-      LOG_TRANSITIONS: true, // For debug
-      rootElement: '#applist'
+        LOG_TRANSITIONS: true, // For debug
+        rootElement: '#applist'
     });
 
-    AppList.ApplicationController = Ember.Controller.extend({
-      list_loading: false
+    AppList.ApplicationListComponent = Ember.Component.extend({
+        init: function() {
+            this._super(...arguments);
+
+            this.set('list_loading', true)
+
+            this.fill_list();
+        },
+
+        fill_list: function() {
+            setTimeout(function() {
+                this.set('list_loading', false);
+            }.bind(this), 5000)
+        }
     });
 
     // This model keeps the retrieved content from the REST query locally.
