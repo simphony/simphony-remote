@@ -117,6 +117,8 @@ require([
             this._super(...arguments);
 
             this.set('list_loading', true);
+            this.set('empty_list', false);
+
             this.set('app_data', null);
             this.set('configurables', []);
             this.set('status', [])
@@ -130,9 +132,15 @@ require([
             ).done(function (app_data) {
                 this.set('app_data', app_data);
 
-                // Add the options for some image types
-                for (var i = 0; i < this.get('app_data').length; ++i) {
-                    this._update_image(i);
+                var num_entries = this.get('app_data').length;
+
+                if(num_entries == 0) {
+                    this.set('empty_list', true);
+                } else {
+                    // Add the options for some image types
+                    for (var i = 0; i < num_entries; ++i) {
+                        this._update_image(i);
+                    }
                 }
 
                 this.set('list_loading', false);
