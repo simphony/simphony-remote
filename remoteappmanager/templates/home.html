@@ -50,7 +50,7 @@
 
         <!-- Application list -->
         {{#each application_entry_list as |application|}}
-            <li data-index="{{application.index}}">
+            <li data-index="{{application.index}}" style="display: list-item;">
                 <span class="{{application.app_status}}-badge"></span>
                 <a href="#" class="truncate">
                     <img src="{{icon_src application.app_data}}" class="app-icon">

@@ -5,59 +5,6 @@ define([
     "underscore"
 ], function ($, urlutils, hb) {
     "use strict";
-    var templates = {
-       app_entries: hb.compile(
-           '<li data-index="{{index}}">' +
-           '  <span class="{{app_status}}-badge"></span>' +
-           '  <a href="#" class="truncate">' +
-           '    <img src="{{icon_src app_data}}" class="app-icon">' +
-           '    <button class="stop-button" data-index="{{index}}"><i class="fa fa-times"></i></button>' +
-           '    <span>{{image_name app_data}}</span>' +
-           '  </a>' +
-           '</li>')
-    };
-
-    var ApplicationListView = function(model) {
-        // (Constructor) Represents the application list. In charge of
-        // rendering in on the div with id #applist
-        //
-        // Parameters
-        // model : ApplicationListModel
-        //     The data model.
-        var self = this;
-        self.model = model;
-
-        $("#applist").html(
-            '<li><a href="#"><i class="fa fa-spinner fa-spin"></i> <span>Loading</span></a></li>'
-        );
-    };
-
-    ApplicationListView.prototype.entry_clicked = function(index) {  // jshint ignore:line
-        // handler when entry has been clicked. Override in controller.
-    };
-
-    ApplicationListView.prototype.stop_button_clicked = function(index) {  // jshint ignore:line
-        // handler when stop has been clicked. Override in controller.
-    };
-
-    ApplicationListView.prototype.render = function () {
-        // Renders the full application list and adds it to the DOM.
-        var self = this;
-        var num_entries = this.model.app_data.length;
-        var row;
-        var applist = $("#applist");
-        applist.empty();
-        if (num_entries === 0) {
-            row = $('<li><a href="#">No applications found</a></li>');
-            applist.append(row);
-        } else {
-            for (var i = 0; i < num_entries; i++) {
-                row = self._render_applist_entry(i);
-                applist.append(row.hide().fadeIn(500));
-            }
-        }
-        self.update_selected();
-    };
 
     ApplicationListView.prototype.update_entry = function (index) {
         // Re-renders the entry for a given index, replacing the
