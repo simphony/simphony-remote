@@ -131,11 +131,18 @@ require([
     AppList.ApplicationListComponent = Ember.Component.extend({
         tagName: 'ul',
 
+        empty_list: Ember.computed(
+            'application_entry_list', 'list_loading',
+            function() {
+                return this.get('application_entry_list').length === 0 &&
+                    this.get('list_loading') !== true;
+            }
+        ),
+
         init: function() {
             this._super(...arguments);
 
             this.set('list_loading', true);
-            this.set('empty_list', false);
 
             this.set('app_data', null);
             this.set('configurables', []);
@@ -154,13 +161,9 @@ require([
 
                 var num_entries = app_data.length;
 
-                if(num_entries == 0) {
-                    this.set('empty_list', true);
-                } else {
-                    // Add the options for some image types
-                    for (var i = 0; i < num_entries; ++i) {
-                        this._update_application(i);
-                    }
+                // Add the options for some image types
+                for (var i = 0; i < num_entries; ++i) {
+                    this._update_application(i);
                 }
 
                 this.set('list_loading', false);
