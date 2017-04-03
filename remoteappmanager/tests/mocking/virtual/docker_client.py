@@ -1,4 +1,5 @@
 import json
+import uuid
 import requests
 from collections import namedtuple
 
@@ -8,7 +9,6 @@ from remoteappmanager.docker.docker_labels import (
     SIMPHONY_NS,
     SIMPHONY_NS_ENV,
     SIMPHONY_NS_RUNINFO)
-from remoteappmanager.tests.utils import probe
 
 # internal, convenience classes. Do not export (risks name collisions with
 # container manager similarly named entities.
@@ -136,7 +136,19 @@ class VirtualDockerClient(object):
                 for image in self._images]
 
     def create_container(self, *args, **kwargs):
-        return {"Id": "12345"}
+        id = self._new_id()
+        self._containers.append(
+            _Container(
+                id=id,
+                name=kwargs["name"],
+                image=kwargs["image"],
+                labels=kwargs.get("labels", {}),
+                ports=[],
+                state="running",
+            )
+        )
+
+        return {"Id": id}
 
     def containers(self, *args, **kwargs):
         results = []
@@ -206,12 +218,12 @@ class VirtualDockerClient(object):
                 'NetworkSettings': network_settings
                 }
 
-    def port(self, container_name_or_id, *args, **kwargs):
+    def port(self, container_name_or_id, private_port):
         container = self._find_container(container_name_or_id)
 
-        if container.port:
-            host_ip = container.port[0].get('IP', '')
-            host_port = container.port[0].get('PublicPort', '')
+        if container.ports:
+            host_ip = container.ports[0].get('IP', '')
+            host_port = container.ports[0].get('PublicPort', '')
         else:
             host_ip = host_port = ''
 
@@ -284,3 +296,7 @@ class VirtualDockerClient(object):
         res.reason = reason
         res.request = request
         return res
+
+    def _new_id(self):
+        return uuid.uuid4().hex
+

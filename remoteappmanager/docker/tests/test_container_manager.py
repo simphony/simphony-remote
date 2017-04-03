@@ -300,10 +300,10 @@ class TestContainerManager(AsyncTestCase):
 
     @gen_test
     def test_not_stopping_if_different_realm(self):
+        self.mock_docker_client.stop = mock.Mock()
+        self.mock_docker_client.remove_container = mock.Mock()
         manager = ContainerManager(docker_config={},
                                    realm="anotherrealm")
-        manager._docker_client._sync_client = \
-            VirtualDockerClient.with_containers()
         yield manager.stop_and_remove_container("container_id1")
 
         self.assertFalse(self.mock_docker_client.stop.called)

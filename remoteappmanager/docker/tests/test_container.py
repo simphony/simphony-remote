@@ -85,7 +85,7 @@ class TestContainer(TestCase):
         actual = Container.from_docker_dict(container_dict)
         expected = Container(
             docker_id='container_id1',
-            name='/container_name1',
+            name='/myrealm-username-mapping_5Fid',
             image_name='image_name1',
             image_id='image_id1',
             user="user_name",

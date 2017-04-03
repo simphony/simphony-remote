@@ -526,7 +526,6 @@ class ContainerManager(LoggingMixin):
         Note: The container is only stopped if it belongs to the same
         realm.
         """
-        import pdb; pdb.set_trace()
         self.log.info("Stopping container {}".format(container_id))
 
         container_info = yield self._get_container_info(container_id)
