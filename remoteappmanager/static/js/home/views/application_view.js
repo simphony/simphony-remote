@@ -1,5 +1,5 @@
 define([
-    "jquery", 
+    "jquery",
     "urlutils",
     "handlebars",
     "utils",
@@ -34,7 +34,7 @@ define([
 
     var ApplicationView = function(model) {
         // (Constructor) Represents the main view where the application will be
-        // 
+        //
         // Parameters
         // model : ApplicationListModel
         //     The data model.
@@ -68,7 +68,7 @@ define([
         }
         $("iframe").focus();
     };
-   
+
     ApplicationView.prototype._render_for_model_state = function(delayed) {
         // Decides what to render according to the current model state
         var self = this;
@@ -91,7 +91,7 @@ define([
         }
         return html;
     };
-    
+
     ApplicationView.prototype._render_form = function(index) {
         // Renders the configuration form
         var self = this;
@@ -102,13 +102,13 @@ define([
         var properties = Object.getOwnPropertyNames(configurables);
 
         var disabled = (app_status === models.Status.STARTING);
-        
+
         var base = $(templates.app_start_panel({
             app_data: app_data,
             index: index,
             disabled: disabled
         }));
-        
+
         base.find(".start-button").click(function() {
             self.start_button_clicked($(this).attr("data-index"));
         });
@@ -116,13 +116,13 @@ define([
 
         var policy = app_data.image.policy;
         var policy_ul = base.find(".policy");
-        
+
         if (policy.allow_home) {
             policy_ul.append($("<li>Workspace accessible</li>"));
         } else {
             policy_ul.append($("<li>Workspace not accessible</li>"));
         }
-        
+
         if (policy.volume_source && policy.volume_target && policy.volume_mode) {
             policy_ul.append($(
                 "<li>Volume mounted: " + policy.volume_source +
@@ -131,9 +131,9 @@ define([
         } else {
             policy_ul.append($("<li>No volumes mounted</li>"));
         }
-                
+
         var fieldset = base.find("fieldset");
-        
+
         if (properties.length === 0) {
             fieldset.html("No configurable options for this image");
         } else {
@@ -147,20 +147,20 @@ define([
 
         return base;
     };
-    
+
     ApplicationView.prototype._render_app = function(index, delayed) {
         // Renders the iframe with the application.
         var self = this;
         var app_data = self.model.app_data[index];
-        var location = urlutils.path_join(self.base_url, 
-            "containers", 
+        var location = urlutils.path_join(self.base_url,
+            "containers",
             app_data.container.url_id
         );
-        
+
         if (!delayed) {
             location = location+"/";
-        }    
-        
+        }
+
         var iframe_size = utils.max_iframe_size();
         var iframe = $('<iframe id="application" frameBorder="0" ' +
             'src="' + location + '" ' +

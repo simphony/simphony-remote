@@ -1,5 +1,5 @@
 define([
-    "jquery", 
+    "jquery",
     "urlutils",
     "handlebars",
     "underscore"
@@ -17,10 +17,10 @@ define([
            '</li>')
     };
 
-    var ApplicationListView = function(model) { 
-        // (Constructor) Represents the application list. In charge of 
+    var ApplicationListView = function(model) {
+        // (Constructor) Represents the application list. In charge of
         // rendering in on the div with id #applist
-        // 
+        //
         // Parameters
         // model : ApplicationListModel
         //     The data model.
@@ -32,14 +32,14 @@ define([
         );
     };
 
-    ApplicationListView.prototype.entry_clicked = function(index) {  // jshint ignore:line 
+    ApplicationListView.prototype.entry_clicked = function(index) {  // jshint ignore:line
         // handler when entry has been clicked. Override in controller.
     };
-    
-    ApplicationListView.prototype.stop_button_clicked = function(index) {  // jshint ignore:line 
+
+    ApplicationListView.prototype.stop_button_clicked = function(index) {  // jshint ignore:line
         // handler when stop has been clicked. Override in controller.
     };
-    
+
     ApplicationListView.prototype.render = function () {
         // Renders the full application list and adds it to the DOM.
         var self = this;
@@ -67,7 +67,7 @@ define([
         $("#applist")
             .find("li[data-index='"+index+"']")
             .replaceWith(row);
-        
+
         if (self.model.selected_index === index) {
             self.update_selected();
         }
@@ -88,7 +88,7 @@ define([
     ApplicationListView.prototype._render_applist_entry = function (index) {
         // Returns a jquery HTML snippet for a single application entry
         // The returned entity has event handlers already installed.
-        // index: 
+        // index:
         //     a progressive index for the entry.
         var self = this;
         var app_data = self.model.app_data[index];
@@ -99,7 +99,7 @@ define([
             app_data: app_data,
             app_status: app_status.toLowerCase()
         });
-        
+
         var jq_row = $(row);
         jq_row.click(function() {
             self.entry_clicked($(this).attr("data-index"));
@@ -110,7 +110,7 @@ define([
                 jq_row.find(".stop-button").show();
             }
         }, null);
-        
+
         jq_row.find(".stop-button")
             .hide()
             .click(function(event) {
@@ -122,7 +122,7 @@ define([
             });
         return jq_row;
     };
-   
+
     return {
         ApplicationListView : ApplicationListView
     };
