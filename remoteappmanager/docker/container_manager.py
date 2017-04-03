@@ -14,7 +14,8 @@ from remoteappmanager.docker.image import Image
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.utils import (
     url_path_join,
-    without_end_slash)
+    without_end_slash,
+    deprecated)
 
 from tornado import gen
 from traitlets import (
@@ -36,6 +37,11 @@ class OperationInProgress(Exception):
     """Exception raised when the operation for the requested image or
     container is already in progress."""
     pass
+
+
+class MultipleResultsFound(Exception):
+    """Raised when we are asking for a specific container, but more than
+    one result is found."""
 
 
 class ContainerManager(LoggingMixin):
@@ -163,6 +169,7 @@ class ContainerManager(LoggingMixin):
             self._stop_pending.remove(container_id)
 
     @gen.coroutine
+    @deprecated
     def containers_from_mapping_id(self, user_name, mapping_id):
         """Returns the currently running containers for a given user and
         mapping_id.
@@ -178,30 +185,22 @@ class ContainerManager(LoggingMixin):
         ------
         A list of Container objects, or an empty list if nothing is found.
         """
-        containers = yield self.containers_with_labels({
-                SIMPHONY_NS_RUNINFO.user: user_name,
-                SIMPHONY_NS_RUNINFO.mapping_id: mapping_id,
-                SIMPHONY_NS_RUNINFO.realm: self.realm
-            })
-        return containers
+        return (yield self.find_containers(user_name=user_name,
+                                           mapping_id=mapping_id))
 
     @gen.coroutine
+    @deprecated
     def container_from_url_id(self, url_id):
         """Retrieves and returns the container by its url_id, if present.
         If not present, returns None.
         """
-        containers = yield self.containers_with_labels({
-                SIMPHONY_NS_RUNINFO.url_id: url_id,
-                SIMPHONY_NS_RUNINFO.realm: self.realm
-            })
-        return containers[0] if len(containers) else None
+        return (yield self.find_container(url_id=url_id))
 
     @gen.coroutine
+    @deprecated
     def running_containers(self):
         """Returns all the running containers"""
-        containers = yield self.containers_with_labels({
-                SIMPHONY_NS_RUNINFO.realm: self.realm
-            })
+        containers = yield self.find_containers()
 
         return containers
 
@@ -252,6 +251,53 @@ class ContainerManager(LoggingMixin):
             containers.append(container)
 
         return containers
+
+    @gen.coroutine
+    def find_containers(self,
+                        *,
+                        url_id=None,
+                        mapping_id=None,
+                        user_name=None):
+        """Finds and returns containers matching all the specified arguments.
+        """
+        labels = {
+            SIMPHONY_NS_RUNINFO.realm: self.realm
+        }
+
+        if url_id is not None:
+            labels[SIMPHONY_NS_RUNINFO.url_id] = url_id
+
+        if mapping_id is not None:
+            labels[SIMPHONY_NS_RUNINFO.mapping_id] = mapping_id
+
+        if user_name is not None:
+            labels[SIMPHONY_NS_RUNINFO.user] = user_name
+
+        containers = yield self.containers_with_labels(labels)
+
+        return containers
+
+    @gen.coroutine
+    def find_container(self,
+                       *,
+                       url_id=None,
+                       mapping_id=None,
+                       user_name=None):
+        """Find and returns a container matching the specified
+        arguments.
+
+        Returns the found container or None. If multiple containers
+        match the query, it will raise MultipleResultsFound"""
+        containers = yield self.find_containers(url_id=url_id,
+                                                mapping_id=mapping_id,
+                                                user_name=user_name)
+        if len(containers) > 1:
+            raise MultipleResultsFound()
+
+        if len(containers) == 1:
+            return containers[0]
+
+        return None
 
     @gen.coroutine
     def image(self, image_id_or_name):

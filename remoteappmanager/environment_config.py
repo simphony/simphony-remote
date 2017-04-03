@@ -20,7 +20,6 @@ class EnvironmentConfig(HasTraits):
         """Parses the environment variables, and assign their
         values to our local traits.
         """
-
         for traitlet_name in self.traits().keys():
             envname = traitlet_name.upper()
             setattr(self, traitlet_name,
