@@ -308,7 +308,7 @@ class ContainerManager(LoggingMixin):
         self.log.info('Got container image: {}'.format(image_name))
 
         # Check if the container is present.
-        container = yield self.find_containers(
+        container = yield self.find_container(
             user_name=user_name, mapping_id=mapping_id)
 
         if container is not None:
