@@ -32,7 +32,7 @@ require([
     });
 
     AppList.ApplicationController = Ember.Controller.extend({
-      loading: false
+      list_loading: false
     });
 
     // This model keeps the retrieved content from the REST query locally.
