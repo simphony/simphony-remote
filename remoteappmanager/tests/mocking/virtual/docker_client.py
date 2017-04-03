@@ -143,7 +143,12 @@ class VirtualDockerClient(object):
                 name=kwargs["name"],
                 image=kwargs["image"],
                 labels=kwargs.get("labels", {}),
-                ports=[],
+                ports=[{
+                    "IP": "0.0.0.0",
+                    "PublicPort": 666,
+                    "PrivatePort": 8888,
+                    "Type": "tcp",
+                }],
                 state="running",
             )
         )

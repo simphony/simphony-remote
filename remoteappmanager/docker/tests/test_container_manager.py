@@ -26,33 +26,42 @@ class TestContainerManager(AsyncTestCase):
     @gen_test
     def test_start_stop(self):
         mock_client = self.mock_docker_client
+        with mock.patch.object(mock_client, "start",
+                               wraps=mock_client.start), \
+             mock.patch.object(mock_client, "stop",
+                               wraps=mock_client.stop), \
+             mock.patch.object(mock_client, "create_container",
+                               wraps=mock_client.create_container), \
+             mock.patch.object(mock_client, "remove_container",
+                               wraps=mock_client.remove_container):
 
-        result = yield self.manager.start_container(
-            "username",
-            'image_id1',
-            "new_mapping_id",
-            "/base/url",
-            None,
-            None)
-        self.assertTrue(mock_client.start.called)
-        self.assertTrue(mock_client.create_container.called)
+            result = yield self.manager.start_container(
+                "username",
+                'image_id1',
+                "new_mapping_id",
+                "/base/url",
+                None,
+                None)
 
-        runinfo_labels = mock_client.create_container.call_args[1]["labels"]
+            self.assertTrue(mock_client.start.called)
+            self.assertTrue(mock_client.create_container.called)
 
-        self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.user], "username")
-        self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.realm], "myrealm")
-        self.assertIn(SIMPHONY_NS_RUNINFO.url_id, runinfo_labels)
-        self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.mapping_id],
-                         "new_mapping_id")
+            runinfo_labels = mock_client.create_container.call_args[1]["labels"]
 
-        self.assertIsInstance(result, Container)
-        self.assertFalse(mock_client.stop.called)
-        self.assertFalse(mock_client.remove_container.called)
+            self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.user], "username")
+            self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.realm], "myrealm")
+            self.assertIn(SIMPHONY_NS_RUNINFO.url_id, runinfo_labels)
+            self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.mapping_id],
+                             "new_mapping_id")
 
-        yield self.manager.stop_and_remove_container(result.docker_id)
+            self.assertIsInstance(result, Container)
+            self.assertFalse(mock_client.stop.called)
+            self.assertFalse(mock_client.remove_container.called)
 
-        self.assertTrue(mock_client.stop.called)
-        self.assertTrue(mock_client.remove_container.called)
+            yield self.manager.stop_and_remove_container(result.docker_id)
+
+            self.assertTrue(mock_client.stop.called)
+            self.assertTrue(mock_client.remove_container.called)
 
     @gen_test
     def test_containers_from_mapping_id(self):
@@ -120,59 +129,73 @@ class TestContainerManager(AsyncTestCase):
         # Start the operations, and retrieve the future.
         # they will stop at the first yield and not go further until
         # we yield them
-        f1 = self.manager.start_container("username",
-                                          "image_id1",
-                                          "mapping_id",
-                                          "/foo/bar",
-                                          None,
-                                          )
+        with mock.patch.object(self.mock_docker_client, "start",
+                               wraps=self.mock_docker_client.start):
+            f1 = self.manager.start_container("username",
+                                              "image_id1",
+                                              "mapping_id",
+                                              "/foo/bar",
+                                              None,
+                                              )
 
-        f2 = self.manager.start_container("username",
-                                          "image_id1",
-                                          "mapping_id",
-                                          "/foo/baz",
-                                          None,
-                                          )
+            f2 = self.manager.start_container("username",
+                                              "image_id1",
+                                              "mapping_id",
+                                              "/foo/baz",
+                                              None,
+                                              )
 
-        # If these yielding raise a KeyError, it is because the second
-        # one tries to remove the same key from the list, but it has been
-        # already removed by the first one. Race condition.
-        yield f1
+            # If these yielding raise a KeyError, it is because the second
+            # one tries to remove the same key from the list, but it has been
+            # already removed by the first one. Race condition.
+            yield f1
 
-        with self.assertRaises(OperationInProgress):
-            yield f2
+            with self.assertRaises(OperationInProgress):
+                yield f2
 
-        self.assertEqual(self.mock_docker_client.start.call_count, 1)
+            self.assertEqual(self.mock_docker_client.start.call_count, 1)
 
     @gen_test
     def test_race_condition_stopping(self):
-        f1 = self.manager.stop_and_remove_container("container_id1")
-        f2 = self.manager.stop_and_remove_container("container_id1")
+        docker_client = self.mock_docker_client
 
-        yield f1
+        with mock.patch.object(docker_client, "stop",
+                               wraps=docker_client.stop):
 
-        with self.assertRaises(OperationInProgress):
-            yield f2
+            f1 = self.manager.stop_and_remove_container("container_id1")
+            f2 = self.manager.stop_and_remove_container("container_id1")
 
-        self.assertEqual(self.mock_docker_client.stop.call_count, 1)
+            yield f1
+
+            with self.assertRaises(OperationInProgress):
+                yield f2
+
+            self.assertEqual(self.mock_docker_client.stop.call_count, 1)
 
     @gen_test
     def test_start_already_present_container(self):
         mock_client = self.mock_docker_client
 
-        result = yield self.manager.start_container(
-            "user_name",
-            "image_name1",
-            "mapping_id",
-            "/base/url",
-            None,
-            None)
-        self.assertTrue(mock_client.start.called)
-        self.assertIsInstance(result, Container)
+        with mock.patch.object(mock_client, "start",
+                               wraps=mock_client.start), \
+            mock.patch.object(mock_client, "stop",
+                              wraps=mock_client.stop), \
+            mock.patch.object(mock_client, "remove_container",
+                              wraps=mock_client.remove_container):
 
-        # Stop should have been called and the container removed
-        self.assertTrue(mock_client.stop.called)
-        self.assertTrue(mock_client.remove_container.called)
+            result = yield self.manager.start_container(
+                "user_name",
+                "image_name1",
+                "mapping_id",
+                "/base/url",
+                None,
+                None)
+            self.assertTrue(mock_client.start.called)
+            self.assertIsInstance(result, Container)
+
+            # Stop should have been called and the container removed
+            self.assertTrue(mock_client.stop.called)
+            self.assertTrue(mock_client.remove_container.called)
 
     @gen_test
     def test_image(self):
@@ -190,99 +213,115 @@ class TestContainerManager(AsyncTestCase):
     @gen_test
     def test_start_container_with_nonexisting_volume_source(self):
         # These volume sources are invalid
-        volumes = {'~no_way_this_be_valid': {'bind': '/target_vol1',
-                                             'mode': 'ro'},
-                   '/no_way_this_be_valid': {'bind': '/target_vol2',
-                                             'mode': 'ro'}}
+        docker_client = self.manager._docker_client._sync_client
+        with mock.patch.object(docker_client, "create_container",
+                               wraps=docker_client.create_container):
+            volumes = {'~no_way_this_be_valid': {'bind': '/target_vol1',
+                                                 'mode': 'ro'},
+                       '/no_way_this_be_valid': {'bind': '/target_vol2',
+                                                 'mode': 'ro'}}
 
-        # This volume source is valid
-        good_path = os.path.abspath('.')
-        volumes[good_path] = {'bind': '/target_vol3',
-                              'mode': 'ro'}
+            # This volume source is valid
+            good_path = os.path.abspath('.')
+            volumes[good_path] = {'bind': '/target_vol3',
+                                  'mode': 'ro'}
 
-        yield self.manager.start_container("username",
-                                           "image_id1",
-                                           "mapping_id",
-                                           "/foo/bar",
-                                           volumes,
-                                           )
+            yield self.manager.start_container("username",
+                                               "image_id1",
+                                               "mapping_id",
+                                               "/foo/bar",
+                                               volumes,
+                                               )
 
-        # Call args and keyword args that create_container receives
-        docker_client = self.manager._docker_client
-        args = docker_client._sync_client.create_container.call_args
-        actual_volume_targets = args[1]['volumes']
+            # Call args and keyword args that create_container receives
+            args = docker_client.create_container.call_args
+            actual_volume_targets = args[1]['volumes']
 
-        # Invalid volume paths should have been filtered away
-        self.assertNotIn('/target_vol1', actual_volume_targets)
-        self.assertNotIn('/target_vol2', actual_volume_targets)
+            # Invalid volume paths should have been filtered away
+            self.assertNotIn('/target_vol1', actual_volume_targets)
+            self.assertNotIn('/target_vol2', actual_volume_targets)
 
-        # The current directory is valid, should stay
-        self.assertIn('/target_vol3', actual_volume_targets)
+            # The current directory is valid, should stay
+            self.assertIn('/target_vol3', actual_volume_targets)
 
     @gen_test
     def test_start_container_exception_cleanup(self):
-        self.mock_docker_client.stop = mock.Mock()
-        self.mock_docker_client.remove_container = mock.Mock()
-        self.assertFalse(self.mock_docker_client.stop.called)
-        self.assertFalse(self.mock_docker_client.remove_container.called)
+        docker_client = self.mock_docker_client
 
         def raiser(*args, **kwargs):
             raise Exception("Boom!")
 
-        self.manager._docker_client.start = mock.Mock(side_effect=raiser)
+        with mock.patch.object(docker_client, "stop",
+                               wraps=docker_client.stop), \
+             mock.patch.object(docker_client, "remove_container",
+                               wraps=docker_client.remove_container), \
+             mock.patch.object(docker_client, "start",
+                               side_effect=raiser):
 
-        with self.assertRaisesRegex(Exception, 'Boom!'):
-            yield self.manager.start_container("username",
-                                               "image_id1",
-                                               "mapping_id",
-                                               "/base/url",
-                                               None,
-                                               None)
+            self.assertFalse(self.mock_docker_client.stop.called)
+            self.assertFalse(self.mock_docker_client.remove_container.called)
 
-        self.assertTrue(self.mock_docker_client.stop.called)
-        self.assertTrue(self.mock_docker_client.remove_container.called)
+            with self.assertRaisesRegex(Exception, 'Boom!'):
+                yield self.manager.start_container("username",
+                                                   "image_id1",
+                                                   "mapping_id",
+                                                   "/base/url",
+                                                   None,
+                                                   None)
+
+            self.assertTrue(docker_client.stop.called)
+            self.assertTrue(docker_client.remove_container.called)
 
     @gen_test
     def test_start_container_exception_cleanup_2(self):
         # Same test as above, but checks after the start (at ip and port)
-        self.assertFalse(self.mock_docker_client.stop.called)
-        self.assertFalse(self.mock_docker_client.remove_container.called)
+        docker_client = self.mock_docker_client
 
         def raiser(*args, **kwargs):
             raise Exception("Boom!")
 
-        self.manager._docker_client.port = mock.Mock(side_effect=raiser)
+        with mock.patch.object(docker_client, "stop",
+                               wraps=docker_client.stop), \
+             mock.patch.object(docker_client, "remove_container",
+                               wraps=docker_client.remove_container), \
+             mock.patch.object(docker_client, "port",
+                               side_effect=raiser):
 
-        with self.assertRaisesRegex(Exception, 'Boom!'):
-            yield self.manager.start_container("username",
-                                               "image_id1",
-                                               "mapping_id",
-                                               "/base/url",
-                                               None,
-                                               None)
+            self.manager._docker_client.port = mock.Mock(side_effect=raiser)
 
-        self.assertTrue(self.mock_docker_client.stop.called)
-        self.assertTrue(self.mock_docker_client.remove_container.called)
+            with self.assertRaisesRegex(Exception, 'Boom!'):
+                yield self.manager.start_container("username",
+                                                   "image_id1",
+                                                   "mapping_id",
+                                                   "/base/url",
+                                                   None,
+                                                   None)
+
+            self.assertTrue(self.mock_docker_client.stop.called)
+            self.assertTrue(self.mock_docker_client.remove_container.called)
 
     @gen_test
     def test_start_container_with_environment(self):
         mock_client = self.mock_docker_client
+        with mock.patch.object(mock_client, "create_container",
+                               wraps=mock_client.create_container):
 
-        environment = {
-            "FOO": "bar"
-        }
+            environment = {
+                "FOO": "bar"
+            }
 
-        yield self.manager.start_container(
-            "username",
-            "image_name1",
-            "mapping_id",
-            "/base/url",
-            None,
-            environment)
+            yield self.manager.start_container(
+                "username",
+                "image_name1",
+                "mapping_id",
+                "/base/url",
+                None,
+                environment)
 
-        self.assertEqual(
-            mock_client.create_container.call_args[1]["environment"]["FOO"],
-            "bar")
+            self.assertEqual(
+                mock_client.create_container.call_args[1][
+                    "environment"]["FOO"],
+                "bar")
 
     @gen_test
     def test_different_realm(self):
