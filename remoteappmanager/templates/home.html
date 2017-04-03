@@ -23,12 +23,12 @@
         <li class="header">APPLICATIONS</li>
     </ul>
 
-    <ul class="sidebar-menu" id="applist"></ul>
+    <div id="ember_container"></div>
 
     {% raw %}
     <!-- Ember template for the Application list -->
     <script type="text/x-handlebars" data-template-name="application">
-        {{ application-list }}
+        {{ application-list class="sidebar-menu" id="applist" }}
     </script>
 
     <script type="text/x-handlebars" data-template-name="components/application-list">

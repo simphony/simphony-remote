@@ -106,7 +106,7 @@ require([
 
     var AppList = Ember.Application.create({
         LOG_TRANSITIONS: true, // For debug
-        rootElement: '#applist'
+        rootElement: '#ember_container'
     });
 
     AppList.IconSrcHelper = Ember.Helper.helper(function([app_data]){
@@ -129,6 +129,8 @@ require([
     });
 
     AppList.ApplicationListComponent = Ember.Component.extend({
+        tagName: 'ul',
+
         init: function() {
             this._super(...arguments);
 
