@@ -9,7 +9,6 @@ require([
     "home/views/application_view",
     "jsapi/v1/resources",
     "handlebars",
-    "init",
     'utils',
     'home/configurables',
 ], function(
@@ -22,13 +21,11 @@ require([
     application_view,
     resources,
     hb,
-    init,
     utils,
     configurables) {
     "use strict";
 
     var ga = analytics.init();
-    init.handlebars();
 
     var available_applications_info = function () {
         // Retrieve information from the various applications and
@@ -112,6 +109,25 @@ require([
         rootElement: '#applist'
     });
 
+    AppList.IconSrcHelper = Ember.Helper.helper(function([app_data]){
+        var icon_data = app_data.image.icon_128;
+        return (
+            icon_data ?
+            "data:image/png;base64,"+icon_data :
+            urlutils.path_join(
+                this.base_url, "static", "images", "generic_appicon_128.png"
+            )
+        );
+    });
+
+    AppList.AppNameHelper = Ember.Helper.helper(function([app_data]){
+        return (
+            app_data.image.ui_name ?
+            app_data.image.ui_name :
+            app_data.image.name
+        );
+    });
+
     AppList.ApplicationListComponent = Ember.Component.extend({
         init: function() {
             this._super(...arguments);
@@ -121,7 +137,9 @@ require([
 
             this.set('app_data', null);
             this.set('configurables', []);
-            this.set('status', [])
+            this.set('status', []);
+
+            this.set('application_entry_list', []);
 
             this.fill_list();
         },
@@ -139,7 +157,7 @@ require([
                 } else {
                     // Add the options for some image types
                     for (var i = 0; i < num_entries; ++i) {
-                        this._update_image(i);
+                        this._update_application(i);
                     }
                 }
 
@@ -147,7 +165,7 @@ require([
             }.bind(this));
         },
 
-        _update_image: function(index) {
+        _update_application: function(index) {
             // Updates the configurables submodel for a given application index.
             var app_data = this.get('app_data')[index];
             var image = app_data.image;
@@ -168,8 +186,17 @@ require([
                 }
             }
 
-            this.get('status')[index] =
-                app_data.container === null ? Status.STOPPED : Status.RUNNING;
+            var app_status = app_data.container === null ?
+                Status.STOPPED :
+                Status.RUNNING;
+            this.get('status')[index] = app_status;
+
+            var application_entry_list = this.get('application_entry_list');
+            this.set('application_entry_list', application_entry_list.concat([{
+                index: index,
+                app_data: app_data,
+                app_status: app_status.toLowerCase()
+            }]));
         }
     });
 
