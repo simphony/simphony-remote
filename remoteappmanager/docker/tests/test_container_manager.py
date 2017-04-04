@@ -56,7 +56,7 @@ class TestContainerManager(AsyncTestCase):
         self.assertTrue(mock_client.remove_container.called)
 
     @gen_test
-    def test_containers_from_mapping_id(self):
+    def test_find_from_mapping_id(self):
         """ Test containers_for_mapping_id returns a list of Container """
         result = yield self.manager.find_containers(
             user_name="username",
@@ -78,7 +78,7 @@ class TestContainerManager(AsyncTestCase):
         utils.assert_containers_equal(self, result[0], expected)
 
     @gen_test
-    def test_containers_from_url_id(self):
+    def test_find_from_url_id(self):
         """ Test containers_for_mapping_id returns a list of Container """
         result = yield self.manager.find_container(
             url_id="url_id")
@@ -98,7 +98,7 @@ class TestContainerManager(AsyncTestCase):
         utils.assert_containers_equal(self, result, expected)
 
     @gen_test
-    def test_containers_from_url_id_exceptions(self):
+    def test_find_from_url_id_exceptions(self):
         """ Test containers_for_mapping_id returns a list of Container """
         docker_client = self.mock_docker_client
         docker_client.port = mock.Mock(side_effect=Exception("Boom!"))
@@ -115,7 +115,7 @@ class TestContainerManager(AsyncTestCase):
         self.assertEqual(result, None)
 
     @gen_test
-    def test_running_containers(self):
+    def test_find_containers(self):
         result = yield self.manager.find_containers()
         self.assertEqual(len(result), 1)
 

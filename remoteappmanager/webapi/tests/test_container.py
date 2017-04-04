@@ -221,7 +221,7 @@ class TestContainer(WebAPITestCase):
                           "message": "unrecognized mapping_id"})
 
     def test_retrieve(self):
-        self._app.container_manager.container_from_url_id = mock_coro_factory(
+        self._app.container_manager.find_container = mock_coro_factory(
             DockerContainer(user="username")
         )
         _, data = self.get("/user/username/api/v1/containers/found/",
@@ -230,13 +230,13 @@ class TestContainer(WebAPITestCase):
         self.assertEqual(data["image_name"], "")
         self.assertEqual(data["name"], "")
 
-        self._app.container_manager.container_from_url_id = \
+        self._app.container_manager.find_container = \
             mock_coro_factory(return_value=None)
         self.get("/user/username/api/v1/containers/notfound/",
                  httpstatus.NOT_FOUND)
 
     def test_prevent_retrieve_from_other_user(self):
-        self._app.container_manager.container_from_url_id = mock_coro_factory(
+        self._app.container_manager.find_container = mock_coro_factory(
             DockerContainer(user="foo")
         )
 
@@ -244,7 +244,7 @@ class TestContainer(WebAPITestCase):
                  httpstatus.NOT_FOUND)
 
     def test_delete(self):
-        self._app.container_manager.container_from_url_id = mock_coro_factory(
+        self._app.container_manager.find_container = mock_coro_factory(
             DockerContainer(user="username")
         )
 
@@ -252,13 +252,13 @@ class TestContainer(WebAPITestCase):
                     httpstatus.NO_CONTENT)
         self.assertTrue(self._app.reverse_proxy.unregister.called)
 
-        self._app.container_manager.container_from_url_id = \
+        self._app.container_manager.find_container = \
             mock_coro_factory(return_value=None)
         self.delete("/user/username/api/v1/containers/notfound/",
                     httpstatus.NOT_FOUND)
 
     def test_prevent_delete_from_other_user(self):
-        self._app.container_manager.container_from_url_id = mock_coro_factory(
+        self._app.container_manager.find_container = mock_coro_factory(
             DockerContainer(user="foo")
         )
         self.delete("/user/username/api/v1/containers/found/",

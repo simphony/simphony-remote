@@ -89,14 +89,13 @@ class Container(Resource):
     def retrieve(self, identifier):
         """Return the representation of the running container."""
         container_manager = self.application.container_manager
-        container = yield container_manager.container_from_url_id(identifier)
+        container = yield container_manager.find_container(
+            url_id=identifier,
+            user_name=self.current_user.name)
 
         if container is None:
             self.log.warning("Could not find container for id {}".format(
                 identifier))
-            raise exceptions.NotFound()
-
-        if container.user != self.current_user.name:
             raise exceptions.NotFound()
 
         return dict(
@@ -109,14 +108,14 @@ class Container(Resource):
     def delete(self, identifier):
         """Stop the container."""
         container_manager = self.application.container_manager
-        container = yield container_manager.container_from_url_id(identifier)
+        container = yield container_manager.find_container(
+            url_id=identifier,
+            user_name=self.current_user.name
+        )
 
         if not container:
             self.log.warning("Could not find container for id {}".format(
                              identifier))
-            raise exceptions.NotFound()
-
-        if container.user != self.current_user.name:
             raise exceptions.NotFound()
 
         try:
