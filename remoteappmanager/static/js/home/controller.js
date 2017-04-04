@@ -130,8 +130,18 @@ require([
         );
     });
 
+    AppList.IsRunningHelper = Ember.Helper.helper(function([status]) {
+        return status === Status.RUNNING.toLowerCase();
+    });
+
     AppList.EqualHelper = Ember.Helper.helper(function(params) {
         return params[0] === params[1];
+    });
+
+    // Ember application model
+
+    const Application = Ember.Object.extend({
+        //
     });
 
     // Ember component for the application list
@@ -199,16 +209,28 @@ require([
                 }
             }
 
-            this.get('application_entry_list').pushObject({
+            var app_object = Application.create({
                 app_data: app_data,
                 configurable: configurable,
                 status: status.toLowerCase()
             });
+
+            this.get('application_entry_list').pushObject(app_object);
         },
 
         actions: {
             toggle_app_clicked(index) {
                 this.set('selected_app', index);
+                // TODO: Display form or application
+            },
+            toggle_app_stopped(application) {
+                if (application.get('status') === Status.STOPPING) {
+                    return;
+                }
+
+                application.set('status', Status.STOPPING);
+
+                //TODO: Stop application
             }
         }
     });
