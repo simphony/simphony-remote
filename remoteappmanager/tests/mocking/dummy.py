@@ -32,11 +32,13 @@ User = namedtuple('User', ('id', 'name'))
 class DummyDBAccounting(interfaces.ABCAccounting):
     def __init__(self):
         self.users = {
-            0: User(0, "username")
+            0: User(0, "johndoe")
         }
 
         self.applications = {
-            0: DummyDBApplication(id=0, image='image_id1'),
+            0: DummyDBApplication(
+                id=0,
+                image='simphonyproject/simphony-mayavi:0.6.0'),
         }
 
         self.policies = {
@@ -44,10 +46,10 @@ class DummyDBAccounting(interfaces.ABCAccounting):
         }
 
         self.accounting = {
-            'mapping_id': (
+            'cbaee2e8ef414f9fb0f1c97416b8aa6c': (
                 self.users[0], self.applications[0], self.policies[0]
             ),
-            'id678': (
+            'b7ca425a51bf40acbd305b3f782714b6': (
                 self.users[0], self.applications[0], self.policies[0]
             )
         }

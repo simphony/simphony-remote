@@ -99,10 +99,10 @@ class TestContainer(TestCase):
     def test_from_docker_dict_inspect_container(self):
         client = VirtualDockerClient.with_containers()
         actual = Container.from_docker_dict(
-            client.inspect_container('container_id1'))
+            client.inspect_container('d2b56bffb5655cb7668b685b80116041a20ee8662ebfa5b5cb68cfc423d9dc30'))  # noqa
 
         expected = Container(
-            docker_id='container_id1',
+            docker_id='d2b56bffb5655cb7668b685b80116041a20ee8662ebfa5b5cb68cfc423d9dc30',  # noqa
             name='/myrealm-username-mapping_5Fid',
             image_name='image_name1',
             image_id='image_id1',
