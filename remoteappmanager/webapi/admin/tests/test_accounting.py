@@ -18,10 +18,10 @@ class TestAccounting(WebAPITestCase):
         return app
 
     def test_delete(self):
-        self.delete("/user/username/api/v1/accounting/mapping_id/",
+        self.delete("/user/johndoe/api/v1/accounting/cbaee2e8ef414f9fb0f1c97416b8aa6c/",  # noqa
                     httpstatus.NO_CONTENT)
 
-        self.delete("/user/username/api/v1/accounting/12345/",
+        self.delete("/user/johndoe/api/v1/accounting/12345/",
                     httpstatus.NOT_FOUND)
 
     def test_unable_to_delete(self):
@@ -29,20 +29,20 @@ class TestAccounting(WebAPITestCase):
                         "dummy.DummyDBAccounting.revoke_access_by_id"
                         ) as mock_delete_user:
             mock_delete_user.side_effect = UnsupportedOperation()
-            self.delete("/user/username/api/v1/accounting/mapping_id/",
+            self.delete("/user/johndoe/api/v1/accounting/cbaee2e8ef414f9fb0f1c97416b8aa6c/",  # noqa
                         httpstatus.INTERNAL_SERVER_ERROR)
 
     def test_create(self):
-        self.post("/user/username/api/v1/accounting/",
+        self.post("/user/johndoe/api/v1/accounting/",
                   {"user_name": ""},
                   httpstatus.BAD_REQUEST)
 
-        self.post("/user/username/api/v1/accounting/",
+        self.post("/user/johndoe/api/v1/accounting/",
                   {},
                   httpstatus.BAD_REQUEST)
 
-        self.post("/user/username/api/v1/accounting/",
-                  {"user_name": "username",
+        self.post("/user/johndoe/api/v1/accounting/",
+                  {"user_name": "johndoe",
                    "image_name": "image_id1",
                    "allow_home": True,
                    "volume": "/foo:/bar:ro"
@@ -50,8 +50,8 @@ class TestAccounting(WebAPITestCase):
                   httpstatus.CREATED)
 
         # Post in this case is idempotent
-        self.post("/user/username/api/v1/accounting/",
-                  {"user_name": "username",
+        self.post("/user/johndoe/api/v1/accounting/",
+                  {"user_name": "johndoe",
                    "image_name": "image_id1",
                    "allow_home": True,
                    "volume": "/foo:/bar:ro"
@@ -63,8 +63,8 @@ class TestAccounting(WebAPITestCase):
                         "dummy.DummyDBAccounting.grant_access"
                         ) as mock_grant_access:
             mock_grant_access.side_effect = UnsupportedOperation()
-            self.post("/user/username/api/v1/accounting/",
-                      {"user_name": "username",
+            self.post("/user/johndoe/api/v1/accounting/",
+                      {"user_name": "johndoe",
                        "image_name": "image_id1",
                        "allow_home": True,
                        "volume": "/foo:/bar:ro"
@@ -74,8 +74,8 @@ class TestAccounting(WebAPITestCase):
     def test_delete_failed_auth(self):
         self._app.hub.verify_token.return_value = {}
 
-        self.delete("/user/username/api/v1/accounting/mapping_id/",
+        self.delete("/user/johndoe/api/v1/accounting/cbaee2e8ef414f9fb0f1c97416b8aa6c/",  # noqa
                     httpstatus.NOT_FOUND)
 
     def cookie_auth_token(self):
-        return "jupyter-hub-token-username=username"
+        return "jupyter-hub-token-johndoe=johndoe"

@@ -16,9 +16,9 @@ class GoodTable:
 
     #    name,     image, home, view, common, source, target, mode
     records = [
-        ('foo', 'image_1', '1', '1', '0', '', '', ''),
-        ('foo', 'image_2', '1', '1', '1', '/src', '/target', 'ro'),
-        ('username', 'image_1', '0', '0', '0', '/src', '/target', 'ro')]
+        ('markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '1', '1', '0', '', '', ''),  # noqa
+        ('markdoe', 'simphonyproject/ubuntu-image:latest', '1', '1', '1', '/src', '/target', 'ro'),  # noqa
+        ('johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '0', '0', '0', '/src', '/target', 'ro')]  # noqa
 
 
 class BadTableMissingHeaders:
@@ -29,9 +29,9 @@ class BadTableMissingHeaders:
 
     #    name,     image, home, view, common, mode
     records = [
-        ('foo', 'image_1', '1', '1', '0', ''),
-        ('foo', 'image_2', '1', '1', '1', 'ro'),
-        ('username', 'image_1', '0', '0', '0', 'ro')]
+        ('markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '1', '1', '0', ''),  # noqa
+        ('markdoe', 'simphonyproject/ubuntu-image:latest', '1', '1', '1', 'ro'),  # noqa
+        ('johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '0', '0', '0', 'ro')]  # noqa
 
 
 class GoodTableWithDifferentHeaders:
@@ -45,9 +45,9 @@ class GoodTableWithDifferentHeaders:
 
     #  view, common, source, target, mode, name, image, home, extra
     records = [
-        ('1', '0', '', '', '', 'foo', 'image_1', '1', 'anything'),
-        ('1', '1', '/src', '/target', 'ro', 'foo', 'image_2', '1', 'extra'),
-        ('0', '0', '/src', '/target', 'ro', 'username', 'image_1', '0', 'abc')]
+        ('1', '0', '', '', '', 'markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '1', 'anything'),  # noqa
+        ('1', '1', '/src', '/target', 'ro', 'markdoe', 'simphonyproject/ubuntu-image:latest', '1', 'extra'),  # noqa
+        ('0', '0', '/src', '/target', 'ro', 'johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '0', 'abc')]  # noqa
 
 
 def write_csv_file(file_name, headers, records):

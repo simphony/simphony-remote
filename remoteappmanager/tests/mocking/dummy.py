@@ -39,6 +39,9 @@ class DummyDBAccounting(interfaces.ABCAccounting):
             0: DummyDBApplication(
                 id=0,
                 image='simphonyproject/simphony-mayavi:0.6.0'),
+            1: DummyDBApplication(
+                id=1,
+                image='simphonyproject/ubuntu-image:latest'),
         }
 
         self.policies = {
@@ -50,7 +53,7 @@ class DummyDBAccounting(interfaces.ABCAccounting):
                 self.users[0], self.applications[0], self.policies[0]
             ),
             'b7ca425a51bf40acbd305b3f782714b6': (
-                self.users[0], self.applications[0], self.policies[0]
+                self.users[0], self.applications[1], self.policies[0]
             )
         }
 

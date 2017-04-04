@@ -25,4 +25,4 @@ class TestCommandLineConfig(unittest.TestCase):
                              value)
 
     def test_base_urlpath(self):
-        self.assertEqual(self.config.base_urlpath, "/user/username/")
+        self.assertEqual(self.config.base_urlpath, "/user/johndoe/")
