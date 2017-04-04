@@ -102,25 +102,27 @@ require([
         STOPPED: "STOPPED"
     };
 
-    // Ember objects:
+    // Ember Application
 
     var AppList = Ember.Application.create({
         LOG_TRANSITIONS: true, // For debug
         rootElement: '#ember_container'
     });
 
-    AppList.IconSrcHelper = Ember.Helper.helper(function([app_data]){
+    // Ember Helpers
+
+    AppList.IconSrcHelper = Ember.Helper.helper(function([app_data]) {
         var icon_data = app_data.image.icon_128;
         return (
             icon_data ?
-            "data:image/png;base64,"+icon_data :
+            "data:image/png;base64," + icon_data :
             urlutils.path_join(
                 this.base_url, "static", "images", "generic_appicon_128.png"
             )
         );
     });
 
-    AppList.AppNameHelper = Ember.Helper.helper(function([app_data]){
+    AppList.AppNameHelper = Ember.Helper.helper(function([app_data]) {
         return (
             app_data.image.ui_name ?
             app_data.image.ui_name :
@@ -128,9 +130,11 @@ require([
         );
     });
 
-    AppList.EqualHelper = Ember.Helper.helper(function(params){
+    AppList.EqualHelper = Ember.Helper.helper(function(params) {
         return params[0] === params[1];
     });
+
+    // Ember component for the application list
 
     AppList.ApplicationListComponent = Ember.Component.extend({
         tagName: 'ul',
@@ -146,14 +150,10 @@ require([
         init: function() {
             this._super(...arguments);
 
+            this.app_data = null; // Not an Ember Object
+
             this.set('list_loading', true);
-
             this.set('selected_app', null);
-
-            this.set('app_data', null);
-            this.set('configurables', []);
-            this.set('status', []);
-
             this.set('application_entry_list', []);
 
             this.fill_list();
@@ -163,7 +163,7 @@ require([
             return $.when(
                 available_applications_info()
             ).done(function (app_data) {
-                this.set('app_data', app_data);
+                this.app_data = app_data;
 
                 var num_entries = app_data.length;
 
@@ -178,10 +178,12 @@ require([
 
         _update_application: function(index) {
             // Updates the configurables submodel for a given application index.
-            var app_data = this.get('app_data')[index];
+            var app_data = this.app_data[index];
             var image = app_data.image;
-
-            this.get('configurables')[index] = {};
+            var status = app_data.container !== null ?
+                Status.RUNNING :
+                Status.STOPPED;
+            var configurable = {};
 
             for (var i = 0; i < image.configurables.length; ++i) {
                 var tag = image.configurables[i];
@@ -193,24 +195,19 @@ require([
                 var ConfigurableCls = configurables.from_tag(tag);
 
                 if (ConfigurableCls !== null) {
-                    this.get('configurables')[index][tag] = new ConfigurableCls();
+                    configurable[tag] = new ConfigurableCls();
                 }
             }
 
-            var app_status = app_data.container === null ?
-                Status.STOPPED :
-                Status.RUNNING;
-            this.get('status')[index] = app_status;
-
-            var application_entry_list = this.get('application_entry_list');
-            this.set('application_entry_list', application_entry_list.concat([{
+            this.get('application_entry_list').pushObject({
                 app_data: app_data,
-                app_status: app_status.toLowerCase()
-            }]));
+                configurable: configurable,
+                status: status.toLowerCase()
+            });
         },
 
         actions: {
-            toggle_click(index) {
+            toggle_app_clicked(index) {
                 this.set('selected_app', index);
             }
         }
