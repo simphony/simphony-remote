@@ -1,87 +1,169 @@
-{% extends "page.html" %}
+{% extends "base.html" %}
 
-{% block sidebar %}
-<!-- sidebar: style can be found in sidebar.less -->
-<section class="sidebar">
-
-    <!-- search form (Optional) -->
-    <form action="#" method="get" class="sidebar-form">
-        <div class="input-group">
-            <input type="text" name="q" class="form-control" placeholder="Search...">
-            <span class="input-group-btn">
-                <button type="submit" name="search" id="search-btn" class="btn btn-flat">
-                    <i class="fa fa-search"></i>
-                </button>
-            </span>
+{% block body %}
+    <noscript>
+        <div id='noscript'>
+            Jupyter Hub requires JavaScript.<br>
+            Please enable it to proceed.
         </div>
-    </form>
+    </noscript>
 
-    <!-- /.search form -->
+    <div class="wrapper">
 
-    <!-- Sidebar Menu -->
-    <ul class="sidebar-menu">
-        <li class="header">APPLICATIONS</li>
-    </ul>
+        <!-- Main Header -->
+        <header class="main-header">
 
-    <div id="ember_container"></div>
+            <a href="#" class="logo">
+                <!-- logo for regular state and mobile devices -->
+                <span class="logo-lg"><b>Simphony</b>Remote</span>
+            </a>
 
-    {% raw %}
-    <!-- Ember template for the Application list -->
-    <script type="text/x-handlebars" data-template-name="application">
-        {{ application-list class="sidebar-menu" id="applist" }}
-    </script>
+        <!-- Header Navbar -->
+        <nav class="navbar navbar-static-top" role="navigation">
+            <!-- Navbar Right Menu -->
+            <div class="navbar-custom-menu">
+                <ul class="nav navbar-nav">
 
-    <script type="text/x-handlebars" data-template-name="components/application-list">
-        <!-- Loading icon -->
-        {{#if list_loading}}
-            <li>
-                <a href="#">
-                    <i class="fa fa-spinner fa-spin"></i>
-                    <span>Loading</span>
-                </a>
-            </li>
-        {{/if}}
+                    <!-- User Account Menu -->
+                    <li class="dropdown user user-menu">
+                        <!-- Menu Toggle Button -->
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <!-- The user image in the navbar-->
+                            <img src="https://www.gravatar.com/avatar/{{ user.name | gravatar_id }}" class="user-image" alt="User Image">
+                            <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                            <span class="hidden-xs">{{ user.name }}</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <!-- The user image in the menu -->
+                            <li class="user-header">
+                                <img src="https://www.gravatar.com/avatar/{{ user.name | gravatar_id }}" class="img-circle" alt="User Image">
+                                <p>{{ user.name }}</p>
+                            </li>
+                            <!-- Menu Body -->
+                            <li class="user-body"></li>
 
-        {{#if empty_list}}
-            <li>
-                <a href="#">No applications found</a>
-            </li>
-        {{/if}}
+                            <!-- Menu Footer-->
+                            <li class="user-footer">
+                                <div class="pull-right">
+                                    {% block login_widget %}
+                                        <a id="logout" href="{{ logout_url }}" class="btn btn-default btn-flat">
+                                            <i class="fa fa-sign-out"> Sign out</i>
+                                        </a>
+                                    {% endblock %}
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- Control Sidebar Toggle Button -->
+                </ul>
+            </div>
+        </nav>
+        </header>
 
-        <!-- Application list -->
-        {{#each application_entry_list as |application index|}}
-            <li onclick={{action "toggle_app_clicked" index}}
-                data-index="{{index}}"
-                class="{{ if (equal selected_app index) 'active' }}">
+        <!-- Left side column. contains the logo and sidebar -->
+        <aside class="main-sidebar">
+            <!-- sidebar: style can be found in sidebar.less -->
+            <section class="sidebar">
 
-                <span class="{{application.status}}-badge"></span>
+                <!-- search form (Optional) -->
+                <form action="#" method="get" class="sidebar-form">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="Search...">
+                        <span class="input-group-btn">
+                            <button type="submit" name="search" id="search-btn" class="btn btn-flat">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </span>
+                    </div>
+                </form>
 
-                <a href="#" class="truncate">
+                <!-- /.search form -->
 
-                    <img src="{{icon_src application.app_data}}" class="app-icon">
+                <!-- Sidebar Menu -->
+                <ul class="sidebar-menu">
+                    <li class="header">APPLICATIONS</li>
+                </ul>
 
-                    {{#if (is-running application.status)}}
-                        <button class="stop-button"
-                                data-index="{{index}}"
-                                onclick={{action "toggle_app_stopped" application}}>
-                            <i class="fa fa-times"></i>
-                        </button>
+                <div id="ember_container"></div>
+
+                {% raw %}
+                <!-- Ember template for the Application list -->
+                <script type="text/x-handlebars" data-template-name="application">
+                    {{ application-list class="sidebar-menu" id="applist" }}
+                </script>
+
+                <script type="text/x-handlebars" data-template-name="components/application-list">
+                    <!-- Loading icon -->
+                    {{#if list_loading}}
+                        <li>
+                            <a href="#">
+                                <i class="fa fa-spinner fa-spin"></i>
+                                <span>Loading</span>
+                            </a>
+                        </li>
                     {{/if}}
 
-                    <span>{{app_name application.app_data}}</span>
+                    {{#if empty_list}}
+                        <li>
+                            <a href="#">No applications found</a>
+                        </li>
+                    {{/if}}
 
-                </a>
-            </li>
-        {{/each}}
-    </script>
-    {% endraw %}
+                    <!-- Application list -->
+                    {{#each application_entry_list as |application index|}}
+                        <li onclick={{action "toggle_app_clicked" index}}
+                            data-index="{{index}}"
+                            class="{{ if (equal selected_app index) 'active' }}">
 
-  <!-- /.sidebar-menu -->
-</section>
-<!-- /.sidebar -->
-{% endblock %}
+                            <span class="{{application.status}}-badge"></span>
 
-{% block main %}
+                            <a href="#" class="truncate">
+
+                                <img src="{{icon_src application.app_data}}" class="app-icon">
+
+                                {{#if (is-running application.status)}}
+                                    <button class="stop-button"
+                                            data-index="{{index}}"
+                                            onclick={{action "toggle_app_stopped" application}}>
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                {{/if}}
+
+                                <span>{{app_name application.app_data}}</span>
+
+                            </a>
+                        </li>
+                    {{/each}}
+                </script>
+                {% endraw %}
+
+              <!-- /.sidebar-menu -->
+            </section>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Main content -->
+            <section class="content">
+                <!-- Your Page Content Here -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+    </div>
+
+    <script src="{{ static_url("components/admin-lte/plugins/jQuery/jquery-2.2.3.min.js") }}"></script>
+    <script src="{{ static_url("components/admin-lte/bootstrap/js/bootstrap.min.js") }}"></script>
+    <script src="{{ static_url("components/admin-lte/dist/js/app.min.js") }}"></script>
+
+    {% block dialogs %}
+        {% call macros.modal_dlg('Error', btn_label='OK') %}
+            <div class="error-msg">
+                The error
+            </div>
+        {% endcall %}
+    {% endblock %}
 {% endblock %}
 
 {% block script_init %}
