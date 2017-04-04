@@ -9,11 +9,11 @@ class TestConfigurables(unittest.TestCase):
     def setUp(self):
         docker_client = VirtualDockerClient.with_containers()
         image_dict = docker_client.inspect_image(
-            'simphonyproject/simphony-mayavi')
+            'simphonyproject/simphony-mayavi:0.6.0')
         self.image_1 = Image.from_docker_dict(image_dict)
 
         image_dict = docker_client.inspect_image(
-            'simphonyproject/ubuntu-image')
+            'simphonyproject/ubuntu-image:latest')
         self.image_2 = Image.from_docker_dict(image_dict)
 
     def test_resolution(self):
