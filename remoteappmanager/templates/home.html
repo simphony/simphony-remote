@@ -60,97 +60,100 @@
         </nav>
         </header>
 
-        <!-- Left side column. contains the logo and sidebar -->
-        <aside class="main-sidebar">
-            <!-- sidebar: style can be found in sidebar.less -->
-            <section class="sidebar">
+        <div id="ember_container"></div>
 
-                <!-- search form (Optional) -->
-                <form action="#" method="get" class="sidebar-form">
-                    <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="Search...">
-                        <span class="input-group-btn">
-                            <button type="submit" name="search" id="search-btn" class="btn btn-flat">
-                                <i class="fa fa-search"></i>
-                            </button>
-                        </span>
-                    </div>
-                </form>
+        {% raw %}
+        <!-- Ember template for the Application list -->
+        <script type="text/x-handlebars" data-template-name="application">
 
-                <!-- /.search form -->
+            <!-- Left side column. contains the logo and sidebar -->
+            <aside class="main-sidebar">
+                <!-- sidebar: style can be found in sidebar.less -->
+                <section class="sidebar">
 
-                <!-- Sidebar Menu -->
-                <ul class="sidebar-menu">
-                    <li class="header">APPLICATIONS</li>
-                </ul>
+                    <!-- search form (Optional) -->
+                    <form action="#" method="get" class="sidebar-form">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control" placeholder="Search...">
+                            <span class="input-group-btn">
+                                <button type="submit" name="search" id="search-btn" class="btn btn-flat">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </form>
 
-                <div id="ember_container"></div>
+                    <!-- /.search form -->
 
-                {% raw %}
-                <!-- Ember template for the Application list -->
-                <script type="text/x-handlebars" data-template-name="application">
+                    <!-- Sidebar Menu -->
+                    <ul class="sidebar-menu">
+                        <li class="header">APPLICATIONS</li>
+                    </ul>
+
                     {{ application-list class="sidebar-menu" id="applist" }}
-                </script>
 
-                <script type="text/x-handlebars" data-template-name="components/application-list">
-                    <!-- Loading icon -->
-                    {{#if list_loading}}
-                        <li>
-                            <a href="#">
-                                <i class="fa fa-spinner fa-spin"></i>
-                                <span>Loading</span>
-                            </a>
-                        </li>
-                    {{/if}}
+                    <!-- /.sidebar-menu -->
+                </section>
+                <!-- /.sidebar -->
+            </aside>
 
-                    {{#if empty_list}}
-                        <li>
-                            <a href="#">No applications found</a>
-                        </li>
-                    {{/if}}
+            <!-- Content Wrapper. Contains page content -->
+            <div class="content-wrapper">
+                <!-- Main content -->
+                <section class="content">
+                    <!-- Your Page Content Here -->
+                </section>
+                <!-- /.content -->
+            </div>
+            <!-- /.content-wrapper -->
 
-                    <!-- Application list -->
-                    {{#each application_entry_list as |application index|}}
-                        <li onclick={{action "toggle_app_clicked" index}}
-                            data-index="{{index}}"
-                            class="{{ if (equal selected_app index) 'active' }}">
+        </script>
 
-                            <span class="{{application.status}}-badge"></span>
+        <script type="text/x-handlebars" data-template-name="components/application-list">
+            <!-- Loading icon -->
+            {{#if list_loading}}
+                <li>
+                    <a href="#">
+                        <i class="fa fa-spinner fa-spin"></i>
+                        <span>Loading</span>
+                    </a>
+                </li>
+            {{/if}}
 
-                            <a href="#" class="truncate">
+            {{#if empty_list}}
+                <li>
+                    <a href="#">No applications found</a>
+                </li>
+            {{/if}}
 
-                                <img src="{{icon_src application.app_data}}" class="app-icon">
+            <!-- Application list -->
+            {{#each application_entry_list as |application index|}}
+                <li onclick={{action "toggle_app_clicked" index}}
+                    data-index="{{index}}"
+                    class="{{ if (equal selected_app index) 'active' }}">
 
-                                {{#if (is-running application.status)}}
-                                    <button class="stop-button"
-                                            data-index="{{index}}"
-                                            onclick={{action "toggle_app_stopped" application}}>
-                                        <i class="fa fa-times"></i>
-                                    </button>
-                                {{/if}}
+                    <span class="{{application.status}}-badge"></span>
 
-                                <span>{{app_name application.app_data}}</span>
+                    <a href="#" class="truncate">
 
-                            </a>
-                        </li>
-                    {{/each}}
-                </script>
-                {% endraw %}
+                        <img src="{{icon_src application.app_data}}" class="app-icon">
 
-              <!-- /.sidebar-menu -->
-            </section>
-            <!-- /.sidebar -->
-        </aside>
+                        {{#if (is-running application.status)}}
+                            <button class="stop-button"
+                                    data-index="{{index}}"
+                                    onclick={{action "toggle_app_stopped" application}}>
+                                <i class="fa fa-times"></i>
+                            </button>
+                        {{/if}}
 
-        <!-- Content Wrapper. Contains page content -->
-        <div class="content-wrapper">
-            <!-- Main content -->
-            <section class="content">
-                <!-- Your Page Content Here -->
-            </section>
-            <!-- /.content -->
-        </div>
-        <!-- /.content-wrapper -->
+                        <span>{{app_name application.app_data}}</span>
+
+                    </a>
+                </li>
+            {{/each}}
+        </script>
+        {% endraw %}
+
     </div>
 
     <script src="{{ static_url("components/admin-lte/plugins/jQuery/jquery-2.2.3.min.js") }}"></script>
