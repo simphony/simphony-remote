@@ -236,12 +236,12 @@ class TestContainer(WebAPITestCase):
                  httpstatus.NOT_FOUND)
 
     def test_prevent_retrieve_from_other_user(self):
-        self._app.container_manager.find_container = mock_coro_factory(
-            DockerContainer(user="foo")
-        )
+        self._app.container_manager.find_container = mock_coro_factory(None)
 
         self.get("/user/username/api/v1/containers/found/",
                  httpstatus.NOT_FOUND)
+        kwargs = self._app.container_manager.find_container.call_args[1]
+        self.assertEqual(kwargs["user_name"], "username")
 
     def test_delete(self):
         self._app.container_manager.find_container = mock_coro_factory(
@@ -259,10 +259,13 @@ class TestContainer(WebAPITestCase):
 
     def test_prevent_delete_from_other_user(self):
         self._app.container_manager.find_container = mock_coro_factory(
-            DockerContainer(user="foo")
+            None
         )
         self.delete("/user/username/api/v1/containers/found/",
                     httpstatus.NOT_FOUND)
+
+        kwargs = self._app.container_manager.find_container.call_args[1]
+        self.assertEqual(kwargs["user_name"], "username")
 
     def test_post_start(self):
         with patch("remoteappmanager"
