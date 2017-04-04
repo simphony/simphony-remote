@@ -12,7 +12,7 @@ class Container(Resource):
     def delete(self, identifier):
         """Stop the container."""
         container_manager = self.application.container_manager
-        container = yield container_manager.container_from_url_id(identifier)
+        container = yield container_manager.find_container(url_id=identifier)
 
         if not container:
             self.log.warning("Could not find container for id {}".format(

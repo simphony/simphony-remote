@@ -116,6 +116,7 @@ def mock_coro_factory(return_value=None, side_effect=None):
     @gen.coroutine
     def coro(*args, **kwargs):
         coro.called = True
+        coro.call_args = (args, kwargs)
         yield gen.sleep(0.1)
         if side_effect:
             if isinstance(side_effect, Exception):

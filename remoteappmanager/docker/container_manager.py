@@ -14,8 +14,8 @@ from remoteappmanager.docker.image import Image
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.utils import (
     url_path_join,
-    without_end_slash,
-    deprecated)
+    without_end_slash)
+
 
 from tornado import gen
 from traitlets import (
@@ -169,42 +169,6 @@ class ContainerManager(LoggingMixin):
             self._stop_pending.remove(container_id)
 
     @gen.coroutine
-    @deprecated
-    def containers_from_mapping_id(self, user_name, mapping_id):
-        """Returns the currently running containers for a given user and
-        mapping_id.
-
-        Parameters
-        ----------
-        user_name: str
-            The username
-        mapping_id : str
-            The unique id to identify the container
-
-        Return
-        ------
-        A list of Container objects, or an empty list if nothing is found.
-        """
-        return (yield self.find_containers(user_name=user_name,
-                                           mapping_id=mapping_id))
-
-    @gen.coroutine
-    @deprecated
-    def container_from_url_id(self, url_id):
-        """Retrieves and returns the container by its url_id, if present.
-        If not present, returns None.
-        """
-        return (yield self.find_container(url_id=url_id))
-
-    @gen.coroutine
-    @deprecated
-    def running_containers(self):
-        """Returns all the running containers"""
-        containers = yield self.find_containers()
-
-        return containers
-
-    @gen.coroutine
     def containers_with_labels(self, labels):
         filters = {
             'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]}
@@ -344,14 +308,10 @@ class ContainerManager(LoggingMixin):
         self.log.info('Got container image: {}'.format(image_name))
 
         # Check if the container is present.
-        containers = yield self.containers_from_mapping_id(
-            user_name, mapping_id)
+        container = yield self.find_container(
+            user_name=user_name, mapping_id=mapping_id)
 
-        if len(containers) != 0:
-            # we assume only one present. The API is made for potential
-            # of multiple instances.
-            container = containers[0]
-
+        if container is not None:
             # Make sure we stop and remove it if by any chance is already
             # there. This will guarantee a fresh start every time.
             self.log.info('Container for image {} '
