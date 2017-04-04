@@ -14,57 +14,48 @@ from remoteappmanager.docker.docker_labels import (
 # container manager similarly named entities.
 
 _Image = namedtuple("Image",
-                    field_names="id name labels")
+                    field_names="id name labels exposed_ports")
 _Container = namedtuple("Container",
                         field_names="id name image labels ports state")
 
 
 class VirtualDockerClient(object):
     """A virtual docker client that behaves like the real thing
-    but does nothing. It provides the same interface as dockerpy Client.
-
-    When created, it provides a predefined set of available images.
+    but does nothing on docker. It provides the same interface as dockerpy
+    Client.
     """
+
     def __init__(self):
+        # This entry contains the images that can be installed.
+        # It simulates the hub docker retrieval.
+        self._available_images = self._init_available_images()
+
+        # This contains the images that are currently installed.
         self._images = []
+
+        # This one contains the containers that are currently present
         self._containers = []
 
     @classmethod
     def with_containers(cls):
+        """
+        Alternative constructor.
+        When created, it provides a predefined set of available images.
+        """
         self = cls()
 
-        self._images = [
-            _Image(
-                id="image_id1",
-                name='image_name1',
-                labels={
-                    SIMPHONY_NS.description: 'Ubuntu machine with mayavi preinstalled',  # noqa
-                    SIMPHONY_NS.ui_name: 'Mayavi 4.4.4',
-                    SIMPHONY_NS.type: 'vncapp',
-                    SIMPHONY_NS_ENV['x11-width']: '',
-                    SIMPHONY_NS_ENV['x11-height']: '',
-                    SIMPHONY_NS_ENV['x11-depth']: '',
-                }
-            ),
-            _Image(
-                id="image_id2",
-                name='image_name2',
-                labels={
-                    SIMPHONY_NS.description: 'A vanilla Ubuntu installation',  # noqa
-                }
-            )]
-
+        self._images = self._available_images[:]
         self._containers = [
             _Container(
-                id="container_id1",
-                name="myrealm-username-mapping_5Fid",
-                image="image_id1",
+                id="223c6fc3c5054b7e916ab000ae302df3",
+                name="realm-johndoe-5b34ce60d95742fa828cdced12b4c342",
+                image="simphonyproject/simphony-mayavi",
                 labels={
-                    SIMPHONY_NS_RUNINFO.user: 'user_name',
-                    SIMPHONY_NS_RUNINFO.mapping_id: 'mapping_id',
-                    SIMPHONY_NS_RUNINFO.url_id: 'url_id',
-                    SIMPHONY_NS_RUNINFO.realm: 'myrealm',
-                    SIMPHONY_NS_RUNINFO.urlpath: '/user/username/containers/url_id'  # noqa
+                    SIMPHONY_NS_RUNINFO.user: 'johndoe',
+                    SIMPHONY_NS_RUNINFO.mapping_id: '5b34ce60d95742fa828cdced12b4c342',  # noqa
+                    SIMPHONY_NS_RUNINFO.url_id: '20dcb84cdbea4b1899447246789093d0',  # noqa
+                    SIMPHONY_NS_RUNINFO.realm: 'realm',
+                    SIMPHONY_NS_RUNINFO.urlpath: '/user/username/containers/20dcb84cdbea4b1899447246789093d0'  # noqa
                 },
                 ports=[{
                     "IP": "0.0.0.0",
@@ -75,11 +66,15 @@ class VirtualDockerClient(object):
                 state="running",
             ),
             _Container(
-                id="container_id2",
-                name="myrealm-username-mapping_5Fid_5Fexited",
-                image="image_id2",
+                id="d04eaa6e2c36419cb25b316231a201c0",
+                name="realm-johndoe-6d24a0746a4e409c9b9078b158b8c484",
+                image="simphonyproject/simphony-mayavi",
                 labels={
-                    SIMPHONY_NS_RUNINFO.user: 'user_name'
+                    SIMPHONY_NS_RUNINFO.user: 'johndoe',
+                    SIMPHONY_NS_RUNINFO.mapping_id: 'db3890933e4843f092e954fc5e0caf9e',  # noqa
+                    SIMPHONY_NS_RUNINFO.url_id: '90d581268df8428aa91d56a62d83b163',  # noqa
+                    SIMPHONY_NS_RUNINFO.realm: 'realm',
+                    SIMPHONY_NS_RUNINFO.urlpath: '/user/username/containers/90d581268df8428aa91d56a62d83b163'  # noqa
                 },
                 ports=[{
                     "PrivatePort": 8889,
@@ -88,9 +83,9 @@ class VirtualDockerClient(object):
                 state="exited",
             ),
             _Container(
-                id="container_id3",
-                name="remoteexec-username-mapping_5Fid_5Fstopped",
-                image="image_id1",
+                id="51e69f95a0d04294a2956c35e2894661",
+                name="realm-johndoe-27d17e78297441fdbe43ee6b8c148a17",
+                image="simphonyproject/simphony-mayavi",
                 labels={},
                 ports=[{
                     "IP": "0.0.0.0",
@@ -303,3 +298,32 @@ class VirtualDockerClient(object):
 
     def _new_id(self):
         return uuid.uuid4().hex
+
+    def _init_available_images(self):
+        """Provides the available images"""
+        return [
+            _Image(
+                id="sha256:2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",  # noqa
+                name='simphonyproject/simphony-mayavi',
+                labels={
+                    SIMPHONY_NS.description: 'Ubuntu machine with mayavi preinstalled',  # noqa
+                    SIMPHONY_NS.ui_name: 'Mayavi 4.4.4',
+                    SIMPHONY_NS.type: 'vncapp',
+                    SIMPHONY_NS_ENV['x11-width']: '',
+                    SIMPHONY_NS_ENV['x11-height']: '',
+                    SIMPHONY_NS_ENV['x11-depth']: '',
+                },
+                exposed_ports={
+                    "8888/tcp": {}
+                }
+            ),
+            _Image(
+                id="sha256:86acc3c585a1bb1f3be294c2a02fc69a145e5e76d580a5c7c120ff1ecd1a86ab",  # noqa
+                name='simphonyproject/ubuntu-image',
+                labels={
+                    SIMPHONY_NS.description: 'A vanilla Ubuntu installation',  # noqa
+                },
+                exposed_ports={
+                    "8888/tcp": {}
+                }
+            )]
