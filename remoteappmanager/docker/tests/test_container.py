@@ -3,6 +3,8 @@ from unittest import TestCase
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.docker_labels import (
     SIMPHONY_NS, SIMPHONY_NS_RUNINFO)
+from remoteappmanager.tests.mocking.virtual.docker_client import \
+    VirtualDockerClient
 from remoteappmanager.tests.utils import assert_containers_equal
 
 
@@ -90,7 +92,24 @@ class TestContainer(TestCase):
             user="user",
             ip='0.0.0.0',
             port=80,
-            url_id="8e2fe66d5de74db9bbab50c0d2f92b33",
+            url_id="8e2fe66d5de74db9bbab50c0d2f92b33"
+        )
+        assert_containers_equal(self, actual, expected)
+
+    def test_from_docker_dict_inspect_container(self):
+        client = VirtualDockerClient.with_containers()
+        actual = Container.from_docker_dict(
+            client.inspect_container('container_id1'))
+
+        expected = Container(
+            docker_id='container_id1',
+            name='/myrealm-username-mapping_5Fid',
+            image_name='image_name1',
+            image_id='image_id1',
+            user="username",
+            ip='0.0.0.0',
+            port=666,
+            url_id="url_id",
             mapping_id="mapping_id",
             realm="myrealm",
             urlpath="/user/username/containers/8e2fe66d5de74db9bbab50c0d2f92b33"  # noqa

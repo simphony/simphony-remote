@@ -221,7 +221,7 @@ def create_container_manager(params=None):
     manager : remoteappmanager.docker.container_manager.ContainerManager
     '''
     if params is None:
-        params = {'docker_config': {}}
+        params = {'docker_config': {}, "realm": "myrealm"}
 
     manager = ContainerManager(**params)
     manager._docker_client._sync_client = VirtualDockerClient.with_containers()
