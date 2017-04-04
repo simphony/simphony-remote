@@ -256,7 +256,13 @@ class ContainerManager(LoggingMixin):
                                                 mapping_id=mapping_id,
                                                 user_name=user_name)
         if len(containers) > 1:
-            raise MultipleResultsFound()
+            raise MultipleResultsFound(
+                "Found {} results for request {}, {}, {}".format(
+                    len(containers),
+                    url_id,
+                    mapping_id,
+                    user_name
+                ))
 
         if len(containers) == 1:
             return containers[0]
