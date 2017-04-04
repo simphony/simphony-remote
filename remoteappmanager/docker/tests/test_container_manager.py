@@ -67,10 +67,12 @@ class TestContainerManager(AsyncTestCase):
             self.assertTrue(mock_client.remove_container.called)
 
     @gen_test
-    def test_containers_from_mapping_id(self):
+    def test_find_from_mapping_id(self):
         """ Test containers_for_mapping_id returns a list of Container """
-        result = yield self.manager.containers_from_mapping_id("username",
-                                                               "mapping_id")
+        result = yield self.manager.find_containers(
+            user_name="username",
+            mapping_id="mapping_id")
+
         expected = Container(docker_id='container_id1',
                              mapping_id="mapping_id",
                              name='/myrealm-username-mapping_5Fid',
@@ -87,9 +89,10 @@ class TestContainerManager(AsyncTestCase):
         utils.assert_containers_equal(self, result[0], expected)
 
     @gen_test
-    def test_containers_from_url_id(self):
+    def test_find_from_url_id(self):
         """ Test containers_for_mapping_id returns a list of Container """
-        result = yield self.manager.container_from_url_id("url_id")
+        result = yield self.manager.find_container(
+            url_id="url_id")
         expected = Container(docker_id='container_id1',
                              mapping_id="mapping_id",
                              name='/myrealm-username-mapping_5Fid',
@@ -106,12 +109,12 @@ class TestContainerManager(AsyncTestCase):
         utils.assert_containers_equal(self, result, expected)
 
     @gen_test
-    def test_containers_from_url_id_exceptions(self):
+    def test_find_from_url_id_exceptions(self):
         """ Test containers_for_mapping_id returns a list of Container """
         docker_client = self.mock_docker_client
         docker_client.port = mock.Mock(side_effect=Exception("Boom!"))
 
-        result = yield self.manager.container_from_url_id("url_id")
+        result = yield self.manager.find_container(url_id="url_id")
         self.assertEqual(result, None)
 
         # Making it so that no valid dictionary is returned.
@@ -119,12 +122,12 @@ class TestContainerManager(AsyncTestCase):
         self.mock_docker_client = docker_client
         self.manager._docker_client._sync_client = docker_client
 
-        result = yield self.manager.container_from_url_id("url_id")
+        result = yield self.manager.find_container(url_id="url_id")
         self.assertEqual(result, None)
 
     @gen_test
-    def test_running_containers(self):
-        result = yield self.manager.running_containers()
+    def test_find_containers(self):
+        result = yield self.manager.find_containers()
         self.assertEqual(len(result), 1)
 
     @gen_test
@@ -333,11 +336,11 @@ class TestContainerManager(AsyncTestCase):
         manager._docker_client._sync_client = \
             VirtualDockerClient.with_containers()
 
-        result = yield manager.containers_from_mapping_id("user_name",
-                                                          "mapping_id")
-        self.assertEqual(result, [])
+        result = yield manager.find_container(
+            user_name="user_name", mapping_id="mapping_id")
+        self.assertIsNone(result)
 
-        result = yield manager.running_containers()
+        result = yield manager.find_containers()
         self.assertEqual(result, [])
 
     @gen_test
