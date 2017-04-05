@@ -232,6 +232,12 @@ require([
 
                 //TODO: Stop application
             }
+        },
+
+        didInsertElement() {
+            this._super(...arguments);
+            // Load AdminLTE Javascript (Temporary)
+            require([window.AdminLTEJavascriptPath]);
         }
     });
 

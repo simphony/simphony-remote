@@ -156,9 +156,7 @@
 
     </div>
 
-    <script src="{{ static_url("components/admin-lte/plugins/jQuery/jquery-2.2.3.min.js") }}"></script>
-    <script src="{{ static_url("components/admin-lte/bootstrap/js/bootstrap.min.js") }}"></script>
-    <script src="{{ static_url("components/admin-lte/dist/js/app.min.js") }}"></script>
+
 
     {% block dialogs %}
         {% call macros.modal_dlg('Error', btn_label='OK') %}
@@ -172,6 +170,10 @@
 {% block script_init %}
     {{  super() }}
     <script type="text/javascript">
-    require(["home/controller"]);
+        window.AdminLTEJavascriptPath = "{{ static_url("components/admin-lte/dist/js/app.min.js") }}";
+        require(["home/controller"]);
     </script>
+
+    <script src="{{ static_url("components/admin-lte/plugins/jQuery/jquery-2.2.3.min.js") }}"></script>
+    <script src="{{ static_url("components/admin-lte/bootstrap/js/bootstrap.min.js") }}"></script>
 {% endblock %}
