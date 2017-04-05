@@ -138,19 +138,23 @@ require([
         return params[0] === params[1];
     });
 
+    AppList.NotNullHelper = Ember.Helper.helper(function([param]) {
+        return param !== null;
+    });
+
     // Ember Controller
 
     AppList.ApplicationController = Ember.Controller.extend({
         init: function() {
             this._super(...arguments);
 
-            this.set('selected_app', null);
+            this.set('current_application', null);
         },
 
         actions: {
-            toggle_app_selected(index) {
-                console.log('(Controller) App selected:', index);
-                this.set('selected_app', index);
+            toggle_app_selected(application) {
+                console.log('(Controller) App selected:', application);
+                this.set('current_application', application);
             }
         }
     });
@@ -240,7 +244,10 @@ require([
                 this.set('selected_app', index);
 
                 // Send the action to the controller
-                this.sendAction('select_app', index);
+                this.sendAction(
+                    'update_current_app',
+                    this.get('application_entry_list').objectAt(index)
+                );
             },
             toggle_app_stopped(application) {
                 if (application.get('status') === Status.STOPPING) {
@@ -264,10 +271,12 @@ require([
 
     AppList.ApplicationViewComponent = Ember.Component.extend({
         tagName: 'section',
+        disabled: false,
+        current_application: null,
 
-        change_url: function(){
-            console.log('(ApplicationView) Changing url to app', this.get('selected_app'))
-        }.observes('selected_app'),
+        update: function(){
+            console.log('(ApplicationView) Changing to app', this.get('current_application'))
+        }.observes('current_application'),
     });
 
     // This model keeps the retrieved content from the REST query locally.
