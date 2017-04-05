@@ -1,20 +1,20 @@
 /*globals: require, console*/
 require([
     "jquery",
-    "urlutils",
     "analytics",
     "home/models",
     "home/components/application_list_component",
     "home/components/application_view_component",
+    "home/helpers",
     "jsapi/v1/resources",
     'utils',
 ], function(
     $,
-    urlutils,
     analytics,
     models,
     application_list_component,
     application_view_component,
+    helpers,
     resources,
     utils,
     configurables) {
@@ -30,37 +30,10 @@ require([
         rootElement: '#ember_container'
     });
 
-    // Ember Helpers
+    // Add Ember helpers to the application
 
-    AppList.IconSrcHelper = Ember.Helper.helper(function([app_data]) {
-        var icon_data = app_data.image.icon_128;
-        return (
-            icon_data ?
-            "data:image/png;base64," + icon_data :
-            urlutils.path_join(
-                this.base_url, "static", "images", "generic_appicon_128.png"
-            )
-        );
-    });
-
-    AppList.AppNameHelper = Ember.Helper.helper(function([app_data]) {
-        return (
-            app_data.image.ui_name ?
-            app_data.image.ui_name :
-            app_data.image.name
-        );
-    });
-
-    AppList.IsRunningHelper = Ember.Helper.helper(function([status]) {
-        return status === Status.RUNNING.toLowerCase();
-    });
-
-    AppList.EqualHelper = Ember.Helper.helper(function(params) {
-        return params[0] === params[1];
-    });
-
-    AppList.NotNullHelper = Ember.Helper.helper(function([param]) {
-        return param !== null;
+    Object.keys(helpers).forEach(function(key) {
+        AppList[key] = helpers[key];
     });
 
     // Ember Controller
