@@ -90,7 +90,7 @@
                         <li class="header">APPLICATIONS</li>
                     </ul>
 
-                    {{ application-list class="sidebar-menu" id="applist" }}
+                    {{ application-list class="sidebar-menu" id="applist" select_app=(action "toggle_app_selected") }}
 
                     <!-- /.sidebar-menu -->
                 </section>
@@ -100,9 +100,7 @@
             <!-- Content Wrapper. Contains page content -->
             <div class="content-wrapper">
                 <!-- Main content -->
-                <section class="content">
-                    <!-- Your Page Content Here -->
-                </section>
+                {{ application-view class="content" selected_app=selected_app }}
                 <!-- /.content -->
             </div>
             <!-- /.content-wrapper -->

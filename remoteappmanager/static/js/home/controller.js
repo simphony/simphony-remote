@@ -138,6 +138,23 @@ require([
         return params[0] === params[1];
     });
 
+    // Ember Controller
+
+    AppList.ApplicationController = Ember.Controller.extend({
+        init: function() {
+            this._super(...arguments);
+
+            this.set('selected_app', null);
+        },
+
+        actions: {
+            toggle_app_selected(index) {
+                console.log('(Controller) App selected:', index);
+                this.set('selected_app', index);
+            }
+        }
+    });
+
     // Ember application model
 
     const Application = Ember.Object.extend({
@@ -221,7 +238,9 @@ require([
         actions: {
             toggle_app_clicked(index) {
                 this.set('selected_app', index);
-                // TODO: Display form or application
+
+                // Send the action to the controller
+                this.sendAction('select_app', index);
             },
             toggle_app_stopped(application) {
                 if (application.get('status') === Status.STOPPING) {
@@ -239,6 +258,16 @@ require([
             // Load AdminLTE Javascript (Temporary)
             require([window.AdminLTEJavascriptPath]);
         }
+    });
+
+    // Ember component for the application VNC view
+
+    AppList.ApplicationViewComponent = Ember.Component.extend({
+        tagName: 'section',
+
+        change_url: function(){
+            console.log('(ApplicationView) Changing url to app', this.get('selected_app'))
+        }.observes('selected_app'),
     });
 
     // This model keeps the retrieved content from the REST query locally.
