@@ -28,6 +28,18 @@ define([
         return status === 'running';
     });
 
+    var IsStoppedHelper = Ember.Helper.helper(function([status]) {
+        return status === 'stopped';
+    });
+
+    var IsStartingHelper = Ember.Helper.helper(function([status]) {
+        return status === 'starting';
+    });
+
+    var IsStoppingHelper = Ember.Helper.helper(function([status]) {
+        return status === 'stopping';
+    });
+
     var EqualHelper = Ember.Helper.helper(function(params) {
         return params[0] === params[1];
     });
@@ -40,6 +52,9 @@ define([
         IconSrcHelper: IconSrcHelper,
         AppNameHelper: AppNameHelper,
         IsRunningHelper: IsRunningHelper,
+        IsStoppedHelper: IsStoppedHelper,
+        IsStartingHelper: IsStartingHelper,
+        IsStoppingHelper: IsStoppingHelper,
         EqualHelper: EqualHelper,
         NotNullHelper: NotNullHelper
     };
