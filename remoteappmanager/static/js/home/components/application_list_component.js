@@ -7,10 +7,10 @@ define([
         applications_info.available_applications_info;
 
     var Status = {
-        RUNNING: "RUNNING",
-        STARTING: "STARTING",
-        STOPPING: "STOPPING",
-        STOPPED: "STOPPED"
+        RUNNING: "running",
+        STARTING: "starting",
+        STOPPING: "stopping",
+        STOPPED: "stopped"
     };
 
     // Ember application model
@@ -87,7 +87,7 @@ define([
             var app_object = Application.create({
                 app_data: app_data,
                 configurable: configurable,
-                status: status.toLowerCase()
+                status: status
             });
 
             this.get('application_entry_list').pushObject(app_object);
@@ -110,7 +110,7 @@ define([
                     return;
                 }
 
-                application.set('status', Status.STOPPING);
+                application.set('status', Status.STOPPED);
 
                 //TODO: Stop application
             }

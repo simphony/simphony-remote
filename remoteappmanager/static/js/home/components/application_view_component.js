@@ -6,11 +6,12 @@ define([], function() {
     var ApplicationViewComponent = Ember.Component.extend({
         tagName: 'section',
         disabled: false,
-        current_application: null,
 
-        update: function(){
-            console.log('(ApplicationView) Changing to app', this.get('current_application'))
-        }.observes('current_application'),
+        actions: {
+            start_button_clicked() {
+                this.set('application_status', 'running');
+            }
+        }
     });
 
     return {

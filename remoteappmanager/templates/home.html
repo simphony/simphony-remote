@@ -105,11 +105,14 @@
             <!-- Content Wrapper. Contains page content -->
             <div class="content-wrapper">
                 <!-- Main content -->
-                {{
-                    application-view
-                    class="content"
-                    current_application=current_application
-                }}
+                {{#if (not-null current_application)}}
+                    {{
+                        application-view
+                        class="content"
+                        application_data=current_application.app_data
+                        application_status=current_application.status
+                    }}
+                {{/if}}
                 <!-- /.content -->
             </div>
             <!-- /.content-wrapper -->
@@ -161,13 +164,13 @@
         </script>
 
         <script type="text/x-handlebars" data-template-name="components/application-view">
-            {{#if (not-null current_application)}}
+            {{#if (is-stopped application_status)}}
                  <div class="row">
                      <div class="col-md-offset-2 col-md-8">
                          <div class="box box-primary">
                              <div class="box-header with-border">
                                  <h3 class="box-title">
-                                     {{app_name current_application.app_data}}
+                                     {{app_name application_data}}
                                  </h3>
                                  <div class="box-tools pull-right"></div>
                              </div>
@@ -180,7 +183,10 @@
                                  </form>
                              </div>
                              <div class="box-footer">
-                                 <button class="btn btn-primary pull-right start-button" disabled={{disabled}}>
+                                 <button
+                                         onclick={{action "start_button_clicked"}}
+                                         class="btn btn-primary pull-right start-button"
+                                         disabled={{disabled}}>
                                      Start
                                  </button>
                              </div>
