@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "bower": "*",
-        "configurable-http-proxy": "git://github.com/jupyterhub/configurable-http-proxy.git#e52764b9e742904c0982739b1479f3bf88dad3f4"
+        "configurable-http-proxy": "git://github.com/jupyterhub/configurable-http-proxy.git#2.0.1"
     },
     "devDependencies": {
 	    "jshint": "*",
