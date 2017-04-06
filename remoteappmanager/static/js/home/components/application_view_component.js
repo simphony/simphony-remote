@@ -34,7 +34,7 @@ define([
 
                 var mapping_id = this.get('application.app_data.mapping_id');
 
-                var self = this;
+                var current_application = this.get('application');
                 resources.Container.create({
                     mapping_id: mapping_id//,
                     //configurables: {'resolution': '800x600'}
@@ -47,15 +47,15 @@ define([
 
                     resources.Application.retrieve(mapping_id)
                         .done(function(new_data) {
-                            self.set('application.app_data', new_data);
-                            self.set('application.status', Status.RUNNING);
+                            current_application.set('app_data', new_data);
+                            current_application.set('status', Status.RUNNING);
                         })
                         .fail(function(error) {
-                            self.set('application.status', Status.STOPPED);
+                            current_application.set('status', Status.STOPPED);
                             // dialogs.webapi_error_dialog(error);
                         });
                 }).fail(function(error) {
-                    self.set('application.status', Status.STOPPED);
+                    current_application.set('status', Status.STOPPED);
                     // dialogs.webapi_error_dialog(error);
                 });
             }
