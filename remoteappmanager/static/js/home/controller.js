@@ -1,23 +1,14 @@
 /*globals: require, console*/
 require([
-    "jquery",
     "analytics",
-    "home/models",
     "home/components/application_list_component",
     "home/components/application_view_component",
     "home/helpers",
-    "jsapi/v1/resources",
-    'utils',
 ], function(
-    $,
     analytics,
-    models,
     application_list_component,
     application_view_component,
-    helpers,
-    resources,
-    utils,
-    configurables) {
+    helpers) {
     "use strict";
     var Status = application_list_component.Status;
 
