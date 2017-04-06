@@ -70,20 +70,21 @@ class TestContainerManager(AsyncTestCase):
     def test_find_from_mapping_id(self):
         """ Test containers_for_mapping_id returns a list of Container """
         result = yield self.manager.find_containers(
-            user_name="username",
-            mapping_id="mapping_id")
+            user_name="johndoe",
+            mapping_id="5b34ce60d95742fa828cdced12b4c342")
 
-        expected = Container(docker_id='container_id1',
-                             mapping_id="mapping_id",
-                             name='/myrealm-username-mapping_5Fid',
-                             image_name='image_name1',  # noqa
-                             user="username",
-                             image_id='image_id1',
+        expected = Container(docker_id='d2b56bffb5655cb7668b685b80116041a20ee8662ebfa5b5cb68cfc423d9dc30',  # noqa
+                             mapping_id="5b34ce60d95742fa828cdced12b4c342",
+                             name="/myrealm-johndoe-5b34ce60d95742fa828cdced12b4c342-ascvbefsda",  # noqa
+                             image_name='simphonyproject/simphony-mayavi:0.6.0',  # noqa
+                             user="johndoe",
+                             image_id="sha256:2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824", # noqa
                              ip='127.0.0.1',
                              port=666,
-                             url_id='url_id',
+                             url_id='20dcb84cdbea4b1899447246789093d0',
                              realm="myrealm",
-                             urlpath="/user/username/containers/url_id")
+                             urlpath="/user/johndoe/containers/20dcb84cdbea4b1899447246789093d0"  # noqa
+                             )
 
         self.assertEqual(len(result), 1)
         utils.assert_containers_equal(self, result[0], expected)
@@ -92,18 +93,19 @@ class TestContainerManager(AsyncTestCase):
     def test_find_from_url_id(self):
         """ Test containers_for_mapping_id returns a list of Container """
         result = yield self.manager.find_container(
-            url_id="url_id")
-        expected = Container(docker_id='container_id1',
-                             mapping_id="mapping_id",
-                             name='/myrealm-username-mapping_5Fid',
-                             image_name='image_name1',  # noqa
-                             user="username",
-                             image_id='image_id1',
+            url_id="20dcb84cdbea4b1899447246789093d0")
+
+        expected = Container(docker_id='d2b56bffb5655cb7668b685b80116041a20ee8662ebfa5b5cb68cfc423d9dc30',  # noqa
+                             mapping_id="5b34ce60d95742fa828cdced12b4c342",
+                             name="/myrealm-johndoe-5b34ce60d95742fa828cdced12b4c342-ascvbefsda",  # noqa
+                             image_name='simphonyproject/simphony-mayavi:0.6.0',  # noqa
+                             user="johndoe",
+                             image_id="sha256:2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824", # noqa
                              ip='127.0.0.1',
                              port=666,
-                             url_id='url_id',
+                             url_id='20dcb84cdbea4b1899447246789093d0',
                              realm="myrealm",
-                             urlpath="/user/username/containers/url_id",
+                             urlpath="/user/johndoe/containers/20dcb84cdbea4b1899447246789093d0"  # noqa
                              )
 
         utils.assert_containers_equal(self, result, expected)
@@ -168,8 +170,8 @@ class TestContainerManager(AsyncTestCase):
         with mock.patch.object(docker_client, "stop",
                                wraps=docker_client.stop):
 
-            f1 = self.manager.stop_and_remove_container("container_id1")
-            f2 = self.manager.stop_and_remove_container("container_id1")
+            f1 = self.manager.stop_and_remove_container("d2b56bffb5655cb7668b685b80116041a20ee8662ebfa5b5cb68cfc423d9dc30")  # noqa
+            f2 = self.manager.stop_and_remove_container("d2b56bffb5655cb7668b685b80116041a20ee8662ebfa5b5cb68cfc423d9dc30")  # noqa
 
             yield f1
 
@@ -190,10 +192,10 @@ class TestContainerManager(AsyncTestCase):
                               wraps=mock_client.remove_container):
 
             result = yield self.manager.start_container(
-                "user_name",
-                "image_name1",
-                "mapping_id",
-                "/base/url",
+                "johndoe",
+                "simphonyproject/simphony-mayavi:0.6.0",
+                "5b34ce60d95742fa828cdced12b4c342",
+                "/users/johndoe/containers/random_value",
                 None,
                 None)
             self.assertTrue(mock_client.start.called)
@@ -205,13 +207,13 @@ class TestContainerManager(AsyncTestCase):
 
     @gen_test
     def test_image(self):
-        image = yield self.manager.image('image_name1')
+        image = yield self.manager.image('simphonyproject/simphony-mayavi:0.6.0')  # noqa
         self.assertIsInstance(image, Image)
         self.assertEqual(image.description,
                          'Ubuntu machine with mayavi preinstalled')
         self.assertEqual(image.icon_128, "")
         self.assertEqual(image.ui_name, "Mayavi 4.4.4")
-        self.assertEqual(image.docker_id, 'image_id1')
+        self.assertEqual(image.docker_id, "sha256:2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824")  # noqa
 
         image = yield self.manager.image("whatev")
         self.assertIsNone(image)
@@ -232,9 +234,9 @@ class TestContainerManager(AsyncTestCase):
             volumes[good_path] = {'bind': '/target_vol3',
                                   'mode': 'ro'}
 
-            yield self.manager.start_container("username",
-                                               "image_id1",
-                                               "mapping_id",
+            yield self.manager.start_container("johndoe",
+                                               "simphonyproject/simphony-mayavi:0.6.0",  # noqa
+                                               "5b34ce60d95742fa828cdced12b4c342",
                                                "/foo/bar",
                                                volumes,
                                                )
@@ -268,10 +270,10 @@ class TestContainerManager(AsyncTestCase):
             self.assertFalse(self.mock_docker_client.remove_container.called)
 
             with self.assertRaisesRegex(Exception, 'Boom!'):
-                yield self.manager.start_container("username",
-                                                   "image_id1",
-                                                   "mapping_id",
-                                                   "/base/url",
+                yield self.manager.start_container("johndoe",
+                                                   "simphonyproject/simphony-mayavi:0.6.0",  # noqa
+                                                   "5b34ce60d95742fa828cdced12b4c342",  # noqa
+                                                   "/users/johndoe/containers/4273750ddce3454283a5b1817526260b/",  # noqa
                                                    None,
                                                    None)
 
@@ -296,10 +298,10 @@ class TestContainerManager(AsyncTestCase):
             self.manager._docker_client.port = mock.Mock(side_effect=raiser)
 
             with self.assertRaisesRegex(Exception, 'Boom!'):
-                yield self.manager.start_container("username",
-                                                   "image_id1",
-                                                   "mapping_id",
-                                                   "/base/url",
+                yield self.manager.start_container("johndoe",
+                                                   "simphonyproject/simphony-mayavi:0.6.0",  # noqa
+                                                   "4273750ddce3454283a5b1817526260b",  # noqa
+                                                   "/users/johndoe/containers/3b83f81f2e4544e6aa1493b50202f8eb",  # noqa
                                                    None,
                                                    None)
 
@@ -317,10 +319,10 @@ class TestContainerManager(AsyncTestCase):
             }
 
             yield self.manager.start_container(
-                "username",
-                "image_name1",
-                "mapping_id",
-                "/base/url",
+                "johndoe",
+                "simphonyproject/simphony-mayavi:0.6.0",
+                "4273750ddce3454283a5b1817526260b",
+                "/users/johndoe/containers/3b83f81f2e4544e6aa1493b50202f8eb",
                 None,
                 environment)
 
@@ -337,7 +339,7 @@ class TestContainerManager(AsyncTestCase):
             VirtualDockerClient.with_containers()
 
         result = yield manager.find_container(
-            user_name="user_name", mapping_id="mapping_id")
+            user_name="johndoe", mapping_id="5b34ce60d95742fa828cdced12b4c342")
         self.assertIsNone(result)
 
         result = yield manager.find_containers()
@@ -349,7 +351,7 @@ class TestContainerManager(AsyncTestCase):
         self.mock_docker_client.remove_container = mock.Mock()
         manager = ContainerManager(docker_config={},
                                    realm="anotherrealm")
-        yield manager.stop_and_remove_container("container_id1")
+        yield manager.stop_and_remove_container("d2b56bffb5655cb7668b685b80116041a20ee8662ebfa5b5cb68cfc423d9dc30")  # noqa
 
         self.assertFalse(self.mock_docker_client.stop.called)
         self.assertFalse(self.mock_docker_client.remove_container.called)
