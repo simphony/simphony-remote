@@ -36,10 +36,10 @@ class TestContainerManager(AsyncTestCase):
                               wraps=mock_client.remove_container):
 
             result = yield self.manager.start_container(
-                "username",
-                'image_id1',
-                "new_mapping_id",
-                "/base/url",
+                "johndoe",
+                'simphonyproject/simphony-mayavi:0.6.0',
+                "63dce9335bca49798bbb93146ad07c66",
+                "/user/johndoe/containers/cbeb652678244ed1aa5f68735abb4868",
                 None,
                 None)
 
@@ -50,12 +50,12 @@ class TestContainerManager(AsyncTestCase):
                 "labels"]
 
             self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.user],
-                             "username")
+                             "johndoe")
             self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.realm],
                              "myrealm")
             self.assertIn(SIMPHONY_NS_RUNINFO.url_id, runinfo_labels)
             self.assertEqual(runinfo_labels[SIMPHONY_NS_RUNINFO.mapping_id],
-                             "new_mapping_id")
+                             "63dce9335bca49798bbb93146ad07c66")
 
             self.assertIsInstance(result, Container)
             self.assertFalse(mock_client.stop.called)
@@ -139,17 +139,17 @@ class TestContainerManager(AsyncTestCase):
         # we yield them
         with mock.patch.object(self.mock_docker_client, "start",
                                wraps=self.mock_docker_client.start):
-            f1 = self.manager.start_container("username",
-                                              "image_id1",
-                                              "mapping_id",
-                                              "/foo/bar",
+            f1 = self.manager.start_container("johndoe",
+                                              "simphonyproject/simphony-mayavi:0.6.0",  # noqa
+                                              "76cd29a4d61f4ddc95fa633347934807",  # noqa
+                                              "/user/johndoe/containers/4b9a34d803c74013939d8df05eef9262",  # noqa
                                               None,
                                               )
 
-            f2 = self.manager.start_container("username",
-                                              "image_id1",
-                                              "mapping_id",
-                                              "/foo/baz",
+            f2 = self.manager.start_container("johndoe",
+                                              "simphonyproject/simphony-mayavi:0.6.0",  # noqa
+                                              "76cd29a4d61f4ddc95fa633347934807",  # noqa
+                                              "/user/johndoe/containers/a2612a5a12074ce99ece1c2888fe34c0",  # noqa
                                               None,
                                               )
 

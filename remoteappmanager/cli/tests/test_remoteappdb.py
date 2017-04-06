@@ -62,13 +62,13 @@ class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
     @mock.patch('remoteappmanager.cli.remoteappdb.__main__.get_docker_client',  # noqa
                 create_docker_client)
     def test_app_create_with_verify(self):
-        exit_code, output = self._remoteappdb("app create image_id1")
+        exit_code, output = self._remoteappdb("app create simphonyproject/simphony-mayavi:0.6.0")  # noqa
 
         self.assertEqual(exit_code, 0)
 
         # Check that the app is created
         exit_code, output = self._remoteappdb("app list")
-        self.assertIn('image_id1', output)
+        self.assertIn('simphonyproject/simphony-mayavi:0.6.0', output)
 
     @mock.patch('remoteappmanager.cli.remoteappdb.__main__.get_docker_client',  # noqa
                 create_docker_client)
