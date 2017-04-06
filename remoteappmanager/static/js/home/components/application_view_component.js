@@ -14,6 +14,11 @@ define([
 
     var Status = application_list_component.Status;
 
+    var getWindowResolution = function() {
+        var max_size = utils.max_iframe_size();
+        return max_size[0]+"x"+max_size[1];
+    };
+
     // Ember component for the application VNC view
 
     var ApplicationViewComponent = Ember.Component.extend({
@@ -28,8 +33,7 @@ define([
             this._super(...arguments);
 
             // Default resolution is the Window size
-            var max_size = utils.max_iframe_size();
-            this.set('resolution', max_size[0]+"x"+max_size[1]);
+            this.set('resolution', 'Window');
         },
 
         noPadding: Ember.computed('application.status', function() {
@@ -47,11 +51,15 @@ define([
             );
         }),
 
-        iframe_style: Ember.computed('resolution', function() {
-            var resolution = this.get('resolution').split('x');
+        iframe_style: Ember.computed('resolution', 'application.status', function() {
+            var resolution = this.get('resolution');
+            if(resolution === 'Window') { resolution = getWindowResolution(); }
+
+            var size = resolution.split('x');
+
             return Ember.String.htmlSafe(
-                'min-width:'+resolution[0]+'px;'+
-                'min-height:'+resolution[1]+'px;'
+                'min-width:'+size[0]+'px;'+
+                'min-height:'+size[1]+'px;'
             );
         }),
 
@@ -61,10 +69,13 @@ define([
 
                 var mapping_id = this.get('application.app_data.mapping_id');
 
+                var resolution = this.get('resolution');
+                if(resolution === 'Window') { resolution = getWindowResolution(); }
+
                 var current_application = this.get('application');
                 resources.Container.create({
                     mapping_id: mapping_id,
-                    configurables: {'resolution': {'resolution': this.get('resolution')}}
+                    configurables: {'resolution': {'resolution': resolution}}
                 }).done(function() {
                     ga('send', 'event', {
                         eventCategory: 'Application',
@@ -88,14 +99,7 @@ define([
             },
 
             toggle_resolution_changed: function(event) {
-                var value = event.target.value;
-
-                if(value === 'Window') {
-                    var max_size = utils.max_iframe_size();
-                    this.set('resolution', max_size[0]+"x"+max_size[1]);
-                } else {
-                    this.set('resolution', value);
-                }
+                this.set('resolution', event.target.value);
             }
         }
     });
