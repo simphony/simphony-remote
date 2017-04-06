@@ -3,9 +3,10 @@ define([
     'jsapi/v1/resources',
     './application_list_component',
     '../../urlutils',
-    '../../utils'
+    '../../utils',
+    '../../dialogs'
 ], function(
-        analytics, resources, application_list_component, urlutils, utils
+        analytics, resources, application_list_component, urlutils, utils, dialogs
     ) {
     'use strict';
 
@@ -78,11 +79,11 @@ define([
                         })
                         .fail(function(error) {
                             current_application.set('status', Status.STOPPED);
-                            // dialogs.webapi_error_dialog(error);
+                            dialogs.webapi_error_dialog(error);
                         });
                 }).fail(function(error) {
                     current_application.set('status', Status.STOPPED);
-                    // dialogs.webapi_error_dialog(error);
+                    dialogs.webapi_error_dialog(error);
                 });
             },
 

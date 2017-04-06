@@ -1,7 +1,8 @@
 define([
     '../applications_info',
     'jsapi/v1/resources',
-], function(applications_info, resources) {
+    '../../dialogs'
+], function(applications_info, resources, dialogs) {
     "use strict";
     var available_applications_info =
         applications_info.available_applications_info;
@@ -98,12 +99,12 @@ define([
                     })
                     .fail(function(error) {
                         application.set('status', Status.STOPPED);
-                        // dialogs.webapi_error_dialog(error);
+                        dialogs.webapi_error_dialog(error);
                     });
                 })
                 .fail(function (error) {
-                        application.set('status', Status.STOPPED);
-                        // dialogs.webapi_error_dialog(error);
+                    application.set('status', Status.STOPPED);
+                    dialogs.webapi_error_dialog(error);
                 });
             }
         },
