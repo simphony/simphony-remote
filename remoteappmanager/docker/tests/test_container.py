@@ -16,7 +16,7 @@ class TestContainer(TestCase):
             'HostConfig': {'NetworkMode': 'default'},
             'Id': 'b55a25bdda5273a4a835dbf7843937daff2f124cd6e39e6546bb0f9e6a84a76c',  # noqa
             'Image': 'empty-ubuntu:latest',
-            'ImageID': 'sha256:f4610c7580b8f0a9a25086b6287d0069fb8a',
+            'ImageID': 'sha256:14f98aa95d388cabbc4aa44b4b547b729c64673f51fc3321dccdf42fee20f01a',  # noqa
             'Labels': {SIMPHONY_NS.ui_name: 'Empty Ubuntu',
                        SIMPHONY_NS_RUNINFO.user: 'johndoe',
                        SIMPHONY_NS_RUNINFO.url_id: "8e2fe66d5de74db9bbab50c0d2f92b33",  # noqa
@@ -35,7 +35,7 @@ class TestContainer(TestCase):
             docker_id='b55a25bdda5273a4a835dbf7843937daff2f124cd6e39e6546bb0f9e6a84a76c',  # noqa
             name='/myrealm-johndoe-empty-ubuntu_3Alatest',
             image_name='empty-ubuntu:latest',
-            image_id='sha256:f4610c7580b8f0a9a25086b6287d0069fb8a',
+            image_id='sha256:14f98aa95d388cabbc4aa44b4b547b729c64673f51fc3321dccdf42fee20f01a',  # noqa
             user="johndoe",
             ip='0.0.0.0',
             port=32823,
