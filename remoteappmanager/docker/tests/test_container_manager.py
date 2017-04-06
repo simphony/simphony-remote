@@ -236,7 +236,7 @@ class TestContainerManager(AsyncTestCase):
 
             yield self.manager.start_container("johndoe",
                                                "simphonyproject/simphony-mayavi:0.6.0",  # noqa
-                                               "5b34ce60d95742fa828cdced12b4c342",
+                                               "5b34ce60d95742fa828cdced12b4c342",  # noqa
                                                "/foo/bar",
                                                volumes,
                                                )
