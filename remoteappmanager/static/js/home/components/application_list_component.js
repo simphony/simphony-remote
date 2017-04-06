@@ -1,7 +1,8 @@
 define([
     '../applications_info',
-    '../configurables'
-], function(applications_info, configurables) {
+    '../configurables',
+    'jsapi/v1/resources',
+], function(applications_info, configurables, resources) {
     "use strict";
     var available_applications_info =
         applications_info.available_applications_info;
@@ -106,13 +107,28 @@ define([
                 );
             },
             toggle_app_stopped(application) {
-                if (application.get('status') === Status.STOPPING) {
-                    return;
-                }
+                application.set('status', Status.STOPPING);
 
-                application.set('status', Status.STOPPED);
+                var url_id = application.get('app_data.container.url_id');
 
-                //TODO: Stop application
+                resources.Container.delete(url_id)
+                .done(function () {
+                    var mapping_id = application.get('app_data.mapping_id');
+
+                    return resources.Application.retrieve(mapping_id)
+                    .done(function(new_data) {
+                        application.set('status', Status.STOPPED);
+                        application.set('app_data', new_data);
+                    })
+                    .fail(function(error) {
+                        application.set('status', Status.STOPPED);
+                        // dialogs.webapi_error_dialog(error);
+                    });
+                })
+                .fail(function (error) {
+                        application.set('status', Status.STOPPED);
+                        // dialogs.webapi_error_dialog(error);
+                });
             }
         },
 
