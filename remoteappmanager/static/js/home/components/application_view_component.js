@@ -47,12 +47,12 @@ define([
             );
         }),
 
-        width: Ember.computed('resolution', function() {
-            return this.get('resolution').split('x')[0];
-        }),
-
-        height: Ember.computed('resolution', function() {
-            return this.get('resolution').split('x')[1];
+        iframe_style: Ember.computed('resolution', function() {
+            var resolution = this.get('resolution').split('x');
+            return Ember.String.htmlSafe(
+                'min-width:'+resolution[0]+'px;'+
+                'min-height:'+resolution[1]+'px;'
+            );
         }),
 
         actions: {
