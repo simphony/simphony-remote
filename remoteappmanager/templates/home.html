@@ -108,7 +108,6 @@
                 {{#if (not-null current_application)}}
                     {{
                         application-view
-                        class="content"
                         application=current_application
                     }}
                 {{/if}}
@@ -188,7 +187,16 @@
                                  </ul>
                                  <h4>Configuration</h4>
                                  <form class="configuration">
-                                     <fieldset disabled={{ if (is-starting application.status) true }}></fieldset>
+                                     <fieldset disabled={{ if (is-starting application.status) true }}>
+                                         <div class="form-group">
+                                             <label>Resolution</label>
+                                             <select class="form-control" onchange={{action "toggle_resolution_changed"}}>
+                                                 {{#each resolution_options as |resolution|}}
+                                                    <option value="{{resolution}}">{{resolution}}</option>
+                                                 {{/each}}
+                                             </select>
+                                         </div>
+                                     </fieldset>
                                  </form>
                              </div>
                              <div class="box-footer">
@@ -202,15 +210,14 @@
                          </div>
                      </div>
                  </div>
-            {{/if}}
+            {{else}}
 
             <!-- Application view -->
-            {{#if (or (is-running application.status)(is-stopping application.status))}}
                 <iframe
                         id="application"
                         frameBorder="0"
                         src="{{ application_location }}"
-                        style="min-width: {{ iframe_width }}px; min-height: {{ iframe_height }}px;">
+                        style="min-width: {{ width }}px; min-height: {{ height }}px;">
                 </iframe>
             {{/if}}
         </script>

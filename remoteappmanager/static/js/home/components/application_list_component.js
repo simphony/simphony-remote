@@ -1,8 +1,7 @@
 define([
     '../applications_info',
-    '../configurables',
     'jsapi/v1/resources',
-], function(applications_info, configurables, resources) {
+], function(applications_info, resources) {
     "use strict";
     var available_applications_info =
         applications_info.available_applications_info;
@@ -55,43 +54,20 @@ define([
 
                 // Add the options for some image types
                 for (var i = 0; i < num_entries; ++i) {
-                    this._update_application(i);
+                    this.get('application_entry_list').pushObject(
+                        Application.create({
+                            app_data: app_data[i],
+                            status: (
+                                app_data[i].container !== null ?
+                                Status.RUNNING :
+                                Status.STOPPED
+                            )
+                        })
+                    );
                 }
 
                 this.set('list_loading', false);
             }.bind(this));
-        },
-
-        _update_application: function(index) {
-            // Updates the configurables submodel for a given application index.
-            var app_data = this.app_data[index];
-            var image = app_data.image;
-            var status = app_data.container !== null ?
-                Status.RUNNING :
-                Status.STOPPED;
-            var configurable = {};
-
-            for (var i = 0; i < image.configurables.length; ++i) {
-                var tag = image.configurables[i];
-
-                // If this returns null, the tag has not been recognized
-                // by the client. skip it and let the server deal with the
-                // missing data, either by using a default or throwing
-                // an error.
-                var ConfigurableCls = configurables.from_tag(tag);
-
-                if (ConfigurableCls !== null) {
-                    configurable[tag] = new ConfigurableCls();
-                }
-            }
-
-            var app_object = Application.create({
-                app_data: app_data,
-                configurable: configurable,
-                status: status
-            });
-
-            this.get('application_entry_list').pushObject(app_object);
         },
 
         actions: {
