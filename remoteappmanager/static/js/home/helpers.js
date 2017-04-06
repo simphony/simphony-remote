@@ -5,7 +5,9 @@ define([
 
     // Ember Helpers
 
-    var IconSrcHelper = Ember.Helper.helper(function([app_data]) {
+    var helpers = {};
+
+    helpers.IconSrcHelper = Ember.Helper.helper(function([app_data]) {
         var icon_data = app_data.image.icon_128;
         return (
             icon_data ?
@@ -16,7 +18,7 @@ define([
         );
     });
 
-    var AppNameHelper = Ember.Helper.helper(function([app_data]) {
+    helpers.AppNameHelper = Ember.Helper.helper(function([app_data]) {
         return (
             app_data.image.ui_name ?
             app_data.image.ui_name :
@@ -24,38 +26,44 @@ define([
         );
     });
 
-    var IsRunningHelper = Ember.Helper.helper(function([status]) {
+    // Application status helpers
+    helpers.IsRunningHelper = Ember.Helper.helper(function([status]) {
         return status === 'running';
     });
 
-    var IsStoppedHelper = Ember.Helper.helper(function([status]) {
+    helpers.IsStoppedHelper = Ember.Helper.helper(function([status]) {
         return status === 'stopped';
     });
 
-    var IsStartingHelper = Ember.Helper.helper(function([status]) {
+    helpers.IsStartingHelper = Ember.Helper.helper(function([status]) {
         return status === 'starting';
     });
 
-    var IsStoppingHelper = Ember.Helper.helper(function([status]) {
+    helpers.IsStoppingHelper = Ember.Helper.helper(function([status]) {
         return status === 'stopping';
     });
 
-    var EqualHelper = Ember.Helper.helper(function(params) {
+
+    helpers.EqualHelper = Ember.Helper.helper(function(params) {
         return params[0] === params[1];
     });
 
-    var NotNullHelper = Ember.Helper.helper(function([param]) {
+    helpers.NotNullHelper = Ember.Helper.helper(function([param]) {
         return param !== null;
     });
 
-    return {
-        IconSrcHelper: IconSrcHelper,
-        AppNameHelper: AppNameHelper,
-        IsRunningHelper: IsRunningHelper,
-        IsStoppedHelper: IsStoppedHelper,
-        IsStartingHelper: IsStartingHelper,
-        IsStoppingHelper: IsStoppingHelper,
-        EqualHelper: EqualHelper,
-        NotNullHelper: NotNullHelper
-    };
+    // Logical helpers
+    helpers.AndHelper = Ember.Helper.helper(function(params) {
+        return params.reduce(function(a, b) {
+            return a && b;
+        });
+    });
+
+    helpers.OrHelper = Ember.Helper.helper(function(params) {
+        return params.reduce(function(a, b) {
+            return a || b;
+        });
+    });
+
+    return helpers;
 });

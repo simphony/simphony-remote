@@ -111,6 +111,7 @@
                         class="content"
                         application_data=current_application.app_data
                         application_status=current_application.status
+                        application_configurable=current_application.configurable
                     }}
                 {{/if}}
                 <!-- /.content -->
@@ -164,7 +165,8 @@
         </script>
 
         <script type="text/x-handlebars" data-template-name="components/application-view">
-            {{#if (is-stopped application_status)}}
+            <!-- Start application form -->
+            {{#if (or (is-stopped application_status)(is-starting application_status))}}
                  <div class="row">
                      <div class="col-md-offset-2 col-md-8">
                          <div class="box box-primary">
@@ -176,23 +178,42 @@
                              </div>
                              <div class="box-body">
                                  <h4>Policy</h4>
-                                 <ul class="policy"></ul>
+                                 <ul class="policy">
+                                     <li> Workspace {{ unless application_data.image.policy.allow_home 'not' }} accessible </li>
+                                     {{#if (and application_data.image.policy.volume_source application_data.image.policy.volume_target application_data.image.policy.volume_mode)}}
+                                        <li>
+                                            Volume mounted: {{application_data.image.policy.volume_source}} &#x2192; {{application_data.image.policy.volume_target}} ({{application_data.image.policy.volume_mode}})
+                                        </li>
+                                     {{else}}
+                                        <li> No volumes mounted </li>
+                                     {{/if}}
+                                 </ul>
                                  <h4>Configuration</h4>
                                  <form class="configuration">
-                                     <fieldset disabled={{disabled}}></fieldset>
+                                     <fieldset disabled={{ if (is-starting application_status) true }}></fieldset>
                                  </form>
                              </div>
                              <div class="box-footer">
                                  <button
-                                         onclick={{action "start_button_clicked"}}
+                                         onclick={{action "start_application"}}
                                          class="btn btn-primary pull-right start-button"
-                                         disabled={{disabled}}>
+                                         disabled={{ if (is-starting application_status) true }}>
                                      Start
                                  </button>
                              </div>
                          </div>
                      </div>
                  </div>
+            {{/if}}
+
+            <!-- Application view -->
+            {{#if (or (is-running application_status)(is-stopping application_status))}}
+                <iframe
+                        id="application"
+                        frameBorder="0"
+                        src="{{ application_location }}"
+                        style="min-width: {{ iframe_width }}px; min-height: {{ iframe_height }}px;">
+                </iframe>
             {{/if}}
         </script>
         {% endraw %}
