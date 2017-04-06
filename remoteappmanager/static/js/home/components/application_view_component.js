@@ -1,12 +1,15 @@
 define([
+    'analytics',
     'jsapi/v1/resources',
     './application_list_component',
     '../../urlutils',
     '../../utils'
 ], function(
-        resources, application_list_component, urlutils, utils
+        analytics, resources, application_list_component, urlutils, utils
     ) {
     'use strict';
+
+    var ga = analytics.init();
 
     var Status = application_list_component.Status;
 
@@ -62,11 +65,11 @@ define([
                     mapping_id: mapping_id,
                     configurables: {'resolution': {'resolution': this.get('resolution')}}
                 }).done(function() {
-                    /*ga('send', 'event', {
+                    ga('send', 'event', {
                         eventCategory: 'Application',
                         eventAction: 'start',
-                        eventLabel: image_name
-                    });*/
+                        eventLabel: current_application.get('app_data.image.name')
+                    });
 
                     resources.Application.retrieve(mapping_id)
                         .done(function(new_data) {

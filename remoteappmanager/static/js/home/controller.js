@@ -1,18 +1,14 @@
 /*globals: require, console*/
 require([
-    "analytics",
     "home/components/application_list_component",
     "home/components/application_view_component",
     "home/helpers",
 ], function(
-    analytics,
     application_list_component,
     application_view_component,
     helpers) {
     "use strict";
     var Status = application_list_component.Status;
-
-    var ga = analytics.init();
 
     // Ember Application
 
