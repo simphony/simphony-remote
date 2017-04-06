@@ -20,19 +20,19 @@ define([
             this.set('iframe_height', 600);
         },
 
-        application_location: Ember.computed('application_data', function() {
+        application_location: Ember.computed('application.app_data', function() {
             return urlutils.path_join(
                 window.apidata.base_url,
                 "containers",
-                this.get('application_data.container.url_id')
+                this.get('application.app_data.container.url_id')
             );
         }),
 
         actions: {
             start_application() {
-                this.set('application_status', Status.STARTING);
+                this.set('application.status', Status.STARTING);
 
-                var mapping_id = this.get('application_data.mapping_id');
+                var mapping_id = this.get('application.app_data.mapping_id');
 
                 var self = this;
                 resources.Container.create({
@@ -47,15 +47,15 @@ define([
 
                     resources.Application.retrieve(mapping_id)
                         .done(function(new_data) {
-                            self.set('application_data', new_data);
-                            self.set('application_status', Status.RUNNING);
+                            self.set('application.app_data', new_data);
+                            self.set('application.status', Status.RUNNING);
                         })
                         .fail(function(error) {
-                            self.set('application_status', Status.STOPPED);
+                            self.set('application.status', Status.STOPPED);
                             // dialogs.webapi_error_dialog(error);
                         });
                 }).fail(function(error) {
-                    self.set('application_status', Status.STOPPED);
+                    self.set('application.status', Status.STOPPED);
                     // dialogs.webapi_error_dialog(error);
                 });
             }
