@@ -15,18 +15,18 @@ class TestRegisterContainerHandler(TempMixin, utils.AsyncHTTPTestCase):
         return app
 
     def test_absent_url_id(self):
-        res = self.fetch("/user/username/containers/99999/",
+        res = self.fetch("/user/johndoe/containers/99999/",
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-johndoe=foo"
                          }
                          )
 
         self.assertEqual(res.code, 404)
 
     def test_present_url_id(self):
-        res = self.fetch("/user/username/containers/url_id",
+        res = self.fetch("/user/johndoe/containers/20dcb84cdbea4b1899447246789093d0/",  # noqa
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-johndoe=foo"
                          },
                          follow_redirects=False
                          )
@@ -36,9 +36,9 @@ class TestRegisterContainerHandler(TempMixin, utils.AsyncHTTPTestCase):
 
     def test_failed_auth(self):
         self._app.hub.verify_token.return_value = {}
-        res = self.fetch("/user/username/containers/url_id",
+        res = self.fetch("/user/johndoe/containers/url_id",
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-johndoe=foo"
                          },
                          follow_redirects=False
                          )
@@ -51,9 +51,9 @@ class TestRegisterContainerHandler(TempMixin, utils.AsyncHTTPTestCase):
         self._app.reverse_proxy.register = mock_coro_factory(
             side_effect=Exception("BOOM"))
 
-        res = self.fetch("/user/username/containers/url_id",
+        res = self.fetch("/user/johndoe/containers/",
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-johndoe=foo"
                          },
                          follow_redirects=False
                          )

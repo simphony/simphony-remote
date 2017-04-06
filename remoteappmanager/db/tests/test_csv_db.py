@@ -16,9 +16,9 @@ class GoodTable:
 
     #    name,     image, home, view, common, source, target, mode
     records = [
-        ('foo', 'image_1', '1', '1', '0', '', '', ''),
-        ('foo', 'image_2', '1', '1', '1', '/src', '/target', 'ro'),
-        ('username', 'image_1', '0', '0', '0', '/src', '/target', 'ro')]
+        ('markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '1', '1', '0', '', '', ''),  # noqa
+        ('markdoe', 'simphonyproject/ubuntu-image:latest', '1', '1', '1', '/src', '/target', 'ro'),  # noqa
+        ('johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '0', '0', '0', '/src', '/target', 'ro')]  # noqa
 
 
 class BadTableMissingHeaders:
@@ -29,9 +29,9 @@ class BadTableMissingHeaders:
 
     #    name,     image, home, view, common, mode
     records = [
-        ('foo', 'image_1', '1', '1', '0', ''),
-        ('foo', 'image_2', '1', '1', '1', 'ro'),
-        ('username', 'image_1', '0', '0', '0', 'ro')]
+        ('markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '1', '1', '0', ''),  # noqa
+        ('markdoe', 'simphonyproject/ubuntu-image:latest', '1', '1', '1', 'ro'),  # noqa
+        ('johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '0', '0', '0', 'ro')]  # noqa
 
 
 class GoodTableWithDifferentHeaders:
@@ -45,9 +45,9 @@ class GoodTableWithDifferentHeaders:
 
     #  view, common, source, target, mode, name, image, home, extra
     records = [
-        ('1', '0', '', '', '', 'foo', 'image_1', '1', 'anything'),
-        ('1', '1', '/src', '/target', 'ro', 'foo', 'image_2', '1', 'extra'),
-        ('0', '0', '/src', '/target', 'ro', 'username', 'image_1', '0', 'abc')]
+        ('1', '0', '', '', '', 'markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '1', 'anything'),  # noqa
+        ('1', '1', '/src', '/target', 'ro', 'markdoe', 'simphonyproject/ubuntu-image:latest', '1', 'extra'),  # noqa
+        ('0', '0', '/src', '/target', 'ro', 'johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '0', 'abc')]  # noqa
 
 
 def write_csv_file(file_name, headers, records):
@@ -72,19 +72,19 @@ class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
                                  self.assertApplicationPolicyEqual)
 
     def create_expected_users(self):
-        return (CSVUser(0, 'foo'), CSVUser(1, 'username'))
+        return (CSVUser(0, 'markdoe'), CSVUser(1, 'johndoe'))
 
     def create_expected_configs(self, user):
         mappings = {
-            'foo': (
-                (CSVApplication(id=0, image='image_1'),
+            'markdoe': (
+                (CSVApplication(id=0, image='simphonyproject/simphony-mayavi:0.6.0'),  # noqa
                  CSVApplicationPolicy(allow_home=True,
                                       allow_view=True,
                                       allow_common=False,
                                       volume_source=None,
                                       volume_target=None,
                                       volume_mode=None)),
-                (CSVApplication(id=1, image='image_2'),
+                (CSVApplication(id=1, image='simphonyproject/ubuntu-image:latest'),  # noqa
                  CSVApplicationPolicy(allow_home=True,
                                       allow_view=True,
                                       allow_common=True,
@@ -92,8 +92,8 @@ class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
                                       volume_target='/target',
                                       volume_mode='ro'))
                 ),
-            'username': (
-                (CSVApplication(id=0, image='image_1'),
+            'johndoe': (
+                (CSVApplication(id=0, image='simphonyproject/simphony-mayavi:0.6.0'),  # noqa
                  CSVApplicationPolicy(allow_home=False,
                                       allow_view=False,
                                       allow_common=False,
@@ -109,13 +109,13 @@ class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
     def test_get_user(self):
         accounting = self.create_accounting()
 
-        user = accounting.get_user(user_name='foo')
+        user = accounting.get_user(user_name='markdoe')
         self.assertIsInstance(user, CSVUser)
-        self.assertEqual(user.name, 'foo')
+        self.assertEqual(user.name, 'markdoe')
 
         user = accounting.get_user(id=0)
         self.assertIsInstance(user, CSVUser)
-        self.assertEqual(user.name, 'foo')
+        self.assertEqual(user.name, 'markdoe')
 
         user = accounting.get_user(user_name='unknown')
         self.assertIsNone(user)
