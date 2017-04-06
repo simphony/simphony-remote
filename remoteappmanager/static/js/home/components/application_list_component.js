@@ -75,8 +75,6 @@ define([
             toggle_app_clicked(index) {
                 this.set('selected_app', index);
 
-                console.log('(ApplicationListComponent) Application', index, 'selected');
-
                 // Send the action to the controller
                 this.sendAction(
                     'update_current_app',

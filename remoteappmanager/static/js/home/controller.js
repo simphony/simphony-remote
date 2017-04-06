@@ -13,7 +13,6 @@ require([
     // Ember Application
 
     var AppList = Ember.Application.create({
-        LOG_TRANSITIONS: true, // For debug
         rootElement: '#ember_container'
     });
 
@@ -34,7 +33,6 @@ require([
 
         actions: {
             toggle_app_selected(application) {
-                console.log('(Controller) App selected:', application);
                 this.set('current_application', application);
             }
         }
