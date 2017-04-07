@@ -7,8 +7,8 @@ define([
 
     var helpers = {};
 
-    helpers.IconSrcHelper = Ember.Helper.helper(function([app_data]) {
-        var icon_data = app_data.image.icon_128;
+    helpers.IconSrcHelper = Ember.Helper.helper(function(params) {
+        var icon_data = params[0].image.icon_128;
         return (
             icon_data ?
             "data:image/png;base64," + icon_data :
@@ -18,29 +18,29 @@ define([
         );
     });
 
-    helpers.AppNameHelper = Ember.Helper.helper(function([app_data]) {
+    helpers.AppNameHelper = Ember.Helper.helper(function(params) {
         return (
-            app_data.image.ui_name ?
-            app_data.image.ui_name :
-            app_data.image.name
+            params[0].image.ui_name ?
+            params[0].image.ui_name :
+            params[0].image.name
         );
     });
 
     // Application status helpers
-    helpers.IsRunningHelper = Ember.Helper.helper(function([status]) {
-        return status === 'running';
+    helpers.IsRunningHelper = Ember.Helper.helper(function(params) {
+        return params[0] === 'running';
     });
 
-    helpers.IsStoppedHelper = Ember.Helper.helper(function([status]) {
-        return status === 'stopped';
+    helpers.IsStoppedHelper = Ember.Helper.helper(function(params) {
+        return params[0] === 'stopped';
     });
 
-    helpers.IsStartingHelper = Ember.Helper.helper(function([status]) {
-        return status === 'starting';
+    helpers.IsStartingHelper = Ember.Helper.helper(function(params) {
+        return params[0] === 'starting';
     });
 
-    helpers.IsStoppingHelper = Ember.Helper.helper(function([status]) {
-        return status === 'stopping';
+    helpers.IsStoppingHelper = Ember.Helper.helper(function(params) {
+        return params[0] === 'stopping';
     });
 
 
@@ -48,8 +48,8 @@ define([
         return params[0] === params[1];
     });
 
-    helpers.NotNullHelper = Ember.Helper.helper(function([param]) {
-        return param !== null;
+    helpers.NotNullHelper = Ember.Helper.helper(function(params) {
+        return params[0] !== null;
     });
 
     // Logical helpers

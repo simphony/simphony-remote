@@ -61,7 +61,7 @@ define([
         }),
 
         actions: {
-            start_application() {
+            start_application: function() {
                 this.set('application.status', Status.STARTING);
 
                 var mapping_id = this.get('application.app_data.mapping_id');

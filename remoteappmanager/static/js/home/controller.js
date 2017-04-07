@@ -26,14 +26,14 @@ require([
 
     AppList.ApplicationController = Ember.Controller.extend({
         init: function() {
-            this._super(...arguments);
+            this._super(arguments);
 
             this.set('current_application', null);
             this.set('delayed', true);
         },
 
         actions: {
-            toggle_app_selected(application) {
+            toggle_app_selected: function(application) {
                 this.set('delayed', application.status !== Status.RUNNING);
                 this.set('current_application', application);
             }

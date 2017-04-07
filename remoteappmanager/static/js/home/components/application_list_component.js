@@ -16,7 +16,7 @@ define([
 
     // Ember application model
 
-    const Application = Ember.Object.extend({
+    var Application = Ember.Object.extend({
         //
     });
 
@@ -34,7 +34,7 @@ define([
         ),
 
         init: function() {
-            this._super(...arguments);
+            this._super(arguments);
 
             this.app_data = null; // Not an Ember Object
 
@@ -73,7 +73,7 @@ define([
         },
 
         actions: {
-            toggle_app_clicked(index) {
+            toggle_app_clicked: function(index) {
                 this.set('selected_app', index);
 
                 // Send the action to the controller
@@ -82,7 +82,7 @@ define([
                     this.get('application_entry_list').objectAt(index)
                 );
             },
-            toggle_app_stopped(application) {
+            toggle_app_stopped: function(application) {
                 application.set('status', Status.STOPPING);
 
                 var url_id = application.get('app_data.container.url_id');
@@ -108,8 +108,8 @@ define([
             }
         },
 
-        didInsertElement() {
-            this._super(...arguments);
+        didInsertElement: function() {
+            this._super(arguments);
             // Load AdminLTE Javascript (Temporary)
             require([window.AdminLTEJavascriptPath]);
         }
