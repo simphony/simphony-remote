@@ -15,10 +15,10 @@ from remoteappmanager.utils import remove_quotes
 
 # A set of viable start arguments. As they would arrive from outside
 arguments = {
-    "user": "username",
+    "user": "johndoe",
     "port": 57022,
-    "cookie-name": "jupyter-hub-token-username",
-    "base-urlpath": "\"/user/username/\"",
+    "cookie-name": "jupyter-hub-token-johndoe",
+    "base-urlpath": "\"/user/johndoe/\"",
     "hub-host": "",
     "hub-prefix": "/hub/",
     "hub-api-url": "http://172.17.5.167:8081/hub/api",
@@ -116,6 +116,7 @@ def mock_coro_factory(return_value=None, side_effect=None):
     @gen.coroutine
     def coro(*args, **kwargs):
         coro.called = True
+        coro.call_args = (args, kwargs)
         yield gen.sleep(0.1)
         if side_effect:
             if isinstance(side_effect, Exception):
@@ -125,6 +126,7 @@ def mock_coro_factory(return_value=None, side_effect=None):
         return coro.return_value
 
     coro.called = False
+    coro.call_args = ([], {})
     coro.return_value = return_value
     return coro
 

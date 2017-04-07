@@ -1,18 +1,20 @@
 import unittest
 from remoteappmanager.docker.configurables import Resolution, for_image
 from remoteappmanager.docker.image import Image
-from remoteappmanager.tests.mocking.virtual.docker_client import \
-    create_docker_client
+from remoteappmanager.tests.mocking.virtual.docker_client import (
+    VirtualDockerClient)
 
 
 class TestConfigurables(unittest.TestCase):
     def setUp(self):
-        docker_client = create_docker_client()
-        image_dict = docker_client.inspect_image('image_id2')
-        self.image_2 = Image.from_docker_dict(image_dict)
-
-        image_dict = docker_client.inspect_image('image_id1')
+        docker_client = VirtualDockerClient.with_containers()
+        image_dict = docker_client.inspect_image(
+            'simphonyproject/simphony-mayavi:0.6.0')
         self.image_1 = Image.from_docker_dict(image_dict)
+
+        image_dict = docker_client.inspect_image(
+            'simphonyproject/ubuntu-image:latest')
+        self.image_2 = Image.from_docker_dict(image_dict)
 
     def test_resolution(self):
         self.assertTrue(Resolution.supported_by(self.image_1))

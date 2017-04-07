@@ -4,7 +4,7 @@ from remoteappmanager.tests.mocking import dummy
 
 class TestBaseAccess(utils.AsyncHTTPTestCase):
     #: which url to poke
-    url = "/user/username"
+    url = "/user/johndoe"
 
     # which string we expect in the body to say it's ok
     body_string = "adminoptions"
@@ -21,7 +21,7 @@ class TestBaseAccess(utils.AsyncHTTPTestCase):
     def test_access(self):
         res = self.fetch(self.url,
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-johndoe=foo"
                          }
                          )
 
@@ -42,29 +42,29 @@ class TestBaseAccess(utils.AsyncHTTPTestCase):
 
 
 class TestApplicationsHandler(TestBaseAccess):
-    url = "/user/username/applications/"
+    url = "/user/johndoe/applications/"
     body_string = "datatable"
 
 
 class TestUsersHandler(TestBaseAccess):
-    url = "/user/username/users/"
+    url = "/user/johndoe/users/"
     body_string = "datatable"
 
 
 class TestContainersHandler(TestBaseAccess):
-    url = "/user/username/containers/"
+    url = "/user/johndoe/containers/"
     body_string = "datatable"
 
 
 class TestAccountingHandler(TestBaseAccess):
-    url = "/user/username/users/0/accounting/"
+    url = "/user/johndoe/users/0/accounting/"
     body_string = "datatable"
 
     def test_unknown_id(self):
         self._app.db.unexistent_user_id = 123422
-        res = self.fetch("/user/username/users/123422/accounting/",
+        res = self.fetch("/user/johndoe/users/123422/accounting/",
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-johndoe=foo"
                          })
 
         self.assertEqual(res.code, 404)

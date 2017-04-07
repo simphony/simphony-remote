@@ -18,13 +18,13 @@ class TestApplication(WebAPITestCase):
         return app
 
     def test_delete(self):
-        self.delete("/user/username/api/v1/applications/0/",
+        self.delete("/user/johndoe/api/v1/applications/0/",
                     httpstatus.NO_CONTENT)
 
-        self.delete("/user/username/api/v1/applications/12345/",
+        self.delete("/user/johndoe/api/v1/applications/12345/",
                     httpstatus.NOT_FOUND)
 
-        self.delete("/user/username/api/v1/applications/foo/",
+        self.delete("/user/johndoe/api/v1/applications/foo/",
                     httpstatus.NOT_FOUND)
 
     def test_unable_to_delete(self):
@@ -32,15 +32,15 @@ class TestApplication(WebAPITestCase):
                         "dummy.DummyDBAccounting.remove_application"
                         ) as mock_delete_app:
             mock_delete_app.side_effect = UnsupportedOperation()
-            self.delete("/user/username/api/v1/applications/1/",
+            self.delete("/user/johndoe/api/v1/applications/1/",
                         httpstatus.INTERNAL_SERVER_ERROR)
 
     def test_create(self):
-        self.post("/user/username/api/v1/applications/",
+        self.post("/user/johndoe/api/v1/applications/",
                   {"image_name": "foobar"},
                   httpstatus.CREATED)
 
-        self.post("/user/username/api/v1/applications/",
+        self.post("/user/johndoe/api/v1/applications/",
                   {"image_name": "foobar"},
                   httpstatus.CONFLICT)
 
@@ -49,24 +49,24 @@ class TestApplication(WebAPITestCase):
                         "dummy.DummyDBAccounting.create_application"
                         ) as mock_create_app:
             mock_create_app.side_effect = UnsupportedOperation()
-            self.post("/user/username/api/v1/applications/",
+            self.post("/user/johndoe/api/v1/applications/",
                       {"image_name": "foobar"},
                       httpstatus.INTERNAL_SERVER_ERROR)
 
     def test_create_invalid_representation(self):
-        self.post("/user/username/api/v1/applications/",
+        self.post("/user/johndoe/api/v1/applications/",
                   {"image_name": ""},
                   httpstatus.BAD_REQUEST)
 
-        self.post("/user/username/api/v1/applications/",
+        self.post("/user/johndoe/api/v1/applications/",
                   {},
                   httpstatus.BAD_REQUEST)
 
     def test_delete_failed_auth(self):
         self._app.hub.verify_token.return_value = {}
 
-        self.delete("/user/username/api/v1/applications/0/",
+        self.delete("/user/johndoe/api/v1/applications/0/",
                     httpstatus.NOT_FOUND)
 
     def cookie_auth_token(self):
-        return "jupyter-hub-token-username=username"
+        return "jupyter-hub-token-johndoe=johndoe"

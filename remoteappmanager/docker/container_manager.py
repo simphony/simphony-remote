@@ -2,6 +2,7 @@ import os
 import string
 from urllib.parse import urlparse
 import uuid
+import random
 
 from docker.errors import APIError, NotFound
 from escapism import escape
@@ -14,6 +15,7 @@ from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.utils import (
     url_path_join,
     without_end_slash)
+
 
 from tornado import gen
 from traitlets import (
@@ -35,6 +37,11 @@ class OperationInProgress(Exception):
     """Exception raised when the operation for the requested image or
     container is already in progress."""
     pass
+
+
+class MultipleResultsFound(Exception):
+    """Raised when we are asking for a specific container, but more than
+    one result is found."""
 
 
 class ContainerManager(LoggingMixin):
@@ -162,49 +169,6 @@ class ContainerManager(LoggingMixin):
             self._stop_pending.remove(container_id)
 
     @gen.coroutine
-    def containers_from_mapping_id(self, user_name, mapping_id):
-        """Returns the currently running containers for a given user and
-        mapping_id.
-
-        Parameters
-        ----------
-        user_name: str
-            The username
-        mapping_id : str
-            The unique id to identify the container
-
-        Return
-        ------
-        A list of Container objects, or an empty list if nothing is found.
-        """
-        containers = yield self.containers_with_labels({
-                SIMPHONY_NS_RUNINFO.user: user_name,
-                SIMPHONY_NS_RUNINFO.mapping_id: mapping_id,
-                SIMPHONY_NS_RUNINFO.realm: self.realm
-            })
-        return containers
-
-    @gen.coroutine
-    def container_from_url_id(self, url_id):
-        """Retrieves and returns the container by its url_id, if present.
-        If not present, returns None.
-        """
-        containers = yield self.containers_with_labels({
-                SIMPHONY_NS_RUNINFO.url_id: url_id,
-                SIMPHONY_NS_RUNINFO.realm: self.realm
-            })
-        return containers[0] if len(containers) else None
-
-    @gen.coroutine
-    def running_containers(self):
-        """Returns all the running containers"""
-        containers = yield self.containers_with_labels({
-                SIMPHONY_NS_RUNINFO.realm: self.realm
-            })
-
-        return containers
-
-    @gen.coroutine
     def containers_with_labels(self, labels):
         filters = {
             'label': ['{0}={1}'.format(k, v) for k, v in labels.items()]}
@@ -253,6 +217,59 @@ class ContainerManager(LoggingMixin):
         return containers
 
     @gen.coroutine
+    def find_containers(self,
+                        *,
+                        url_id=None,
+                        mapping_id=None,
+                        user_name=None):
+        """Finds and returns containers matching all the specified arguments.
+        """
+        labels = {
+            SIMPHONY_NS_RUNINFO.realm: self.realm
+        }
+
+        if url_id is not None:
+            labels[SIMPHONY_NS_RUNINFO.url_id] = url_id
+
+        if mapping_id is not None:
+            labels[SIMPHONY_NS_RUNINFO.mapping_id] = mapping_id
+
+        if user_name is not None:
+            labels[SIMPHONY_NS_RUNINFO.user] = user_name
+
+        containers = yield self.containers_with_labels(labels)
+
+        return containers
+
+    @gen.coroutine
+    def find_container(self,
+                       *,
+                       url_id=None,
+                       mapping_id=None,
+                       user_name=None):
+        """Find and returns a container matching the specified
+        arguments.
+
+        Returns the found container or None. If multiple containers
+        match the query, it will raise MultipleResultsFound"""
+        containers = yield self.find_containers(url_id=url_id,
+                                                mapping_id=mapping_id,
+                                                user_name=user_name)
+        if len(containers) > 1:
+            raise MultipleResultsFound(
+                "Found {} results for request {}, {}, {}".format(
+                    len(containers),
+                    url_id,
+                    mapping_id,
+                    user_name
+                ))
+
+        if len(containers) == 1:
+            return containers[0]
+
+        return None
+
+    @gen.coroutine
     def image(self, image_id_or_name):
         """Returns the Image object associated to a given id
         """
@@ -295,22 +312,17 @@ class ContainerManager(LoggingMixin):
             raise e
 
         self.log.info('Got container image: {}'.format(image_name))
-        # build the dictionary of keyword arguments for create_container
-        container_name = _generate_container_name(self.realm,
-                                                  user_name,
-                                                  mapping_id)
-        container_url_id = _generate_container_url_id()
 
-        # Check if the container is present. If not, create it
-        container_info = yield self._get_container_info(container_name)
+        # Check if the container is present.
+        container = yield self.find_container(
+            user_name=user_name, mapping_id=mapping_id)
 
-        if container_info is not None:
-            # Make sure we stop and remove the container if by any change
-            # is already there. This will guarantee a fresh start every time.
+        if container is not None:
+            # Make sure we stop and remove it if by any chance is already
+            # there. This will guarantee a fresh start every time.
             self.log.info('Container for image {} '
                           'already present. Stopping.'.format(image_name))
-            container_id = container_info["Id"]
-            yield self.stop_and_remove_container(container_id)
+            yield self.stop_and_remove_container(container.docker_id)
 
         # Data volume binding to be used with Docker Client
         # volumes = {volume_source: {'bind': volume_target,
@@ -332,17 +344,19 @@ class ContainerManager(LoggingMixin):
             self.log.error('Path(s) does not exist, not mounting:\n%s',
                            '\n'.join(volumes.keys() - filtered_volumes.keys()))
 
-        # Info for debugging
         self.log.info(
             'Mounting these volumes: \n%s',
             '\n'.join('{0} -> {1}'.format(source, target['bind'])
                       for source, target in filtered_volumes.items()))
 
+        container_url_id = _generate_container_url_id()
         container_urlpath = without_end_slash(
             url_path_join(base_urlpath,
                           "containers",
                           container_url_id))
-
+        container_name = _generate_container_name(self.realm,
+                                                  user_name,
+                                                  mapping_id)
         create_kwargs = dict(
             image=image_name,
             name=container_name,
@@ -524,7 +538,6 @@ class ContainerManager(LoggingMixin):
         Note: The container is only stopped if it belongs to the same
         realm.
         """
-
         self.log.info("Stopping container {}".format(container_id))
 
         container_info = yield self._get_container_info(container_id)
@@ -651,7 +664,13 @@ def _generate_container_name(realm, user_name, mapping_id):
 
     Return
     ------
-    A string combining the three parameters in an appropriate container name
+    A string combining the three parameters in an appropriate container name,
+    plus a random token to prevent collisions with a similarly named rogue
+    container.
+
+    NOTE: the container name is not meant for parsing. It's only for human
+    consumption in the docker list. All information and all searching should
+    be extracted from labels.
     """
     escaped_realm = escape(realm,
                            safe=_CONTAINER_SAFE_CHARS,
@@ -662,10 +681,14 @@ def _generate_container_name(realm, user_name, mapping_id):
     escaped_mapping_id = escape(mapping_id,
                                 safe=_CONTAINER_SAFE_CHARS,
                                 escape_char=_CONTAINER_ESCAPE_CHAR)
+    random_token = ''.join(random.choice(string.ascii_lowercase)
+                           for _ in range(10))
 
-    return "{}-{}-{}".format(escaped_realm,
-                             escaped_user_name,
-                             escaped_mapping_id)
+    return "{}-{}-{}-{}".format(escaped_realm,
+                                escaped_user_name,
+                                escaped_mapping_id,
+                                random_token
+                                )
 
 
 def _generate_container_url_id():

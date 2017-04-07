@@ -10,7 +10,7 @@ class ContainersHandler(BaseHandler):
     @gen.coroutine
     def get(self):
         manager = self.application.container_manager
-        containers = (yield manager.running_containers())
+        containers = (yield manager.find_containers())
 
         self.render('admin/containers.html',
                     containers=containers,

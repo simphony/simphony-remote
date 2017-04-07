@@ -3,12 +3,12 @@ from unittest import TestCase
 from remoteappmanager.docker.docker_labels import SIMPHONY_NS, SIMPHONY_NS_ENV
 from remoteappmanager.docker.image import Image
 from remoteappmanager.tests.mocking.virtual.docker_client import (
-    create_docker_client)
+    VirtualDockerClient)
 
 
 class TestImage(TestCase):
     def test_from_docker_dict_images(self):
-        docker_client = create_docker_client()
+        docker_client = VirtualDockerClient.with_containers()
         image_dict = docker_client.images()[0]
         image = Image.from_docker_dict(image_dict)
 
@@ -21,8 +21,8 @@ class TestImage(TestCase):
         self.assertEqual(image.type, 'vncapp')
 
     def test_from_docker_dict_inspect_image(self):
-        docker_client = create_docker_client()
-        image_dict = docker_client.inspect_image('image_id1')
+        docker_client = VirtualDockerClient.with_containers()
+        image_dict = docker_client.inspect_image('simphonyproject/simphony-mayavi:0.6.0')  # noqa
 
         labels = image_dict['Config']['Labels']
         # Insert an unpalatable label for the envs.
@@ -46,8 +46,8 @@ class TestImage(TestCase):
         })
 
     def test_missing_image_type(self):
-        docker_client = create_docker_client()
-        image_dict = docker_client.inspect_image('image_id2')
+        docker_client = VirtualDockerClient.with_containers()
+        image_dict = docker_client.inspect_image('simphonyproject/ubuntu-image:latest')  # noqa
         image = Image.from_docker_dict(image_dict)
 
         self.assertEqual(image.type, '')

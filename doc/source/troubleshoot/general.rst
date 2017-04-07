@@ -22,3 +22,10 @@ remoteappmanager the lookup is performed again.
 It is debatable if this behavior is a bug or not (after all, bash also won't
 alter your current enviroment if root changes /etc/bashrc, and you will have to
 logout to get the new environment). Issue #305 debates this point.
+
+
+I use the GitHub authenticator. A GitHub user has capitalisation in its username, but I see it as lowercase.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This is by design in both GitHub and JupyterHub. GitHub usernames are case insensitive, and case preserving.
+JupyterHub authenticator always normalises the usernames to lowercase.

@@ -18,41 +18,41 @@ class TestContainer(WebAPITestCase):
         return app
 
     def test_delete(self):
-        self._app.container_manager.container_from_url_id = mock_coro_factory(
-            DockerContainer(user="username")
+        self._app.container_manager.find_container = mock_coro_factory(
+            DockerContainer(user="johndoe")
         )
-        self.delete("/user/username/api/v1/containers/found/",
+        self.delete("/user/johndoe/api/v1/containers/found/",
                     httpstatus.NO_CONTENT)
 
         self.assertTrue(self._app.reverse_proxy.unregister.called)
 
-        self._app.container_manager.container_from_url_id = \
+        self._app.container_manager.find_container = \
             mock_coro_factory(return_value=None)
-        self.delete("/user/username/api/v1/containers/notfound/",
+        self.delete("/user/johndoe/api/v1/containers/notfound/",
                     httpstatus.NOT_FOUND)
 
     def test_delete_failure_reverse_proxy(self):
-        self._app.container_manager.container_from_url_id = mock_coro_factory(
-            DockerContainer(user="username")
+        self._app.container_manager.find_container = mock_coro_factory(
+            DockerContainer(user="johndoe")
         )
-        self._app.reverse_proxy.unregister.side_effect = Exception()
+        self._app.reverse_proxy.unregister.side_effect = Exception("BOOM!")
 
-        self.delete("/user/username/api/v1/containers/found/",
+        self.delete("/user/johndoe/api/v1/containers/found/",
                     httpstatus.NO_CONTENT)
 
     def test_delete_failure_stop_container(self):
         manager = self._app.container_manager
-        manager.container_from_url_id = mock_coro_factory(
-            DockerContainer(user="username")
+        manager.find_container = mock_coro_factory(
+            DockerContainer(user="johndoe")
         )
         manager.stop_and_remove_container = mock_coro_factory(
-            side_effect=Exception())
+            side_effect=Exception("BOOM!"))
 
-        self.delete("/user/username/api/v1/containers/found/",
+        self.delete("/user/johndoe/api/v1/containers/found/",
                     httpstatus.NO_CONTENT)
 
     def cookie_auth_token(self):
-        return "jupyter-hub-token-username=username"
+        return "jupyter-hub-token-johndoe=johndoe"
 
 
 class TestContainerNoUser(WebAPITestCase):
@@ -62,8 +62,8 @@ class TestContainerNoUser(WebAPITestCase):
         return app
 
     def test_delete_no_user(self):
-        self.delete("/user/username/api/v1/containers/found/",
+        self.delete("/user/johndoe/api/v1/containers/found/",
                     httpstatus.NOT_FOUND)
 
     def cookie_auth_token(self):
-        return "jupyter-hub-token-username=username"
+        return "jupyter-hub-token-johndoe=johndoe"

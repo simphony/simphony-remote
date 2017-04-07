@@ -1,16 +1,16 @@
 define([
-    'analytics',
+    '../../gamodule',
     'jsapi/v1/resources',
     './application_list_component',
     '../../urlutils',
     '../../utils',
     '../../dialogs'
 ], function(
-        analytics, resources, application_list_component, urlutils, utils, dialogs
+        gamodule, resources, application_list_component, urlutils, utils, dialogs
     ) {
     'use strict';
 
-    var ga = analytics.init();
+    var ga = gamodule.init();
 
     var Status = application_list_component.Status;
 

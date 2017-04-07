@@ -18,13 +18,13 @@ class TestUser(WebAPITestCase):
         return app
 
     def test_delete(self):
-        self.delete("/user/username/api/v1/users/0/",
+        self.delete("/user/johndoe/api/v1/users/0/",
                     httpstatus.NO_CONTENT)
 
-        self.delete("/user/username/api/v1/users/12345/",
+        self.delete("/user/johndoe/api/v1/users/12345/",
                     httpstatus.NOT_FOUND)
 
-        self.delete("/user/username/api/v1/users/foo/",
+        self.delete("/user/johndoe/api/v1/users/foo/",
                     httpstatus.NOT_FOUND)
 
     def test_unable_to_delete(self):
@@ -32,23 +32,23 @@ class TestUser(WebAPITestCase):
                         "dummy.DummyDBAccounting.remove_user"
                         ) as mock_delete_user:
             mock_delete_user.side_effect = UnsupportedOperation()
-            self.delete("/user/username/api/v1/users/1/",
+            self.delete("/user/johndoe/api/v1/users/1/",
                         httpstatus.INTERNAL_SERVER_ERROR)
 
     def test_create(self):
-        self.post("/user/username/api/v1/users/",
+        self.post("/user/johndoe/api/v1/users/",
                   {"name": ""},
                   httpstatus.BAD_REQUEST)
 
-        self.post("/user/username/api/v1/users/",
+        self.post("/user/johndoe/api/v1/users/",
                   {},
                   httpstatus.BAD_REQUEST)
 
-        self.post("/user/username/api/v1/users/",
+        self.post("/user/johndoe/api/v1/users/",
                   {"name": "foobar"},
                   httpstatus.CREATED)
 
-        self.post("/user/username/api/v1/users/",
+        self.post("/user/johndoe/api/v1/users/",
                   {"name": "foobar"},
                   httpstatus.CONFLICT)
 
@@ -57,15 +57,15 @@ class TestUser(WebAPITestCase):
                         "dummy.DummyDBAccounting.create_user"
                         ) as mock_create_user:
             mock_create_user.side_effect = UnsupportedOperation()
-            self.post("/user/username/api/v1/users/",
+            self.post("/user/johndoe/api/v1/users/",
                       {"name": "foobar"},
                       httpstatus.INTERNAL_SERVER_ERROR)
 
     def test_delete_failed_auth(self):
         self._app.hub.verify_token.return_value = {}
 
-        self.delete("/user/username/api/v1/users/0/",
+        self.delete("/user/johndoe/api/v1/users/0/",
                     httpstatus.NOT_FOUND)
 
     def cookie_auth_token(self):
-        return "jupyter-hub-token-username=username"
+        return "jupyter-hub-token-johndoe=johndoe"

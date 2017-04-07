@@ -15,7 +15,7 @@ from remoteappmanager.tests.utils import (
     basic_command_line_config,
     basic_environment_config)
 from remoteappmanager.tests.mocking.virtual.docker_client import (
-    create_docker_client)
+    VirtualDockerClient)
 
 
 class DummyDBApplication(interfaces.ABCApplication):
@@ -32,11 +32,16 @@ User = namedtuple('User', ('id', 'name'))
 class DummyDBAccounting(interfaces.ABCAccounting):
     def __init__(self):
         self.users = {
-            0: User(0, "username")
+            0: User(0, "johndoe")
         }
 
         self.applications = {
-            0: DummyDBApplication(id=0, image='image_id1'),
+            0: DummyDBApplication(
+                id=0,
+                image='simphonyproject/simphony-mayavi:0.6.0'),
+            1: DummyDBApplication(
+                id=1,
+                image='simphonyproject/ubuntu-image:latest'),
         }
 
         self.policies = {
@@ -44,11 +49,11 @@ class DummyDBAccounting(interfaces.ABCAccounting):
         }
 
         self.accounting = {
-            'mapping_id': (
+            'cbaee2e8ef414f9fb0f1c97416b8aa6c': (
                 self.users[0], self.applications[0], self.policies[0]
             ),
-            'id678': (
-                self.users[0], self.applications[0], self.policies[0]
+            'b7ca425a51bf40acbd305b3f782714b6': (
+                self.users[0], self.applications[1], self.policies[0]
             )
         }
 
@@ -221,10 +226,10 @@ def create_container_manager(params=None):
     manager : remoteappmanager.docker.container_manager.ContainerManager
     '''
     if params is None:
-        params = {'docker_config': {}}
+        params = {'docker_config': {}, "realm": "myrealm"}
 
     manager = ContainerManager(**params)
-    manager._docker_client._sync_client = create_docker_client()
+    manager._docker_client._sync_client = VirtualDockerClient.with_containers()
     return manager
 
 
