@@ -44,10 +44,16 @@ define([
         }),
 
         application_location: Ember.computed('application.app_data', function() {
-            return urlutils.path_join(
+            var app_url = urlutils.path_join(
                 window.apidata.base_url,
                 'containers',
                 this.get('application.app_data.container.url_id')
+            );
+
+            return (
+                this.get('delayed') ?
+                app_url :
+                app_url + '/'
             );
         }),
 
