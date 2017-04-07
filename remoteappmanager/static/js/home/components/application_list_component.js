@@ -62,7 +62,8 @@ define([
                                 app_data[i].container !== null ?
                                 Status.RUNNING :
                                 Status.STOPPED
-                            )
+                            ),
+                            resolution: 'Window'
                         })
                     );
                 }

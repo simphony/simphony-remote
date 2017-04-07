@@ -29,13 +29,6 @@ define([
             'Window', '1920x1080', '1280x1024', '1280x800', '1024x768'
         ],
 
-        init: function() {
-            this._super(...arguments);
-
-            // Default resolution is the Window size
-            this.set('resolution', 'Window');
-        },
-
         noPadding: Ember.computed('application.status', function() {
             var app_status = this.get('application.status');
             return app_status === Status.RUNNING;
@@ -55,8 +48,8 @@ define([
             );
         }),
 
-        iframe_style: Ember.computed('resolution', 'application.status', function() {
-            var resolution = this.get('resolution');
+        iframe_style: Ember.computed('application.resolution', 'application.status', function() {
+            var resolution = this.get('application.resolution');
             if(resolution === 'Window') { resolution = getWindowResolution(); }
 
             var size = resolution.split('x');
@@ -73,7 +66,7 @@ define([
 
                 var mapping_id = this.get('application.app_data.mapping_id');
 
-                var resolution = this.get('resolution');
+                var resolution = this.get('application.resolution');
                 if(resolution === 'Window') { resolution = getWindowResolution(); }
 
                 var current_application = this.get('application');
@@ -103,7 +96,7 @@ define([
             },
 
             toggle_resolution_changed: function(event) {
-                this.set('resolution', event.target.value);
+                this.set('application.resolution', event.target.value);
             }
         }
     });

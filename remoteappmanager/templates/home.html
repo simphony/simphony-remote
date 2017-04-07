@@ -191,7 +191,7 @@
                                              <label>Resolution</label>
                                              <select class="form-control" onchange={{action "toggle_resolution_changed"}}>
                                                  {{#each resolution_options as |resolution|}}
-                                                    <option value="{{resolution}}">{{resolution}}</option>
+                                                    <option value="{{resolution}}" selected={{equal resolution application.resolution}}>{{resolution}}</option>
                                                  {{/each}}
                                              </select>
                                          </div>
