@@ -1,7 +1,8 @@
-from itertools import cycle
 import json
+import hashlib
+import uuid
 import requests
-from unittest import mock
+from collections import namedtuple
 
 import docker
 
@@ -10,96 +11,166 @@ from remoteappmanager.docker.docker_labels import (
     SIMPHONY_NS_ENV,
     SIMPHONY_NS_RUNINFO)
 
+# internal, convenience classes. Do not export (risks name collisions with
+# container manager similarly named entities.
 
-FAKE_IMAGE_IDS = ('image_id1', 'image_id2')
-
-FAKE_IMAGE_NAMES = ('image_name1', 'image_name2')
-
-FAKE_CONTAINER_IDS = ('container_id1', 'container_id2', 'container_id3')
-
-FAKE_CONTAINER_NAMES = ('myrealm-username-mapping_5Fid',
-                        'myrealm-username-mapping_5Fid_5Fexited',
-                        'remoteexec-username-mapping_5Fid_5Fstopped')
+_Image = namedtuple("Image",
+                    field_names="id name labels exposed_ports")
+_Container = namedtuple("Container",
+                        field_names="id name image labels ports state")
 
 
-def docker_response(status_code=200, content='',
-                    headers=None, reason=None,
-                    request=None):
-    res = requests.Response()
-    res.status_code = status_code
-    content = json.dumps(content).encode('ascii')
-    res._content = content
-    res.headers = requests.structures.CaseInsensitiveDict(headers or {})
-    res.reason = reason
-    res.request = request
-    return res
+class VirtualDockerClient(object):
+    """A virtual docker client that behaves like the real thing
+    but does nothing on docker. It provides the same interface as dockerpy
+    Client.
+    """
 
+    def __init__(self):
+        # This entry contains the images that can be installed.
+        # It simulates the hub docker retrieval.
+        self._available_images = self._init_available_images()
 
-def get_fake_image_labels(num=2):
-    samples = cycle(
-        (
-            {SIMPHONY_NS.description: 'Ubuntu machine with mayavi preinstalled',  # noqa
-             SIMPHONY_NS.ui_name: 'Mayavi 4.4.4',
-             SIMPHONY_NS.type: 'vncapp',
-             SIMPHONY_NS_ENV['x11-width']: '',
-             SIMPHONY_NS_ENV['x11-height']: '',
-             SIMPHONY_NS_ENV['x11-depth']: '',
-             },
-            {SIMPHONY_NS.description: 'A vanilla Ubuntu installation'},  # noqa
+        # This contains the images that are currently installed.
+        self._images = []
+
+        # This one contains the containers that are currently present
+        self._containers = []
+
+    @classmethod
+    def with_containers(cls):
+        """
+        Alternative constructor.
+        When created, it provides a predefined set of available images.
+        """
+        self = cls()
+
+        self._images = self._available_images[:]
+        self._containers = [
+            _Container(
+                id="d2b56bffb5655cb7668b685b80116041a20ee8662ebfa5b5cb68cfc423d9dc30",  # noqa
+                name="myrealm-johndoe-5b34ce60d95742fa828cdced12b4c342-ascvbefsda",  # noqa
+                image=self._images[0],
+                labels={
+                    SIMPHONY_NS_RUNINFO.user: 'johndoe',
+                    SIMPHONY_NS_RUNINFO.mapping_id: '5b34ce60d95742fa828cdced12b4c342',  # noqa
+                    SIMPHONY_NS_RUNINFO.url_id: '20dcb84cdbea4b1899447246789093d0',  # noqa
+                    SIMPHONY_NS_RUNINFO.realm: 'myrealm',
+                    SIMPHONY_NS_RUNINFO.urlpath: '/user/johndoe/containers/20dcb84cdbea4b1899447246789093d0'  # noqa
+                },
+                ports=[{
+                    "IP": "0.0.0.0",
+                    "PublicPort": 666,
+                    "PrivatePort": 8888,
+                    "Type": "tcp",
+                }],
+                state="running",
+            ),
+            _Container(
+                id="7067d5c0c5a62d50fe82538c7a55883cee1ded1d7010520c0be1f9a1ecbf6fed",  # noqa
+                name="myrealm-johndoe-6d24a0746a4e409c9b9078b158b8c484-cvbaeaehu",  # noqa
+                image=self._images[0],
+                labels={
+                    SIMPHONY_NS_RUNINFO.user: 'johndoe',
+                    SIMPHONY_NS_RUNINFO.mapping_id: 'db3890933e4843f092e954fc5e0caf9e',  # noqa
+                    SIMPHONY_NS_RUNINFO.url_id: '90d581268df8428aa91d56a62d83b163',  # noqa
+                    SIMPHONY_NS_RUNINFO.realm: 'myrealm',
+                    SIMPHONY_NS_RUNINFO.urlpath: '/user/johndoe/containers/90d581268df8428aa91d56a62d83b163'  # noqa
+                },
+                ports=[{
+                    "PrivatePort": 8889,
+                    "Type": "tcp",
+                }],
+                state="exited",
+            ),
+            _Container(
+                id="1ba68b442b12083ce29c8bfa27800f2fca96973b758838de35ba562f385283d5",  # noqa
+                name="myrealm-johndoe-27d17e78297441fdbe43ee6b8c148a17-fgadxcvxqw",  # noqa
+                image=self._images[0],
+                labels={},
+                ports=[{
+                    "IP": "0.0.0.0",
+                    "PublicPort": 666,
+                    "PrivatePort": 8888,
+                    "Type": "tcp",
+                }],
+
+                state={'Paused': False,
+                       'Running': False,
+                       'Error': '',
+                       'Pid': 0,
+                       'FinishedAt': '2016-06-22T09:15:35.574996772Z',
+                       'StartedAt': '2016-06-22T09:15:02.196670642Z',
+                       'Restarting': False,
+                       'Status': 'exited',
+                       'Dead': False,
+                       'OOMKilled': False,
+                       'ExitCode': 0},
+            ),
+        ]
+
+        return self
+
+    # API of the dockerpy Docker client.
+
+    def inspect_image(self, image_name_or_id):
+        image = self._find_image(image_name_or_id)
+
+        return {
+            'Id': image.id,
+            'RepoTags': [image.name],
+            'Config': {
+                'Cmd': None,
+                'Domainname': '',
+                'Entrypoint': ['/startup.sh'],
+                'ExposedPorts': {port: {} for port in image.exposed_ports},
+                'Labels': image.labels},
+        }
+
+    def images(self):
+        """Returns the currently installed images"""
+        return [{'Created': '2 days ago',
+                 'Id': image.id,
+                 'Labels': image.labels,
+                 'RepoTags': [image.name]
+                 # Missing keys (omitted because we don't need them now):
+                 # ParentId, RepoDigests, SharedSize, Size, VirtualSize,
+                 # Containers
+                 }
+                for image in self._images]
+
+    def create_container(self, *args, **kwargs):
+        id = self._new_id()
+        image = self._find_image(kwargs["image"])
+
+        self._containers.append(
+            _Container(
+                id=id,
+                name=kwargs["name"],
+                image=image,
+                labels=kwargs.get("labels", {}),
+                ports=[{
+                    "IP": "0.0.0.0",
+                    "PublicPort": 666,
+                    "PrivatePort": 8888,
+                    "Type": "tcp",
+                }],
+                state="running",
+            )
         )
-    )
-    return tuple(next(samples) for _ in range(num))
 
+        return {"Id": id, "Warnings": None}
 
-def get_fake_container_ports(num=3):
-    samples = cycle(([{'IP': '0.0.0.0',
-                       'PublicPort': 666,
-                       'PrivatePort': 8888,
-                       'Type': 'tcp'}],
-                     [{'PrivatePort': 8889,
-                       'Type': 'tcp'}],
-                     []))
-    return tuple(next(samples) for _ in range(num))
-
-
-def get_fake_container_states(num=3):
-    samples = cycle(('running',
-                     'exited',
-                     {'Paused': False, 'Running': False, 'Error': '', 'Pid': 0,
-                      'FinishedAt': '2016-06-22T09:15:35.574996772Z',
-                      'StartedAt': '2016-06-22T09:15:02.196670642Z',
-                      'Restarting': False, 'Status': 'exited', 'Dead': False,
-                      'OOMKilled': False, 'ExitCode': 0}))
-    return tuple(next(samples) for _ in range(num))
-
-
-def get_fake_container_labels(num=3):
-    samples = cycle(({SIMPHONY_NS_RUNINFO.user: 'username',
-                      SIMPHONY_NS_RUNINFO.mapping_id: 'mapping_id',
-                      SIMPHONY_NS_RUNINFO.url_id: 'url_id',
-                      SIMPHONY_NS_RUNINFO.realm: 'myrealm',
-                      SIMPHONY_NS_RUNINFO.urlpath: '/user/username/containers/url_id'},  # noqa
-                     {SIMPHONY_NS_RUNINFO.user: 'username'},
-                     {}))
-    return tuple(next(samples) for _ in range(num))
-
-
-def mock_containers(container_ids, container_names,
-                    container_ports, container_states, container_labels,
-                    image_id, image_name, image_labels):
-
-    def containers(**kwargs):
+    def containers(self, *args, **kwargs):
         results = []
 
-        for container_id, container_name, port, state, labels in zip(
-                container_ids, container_names, container_ports,
-                container_states, container_labels):
-
-            if state != 'running' and not kwargs.get('all', False):
+        for container in self._containers:
+            image = container.image
+            if container.state != 'running' and not kwargs.get('all', False):
                 continue
 
-            all_labels = image_labels.copy()
-            all_labels.update(labels)
+            all_labels = image.labels.copy()
+            all_labels.update(container.labels)
 
             # Apply filters for labels
             if 'filters' in kwargs and 'label' in kwargs['filters']:
@@ -116,49 +187,32 @@ def mock_containers(container_ids, container_names,
 
             results.append(
                 {'Command': '/sbin/init -D',
-                 'Id': container_id,
-                 'Image': image_name,
-                 'ImageID': image_id,
+                 'Id': container.id,
+                 'Image': image.name,
+                 'ImageID': image.id,
                  'Labels': all_labels,
-                 'Names': ['/'+container_name],
-                 'Ports': port,
-                 'State': state})
+                 'Mounts': [],
+                 'Names': ['/'+container.name],
+                 'Ports': container.ports,
+                 'State': container.state
+                 })
 
         return results
 
-    return containers
+    def inspect_container(self, container_name_or_id):
+        container = self._find_container(container_name_or_id)
+        image = container.image
+        labels = container.labels
 
-
-def mock_inspect_container(container_ids, container_names,
-                           container_ports, container_states, container_labels,
-                           image_id, image_name, image_labels):
-
-    def inspect_container(container_name_or_id):
-        if container_name_or_id not in container_ids+container_names:
-            raise docker.errors.NotFound(
-                'Container {} not found'.format(container_name_or_id),
-                response=docker_response(404))
-
-        try:
-            index = container_ids.index(container_name_or_id)
-        except ValueError:
-            index = container_names.index(container_name_or_id)
-
-        container_id = container_ids[index]
-        container_name = container_names[index]
-        container_port = container_ports[index]
-        container_state = container_states[index]
-        labels = container_labels[index]
-
-        all_labels = image_labels.copy()
+        all_labels = image.labels.copy()
         all_labels.update(labels)
 
         network_settings = {}
 
-        if container_port:
+        if container.ports:
             network_settings['Ports'] = {}
 
-            for port_settings in container_port:
+            for port_settings in container.ports:
                 target = '{}/{}'.format(port_settings.get('PrivatePort', ''),
                                         port_settings.get('Type', 'tcp'))
                 host_ip = port_settings.get('IP', '')
@@ -167,165 +221,133 @@ def mock_inspect_container(container_ids, container_names,
                     {'HostIp': str(host_ip),
                      'HostPort': str(host_port)}]
 
-        return {'State': container_state,
-                'Name': '/'+container_name,
-                'Image': image_id,
+        return {'State': container.state,
+                'Name': '/'+container.name,
+                'Image': image.id,
                 'Config': {
-                    'Image': image_name,
+                    'Image': image.name,
                     'Labels': all_labels},
-                'Id': container_id,
+                'Id': container.id,
                 'NetworkSettings': network_settings
                 }
 
-    return inspect_container
+    def port(self, container_name_or_id, private_port):
+        container = self._find_container(container_name_or_id)
 
+        try:
+            host_ip = container.ports[0]['IP']
+            host_port = container.ports[0]['PublicPort']
+            return [{
+                'HostIp': host_ip,
+                'HostPort': host_port
+            }]
+        except (AttributeError, IndexError, KeyError):
+            return None
 
-def mock_inspect_image(image_ids, image_names, image_labels):
+    def start(self, *args, **kwargs):
+        print("VirtualDockerClient.start called with ", args, kwargs)
 
-    def inspect_image(image_name_or_id):
-        if image_name_or_id not in image_ids+image_names:
+    def stop(self, *args, **kwargs):
+        print("VirtualDockerClient.stop called with ", args, kwargs)
+
+    def remove_container(self, container, *args, **kwargs):
+        container = self._find_container(container)
+        self._containers.remove(container)
+
+    def info(self, *args, **kwargs):
+        return {
+            "ID": 'HYXE:PEQI:7RBH:H5FO:YBA3:V6YK:JIVJ:ALZP:A2YO:ZJ2K:K5BN:JGAC',  # noqa
+            'Containers': len(self._containers),
+            'ContainersPaused': len([x for x in self._containers
+                                     if x.state == "paused"]),
+            'ContainersRunning': len([x for x in self._containers
+                                      if x.state == "running"]),
+            'ContainersStopped': len([x for x in self._containers
+                                      if x.state == "stopped"]),
+
+        }
+
+    def create_host_config(self, **kwargs):
+        return {'NetworkMode': 'default'}
+
+    # Additional API for convenience's sake
+
+    def add_container_from_raw_info(self, id, name,
+                                    image, labels, ports, state):
+        self._containers.append(
+            _Container(id, name, image, labels, ports, state)
+        )
+
+    def _find_image(self, image_name_or_id):
+        image_ids = {image.id: image for image in self._images}
+        image_names = {image.name: image for image in self._images}
+
+        image = image_ids.get(image_name_or_id)
+        if image is None:
+            image = image_names.get(image_name_or_id)
+
+        if image is None:
             raise docker.errors.NotFound(
                 'No such image: {}'.format(image_name_or_id),
-                response=docker_response(404))
+                response=self._docker_response(404))
 
-        try:
-            index = image_ids.index(image_name_or_id)
-        except ValueError:
-            index = image_names.index(image_name_or_id)
+        return image
 
-        image_name = image_names[index]
-        image_id = image_ids[index]
-        labels = image_labels[index]
+    def _find_container(self, container_name_or_id):
+        container_ids = {container.id: container
+                         for container in self._containers}
+        container_names = {container.name: container
+                           for container in self._containers}
 
-        return {'Config': {'Cmd': None,
-                           'Domainname': '',
-                           'Entrypoint': ['/startup.sh'],
-                           'ExposedPorts': {'8888/tcp': {}},
-                           'Labels': labels},
-                'Id': image_id,
-                'RepoTags': [image_name]}
+        container = container_ids.get(container_name_or_id)
+        if container is None:
+            container = container_names.get(container_name_or_id)
 
-    return inspect_image
-
-
-def mock_images(image_ids, image_names, image_labels):
-    def images():
-        return [{'Created': '2 days ago',
-                 'Id': image_id,
-                 'Labels': label,
-                 'RepoTags': [image_name]}
-                for image_id, image_name, label in zip(image_ids,
-                                                       image_names,
-                                                       image_labels)]
-    return images
-
-
-def mock_container_port(container_ids, container_names, container_ports):
-    def port(container_name_or_id, *args, **kwargs):
-        if container_name_or_id not in container_ids+container_names:
+        if container is None:
             raise docker.errors.NotFound(
-                "No such container: {} ".format(container_name_or_id),
-                response=docker_response(404))
+                'Container {} not found'.format(container_name_or_id),
+                response=self._docker_response(404))
 
-        try:
-            index = container_ids.index(container_name_or_id)
-        except ValueError:
-            index = container_names.index(container_name_or_id)
+        return container
 
-        container_port = container_ports[index]
+    def _docker_response(self, status_code=200, content='',
+                         headers=None, reason=None,
+                         request=None):
+        res = requests.Response()
+        res.status_code = status_code
+        content = json.dumps(content).encode('ascii')
+        res._content = content
+        res.headers = requests.structures.CaseInsensitiveDict(headers or {})
+        res.reason = reason
+        res.request = request
+        return res
 
-        if container_port:
-            host_ip = container_port[0].get('IP', '')
-            host_port = container_port[0].get('PublicPort', '')
-        else:
-            host_ip = host_port = ''
+    def _new_id(self):
+        """Creates a new random sha256 id."""
+        return hashlib.sha256(uuid.uuid4().hex.encode('utf-8')).hexdigest()
 
-        return [{'HostIp': host_ip, 'HostPort': host_port}]
-    return port
-
-
-def create_docker_client(image_names=FAKE_IMAGE_NAMES,
-                         image_ids=FAKE_IMAGE_IDS,
-                         image_labels=None,
-                         container_names=FAKE_CONTAINER_NAMES,
-                         container_ids=FAKE_CONTAINER_IDS,
-                         container_ports=None, container_states=None,
-                         container_labels=None):
-    """Returns a mock synchronous docker client to return canned
-    responses.
-
-    Parameters
-    ----------
-    image_names : tuple
-        tuple of image names the docker client should see
-
-    image_ids : tuple
-        tuple of image ids associated with image_names
-
-    image_labels : tuple
-        tuple of dict containing the labels associated with
-        each image
-
-    container_names : tuple
-        Names of the containers the docker client should see
-
-    container_ids : tuple
-        tuple of container ids associated with the container_names
-
-    container_ports : tuple
-        tuple of lists, each list describe the ports available for each
-        container
-
-    container_states : tuple
-        tuple of str or dict, states of the corresponding container
-
-    container_labels : tuple
-        tuple of dict containing the labels associated with each
-        container
-
-    Returns
-    -------
-    docker_client : mock.Mock
-        with specification given by docker.Client
-    """
-    # Default image labels etc may contain mutable, so they are set here
-    if image_labels is None:
-        image_labels = get_fake_image_labels(len(image_ids))
-
-    if container_ports is None:
-        container_ports = get_fake_container_ports(len(container_ids))
-
-    if container_states is None:
-        container_states = get_fake_container_states(len(container_ids))
-
-    if container_labels is None:
-        container_labels = get_fake_container_labels(len(container_ids))
-
-    # mock the docker client
-    docker_client = mock.Mock(spec=docker.Client)
-    docker_client.inspect_image = mock_inspect_image(
-        image_ids, image_names, image_labels)
-
-    docker_client.inspect_container = mock_inspect_container(
-        container_ids, container_names, container_ports, container_states,
-        container_labels, image_ids[0], image_names[0], image_labels[0])
-
-    docker_client.containers = mock_containers(
-        container_ids, container_names, container_ports, container_states,
-        container_labels, image_ids[0], image_names[0], image_labels[0])
-
-    docker_client.info = mock.Mock(return_value={"ID": "something"})
-    docker_client.port = mock_container_port(container_ids,
-                                             container_names,
-                                             container_ports)
-    docker_client.images = mock_images(image_ids, image_names, image_labels)
-
-    # These are basic mocked objects
-    docker_client.create_host_config = mock.Mock(return_value={})
-    docker_client.create_container = mock.Mock(
-        return_value={"Id": container_ids[0]})
-    docker_client.start = mock.Mock()
-    docker_client.stop = mock.Mock()
-    docker_client.remove_container = mock.Mock()
-
-    return docker_client
+    def _init_available_images(self):
+        """Provides the available images. Similar to an "in-memory DockerHub".
+        """
+        return [
+            _Image(
+                id="sha256:2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",  # noqa
+                name='simphonyproject/simphony-mayavi:0.6.0',
+                labels={
+                    SIMPHONY_NS.description: 'Ubuntu machine with mayavi preinstalled',  # noqa
+                    SIMPHONY_NS.ui_name: 'Mayavi 4.4.4',
+                    SIMPHONY_NS.type: 'vncapp',
+                    SIMPHONY_NS_ENV['x11-width']: '',
+                    SIMPHONY_NS_ENV['x11-height']: '',
+                    SIMPHONY_NS_ENV['x11-depth']: '',
+                },
+                exposed_ports=["8888/tcp"]
+            ),
+            _Image(
+                id="sha256:86acc3c585a1bb1f3be294c2a02fc69a145e5e76d580a5c7c120ff1ecd1a86ab",  # noqa
+                name='simphonyproject/ubuntu-image:latest',
+                labels={
+                    SIMPHONY_NS.description: 'A vanilla Ubuntu installation',  # noqa
+                },
+                exposed_ports=["8888/tcp"]
+            )]

@@ -4,7 +4,7 @@ from docker.utils import kwargs_from_env
 
 from remoteappmanager.docker.async_docker_client import AsyncDockerClient
 from remoteappmanager.tests.mocking.virtual.docker_client import (
-    create_docker_client)
+    VirtualDockerClient)
 
 
 class TestAsyncDockerClient(AsyncTestCase):
@@ -27,7 +27,7 @@ class TestAsyncDockerClient(AsyncTestCase):
     @gen_test
     def test_info(self):
         client = AsyncDockerClient()
-        client._sync_client = create_docker_client()
+        client._sync_client = VirtualDockerClient.with_containers()
         response = yield client.info()
         # Test contents of response
         self.assertIsInstance(response, dict)

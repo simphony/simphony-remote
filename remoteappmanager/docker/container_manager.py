@@ -256,7 +256,13 @@ class ContainerManager(LoggingMixin):
                                                 mapping_id=mapping_id,
                                                 user_name=user_name)
         if len(containers) > 1:
-            raise MultipleResultsFound()
+            raise MultipleResultsFound(
+                "Found {} results for request {}, {}, {}".format(
+                    len(containers),
+                    url_id,
+                    mapping_id,
+                    user_name
+                ))
 
         if len(containers) == 1:
             return containers[0]
@@ -532,7 +538,6 @@ class ContainerManager(LoggingMixin):
         Note: The container is only stopped if it belongs to the same
         realm.
         """
-
         self.log.info("Stopping container {}".format(container_id))
 
         container_info = yield self._get_container_info(container_id)

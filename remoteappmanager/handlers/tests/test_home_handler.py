@@ -14,9 +14,9 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
         return app
 
     def test_home(self):
-        res = self.fetch("/user/username/",
+        res = self.fetch("/user/johndoe/",
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-johndoe=foo"
                          }
                          )
 
@@ -25,9 +25,9 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
 
     def test_failed_auth(self):
         self._app.hub.verify_token.return_value = {}
-        res = self.fetch("/user/username/",
+        res = self.fetch("/user/johndoe/",
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-johndoe=foo"
                          }
                          )
 

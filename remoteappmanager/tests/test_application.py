@@ -47,7 +47,7 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
         self.assertIsNotNone(app.reverse_proxy)
         self.assertIsNotNone(app.container_manager)
         self.assertIsNotNone(app.hub)
-        self.assertEqual(app.user.name, "username")
+        self.assertEqual(app.user.name, "johndoe")
         self.assertEqual(app.user.account, None)
 
     def test_error_default_value_with_unimportable_accounting(self):
@@ -88,7 +88,7 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
         self.assertIsNotNone(app.file_config)
         self.assertIsNotNone(app.db)
         self.assertIsNotNone(app.user)
-        self.assertEqual(app.user.name, "username")
+        self.assertEqual(app.user.name, "johndoe")
         self.assertIsInstance(app.user.account, test_csv_db.CSVUser)
 
     def test_start(self):

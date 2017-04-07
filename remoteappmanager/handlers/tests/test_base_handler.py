@@ -32,9 +32,9 @@ class TestBaseHandlerInvalidAccounting(TestBaseHandler):
         return file_config
 
     def test_home_internal_error(self):
-        res = self.fetch("/user/username/",
+        res = self.fetch("/user/johndoe/",
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-johndoe=foo"
                          }
                          )
 
@@ -50,9 +50,9 @@ class TestBaseHandlerDatabaseError(TestBaseHandler):
         return file_config
 
     def test_home_internal_error(self):
-        res = self.fetch("/user/username/",
+        res = self.fetch("/user/johndoe/",
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-johndoe=foo"
                          }
                          )
 
@@ -69,9 +69,9 @@ class TestBaseHandlerGATracking(TestBaseHandler):
         return file_config
 
     def test_ga_tracking(self):
-        res = self.fetch("/user/username/",
+        res = self.fetch("/user/johndoe/",
                          headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
+                             "Cookie": "jupyter-hub-token-johndoe=foo"
                          }
                          )
 

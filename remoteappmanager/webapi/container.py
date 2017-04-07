@@ -260,7 +260,7 @@ class Container(Resource):
             e.reason = 'timeout'
             raise e
         except Exception as e:
-            self.log.error(
+            self.log.exception(
                 "Unhandled error starting {user}'s "
                 "container: {error}".format(user=user_name, error=e)
             )
