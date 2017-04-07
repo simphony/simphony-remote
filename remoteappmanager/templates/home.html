@@ -137,9 +137,8 @@
 
             <!-- Application list -->
             {{#each application_entry_list as |application index|}}
-                <li onclick={{action "toggle_app_clicked" index}}
-                    data-index="{{index}}"
-                    class="{{ if (equal selected_app index) 'active' }}">
+                <li class="{{ if (equal selected_app index) 'active' }}"
+                    onclick={{action "toggle_app_clicked" index}}>
 
                     <span class="{{application.status}}-badge"></span>
 
@@ -149,7 +148,6 @@
 
                         {{#if (is-running application.status)}}
                             <button class="stop-button"
-                                    data-index="{{index}}"
                                     onclick={{action "toggle_app_stopped" application}}>
                                 <i class="fa fa-times"></i>
                             </button>
