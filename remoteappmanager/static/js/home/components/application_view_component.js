@@ -38,9 +38,7 @@ define([
 
         noPadding: Ember.computed('application.status', function() {
             var app_status = this.get('application.status');
-            return !(
-                app_status === Status.STOPPED || app_status === Status.STARTING
-            );
+            return app_status === Status.RUNNING;
         }),
 
         application_location: Ember.computed('application.app_data', function() {

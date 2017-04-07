@@ -162,7 +162,7 @@
 
         <script type="text/x-handlebars" data-template-name="components/application-view">
             <!-- Start application form -->
-            {{#if (or (is-stopped application.status)(is-starting application.status))}}
+            {{#unless (is-running application.status)}}
                  <div class="row">
                      <div class="col-md-offset-2 col-md-8">
                          <div class="box box-primary">
@@ -186,7 +186,7 @@
                                  </ul>
                                  <h4>Configuration</h4>
                                  <form class="configuration">
-                                     <fieldset disabled={{ if (is-starting application.status) true }}>
+                                     <fieldset disabled={{ if (or (is-starting application.status)(is-stopping application.status)) true }}>
                                          <div class="form-group">
                                              <label>Resolution</label>
                                              <select class="form-control" onchange={{action "toggle_resolution_changed"}}>
@@ -202,7 +202,7 @@
                                  <button
                                          onclick={{action "start_application"}}
                                          class="btn btn-primary pull-right start-button"
-                                         disabled={{ if (is-starting application.status) true }}>
+                                         disabled={{ if (or (is-starting application.status)(is-stopping application.status)) true }}>
                                      Start
                                  </button>
                              </div>
@@ -218,7 +218,7 @@
                         src="{{ application_location }}"
                         style={{iframe_style}}>
                 </iframe>
-            {{/if}}
+            {{/unless}}
         </script>
         {% endraw %}
 
