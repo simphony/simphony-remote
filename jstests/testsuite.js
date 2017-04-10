@@ -18,7 +18,7 @@
         }
     });
 
-	require([
+    require([
         "tests/test_utils.js",
         "tests/test_analytics.js"
         ], function() {
@@ -29,6 +29,6 @@
 
             QUnit.load();
             QUnit.start();
-	    });
+        });
 }());
 
