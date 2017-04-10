@@ -19,19 +19,3 @@ class TestContainerInteraction(SeleniumTestBase):
                 driver.find_element_by_css_selector("#applist .app-icon")
                 ).click(driver.find_element_by_css_selector(".stop-button")
             ).perform()
-
-    def test_focus(self):
-        driver = self.driver
-        with self.running_container():
-            iframe = driver.find_element_by_css_selector("iframe")
-            self.assertEqual(iframe, self.driver.switch_to.active_element)
-
-            search_box = driver.find_element_by_css_selector(
-                "input.form-control")
-            ActionChains(driver).move_to_element(search_box).click().perform()
-
-            self.assertNotEqual(iframe, self.driver.switch_to.active_element)
-
-            self.click_by_css_selector("#applist > li > a")
-
-            self.assertEqual(iframe, self.driver.switch_to.active_element)
