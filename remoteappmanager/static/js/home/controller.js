@@ -26,7 +26,7 @@ require([
         return $.get(template_location, function(template) {
             Ember.TEMPLATES[template_name] = Ember.Handlebars.compile(template);
         });
-    }
+    };
 
     // Load templates
     var load_templates = [
