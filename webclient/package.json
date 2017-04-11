@@ -1,9 +1,9 @@
 {
   "name": "webclient",
-  "version": "0.0.0",
-  "description": "Small description for webclient goes here",
-  "license": "MIT",
-  "author": "",
+  "version": "1.2.0.dev0",
+  "description": "Ember application which create front-end user application",
+  "license": "BSD",
+  "author": "Enthought",
   "directories": {
     "doc": "doc",
     "test": "tests"
