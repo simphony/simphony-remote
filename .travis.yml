@@ -23,10 +23,6 @@ before_install:
 
 install:
     - make install
-    - pushd webclient
-    - npm install
-    - bower install
-    - popd
 
 before_script:
     - make devdeps
@@ -35,6 +31,7 @@ script:
     - flake8 .
     - make pythontest
     - make jstest
+    - make embertest
     - make docs
     - make testimages
     - make testdb
@@ -48,9 +45,6 @@ script:
     - popd
     - sleep 3
     - DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
-    - pushd webclient
-    - npm test
-    - popd
 
 after_success:
     - coverage run -m tornado.testing discover
