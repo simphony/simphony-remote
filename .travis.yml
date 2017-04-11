@@ -17,7 +17,7 @@ before_install:
     - make pythondeps
     - python -c "import setuptools; print(setuptools.__version__)"
     - pip --version
-    - npm install -g npm
+    - npm install npm
     - npm config set spin false
     - npm install -g bower phantomjs-prebuilt
 
