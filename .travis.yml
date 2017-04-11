@@ -8,6 +8,9 @@ dist: trusty
 addons:
     firefox: "45.0"
 
+node_js:
+    - "7"
+
 before_install:
     - firefox --version
     - make deps
