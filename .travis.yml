@@ -14,9 +14,14 @@ before_install:
     - make pythondeps
     - python -c "import setuptools; print(setuptools.__version__)"
     - pip --version
+    - npm install -g bower phantomjs-prebuilt
 
 install:
     - make install
+    - pushd webclient
+    - npm install
+    - bower install
+    - popd
 
 before_script:
     - make devdeps
@@ -38,6 +43,9 @@ script:
     - popd
     - sleep 3
     - DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
+    - pushd webclient
+    - npm test
+    - popd
 
 after_success:
     - coverage run -m tornado.testing discover
