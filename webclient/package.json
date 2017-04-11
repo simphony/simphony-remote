@@ -1,6 +1,6 @@
 {
   "name": "webclient",
-  "version": "1.2.0.dev0",
+  "version": "1.2.0",
   "description": "Ember application which create front-end user application",
   "license": "BSD",
   "author": "Enthought",
