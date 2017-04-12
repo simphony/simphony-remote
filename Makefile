@@ -61,6 +61,7 @@ install:
 	pushd webclient; \
 		npm install; \
 		bower install; \
+		npm run build; \
 		popd
 
 .PHONY: certs
