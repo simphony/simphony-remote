@@ -17,9 +17,7 @@
   <!-- /.search form -->
 
   <!-- Sidebar Menu -->
-  <ul class="sidebar-menu">
-    <li class="header">APPLICATIONS</li>
-  </ul>
+  <ul class="sidebar-menu" id="react-root"></ul>
 
   <ul class="sidebar-menu" id="applist">
   </ul>
@@ -35,5 +33,6 @@
     {{  super() }}
     <script type="text/javascript">
     require(["home/controller"]);
+    require(["home/react-output"]);
     </script>
 {% endblock %}
