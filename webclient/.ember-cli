@@ -1,0 +1,4 @@
+{
+  "disableAnalytics": false,
+  "output-path": "../build/lib/remoteappmanager/static/dist"
+}

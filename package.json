@@ -1,6 +1,6 @@
 {
     "name": "simphony-remote-deps",
-    "version": "0.0.0",
+    "version": "1.2.0",
     "description": "SimPhoNy-remote nodejs dependencies",
     "author": "Enthought",
     "license": "BSD",

@@ -8,12 +8,17 @@ dist: trusty
 addons:
     firefox: "45.0"
 
+node_js:
+    - "6"
+
 before_install:
     - firefox --version
     - make deps
     - make pythondeps
     - python -c "import setuptools; print(setuptools.__version__)"
     - pip --version
+    - npm config set spin false
+    - npm install -g bower phantomjs-prebuilt
 
 install:
     - make install
@@ -25,6 +30,7 @@ script:
     - flake8 .
     - make pythontest
     - make jstest
+    - make embertest
     - make docs
     - make testimages
     - make testdb

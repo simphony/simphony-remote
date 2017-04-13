@@ -18,3 +18,15 @@ dist/
 jupyterhub/remoteappmanager.db
 jupyterhub/test.key.org
 remoteappmanager/version.py
+
+# webclient
+webclient/dist
+webclient/tmp
+webclient/node_modules
+webclient/bower_components
+webclient/.sass-cache
+webclient/connect.lock
+webclient/coverage/*
+webclient/libpeerconnection.log
+webclient/npm-debug.log*
+webclient/testem.log
