@@ -13,8 +13,8 @@
         "configurable-http-proxy": "git://github.com/jupyterhub/configurable-http-proxy.git#2.0.1"
     },
     "devDependencies": {
-	    "jshint": "*",
-	    "node-qunit-phantomjs": "*"
+        "jshint": "*",
+        "node-qunit-phantomjs": "*"
     }
 }
 
