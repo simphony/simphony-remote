@@ -13,7 +13,8 @@ define([
         data: {
             loading: true,
             application_list: [],
-            selected_app: null
+            selected_app: null,
+            selected_app_callback: function() {} // Temporary
         },
 
         methods: {
@@ -34,6 +35,10 @@ define([
                     app_data.image.name
                 );
             }
+        },
+
+        watch: {
+            selected_app: function() { this.selected_app_callback(); }
         }
     });
 

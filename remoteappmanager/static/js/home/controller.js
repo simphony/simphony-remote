@@ -1,5 +1,6 @@
 /*globals: require, console*/
 require([
+    "init",
     "jquery",
     "urlutils",
     "dialogs",
@@ -9,6 +10,7 @@ require([
     "home/views/application_view",
     "jsapi/v1/resources"
 ], function(
+    init,
     $,
     urlutils,
     dialogs,
@@ -20,20 +22,22 @@ require([
     "use strict";
 
     var ga = gamodule.init();
+    init.handlebars();
 
     // This model keeps the retrieved content from the REST query locally.
     // It is only synchronized at initial load.
     var model = new models.ApplicationListModel();
-    var app_list_view = new application_list_view.ApplicationListView(model);
+    var app_list_view = application_list_view.applicationListView;
     var app_view = new application_view.ApplicationView(model);
 
-    app_list_view.entry_clicked = function (index) {
+    // Temporary solution
+    app_list_view.selected_app_callback = function () {
+        var index = app_list_view.selected_app;
         model.selected_index = index;
-        app_list_view.update_selected();
         app_view.render(false, 200);
     };
 
-    app_list_view.stop_button_clicked = function(index) {
+    /*app_list_view.stop_button_clicked = function(index) {
         if (model.status[index] === models.Status.STOPPING) {
             return;
         }
@@ -65,7 +69,7 @@ require([
                     app_view.render(true);
                     dialogs.webapi_error_dialog(error);
                 });
-    };
+    };*/
 
     app_view.start_button_clicked = function (index) {
         // The container is not running. This is a start button.
@@ -78,7 +82,6 @@ require([
 
         model.status[index] = models.Status.STARTING;
         app_view.render(false, null);
-        app_list_view.update_entry(index);
 
         var configurables_data = {};
         var configurables = model.configurables[index];
@@ -104,27 +107,30 @@ require([
 
             model.update_idx(index)
                 .always(function() {
-                    app_list_view.update_entry(index);
-                    app_list_view.update_selected();
                     app_view.render(true, 200);
                 })
                 .fail(function(error) {
                     model.status[index] = models.Status.STOPPED;
-                    app_list_view.update_entry(index);
                     app_view.render(true, 200);
                     dialogs.webapi_error_dialog(error);
                 });
         }).fail(function(error) {
             model.status[index] = models.Status.STOPPED;
-            app_list_view.update_entry(index);
-            app_list_view.update_selected();
             app_view.render(true, 200);
             dialogs.webapi_error_dialog(error);
         });
     };
 
     $.when(model.update()).done(function () {
-        app_list_view.render();
+        app_list_view.loading = false;
+        var num_app = model.app_data.length;
+        for(var i = 0; i < num_app; i++) {
+            app_list_view.application_list.push({
+                app_data: model.app_data[i],
+                status: model.status[i].toLowerCase()
+            });
+        }
+
         app_view.render(false, 200);
     });
 
