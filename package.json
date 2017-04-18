@@ -1,20 +1,20 @@
 {
-    "name": "simphony-remote-deps",
-    "version": "0.0.0",
-    "description": "SimPhoNy-remote nodejs dependencies",
-    "author": "Enthought",
-    "license": "BSD",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/simphony-remote/simphony-remote.git"
-    },
-    "dependencies": {
-        "bower": "*",
-        "configurable-http-proxy": "git://github.com/jupyterhub/configurable-http-proxy.git#2.0.1"
-    },
-    "devDependencies": {
-	    "jshint": "*",
-	    "node-qunit-phantomjs": "*"
-    }
+  "name": "simphony-remote-deps",
+  "version": "1.2.0",
+  "description": "SimPhoNy-remote nodejs dependencies",
+  "author": "Enthought",
+  "license": "BSD",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simphony-remote/simphony-remote.git"
+  },
+  "dependencies": {
+    "bower": "*",
+    "configurable-http-proxy": "git://github.com/jupyterhub/configurable-http-proxy.git#2.0.1",
+    "vue": "^2.2.6"
+  },
+  "devDependencies": {
+    "jshint": "*",
+    "node-qunit-phantomjs": "*"
+  }
 }
-
