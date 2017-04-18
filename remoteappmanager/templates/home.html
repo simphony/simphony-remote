@@ -17,11 +17,42 @@
   <!-- /.search form -->
 
   <!-- Sidebar Menu -->
-  <ul class="sidebar-menu">
+  <ul id="applist" class="sidebar-menu">
     <li class="header">APPLICATIONS</li>
-  </ul>
 
-  <ul class="sidebar-menu" id="applist">
+    <!--
+      We initialize this element with "display: none" to prevent displaying
+      "No applications found" and the loading spinner at the same time
+    -->
+    <li v-show="application_list.length === 0 && !loading" style="display: none;">
+      <a href="#">No applications found</a>
+    </li>
+
+    <!-- Loading spinner -->
+    <li v-show="loading">
+      <a href="#">
+        <i class="fa fa-spinner fa-spin"></i>
+        <span>Loading</span>
+      </a>
+    </li>
+
+    <!-- Application list
+      The line 'v-show="true" style="display: none;"' is here to fix displaying
+      issues when the javascript is not loaded yet (temporary ?)
+    -->
+    <li v-for="(app, index) in application_list"
+        v-bind:class="{ active: index === selected_app }"
+        v-on:click="selected_app = index"
+        v-show="true" style="display: none;">
+
+      <span v-bind:class="app.status + '-badge'"></span>
+
+      <a href="#" class="truncate">
+        <img v-bind:src="get_icon_src(app.app_data)" class="app-icon">
+
+        <span>{% raw %} {{ get_app_name(app.app_data) }} {% endraw %}</span>
+      </a>
+    </li>
   </ul>
   <!-- /.sidebar-menu -->
 </section>
