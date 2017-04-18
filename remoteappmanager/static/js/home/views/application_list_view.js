@@ -1,6 +1,6 @@
 define([
     'urlutils',
-    'vue'
+    '../../components/vue/dist/vue'
 ], function (urlutils, Vue) {
     'use strict';
 
