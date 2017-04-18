@@ -1,30 +1,25 @@
 /*globals: require, console*/
 require([
-    "jquery", 
-    "urlutils", 
+    "jquery",
+    "urlutils",
     "dialogs",
     "gamodule",
-    "home/models", 
+    "home/models",
     "home/views/application_list_view",
     "home/views/application_view",
-    "jsapi/v1/resources",
-    "handlebars",
-    "init"
+    "jsapi/v1/resources"
 ], function(
-    $, 
-    urlutils, 
-    dialogs, 
-    gamodule, 
-    models, 
+    $,
+    urlutils,
+    dialogs,
+    gamodule,
+    models,
     application_list_view,
-    application_view, 
-    resources,
-    hb,
-    init) {
+    application_view,
+    resources) {
     "use strict";
 
     var ga = gamodule.init();
-    init.handlebars();
 
     // This model keeps the retrieved content from the REST query locally.
     // It is only synchronized at initial load.
@@ -37,18 +32,18 @@ require([
         app_list_view.update_selected();
         app_view.render(false, 200);
     };
-    
+
     app_list_view.stop_button_clicked = function(index) {
         if (model.status[index] === models.Status.STOPPING) {
             return;
         }
         model.status[index] = models.Status.STOPPING;
-        
+
         var app_info = model.app_data[index];
         var url_id = app_info.container.url_id;
 
         app_list_view.update_entry(index);
-        
+
         resources.Container.delete(url_id)
             .done(function () {
                 model.update_idx(index)
@@ -80,7 +75,7 @@ require([
         if (model.status[index] === models.Status.STARTING) {
             return;
         }
-        
+
         model.status[index] = models.Status.STARTING;
         app_view.render(false, null);
         app_list_view.update_entry(index);
@@ -96,7 +91,7 @@ require([
                 configurables_data[tag] = configurable.as_config_dict();
             }
         );
-       
+
         resources.Container.create({
             mapping_id: mapping_id,
             configurables: configurables_data
@@ -128,7 +123,7 @@ require([
         });
     };
 
-    $.when(model.update()).done(function () { 
+    $.when(model.update()).done(function () {
         app_list_view.render();
         app_view.render(false, 200);
     });

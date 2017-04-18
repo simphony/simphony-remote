@@ -1,7 +1,7 @@
 define([
     'urlutils',
-    '../components/vue/dist/vue'
-], function (urlutils) {
+    'vue'
+], function (urlutils, Vue) {
     'use strict';
 
     /* Create application_list ViewModel
