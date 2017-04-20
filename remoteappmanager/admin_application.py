@@ -15,10 +15,10 @@ class AdminApplication(BaseApplication):
     """Tornado main application"""
 
     def _webapi_resources(self):
-        return [admin.Container,
-                admin.Application,
-                admin.User,
-                admin.Accounting]
+        return [admin.ContainerHandler,
+                admin.ApplicationHandler,
+                admin.UserHandler,
+                admin.AccountingHandler]
 
     def _web_handlers(self):
         base_urlpath = self.command_line_config.base_urlpath

@@ -200,19 +200,28 @@ class TestContainer(WebAPITestCase):
         _, data = self.post(
             "/user/johndoe/api/v1/containers/",
             dict(
-                whatever="123"
+                name="123",
+                configurables={},
+                image_name="456",
             ),
             httpstatus.BAD_REQUEST
         )
 
-        self.assertEqual(data,
-                         {"type": "BadRepresentation",
-                          "message": "missing mapping_id"})
+        self.assertEqual(
+            data,
+            {"type": "BadRepresentation",
+             "message": "missing mandatory elements: {'mapping_id'}"
+             })
 
     def test_create_fails_for_invalid_mapping_id(self):
         _, data = self.post(
             "/user/johndoe/api/v1/containers/",
-            dict(mapping_id="whatever"),
+            dict(
+                mapping_id="whatever",
+                name="123",
+                configurables={},
+                image_name="456",
+            ),
             httpstatus.BAD_REQUEST
         )
 

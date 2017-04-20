@@ -1,17 +1,51 @@
 from tornado import gen
 from tornadowebapi.exceptions import NotFound
 from tornadowebapi.resource import Resource
+from tornadowebapi.resource_fragment import ResourceFragment
+from tornadowebapi.traitlets import Unicode, OneOf, Bool, List
+from tornadowebapi.resource_handler import ResourceHandler
 
 from remoteappmanager.webapi.decorators import authenticated
 
 
+class Container(ResourceFragment):
+    name = Unicode()
+    image_name = Unicode()
+    url_id = Unicode()
+
+
+class Policy(ResourceFragment):
+    allow_home = Bool()
+    volume_source = Unicode()
+    volume_target = Unicode()
+    volume_mode = Unicode()
+
+
+class Image(ResourceFragment):
+    name = Unicode()
+    ui_name = Unicode()
+    icon_128 = Unicode()
+    description = Unicode()
+    policy = OneOf(Policy)
+    configurables = List(Unicode)
+
+
 class Application(Resource):
+    image = OneOf(Image)
+    mapping_id = Unicode()
+    container = OneOf(Container)
+
+
+class ApplicationHandler(ResourceHandler):
+    resource_class = Application
+
     @gen.coroutine
     @authenticated
-    def retrieve(self, identifier):
+    def retrieve(self, instance):
         apps = self.application.db.get_apps_for_user(
             self.current_user.account
         )
+        identifier = instance.identifier
 
         # Convert the list of tuples in a dict
         apps_dict = {mapping_id: (app, policy)
@@ -33,7 +67,7 @@ class Application(Resource):
             user_name=self.current_user.name,
             mapping_id=identifier)
 
-        representation = {
+        instance.fill({
             "image": {
                 "name": image.name,
                 "ui_name": image.ui_name,
@@ -48,25 +82,21 @@ class Application(Resource):
                 "configurables": [conf.tag for conf in image.configurables]
             },
             "mapping_id": identifier,
-        }
+        })
 
         if len(containers):
             # We assume that we can only run one container only (although the
             # API considers a broader possibility for future extension.
             container = containers[0]
-            representation["container"] = dict(
-                name=container.name,
-                image_name=container.image_name,
-                url_id=container.url_id,
-            )
-        else:
-            representation["container"] = None
-
-        return representation
+            instance.container = Container().fill({
+                "name": container.name,
+                "image_name": container.image_name,
+                "url_id": container.url_id,
+            })
 
     @gen.coroutine
     @authenticated
-    def items(self):
+    def items(self, items_response):
         """Retrieves a dictionary containing the image and the associated
         container, if active, as values."""
         apps = self.application.db.get_apps_for_user(self.current_user.account)
@@ -78,4 +108,4 @@ class Application(Resource):
             if (yield container_manager.image(app.image)) is not None:
                 result.append(mapping_id)
 
-        return result
+        items_response.set(result)

@@ -9,7 +9,7 @@ from tornadowebapi.http import httpstatus
 
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.image import Image
-from remoteappmanager.webapi import Application
+from remoteappmanager.webapi import ApplicationHandler
 from remoteappmanager.tests.webapi_test_case import WebAPITestCase
 from remoteappmanager.tests.mocking.dummy import create_hub
 
@@ -29,7 +29,7 @@ class TestApplication(WebAPITestCase):
 
     def get_app(self):
         self.reg = registry.Registry()
-        self.reg.register(Application)
+        self.reg.register(ApplicationHandler)
         self.reg.authenticator = DummyAuthenticator
         handlers = self.reg.api_handlers('/')
         app = web.Application(handlers=handlers)

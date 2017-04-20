@@ -5,28 +5,29 @@ from tornado import gen
 
 from tornadowebapi import exceptions
 from tornadowebapi.resource import Resource
+from tornadowebapi.resource_handler import ResourceHandler
+from tornadowebapi.traitlets import Unicode, Dict, Absent
 
 from remoteappmanager.netutils import wait_for_http_server_2xx
 from remoteappmanager.webapi.decorators import authenticated
 
 
 class Container(Resource):
-    def validate_representation(self, representation):
-        try:
-            representation["mapping_id"]
-        except KeyError:
-            raise exceptions.BadRepresentation(message="missing mapping_id")
+    mapping_id = Unicode()
+    name = Unicode()
+    image_name = Unicode()
+    configurables = Dict(optional=True)
 
-        return representation
+
+class ContainerHandler(ResourceHandler):
+    resource_class = Container
 
     @gen.coroutine
     @authenticated
-    def create(self, representation):
-        """Create the container.
-        The representation should accept the application mapping id we
-        want to start"""
+    def create(self, resource, **kwargs):
+        """Create the container."""
 
-        mapping_id = representation["mapping_id"]
+        mapping_id = resource.mapping_id
 
         webapp = self.application
         account = self.current_user.account
@@ -50,8 +51,7 @@ class Container(Resource):
             raise exceptions.BadRepresentation(message="unrecognized image")
 
         try:
-            environment = self._environment_from_configurables(image,
-                                                               representation)
+            environment = self._environment_from_configurables(image, resource)
         except Exception:
             raise exceptions.BadRepresentation(message="invalid configurables")
 
@@ -69,7 +69,7 @@ class Container(Resource):
             raise exceptions.Unable(message=str(e))
 
         try:
-                yield self._wait_for_container_ready(container)
+            yield self._wait_for_container_ready(container)
         except Exception as e:
             self._remove_container_noexcept(container)
             raise exceptions.Unable(message=str(e))
@@ -82,40 +82,41 @@ class Container(Resource):
             self._remove_container_noexcept(container)
             raise exceptions.Unable(message=str(e))
 
-        return container.url_id
+        resource.identifier = container.url_id
 
     @gen.coroutine
     @authenticated
-    def retrieve(self, identifier):
+    def retrieve(self, resource, **kwargs):
         """Return the representation of the running container."""
         container_manager = self.application.container_manager
         container = yield container_manager.find_container(
-            url_id=identifier,
+            url_id=resource.identifier,
             user_name=self.current_user.name)
 
         if container is None:
             self.log.warning("Could not find container for id {}".format(
-                identifier))
+                resource.identifier))
             raise exceptions.NotFound()
 
-        return dict(
+        return resource.fill(dict(
             name=container.name,
-            image_name=container.image_name
-        )
+            image_name=container.image_name,
+            mapping_id=container.mapping_id,
+        ))
 
     @gen.coroutine
     @authenticated
-    def delete(self, identifier):
+    def delete(self, resource, **kwargs):
         """Stop the container."""
         container_manager = self.application.container_manager
         container = yield container_manager.find_container(
-            url_id=identifier,
+            url_id=resource.identifier,
             user_name=self.current_user.name
         )
 
         if not container:
             self.log.warning("Could not find container for id {}".format(
-                             identifier))
+                             resource.identifier))
             raise exceptions.NotFound()
 
         try:
@@ -127,18 +128,18 @@ class Container(Resource):
             # than log the problem and keep going, because we want to stop
             # the container regardless.
             self.log.exception("Could not remove reverse "
-                               "proxy for id {}".format(identifier))
+                               "proxy for id {}".format(resource.identifier))
 
         try:
             yield container_manager.stop_and_remove_container(
                 container.docker_id)
         except Exception:
             self.log.exception("Could not stop and remove container "
-                               "for id {}".format(identifier))
+                               "for id {}".format(resource.identifier))
 
     @gen.coroutine
     @authenticated
-    def items(self):
+    def items(self, items_response, **kwargs):
         """"Return the list of containers we are currently running."""
         container_manager = self.application.container_manager
 
@@ -159,9 +160,11 @@ class Container(Resource):
                 user_name=self.current_user.name,
                 mapping_id=mapping_id)
 
-            running_containers.append(container.url_id)
+            rest_container = Container(identifier=container.url_id)
+            rest_container.fill(container)
+            running_containers.append(rest_container)
 
-        return running_containers
+        items_response.set(running_containers)
 
     ##################
     # Private
@@ -269,16 +272,18 @@ class Container(Resource):
 
         return container
 
-    def _environment_from_configurables(self, image, representation):
+    def _environment_from_configurables(self, image, resource):
         """Helper routine: extracts the configurables from the
         image, matches them to the appropriate configurables
         data in the representation, and returns the resulting environment
         """
         env = {}
 
+        if image.configurables == Absent:
+            return env
+
         for img_conf in image.configurables:
-            config_dict = representation.get(
-                "configurables", {}).get(img_conf.tag, {})
+            config_dict = resource.configurables.get(img_conf.tag)
             env.update(img_conf.config_dict_to_env(config_dict))
 
         return env
