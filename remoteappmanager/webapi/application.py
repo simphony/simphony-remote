@@ -32,8 +32,7 @@ class Image(ResourceFragment):
 
 class Application(Resource):
     image = OneOf(Image)
-    mapping_id = Unicode()
-    container = OneOf(Container)
+    container = OneOf(Container, optional=True)
 
 
 class ApplicationHandler(ResourceHandler):
@@ -106,6 +105,8 @@ class ApplicationHandler(ResourceHandler):
         result = []
         for mapping_id, app, policy in apps:
             if (yield container_manager.image(app.image)) is not None:
-                result.append(mapping_id)
+                resource = self.resource_class(identifier=mapping_id)
+
+                result.append(resource)
 
         items_response.set(result)

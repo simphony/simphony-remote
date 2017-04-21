@@ -26,13 +26,21 @@ class TestContainer(WebAPITestCase):
         manager = self._app.container_manager
         manager.image = mock_coro_factory(Image())
         manager.find_containers = mock_coro_factory(
-            [DockerContainer()])
+            [
+                DockerContainer(user="johndoe",
+                                mapping_id="whatever",
+                                url_id="12345",
+                                name="container",
+                                image_name="image")
+                ])
 
         code, data = self.get(
             "/user/johndoe/api/v1/containers/",
             httpstatus.OK)
 
-        self.assertEqual(data, {"items": ["", ""]})
+        # We get two because we have two mapping ids, hence the find_containers
+        # gets called once per each mapping id.
+        self.assertEqual(data, {"items": ["12345", "12345"]})
 
     def test_create(self):
         with patch("remoteappmanager"
@@ -170,6 +178,8 @@ class TestContainer(WebAPITestCase):
                 "/user/johndoe/api/v1/containers/",
                 dict(
                     mapping_id="cbaee2e8ef414f9fb0f1c97416b8aa6c",
+                    image_name="image",
+                    name="container",
                     configurables={
                         "resolution": {
                         }
@@ -181,6 +191,8 @@ class TestContainer(WebAPITestCase):
             self.post(
                 "/user/johndoe/api/v1/containers/",
                 dict(
+                    image_name="image",
+                    name="container",
                     mapping_id="cbaee2e8ef414f9fb0f1c97416b8aa6c",
                     configurables={
                     }
@@ -188,9 +200,12 @@ class TestContainer(WebAPITestCase):
                 httpstatus.CREATED
             )
 
+            print("YYY")
             self.post(
                 "/user/johndoe/api/v1/containers/",
                 dict(
+                    image_name="image",
+                    name="container",
                     mapping_id="cbaee2e8ef414f9fb0f1c97416b8aa6c",
                 ),
                 httpstatus.CREATED
@@ -210,7 +225,7 @@ class TestContainer(WebAPITestCase):
         self.assertEqual(
             data,
             {"type": "BadRepresentation",
-             "message": "missing mandatory elements: {'mapping_id'}"
+             "message": "Missing mandatory elements: {'mapping_id'}"
              })
 
     def test_create_fails_for_invalid_mapping_id(self):
@@ -231,13 +246,16 @@ class TestContainer(WebAPITestCase):
 
     def test_retrieve(self):
         self._app.container_manager.find_container = mock_coro_factory(
-            DockerContainer(user="johndoe")
+            DockerContainer(user="johndoe",
+                            mapping_id="whatever",
+                            name="container",
+                            image_name="image")
         )
         _, data = self.get("/user/johndoe/api/v1/containers/found/",
                            httpstatus.OK)
 
-        self.assertEqual(data["image_name"], "")
-        self.assertEqual(data["name"], "")
+        self.assertEqual(data["image_name"], "image")
+        self.assertEqual(data["name"], "container")
 
         self._app.container_manager.find_container = \
             mock_coro_factory(return_value=None)

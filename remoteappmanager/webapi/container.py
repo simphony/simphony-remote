@@ -13,10 +13,10 @@ from remoteappmanager.webapi.decorators import authenticated
 
 
 class Container(Resource):
-    mapping_id = Unicode()
-    name = Unicode()
-    image_name = Unicode()
-    configurables = Dict(optional=True)
+    mapping_id = Unicode(allow_empty=False, strip=True)
+    configurables = Dict(optional=True, scope="input")
+    name = Unicode(scope="output", allow_empty=False, strip=True)
+    image_name = Unicode(scope="output", allow_empty=False, strip=True)
 
 
 class ContainerHandler(ResourceHandler):
@@ -279,7 +279,7 @@ class ContainerHandler(ResourceHandler):
         """
         env = {}
 
-        if image.configurables == Absent:
+        if resource.configurables is Absent:
             return env
 
         for img_conf in image.configurables:

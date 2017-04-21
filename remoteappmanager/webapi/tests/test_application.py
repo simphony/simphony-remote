@@ -78,19 +78,18 @@ class TestApplication(WebAPITestCase):
         _, data = self.get("/api/v1/applications/one/", httpstatus.OK)
 
         self.assertEqual(data,
-                         {'container': None,
-                          'image': {
+                         {'image': {
+                              'configurables': [],
                               'description': '',
                               'icon_128': '',
                               'name': 'boo',
-                              'ui_name': 'foo_ui',
                               'policy': {
                                     "allow_home": True,
                                     "volume_mode": 'ro',
                                     "volume_source": "foo",
                                     "volume_target": "bar",
                               },
-                              'configurables': []
+                              'ui_name': 'foo_ui',
                           },
                           'mapping_id': 'one'})
 
@@ -106,7 +105,8 @@ class TestApplication(WebAPITestCase):
                          {'container':
                              {'image_name': 'xxx',
                               'name': 'container',
-                              'url_id': 'yyy'},
+                              'url_id': 'yyy'
+                              },
                           'image': {'description': '',
                                     'icon_128': '',
                                     'name': 'boo',

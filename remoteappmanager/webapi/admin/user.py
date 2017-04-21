@@ -20,9 +20,13 @@ class UserHandler(ResourceHandler):
     @authenticated
     def delete(self, resource, **kwargs):
         db = self.application.db
+        try:
+            identifier = int(resource.identifier)
+        except ValueError:
+            raise exceptions.NotFound()
 
         try:
-            db.remove_user(id=int(resource.identifier))
+            db.remove_user(id=identifier)
             self.log.info("Removed user with id {}".format(
                 resource.identifier))
         except db_exceptions.NotFound:
