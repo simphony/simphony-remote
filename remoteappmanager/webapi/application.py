@@ -90,13 +90,14 @@ class ApplicationHandler(ResourceHandler):
         container, if active, as values."""
         apps = self.application.db.get_apps_for_user(self.current_user.account)
 
-        container_manager = self.application.container_manager
-
         result = []
-        for mapping_id, app, policy in apps:
-            if (yield container_manager.image(app.image)) is not None:
-                resource = self.resource_class(identifier=mapping_id)
+        for mapping_id, _, _ in apps:
+            resource = self.resource_class(identifier=mapping_id)
+            try:
+                yield self.retrieve(resource)
+            except NotFound:
+                continue
 
-                result.append(resource)
+            result.append(resource)
 
         items_response.set(result)

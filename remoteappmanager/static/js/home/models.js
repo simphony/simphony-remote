@@ -25,54 +25,15 @@ define([
         var promise = $.Deferred();
 
         resources.Application.items()
-            .done(function (ids) {
-                // We neutralize the potential error from a jXHR request
-                // and make sure that all our requests "succeed" so that
-                // all/when can guarantee everything is done.
-
-                // These will go out of scope but they are still alive
-                // and performing to completion
-                var requests = [];
-                for (var i = 0; i < ids.length; i++) {
-                    requests.push($.Deferred());
+            .done(function (items, offset, total) {
+                var result = [];
+                for (var key in items) {
+                    if (!items.hasOwnProperty(key)) {
+                        continue;
+                    }
+                    result.push(items[key]);
                 }
-
-                // We need to bind with the current i index in the loop
-                // Hence we create these closures to grab the index for
-                // each new index
-                var done_callback = function(index) {
-                    return function(rep) {
-                        requests[index].resolve(rep);
-                    };
-                };
-                var fail_callback = function(index) {
-                    return function() {
-                        requests[index].resolve(null);
-                    };
-                };
-                
-                for (i = 0; i < ids.length; i++) {
-                    var id = ids[i];
-                    resources.Application.retrieve(id)
-                        .done(done_callback(i))
-                        .fail(fail_callback(i));
-
-                }
-
-                utils.all(requests)
-                    .done(function (promises) {
-                        // Fills the local application model with the results of the
-                        // retrieve promises.
-                        var data = [];
-                        for (var i = 0; i < promises.length; i++) {
-                            var result = promises[i];
-                            if (result !== null) {
-                                data.push(result);
-                            }
-                        }
-                        promise.resolve(data);
-                    });
-
+                promise.resolve(result);
             })
             .fail(function() {
                 promise.resolve([]);
@@ -163,7 +124,7 @@ define([
         var self = this;
         var app_data = self.app_data[index];
         
-        if (app_data.container === null) {
+        if (app_data.container === undefined) {
             self.status[index] = Status.STOPPED;
         } else {
             self.status[index] = Status.RUNNING;
