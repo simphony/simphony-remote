@@ -18,13 +18,12 @@ class ContainerHandler(ResourceHandler):
     @authenticated
     def delete(self, resource, **kwargs):
         """Stop the container."""
+        identifier = resource.identifier
         container_manager = self.application.container_manager
         container = yield container_manager.find_container(
-            url_id=resource.identifier)
+            url_id=identifier)
 
         if not container:
-            self.log.warning("Could not find container for id {}".format(
-                resource.identifier))
             raise exceptions.NotFound()
 
         try:
@@ -35,7 +34,7 @@ class ContainerHandler(ResourceHandler):
             # the container regardless.
             self.log.exception(
                 "Could not remove reverse proxy for id {}".format(
-                    resource.identifier))
+                    identifier))
 
         try:
             yield container_manager.stop_and_remove_container(
@@ -43,4 +42,4 @@ class ContainerHandler(ResourceHandler):
         except Exception:
             self.log.exception(
                 "Could not stop and remove container for id {}".format(
-                    resource.identifier))
+                    identifier))

@@ -40,11 +40,11 @@ class ApplicationHandler(ResourceHandler):
 
     @gen.coroutine
     @authenticated
-    def retrieve(self, instance):
+    def retrieve(self, resource, **kwargs):
         apps = self.application.db.get_apps_for_user(
             self.current_user.account
         )
-        identifier = instance.identifier
+        identifier = resource.identifier
 
         # Convert the list of tuples in a dict
         apps_dict = {mapping_id: (app, policy)
@@ -66,36 +66,26 @@ class ApplicationHandler(ResourceHandler):
             user_name=self.current_user.name,
             mapping_id=identifier)
 
-        instance.fill({
-            "image": {
+        resource.image = Image()
+        resource.image.fill({
                 "name": image.name,
                 "ui_name": image.ui_name,
                 "icon_128": image.icon_128,
                 "description": image.description,
-                "policy": {
-                    "allow_home": policy.allow_home,
-                    "volume_source": policy.volume_source,
-                    "volume_target": policy.volume_target,
-                    "volume_mode": policy.volume_mode,
-                },
                 "configurables": [conf.tag for conf in image.configurables]
-            },
-            "mapping_id": identifier,
         })
+        resource.image.policy = Policy()
+        resource.image.policy.fill(policy)
 
         if len(containers):
             # We assume that we can only run one container only (although the
             # API considers a broader possibility for future extension.
-            container = containers[0]
-            instance.container = Container().fill({
-                "name": container.name,
-                "image_name": container.image_name,
-                "url_id": container.url_id,
-            })
+            resource.container = Container()
+            resource.container.fill(containers[0])
 
     @gen.coroutine
     @authenticated
-    def items(self, items_response):
+    def items(self, items_response, **kwargs):
         """Retrieves a dictionary containing the image and the associated
         container, if active, as values."""
         apps = self.application.db.get_apps_for_user(self.current_user.account)

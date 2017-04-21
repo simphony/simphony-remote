@@ -11,10 +11,10 @@ from remoteappmanager.db import exceptions as db_exceptions
 
 
 class Accounting(Resource):
-    user_name = Unicode()
-    image_name = Unicode()
+    user_name = Unicode(allow_empty=False, strip=True)
+    image_name = Unicode(allow_empty=False, strip=True)
     allow_home = Bool()
-    volume = Unicode(optional=True)
+    volume = Unicode(optional=True, allow_empty=False, strip=True)
 
     @classmethod
     def collection_name(cls):
@@ -44,7 +44,6 @@ class AccountingHandler(ResourceHandler):
             raise exceptions.NotFound()
 
         resource.identifier = id
-        return id
 
     @gen.coroutine
     @authenticated

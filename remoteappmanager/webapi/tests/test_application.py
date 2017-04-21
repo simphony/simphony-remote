@@ -90,8 +90,7 @@ class TestApplication(WebAPITestCase):
                                     "volume_target": "bar",
                               },
                               'ui_name': 'foo_ui',
-                          },
-                          'mapping_id': 'one'})
+                          }})
 
         self._app.container_manager.find_containers = \
             mock_coro_factory(return_value=[Container(
@@ -118,8 +117,8 @@ class TestApplication(WebAPITestCase):
                                         "volume_target": "bar",
                                     },
                                     'configurables': [],
-                                    },
-                          'mapping_id': 'one'})
+                                    }
+                          })
 
         self.get("/api/v1/applications/three/", httpstatus.NOT_FOUND)
 

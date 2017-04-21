@@ -28,8 +28,7 @@ class ApplicationHandler(ResourceHandler):
 
         try:
             db.remove_application(id=id)
-            self.log.info("Removed application with id {}".format(
-                resource.identifier))
+            self.log.info("Removed application with id {}".format(id))
         except db_exceptions.NotFound:
             raise exceptions.NotFound()
         except db_exceptions.UnsupportedOperation:

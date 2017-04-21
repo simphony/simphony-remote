@@ -27,8 +27,7 @@ class UserHandler(ResourceHandler):
 
         try:
             db.remove_user(id=identifier)
-            self.log.info("Removed user with id {}".format(
-                resource.identifier))
+            self.log.info("Removed user with id {}".format(identifier))
         except db_exceptions.NotFound:
             raise exceptions.NotFound()
         except db_exceptions.UnsupportedOperation:
