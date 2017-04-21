@@ -16,9 +16,9 @@ class Container(ResourceFragment):
 
 class Policy(ResourceFragment):
     allow_home = Bool()
-    volume_source = Unicode()
-    volume_target = Unicode()
-    volume_mode = Unicode()
+    volume_source = Unicode(allow_none=True)
+    volume_target = Unicode(allow_none=True)
+    volume_mode = Unicode(allow_none=True)
 
 
 class Image(ResourceFragment):
