@@ -133,8 +133,7 @@ class TestApplication(WebAPITestCase):
                                     "volume_source": "foo",
                                     "volume_target": "bar",
                               },
-                              'ui_name': 'foo_ui',
-                          }})
+                              'ui_name': 'foo_ui'}})
 
         self._app.container_manager.find_containers = \
             mock_coro_factory(return_value=[Container(

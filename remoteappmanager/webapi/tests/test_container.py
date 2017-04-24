@@ -53,8 +53,7 @@ class TestContainer(WebAPITestCase):
                     'name': 'container',
                     'mapping_id': 'whatever'
                 }
-            }
-        })
+            }})
 
     def test_create(self):
         with patch("remoteappmanager"
