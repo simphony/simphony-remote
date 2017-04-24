@@ -48,7 +48,16 @@
       <span v-bind:class="app.status.toLowerCase() + '-badge'"></span>
 
       <a href="#" class="truncate">
-        <img v-bind:src="get_icon_src(app.app_data)" class="app-icon">
+        <img class="app-icon"
+             v-on:mouseenter="mouse_enter(index)"
+             v-bind:src="get_icon_src(app.app_data)">
+
+        <button class="stop-button"
+                v-show="app.status === 'RUNNING' && index_mouse_over === index"
+                v-on:mouseleave="mouse_leave()"
+                v-on:click="stop_application(index)">
+          <i class="fa fa-times"></i>
+        </button>
 
         <span>{% raw %} {{ get_app_name(app.app_data) }} {% endraw %}</span>
       </a>

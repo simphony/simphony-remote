@@ -38,39 +38,36 @@ require([
         app_view.render(false, 200);
     };
 
-    /*app_list_view.stop_button_clicked = function(index) {
-        if (model.status[index] === models.Status.STOPPING) {
+    // Temporary solution, when ApplicationView will be a Vue Object the render
+    // will be automatically triggered
+    app_list_view.stop_application_callback = function(index) {
+        if (model.app_list[index].status === Status.STOPPING) {
             return;
         }
-        model.status[index] = models.Status.STOPPING;
+        model.app_list[index].status = Status.STOPPING;
 
-        var app_info = model.app_data[index];
+        var app_info = model.app_list[index].app_data;
         var url_id = app_info.container.url_id;
-
-        app_list_view.update_entry(index);
 
         resources.Container.delete(url_id)
             .done(function () {
                 model.update_idx(index)
                     .done(function() {
-                        app_list_view.update_entry(index);
                         app_view.render(true);
                     })
                     .fail(function(error) {
-                        model.status[index] = models.Status.STOPPED;
-                        app_list_view.update_entry(index);
+                        model.app_list[index].status = Status.STOPPED;
                         app_view.render(true);
                         dialogs.webapi_error_dialog(error);
                     });
                 })
             .fail(
                 function (error) {
-                    model.status[index] = models.Status.STOPPED;
-                    app_list_view.update_entry(index);
+                    model.app_list[index].status = Status.STOPPED;
                     app_view.render(true);
                     dialogs.webapi_error_dialog(error);
                 });
-    };*/
+    };
 
     app_view.start_button_clicked = function (index) {
         // The container is not running. This is a start button.
