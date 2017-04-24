@@ -24,7 +24,7 @@
       We initialize this element with "display: none" to prevent displaying
       "No applications found" and the loading spinner at the same time
     -->
-    <li v-show="application_list.length === 0 && !loading" style="display: none;">
+    <li v-show="!loading && model.app_list.length === 0" style="display: none;">
       <a href="#">No applications found</a>
     </li>
 
@@ -40,9 +40,9 @@
       The line 'v-show="true" style="display: none;"' is here to fix displaying
       issues when the javascript is not loaded yet (temporary ?)
     -->
-    <li v-for="(app, index) in application_list"
-        v-bind:class="{ active: index === selected_app }"
-        v-on:click="selected_app = index"
+    <li v-for="(app, index) in model.app_list"
+        v-bind:class="{ active: index === model.selected_index }"
+        v-on:click="model.selected_index = index"
         v-show="true" style="display: none;">
 
       <span v-bind:class="app.status + '-badge'"></span>

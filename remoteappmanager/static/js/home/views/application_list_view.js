@@ -12,8 +12,7 @@ define([
 
         data: {
             loading: true,
-            application_list: [],
-            selected_app: null,
+            model: null,
             selected_app_callback: function() {} // Temporary
         },
 
@@ -38,7 +37,7 @@ define([
         },
 
         watch: {
-            selected_app: function() { this.selected_app_callback(); }
+            model.selected_index: function() { this.selected_app_callback(); }
         }
     });
 
