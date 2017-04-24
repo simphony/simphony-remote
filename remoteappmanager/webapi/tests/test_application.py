@@ -61,14 +61,21 @@ class TestApplication(WebAPITestCase):
 
     def test_items(self):
         _, data = self.get("/api/v1/applications/", httpstatus.OK)
-        self.assertEqual(data, {"items": ["one", "two"]})
+        self.assertEqual(data, {
+            "offset": 0,
+            "total": 2,
+            "items": [{}, {}]
+        })
 
         # Check if nothing is returned if no images are present
         self._app.container_manager.image = mock_coro_factory(
             return_value=None)
 
         _, data = self.get("/api/v1/applications/", httpstatus.OK)
-        self.assertEqual(data, {"items": []})
+        self.assertEqual(data, {
+            "offset": 0,
+            "total": 0,
+            "items": {}})
 
     def test_items_no_user(self):
         self.reg.authenticator = NullAuthenticator
@@ -78,7 +85,9 @@ class TestApplication(WebAPITestCase):
         _, data = self.get("/api/v1/applications/one/", httpstatus.OK)
 
         self.assertEqual(data,
-                         {'image': {
+                         {
+                             'mapping_id': "one",
+                             'image': {
                               'configurables': [],
                               'description': '',
                               'icon_128': '',
@@ -101,23 +110,26 @@ class TestApplication(WebAPITestCase):
         _, data = self.get("/api/v1/applications/one/", httpstatus.OK)
 
         self.assertEqual(data,
-                         {'container':
-                             {'image_name': 'xxx',
-                              'name': 'container',
-                              'url_id': 'yyy'
-                              },
-                          'image': {'description': '',
-                                    'icon_128': '',
-                                    'name': 'boo',
-                                    'ui_name': 'foo_ui',
-                                    'policy': {
-                                        "allow_home": True,
-                                        "volume_mode": 'ro',
-                                        "volume_source": "foo",
-                                        "volume_target": "bar",
-                                    },
-                                    'configurables': [],
-                                    }
+                         {
+                             'mapping_id': "one",
+                             'container': {
+                                 'image_name': 'xxx',
+                                 'name': 'container',
+                                 'url_id': 'yyy'
+                                 },
+                             'image': {
+                                 'description': '',
+                                 'icon_128': '',
+                                 'name': 'boo',
+                                 'ui_name': 'foo_ui',
+                                 'policy': {
+                                     "allow_home": True,
+                                     "volume_mode": 'ro',
+                                     "volume_source": "foo",
+                                     "volume_target": "bar",
+                                 },
+                                 'configurables': [],
+                             }
                           })
 
         self.get("/api/v1/applications/three/", httpstatus.NOT_FOUND)

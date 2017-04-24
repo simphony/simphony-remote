@@ -31,6 +31,7 @@ class Image(ResourceFragment):
 
 
 class Application(Resource):
+    mapping_id = Unicode(allow_empty=False, strip=True)
     image = OneOf(Image)
     container = OneOf(Container, optional=True)
 
@@ -66,6 +67,7 @@ class ApplicationHandler(ResourceHandler):
             user_name=self.current_user.name,
             mapping_id=identifier)
 
+        resource.mapping_id = identifier
         resource.image = Image()
         resource.image.fill({
                 "name": image.name,

@@ -51,8 +51,10 @@ class ContainerHandler(ResourceHandler):
             raise exceptions.BadRepresentation(message="unrecognized image")
 
         try:
+            print("QQQ")
             environment = self._environment_from_configurables(image, resource)
         except Exception:
+            self.log.exception("Invalid configurables")
             raise exceptions.BadRepresentation(message="invalid configurables")
 
         # Everything is fine. Start and wait for the container to come online.

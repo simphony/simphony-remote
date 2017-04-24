@@ -40,7 +40,10 @@ class TestContainer(WebAPITestCase):
 
         # We get two because we have two mapping ids, hence the find_containers
         # gets called once per each mapping id.
-        self.assertEqual(data, {"items": ["12345", "12345"]})
+        self.assertEqual(data, {
+            "offset": 0,
+            "total": 2,
+            "items": ["12345", "12345"]})
 
     def test_create(self):
         with patch("remoteappmanager"
