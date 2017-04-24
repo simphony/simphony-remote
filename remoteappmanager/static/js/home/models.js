@@ -25,7 +25,7 @@ define([
         var promise = $.Deferred();
 
         resources.Application.items()
-            .done(function (items, offset, total) {
+            .done(function (identifiers, items) {
                 var result = [];
                 for (var key in items) {
                     if (!items.hasOwnProperty(key)) {

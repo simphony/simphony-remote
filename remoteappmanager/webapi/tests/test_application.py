@@ -109,7 +109,8 @@ class TestApplication(WebAPITestCase):
         self.assertEqual(data, {
             "offset": 0,
             "total": 0,
-            "items": {}})
+            "items": {},
+            "identifiers": []})
 
     def test_items_no_user(self):
         self.reg.authenticator = NullAuthenticator
