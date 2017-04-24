@@ -45,7 +45,7 @@
         v-on:click="model.selected_index = index"
         v-show="true" style="display: none;">
 
-      <span v-bind:class="app.status + '-badge'"></span>
+      <span v-bind:class="app.status.toLowerCase() + '-badge'"></span>
 
       <a href="#" class="truncate">
         <img v-bind:src="get_icon_src(app.app_data)" class="app-icon">

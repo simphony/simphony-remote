@@ -34,8 +34,6 @@ require([
 
     // Temporary solution
     app_list_view.selected_app_callback = function () {
-        var index = app_list_view.selected_app;
-        model.selected_index = index;
         app_view.render(false, 200);
     };
 
@@ -91,9 +89,12 @@ require([
 
         Object.getOwnPropertyNames(configurables).forEach(
             function(val) {
-                var configurable = configurables[val];
-                var tag = configurable.tag;
-                configurables_data[tag] = configurable.as_config_dict();
+                // Vue.js adds an __ob__ property, we have to fix it
+                if (val !== '__ob__') {
+                    var configurable = configurables[val];
+                    var tag = configurable.tag;
+                    configurables_data[tag] = configurable.as_config_dict();
+                };
             }
         );
 

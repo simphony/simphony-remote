@@ -53,8 +53,9 @@ define([
         //    the waiting spinner, rather than the application itself.
         //    Temporary measure. Will go away.
         var self = this;
+        if (self.model.selected_index === null) { return; }
         if (self.visualised_index === self.model.selected_index &&
-            self.visualised_status === self.model.status[self.model.selected_index]) {
+            self.visualised_status === self.model.app_list[self.model.selected_index].status) {
             $("iframe").focus();
             return;
         }
@@ -139,8 +140,11 @@ define([
         } else {
             properties.forEach(
                 function(val) {  // jshint ignore:line
-                    var widget = configurables[val].view(index);
-                    fieldset.append(widget);
+                    // Vue.js adds an __ob__ property, we have to fix it
+                    if (val !== '__ob__') {
+                        var widget = configurables[val].view(index);
+                        fieldset.append(widget);
+                    }
                 }
             );
         }
