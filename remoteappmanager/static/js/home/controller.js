@@ -32,7 +32,8 @@ require([
     var app_list_view = application_list_view.applicationListView;
     var app_view = new application_view.ApplicationView(model);
 
-    // Temporary solution
+    // Temporary solution, when ApplicationView will be a Vue Object the render
+    // will be automatically triggered
     app_list_view.selected_app_callback = function () {
         app_view.render(false, 200);
     };
