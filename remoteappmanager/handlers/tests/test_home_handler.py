@@ -21,7 +21,7 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
                          )
 
         self.assertEqual(res.code, 200)
-        self.assertIn("applist", str(res.body))
+        self.assertIn("ember_container", str(res.body))
 
     def test_failed_auth(self):
         self._app.hub.verify_token.return_value = {}
@@ -33,4 +33,4 @@ class TestHomeHandler(TempMixin, utils.AsyncHTTPTestCase):
 
         self.assertGreaterEqual(res.code, 400)
         self.assertIn(self._app.file_config.login_url, res.effective_url)
-        self.assertNotIn("applist", str(res.body))
+        self.assertNotIn("ember_container", str(res.body))

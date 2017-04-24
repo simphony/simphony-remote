@@ -1,0 +1,39 @@
+<!-- Loading icon -->
+{{#if list_loading}}
+    <li>
+        <a href="#">
+            <i class="fa fa-spinner fa-spin"></i>
+            <span>Loading</span>
+        </a>
+    </li>
+{{/if}}
+
+{{#if empty_list}}
+    <li>
+        <a href="#">No applications found</a>
+    </li>
+{{/if}}
+
+<!-- Application list -->
+{{#each application_entry_list as |application index|}}
+    <li class="{{ if (equal selected_app index) 'active' }}"
+        onclick={{action "toggle_app_clicked" index}}>
+
+        <span class="{{application.status}}-badge"></span>
+
+        <a href="#" class="truncate">
+
+            <img src="{{icon_src application.app_data}}" class="app-icon">
+
+            {{#if (is-running application.status)}}
+                <button class="stop-button"
+                        onclick={{action "toggle_app_stopped" application}}>
+                    <i class="fa fa-times"></i>
+                </button>
+            {{/if}}
+
+            <span>{{app_name application.app_data}}</span>
+
+        </a>
+    </li>
+{{/each}}

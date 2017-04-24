@@ -1,39 +1,85 @@
-{% extends "page.html" %}
+{% extends "base.html" %}
 
-{% block sidebar %}
-<!-- sidebar: style can be found in sidebar.less -->
-<section class="sidebar">
+{% block body %}
+    <noscript>
+        <div id='noscript'>
+            Jupyter Hub requires JavaScript.<br>
+            Please enable it to proceed.
+        </div>
+    </noscript>
 
-  <!-- search form (Optional) -->
-  <form action="#" method="get" class="sidebar-form">
-    <div class="input-group">
-      <input type="text" name="q" class="form-control" placeholder="Search...">
-                <span class="input-group-btn">
-                  <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-                  </button>
-                </span>
+    <div class="wrapper">
+
+        <!-- Main Header -->
+        <header class="main-header">
+
+            <a href="#" class="logo">
+                <!-- logo for regular state and mobile devices -->
+                <span class="logo-lg"><b>Simphony</b>Remote</span>
+            </a>
+
+        <!-- Header Navbar -->
+        <nav class="navbar navbar-static-top" role="navigation">
+            <!-- Navbar Right Menu -->
+            <div class="navbar-custom-menu">
+                <ul class="nav navbar-nav">
+
+                    <!-- User Account Menu -->
+                    <li class="dropdown user user-menu">
+                        <!-- Menu Toggle Button -->
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <!-- The user image in the navbar-->
+                            <img src="https://www.gravatar.com/avatar/{{ user.name | gravatar_id }}" class="user-image" alt="User Image">
+                            <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                            <span class="hidden-xs">{{ user.name }}</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <!-- The user image in the menu -->
+                            <li class="user-header">
+                                <img src="https://www.gravatar.com/avatar/{{ user.name | gravatar_id }}" class="img-circle" alt="User Image">
+                                <p>{{ user.name }}</p>
+                            </li>
+                            <!-- Menu Body -->
+                            <li class="user-body"></li>
+
+                            <!-- Menu Footer-->
+                            <li class="user-footer">
+                                <div class="pull-right">
+                                    {% block login_widget %}
+                                        <a id="logout" href="{{ logout_url }}" class="btn btn-default btn-flat">
+                                            <i class="fa fa-sign-out"> Sign out</i>
+                                        </a>
+                                    {% endblock %}
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- Control Sidebar Toggle Button -->
+                </ul>
+            </div>
+        </nav>
+        </header>
+
+        <div id="ember_container"></div>
+
     </div>
-  </form>
-  <!-- /.search form -->
 
-  <!-- Sidebar Menu -->
-  <ul class="sidebar-menu">
-    <li class="header">APPLICATIONS</li>
-  </ul>
-
-  <ul class="sidebar-menu" id="applist">
-  </ul>
-  <!-- /.sidebar-menu -->
-</section>
-<!-- /.sidebar -->
-{% endblock %}
-
-{% block main %}
+    {% block dialogs %}
+        {% call macros.modal_dlg('Error', btn_label='OK') %}
+            <div class="error-msg">
+                The error
+            </div>
+        {% endcall %}
+    {% endblock %}
 {% endblock %}
 
 {% block script_init %}
     {{  super() }}
     <script type="text/javascript">
-    require(["home/controller"]);
+        window.AdminLTEJavascriptPath = "{{ static_url("components/admin-lte/dist/js/app.min.js") }}";
+        require(["home/controller"]);
     </script>
+
+    <script src="{{ static_url("components/admin-lte/plugins/jQuery/jquery-2.2.3.min.js") }}"></script>
+    <script src="{{ static_url("components/admin-lte/bootstrap/js/bootstrap.min.js") }}"></script>
 {% endblock %}
