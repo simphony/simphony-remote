@@ -40,10 +40,21 @@ class TestContainer(WebAPITestCase):
 
         # We get two because we have two mapping ids, hence the find_containers
         # gets called once per each mapping id.
-        self.assertEqual(data, {
-            "offset": 0,
-            "total": 2,
-            "items": ["12345", "12345"]})
+        # This is a kind of unusual case, because we only get one item
+        # in the items list, due to the nature of the test.
+        self.assertEqual(
+            data,
+            {'identifiers': ['12345', '12345'],
+             'total': 2,
+             'offset': 0,
+             'items': {
+                '12345': {
+                    'image_name': 'image',
+                    'name': 'container',
+                    'mapping_id': 'whatever'
+                }
+            }
+        })
 
     def test_create(self):
         with patch("remoteappmanager"

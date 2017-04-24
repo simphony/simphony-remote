@@ -62,9 +62,43 @@ class TestApplication(WebAPITestCase):
     def test_items(self):
         _, data = self.get("/api/v1/applications/", httpstatus.OK)
         self.assertEqual(data, {
-            "offset": 0,
-            "total": 2,
-            "items": [{}, {}]
+            'total': 2,
+            'items': {
+                'two': {
+                    'image': {
+                        'policy': {
+                            'volume_mode': 'ro',
+                            'volume_source': 'foo',
+                            'allow_home': True,
+                            'volume_target': 'bar'
+                        },
+                        'name': 'boo',
+                        'icon_128': '',
+                        'ui_name': 'foo_ui',
+                        'description': '',
+                        'configurables': []
+                    },
+                    'mapping_id': 'two'
+                },
+                'one': {
+                    'image': {
+                        'policy': {
+                            'volume_mode': 'ro',
+                            'volume_source': 'foo',
+                            'allow_home': True,
+                            'volume_target': 'bar'
+                        },
+                        'name': 'boo',
+                        'icon_128': '',
+                        'ui_name': 'foo_ui',
+                        'description': '',
+                        'configurables': []
+                    },
+                    'mapping_id': 'one'
+                }
+            },
+            'identifiers': ['one', 'two'],
+            'offset': 0
         })
 
         # Check if nothing is returned if no images are present
