@@ -92,7 +92,7 @@ require([
                     var configurable = configurables[val];
                     var tag = configurable.tag;
                     configurables_data[tag] = configurable.as_config_dict();
-                };
+                }
             }
         );
 
