@@ -19,8 +19,8 @@
         }
     });
 
-	require([
-	    "home/init",
+    require([
+        "home/init",
         "tests/home/test_configurables.js",
         "tests/home/test_models.js",
         "tests/home/test_views.js",
@@ -35,6 +35,6 @@
 
             QUnit.load();
             QUnit.start();
-	    });
+        });
 }());
 
