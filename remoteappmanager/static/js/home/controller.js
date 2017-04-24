@@ -1,6 +1,6 @@
 /*globals: require, console*/
 require([
-    "init",
+    "home/init",
     "jquery",
     "urlutils",
     "dialogs",
