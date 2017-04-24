@@ -51,7 +51,6 @@ class ContainerHandler(ResourceHandler):
             raise exceptions.BadRepresentation(message="unrecognized image")
 
         try:
-            print("QQQ")
             environment = self._environment_from_configurables(image, resource)
         except Exception:
             self.log.exception("Invalid configurables")

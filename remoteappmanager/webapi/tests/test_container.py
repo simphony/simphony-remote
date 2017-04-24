@@ -213,7 +213,6 @@ class TestContainer(WebAPITestCase):
                 httpstatus.CREATED
             )
 
-            print("YYY")
             self.post(
                 "/user/johndoe/api/v1/containers/",
                 dict(
