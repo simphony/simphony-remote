@@ -24,6 +24,8 @@ require([
     var ga = gamodule.init();
     init.handlebars();
 
+    var Status = models.Status;
+
     // This model keeps the retrieved content from the REST query locally.
     // It is only synchronized at initial load.
     var model = new models.ApplicationListModel();
@@ -73,22 +75,22 @@ require([
 
     app_view.start_button_clicked = function (index) {
         // The container is not running. This is a start button.
-        var mapping_id = model.app_data[index].mapping_id;
-        var image_name = model.app_data[index].image.name;
+        var mapping_id = model.app_list[index].app_data.mapping_id;
+        var image_name = model.app_list[index].app_data.image.name;
 
-        if (model.status[index] === models.Status.STARTING) {
+        if (model.app_list[index].status === Status.STARTING) {
             return;
         }
 
-        model.status[index] = models.Status.STARTING;
+        model.app_list[index].status = Status.STARTING;
         app_view.render(false, null);
 
         var configurables_data = {};
-        var configurables = model.configurables[index];
+        var configurables = model.app_list[index].configurables;
         configurables_data = {};
 
         Object.getOwnPropertyNames(configurables).forEach(
-            function(val, idx, array) {   // jshint ignore:line
+            function(val) {
                 var configurable = configurables[val];
                 var tag = configurable.tag;
                 configurables_data[tag] = configurable.as_config_dict();
@@ -110,12 +112,12 @@ require([
                     app_view.render(true, 200);
                 })
                 .fail(function(error) {
-                    model.status[index] = models.Status.STOPPED;
+                    model.app_list[index].status = Status.STOPPED;
                     app_view.render(true, 200);
                     dialogs.webapi_error_dialog(error);
                 });
         }).fail(function(error) {
-            model.status[index] = models.Status.STOPPED;
+            model.app_list[index].status = Status.STOPPED;
             app_view.render(true, 200);
             dialogs.webapi_error_dialog(error);
         });
@@ -123,13 +125,7 @@ require([
 
     $.when(model.update()).done(function () {
         app_list_view.loading = false;
-        var num_app = model.app_data.length;
-        for(var i = 0; i < num_app; i++) {
-            app_list_view.application_list.push({
-                app_data: model.app_data[i],
-                status: model.status[i].toLowerCase()
-            });
-        }
+        app_list_view.model = model;
 
         app_view.render(false, 200);
     });
