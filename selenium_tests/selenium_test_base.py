@@ -112,9 +112,9 @@ class SeleniumTestBase(unittest.TestCase):
             driver = self.driver
             self.wait_for(lambda:
                           driver.find_element_by_css_selector(
-                              "#applist > li > a").text != "Loading")
+                              "#applist > li > a > span").text != "Loading")
 
-            self.click_by_css_selector("#applist > li > a > span")
+            self.click_by_css_selector("#applist > li > a > img")
             self.click_by_css_selector(".start-button")
 
             try:
