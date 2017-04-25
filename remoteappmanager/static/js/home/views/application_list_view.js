@@ -1,7 +1,8 @@
 define([
     'urlutils',
+    'utils',
     '../../components/vue/dist/vue.min'
-], function (urlutils, Vue) {
+], function (urlutils, utils, Vue) {
     'use strict';
 
     /* Create application_list ViewModel
@@ -25,20 +26,7 @@ define([
             }
         },
 
-        filters: {
-            icon_src: function(icon_data) {
-                return (
-                    icon_data ?
-                    'data:image/png;base64,' + icon_data :
-                    urlutils.path_join(
-                        window.apidata.base_url, 'static', 'images', 'generic_appicon_128.png'
-                    )
-                );
-            },
-            app_name: function(image) {
-                return image.ui_name? image.ui_name: image.name;
-            }
-        }
+        filters: utils.filters
     });
 
     return {
