@@ -4,10 +4,23 @@ define([
     "handlebars",
     "utils",
     "underscore",
-    "home/models"
-], function ($, urlutils, hb, utils, _, models) {
+    "home/models",
+    '../../components/vue/dist/vue.min'
+], function ($, urlutils, hb, utils, _, models, Vue) {
     "use strict";
-    var templates = {
+
+    var ApplicationView = Vue.extend({
+        el: 'section.content',
+
+        data: function() {
+            return {
+                test: 'Heho ça va ?',
+                model: { app_list: [], selected_index: null }
+            };
+        }
+    });
+
+    /*var templates = {
        app_start_panel: hb.compile(
            '<div class="row">' +
            '  <div class="col-md-offset-2 col-md-8">' +
@@ -164,7 +177,7 @@ define([
             'src="' + location + '" ' +
             'style="min-width: '+iframe_size[0]+'px; min-height: '+iframe_size[1]+'px;"></iframe>');
         return iframe;
-    };
+    };*/
 
     return {
         ApplicationView : ApplicationView

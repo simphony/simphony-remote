@@ -32,9 +32,11 @@ require([
     var app_list_view = new application_list_view.ApplicationListView(
         { model: model }
     );
-    var app_view = new application_view.ApplicationView(model);
+    var app_view = new application_view.ApplicationView(
+        { model: model }
+    );
 
-    // Temporary solution, when ApplicationView will be a Vue Object the render
+    /*// Temporary solution, when ApplicationView will be a Vue Object the render
     // will be automatically triggered
     app_list_view.selected_app_callback = function () {
         app_view.render(false, 200);
@@ -113,13 +115,12 @@ require([
             app_view.render(true, 200);
             dialogs.webapi_error_dialog(error);
         });
-    };
+    };*/
 
     $.when(model.update()).done(function () {
         app_list_view.loading = false;
-        app_list_view.model = model;
 
-        app_view.render(false, 200);
+        //app_view.render(false, 200);
     });
 
 });
