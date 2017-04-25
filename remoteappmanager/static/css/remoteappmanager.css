@@ -133,7 +133,7 @@ body {
 }
 
 .stop-button {
-    display: block;
+    display: none;
     position: absolute;
     top: 10px;
     left: 15px;
@@ -146,6 +146,14 @@ body {
     border-radius: 50%;
     font-size: 18px;
     color: rgba(255, 255, 255, 0.7);
+}
+
+/* When the mouse is on the img or the stop-button -> display stop-button */
+li a img:hover + .stop-button {
+    display: block;
+}
+li a .stop-button:hover {
+    display: block;
 }
 
 .truncate {

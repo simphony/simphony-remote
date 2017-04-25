@@ -8,7 +8,8 @@
           moment: "../components/moment/moment",
           "jsapi/v1/resources": "../../../jstests/tests/home/mock_jsapi",
           handlebars: "../components/handlebars/handlebars.amd.min",
-          underscore: "../components/underscore/underscore-min"
+          underscore: "../components/underscore/underscore-min",
+          vue: "../components/vue/dist/vue"
         },
         shim: {
           bootstrap: {
@@ -18,8 +19,8 @@
         }
     });
 
-	require([
-        "init",
+    require([
+        "home/init",
         "tests/home/test_configurables.js",
         "tests/home/test_models.js",
         "tests/home/test_views.js",
@@ -31,9 +32,9 @@
                 prefix: "/"
             };
             init.handlebars();
-        
+
             QUnit.load();
             QUnit.start();
-	    });
+        });
 }());
 

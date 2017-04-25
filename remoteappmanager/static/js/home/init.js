@@ -3,7 +3,7 @@ define([
     "urlutils"
 ], function(hb, urlutils) {
     "use strict";
-   
+
     return {
         handlebars : function() {
             hb.registerHelper('icon_src', function(app_data) {
