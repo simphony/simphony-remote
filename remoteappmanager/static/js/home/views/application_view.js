@@ -18,6 +18,12 @@ define([
             };
         },
 
+        computed: {
+            current_app: function() {
+                return this.model.app_list[this.model.selected_index] || null;
+            }
+        },
+
         filters: utils.filters
     });
 
