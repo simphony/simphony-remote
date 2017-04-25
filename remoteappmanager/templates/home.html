@@ -20,19 +20,20 @@
   <ul id="applist" class="sidebar-menu">
     <li class="header">APPLICATIONS</li>
 
+    <!--
+      We initialize this element with "display: none" to prevent displaying
+      "No applications found" and the loading spinner at the same time
+    -->
+    <li v-show="!loading && model.app_list.length === 0" style="display: none;">
+      <a href="#">No applications found</a>
+    </li>
+
     <!-- Loading spinner -->
-    <li v-if="loading" id="loading-spinner">
+    <li v-show="loading" id="loading-spinner">
       <a href="#">
         <i class="fa fa-spinner fa-spin"></i>
         <span>Loading</span>
       </a>
-    </li>
-    <!--
-      The line 'v-show="true" style="display: none;"' is here to fix displaying
-      issues when the javascript is not loaded yet (temporary ?)
-    -->
-    <li v-else-if="model.app_list.length === 0" v-show="true" style="display: none;">
-      <a href="#">No applications found</a>
     </li>
 
     <!-- Application list
