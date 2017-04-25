@@ -100,7 +100,6 @@ define([
         var app_status = self.model.app_list[index].status;
 
         var configurables = self.model.app_list[index].configurables;
-        var properties = Object.getOwnPropertyNames(configurables);
 
         var disabled = (app_status === models.Status.STARTING);
 
@@ -135,18 +134,13 @@ define([
 
         var fieldset = base.find("fieldset");
 
-        if (properties.length === 0) {
+        if (configurables.length === 0) {
             fieldset.html("No configurable options for this image");
         } else {
-            properties.forEach(
-                function(val) {  // jshint ignore:line
-                    // Vue.js adds an __ob__ property, we have to fix it
-                    if (val !== '__ob__') {
-                        var widget = configurables[val].view(index);
-                        fieldset.append(widget);
-                    }
-                }
-            );
+            configurables.forEach(function(configurable) {
+                var widget = configurable.view(index);
+                fieldset.append(widget);
+            });
         }
 
         return base;

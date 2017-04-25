@@ -84,19 +84,10 @@ require([
         app_view.render(false, null);
 
         var configurables_data = {};
-        var configurables = model.app_list[index].configurables;
-        configurables_data = {};
-
-        Object.getOwnPropertyNames(configurables).forEach(
-            function(val) {
-                // Vue.js adds an __ob__ property, we have to fix it
-                if (val !== '__ob__') {
-                    var configurable = configurables[val];
-                    var tag = configurable.tag;
-                    configurables_data[tag] = configurable.as_config_dict();
-                }
-            }
-        );
+        model.app_list[index].configurables.forEach(function(configurable) {
+            var tag = configurable.tag;
+            configurables_data[tag] = configurable.as_config_dict();
+        });
 
         resources.Container.create({
             mapping_id: mapping_id,

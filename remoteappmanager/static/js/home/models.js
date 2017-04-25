@@ -135,7 +135,7 @@ define([
         // Contains the submodels for the configurables.
         // It is a dictionary that maps a supported (by the image) configurable tag
         // to its client-side model.
-        this.app_list[index].configurables = {};
+        this.app_list[index].configurables = [];
 
         image.configurables.forEach(function(tag) {
             // If this returns null, the tag has not been recognized
@@ -145,7 +145,7 @@ define([
             var ConfigurableCls = configurables.from_tag(tag);
 
             if (ConfigurableCls !== null) {
-                this.app_list[index].configurables[tag] = new ConfigurableCls();
+                this.app_list[index].configurables.push(new ConfigurableCls());
             }
         }.bind(this));
     };
