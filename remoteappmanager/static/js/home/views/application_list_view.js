@@ -20,8 +20,13 @@ define([
         },
 
         methods: {
-            get_icon_src: function(app_data) {
-                var icon_data = app_data.image.icon_128;
+            stop_application: function(index) {
+                this.stop_application_callback(index);
+            }
+        },
+
+        filters: {
+            icon_src: function(icon_data) {
                 return (
                     icon_data ?
                     'data:image/png;base64,' + icon_data :
@@ -30,15 +35,8 @@ define([
                     )
                 );
             },
-            get_app_name: function(app_data) {
-                return (
-                    app_data.image.ui_name ?
-                    app_data.image.ui_name :
-                    app_data.image.name
-                );
-            },
-            stop_application: function(index) {
-                this.stop_application_callback(index);
+            app_name: function(image) {
+                return image.ui_name? image.ui_name: image.name;
             }
         },
 

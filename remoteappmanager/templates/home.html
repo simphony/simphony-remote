@@ -49,7 +49,7 @@
 
       <a href="#" class="truncate">
         <img class="app-icon"
-             :src="get_icon_src(app.app_data)">
+             :src="app.app_data.image.icon_128 | icon_src">
 
         <button class="stop-button"
                 v-if="app.status === 'RUNNING'"
@@ -57,7 +57,7 @@
           <i class="fa fa-times"></i>
         </button>
 
-        <span>{% raw %} {{ get_app_name(app.app_data) }} {% endraw %}</span>
+        <span>{% raw %} {{ app.app_data.image | app_name }} {% endraw %}</span>
       </a>
     </li>
   </ul>
