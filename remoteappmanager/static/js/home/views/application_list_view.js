@@ -38,10 +38,6 @@ define([
             app_name: function(image) {
                 return image.ui_name? image.ui_name: image.name;
             }
-        },
-
-        watch: {
-            'model.selected_index': function() { this.selected_app_callback(); }
         }
     });
 
