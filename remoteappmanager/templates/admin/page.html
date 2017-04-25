@@ -20,14 +20,23 @@
 {% endblock %}
 
 {% block main %}
+  <div id="adminapp"></div>
+  <!--
   <div class="row">
     <div class="col-md-12">
       <div class="box">
-        <div class="box-header with-border">{% block main_box_title %}{% endblock %}</div>
+        <div class="box-header with-border">{!% block main_box_title %}{!% endblock %}</div>
         <div class="box-body">
-          {% block main_box_body %}{% endblock %}
+          {!% block main_box_body %}{!% endblock %}
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
+{% endblock %}
+
+{% block script_init %}
+  {{ super() }}
+  <script type="text/javascript">
+    require(["admin/app"]);
+  </script>
 {% endblock %}

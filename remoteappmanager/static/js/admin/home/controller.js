@@ -1,7 +1,7 @@
 /*globals: require, console*/
 require([
-    "jquery"
-], function() {
+    "vue/vue.min"
+], function(vue) {
     "use strict";
     
 });

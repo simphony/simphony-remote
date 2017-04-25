@@ -21,4 +21,4 @@ class AdminHomeHandler(BaseHandler):
             num_images=len(app.db.list_applications()),
             num_running_containers=len(containers)
         )
-        self.render('admin/home.html', **context)
+        self.render('admin/page.html', **context)
