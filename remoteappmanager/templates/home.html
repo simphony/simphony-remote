@@ -49,12 +49,10 @@
 
       <a href="#" class="truncate">
         <img class="app-icon"
-             @mouseenter="mouse_enter(index)"
              :src="get_icon_src(app.app_data)">
 
         <button class="stop-button"
-                v-show="app.status === 'RUNNING' && index_mouse_over === index"
-                @mouseleave="mouse_leave()"
+                v-if="app.status === 'RUNNING'"
                 @click="stop_application(index)">
           <i class="fa fa-times"></i>
         </button>

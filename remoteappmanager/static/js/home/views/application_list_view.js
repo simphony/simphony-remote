@@ -21,7 +21,6 @@ define([
             return {
                 loading: true,
                 model: { app_list: [], selected_index: null },
-                index_mouse_over: null,
                 selected_app_callback: function() {}, // Temporary
                 stop_application_callback: function() {} // Temporary
             };
@@ -47,14 +46,6 @@ define([
             },
             stop_application: function(index) {
                 this.stop_application_callback(index);
-            },
-            mouse_enter: function(index) {
-                if(this.model.app_list[index].status === 'RUNNING') {
-                    this.index_mouse_over = index;
-                }
-            },
-            mouse_leave: function() {
-                this.index_mouse_over = null;
             }
         },
 
