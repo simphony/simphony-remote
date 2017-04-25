@@ -27,12 +27,9 @@ define([
         resources.Application.items()
             .done(function (identifiers, items) {
                 var result = [];
-                for (var key in items) {
-                    if (!items.hasOwnProperty(key)) {
-                        continue;
-                    }
+                Object.keys(items).forEach(function(key) {
                     result.push(items[key]);
-                }
+                });
                 promise.resolve(result);
             })
             .fail(function() {
