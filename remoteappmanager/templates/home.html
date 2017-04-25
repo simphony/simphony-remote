@@ -41,21 +41,21 @@
       issues when the javascript is not loaded yet (temporary ?)
     -->
     <li v-for="(app, index) in model.app_list"
-        v-bind:class="{ active: index === model.selected_index }"
-        v-on:click="model.selected_index = index"
+        :class="{ active: index === model.selected_index }"
+        @click="model.selected_index = index"
         v-show="true" style="display: none;">
 
-      <span v-bind:class="app.status.toLowerCase() + '-badge'"></span>
+      <span :class="app.status.toLowerCase() + '-badge'"></span>
 
       <a href="#" class="truncate">
         <img class="app-icon"
-             v-on:mouseenter="mouse_enter(index)"
-             v-bind:src="get_icon_src(app.app_data)">
+             @mouseenter="mouse_enter(index)"
+             :src="get_icon_src(app.app_data)">
 
         <button class="stop-button"
                 v-show="app.status === 'RUNNING' && index_mouse_over === index"
-                v-on:mouseleave="mouse_leave()"
-                v-on:click="stop_application(index)">
+                @mouseleave="mouse_leave()"
+                @click="stop_application(index)">
           <i class="fa fa-times"></i>
         </button>
 
