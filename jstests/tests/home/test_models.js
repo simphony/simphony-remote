@@ -2,7 +2,7 @@ define([
     "home/models" 
 ], function (models) {
     "use strict";
-
+    
     QUnit.module("home.models");
     QUnit.test("instantiation", function (assert) {
         var model = new models.ApplicationListModel();
