@@ -9,7 +9,9 @@ define([
         assert.expect(2);
 
         var model = new models.ApplicationListModel();
-        var view = application_list_view.applicationListView;
+        var view = new application_list_view.ApplicationListView(
+            { model: model }
+        );
 
         assert.ok(view.loading);
 
