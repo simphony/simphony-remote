@@ -10,13 +10,6 @@ define([
     var ApplicationListView = Vue.extend({
         el: '#applist',
 
-        props: {
-            model: {
-                type: Object,
-                required: true
-            }
-        },
-
         data: function() {
             return {
                 loading: true,
