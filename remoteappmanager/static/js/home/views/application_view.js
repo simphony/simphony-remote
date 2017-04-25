@@ -14,10 +14,11 @@ define([
 
         data: function() {
             return {
-                test: 'Heho ça va ?',
                 model: { app_list: [], selected_index: null }
             };
-        }
+        },
+
+        filters: utils.filters
     });
 
     /*var templates = {
