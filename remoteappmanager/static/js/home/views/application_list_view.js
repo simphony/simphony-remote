@@ -31,7 +31,7 @@ define([
                     icon_data ?
                     'data:image/png;base64,' + icon_data :
                     urlutils.path_join(
-                        this.base_url, 'static', 'images', 'generic_appicon_128.png'
+                        window.apidata.base_url, 'static', 'images', 'generic_appicon_128.png'
                     )
                 );
             },
