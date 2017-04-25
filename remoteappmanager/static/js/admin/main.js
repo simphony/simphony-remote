@@ -1,26 +1,27 @@
 /*globals: require, console*/
 require([
-  "vue/dist/vue.min",
-  "vue-router/dist/vue-router.min",
-  "vue-components/main_view"
-], function(Vue, Router, App, MainView) {
+  "components/vue/dist/vue.min",
+  "components/vue-router/dist/vue-router.min",
+], function(Vue, VueRouter) {
   "use strict";
 
   // install router
-  Vue.use(Router);
+  Vue.use(VueRouter);
+  var MainView = {
+    template: "hello"
+  };
 
-  var router = new Router();
-
-  router.map({
-    '/user/:username': {
-      component: MainView
-    }
+  var router = new VueRouter({
+    routes: [
+      {
+        path: '/',
+        component: MainView
+      }
+    ]
   });
 
-  router.beforeEach(function () {
-    window.scrollTo(0, 0);
-  });
-
-  router.start(App, '#adminapp');
+  var app = new Vue({
+    router
+  }).$mount("#adminapp");
     
 });

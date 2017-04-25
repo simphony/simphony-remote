@@ -25,7 +25,8 @@
         "underscore": "~1.8.3",
         "html5shiv": "~3.7.3",
         "respond": "~1.4.2",
-        "vue": "^2.2.6"
+        "vue": "^2.2.6",
+        "vue-router": "^2.5.2"
     },
     "devDependencies": {
         "blanket": "^1.1.7"

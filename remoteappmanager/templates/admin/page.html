@@ -20,7 +20,10 @@
 {% endblock %}
 
 {% block main %}
-  <div id="adminapp"></div>
+  <div id="adminapp">
+    <h1>Hi!</h1>
+    <router-view></router-view>
+  </div>
   <!--
   <div class="row">
     <div class="col-md-12">
@@ -37,6 +40,6 @@
 {% block script_init %}
   {{ super() }}
   <script type="text/javascript">
-    require(["admin/app"]);
+    require(["admin/main"]);
   </script>
 {% endblock %}
