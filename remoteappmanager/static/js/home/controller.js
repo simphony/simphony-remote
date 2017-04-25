@@ -29,7 +29,9 @@ require([
     // This model keeps the retrieved content from the REST query locally.
     // It is only synchronized at initial load.
     var model = new models.ApplicationListModel();
-    var app_list_view = application_list_view.applicationListView;
+    var app_list_view = new application_list_view.ApplicationListView(
+        { model: model }
+    );
     var app_view = new application_view.ApplicationView(model);
 
     // Temporary solution, when ApplicationView will be a Vue Object the render

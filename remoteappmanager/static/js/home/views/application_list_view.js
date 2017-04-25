@@ -7,15 +7,24 @@ define([
     /* Create application_list ViewModel
     (will next be wrapped in a main ViewModel which will contain the
     applicationListView and the applicationView) */
-    var applicationListView = new Vue({
+    var ApplicationListView = Vue.extend({
         el: '#applist',
 
-        data: {
-            loading: true,
-            model: { app_list: [], selected_index: null },
-            index_mouse_over: null,
-            selected_app_callback: function() {}, // Temporary
-            stop_application_callback: function() {} // Temporary
+        props: {
+            model: {
+                type: Object,
+                required: true
+            }
+        },
+
+        data: function() {
+            return {
+                loading: true,
+                model: { app_list: [], selected_index: null },
+                index_mouse_over: null,
+                selected_app_callback: function() {}, // Temporary
+                stop_application_callback: function() {} // Temporary
+            };
         },
 
         methods: {
@@ -55,6 +64,6 @@ define([
     });
 
     return {
-        applicationListView : applicationListView
+        ApplicationListView : ApplicationListView
     };
 });
