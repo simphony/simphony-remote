@@ -9,7 +9,7 @@ from tornadowebapi.http import httpstatus
 
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.image import Image
-from remoteappmanager.webapi import Application
+from remoteappmanager.webapi import ApplicationHandler
 from remoteappmanager.tests.webapi_test_case import WebAPITestCase
 from remoteappmanager.tests.mocking.dummy import create_hub
 
@@ -29,7 +29,7 @@ class TestApplication(WebAPITestCase):
 
     def get_app(self):
         self.reg = registry.Registry()
-        self.reg.register(Application)
+        self.reg.register(ApplicationHandler)
         self.reg.authenticator = DummyAuthenticator
         handlers = self.reg.api_handlers('/')
         app = web.Application(handlers=handlers)
@@ -61,14 +61,56 @@ class TestApplication(WebAPITestCase):
 
     def test_items(self):
         _, data = self.get("/api/v1/applications/", httpstatus.OK)
-        self.assertEqual(data, {"items": ["one", "two"]})
+        self.assertEqual(data, {
+            'total': 2,
+            'items': {
+                'two': {
+                    'image': {
+                        'policy': {
+                            'volume_mode': 'ro',
+                            'volume_source': 'foo',
+                            'allow_home': True,
+                            'volume_target': 'bar'
+                        },
+                        'name': 'boo',
+                        'icon_128': '',
+                        'ui_name': 'foo_ui',
+                        'description': '',
+                        'configurables': []
+                    },
+                    'mapping_id': 'two'
+                },
+                'one': {
+                    'image': {
+                        'policy': {
+                            'volume_mode': 'ro',
+                            'volume_source': 'foo',
+                            'allow_home': True,
+                            'volume_target': 'bar'
+                        },
+                        'name': 'boo',
+                        'icon_128': '',
+                        'ui_name': 'foo_ui',
+                        'description': '',
+                        'configurables': []
+                    },
+                    'mapping_id': 'one'
+                }
+            },
+            'identifiers': ['one', 'two'],
+            'offset': 0
+        })
 
         # Check if nothing is returned if no images are present
         self._app.container_manager.image = mock_coro_factory(
             return_value=None)
 
         _, data = self.get("/api/v1/applications/", httpstatus.OK)
-        self.assertEqual(data, {"items": []})
+        self.assertEqual(data, {
+            "offset": 0,
+            "total": 0,
+            "items": {},
+            "identifiers": []})
 
     def test_items_no_user(self):
         self.reg.authenticator = NullAuthenticator
@@ -78,21 +120,20 @@ class TestApplication(WebAPITestCase):
         _, data = self.get("/api/v1/applications/one/", httpstatus.OK)
 
         self.assertEqual(data,
-                         {'container': None,
-                          'image': {
+                         {
+                             'mapping_id': "one",
+                             'image': {
+                              'configurables': [],
                               'description': '',
                               'icon_128': '',
                               'name': 'boo',
-                              'ui_name': 'foo_ui',
                               'policy': {
                                     "allow_home": True,
                                     "volume_mode": 'ro',
                                     "volume_source": "foo",
                                     "volume_target": "bar",
                               },
-                              'configurables': []
-                          },
-                          'mapping_id': 'one'})
+                              'ui_name': 'foo_ui'}})
 
         self._app.container_manager.find_containers = \
             mock_coro_factory(return_value=[Container(
@@ -103,23 +144,27 @@ class TestApplication(WebAPITestCase):
         _, data = self.get("/api/v1/applications/one/", httpstatus.OK)
 
         self.assertEqual(data,
-                         {'container':
-                             {'image_name': 'xxx',
-                              'name': 'container',
-                              'url_id': 'yyy'},
-                          'image': {'description': '',
-                                    'icon_128': '',
-                                    'name': 'boo',
-                                    'ui_name': 'foo_ui',
-                                    'policy': {
-                                        "allow_home": True,
-                                        "volume_mode": 'ro',
-                                        "volume_source": "foo",
-                                        "volume_target": "bar",
-                                    },
-                                    'configurables': [],
-                                    },
-                          'mapping_id': 'one'})
+                         {
+                             'mapping_id': "one",
+                             'container': {
+                                 'image_name': 'xxx',
+                                 'name': 'container',
+                                 'url_id': 'yyy'
+                                 },
+                             'image': {
+                                 'description': '',
+                                 'icon_128': '',
+                                 'name': 'boo',
+                                 'ui_name': 'foo_ui',
+                                 'policy': {
+                                     "allow_home": True,
+                                     "volume_mode": 'ro',
+                                     "volume_source": "foo",
+                                     "volume_target": "bar",
+                                 },
+                                 'configurables': [],
+                             }
+                          })
 
         self.get("/api/v1/applications/three/", httpstatus.NOT_FOUND)
 

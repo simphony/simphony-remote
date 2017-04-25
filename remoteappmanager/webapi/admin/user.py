@@ -2,25 +2,28 @@ from tornado import gen
 
 from tornadowebapi import exceptions
 from tornadowebapi.resource import Resource
+from tornadowebapi.resource_handler import ResourceHandler
+from tornadowebapi.traitlets import Unicode
 
 from remoteappmanager.webapi.decorators import authenticated
 from remoteappmanager.db import exceptions as db_exceptions
 
 
 class User(Resource):
-    def validate_representation(self, representation):
-        representation["name"] = str(representation["name"]).strip()
-        if len(representation["name"]) == 0:
-            raise ValueError("name cannot be empty")
-        return representation
+    name = Unicode(allow_empty=False, strip=True)
 
-    def validate_identifier(self, identifier):
-        return int(identifier)
+
+class UserHandler(ResourceHandler):
+    resource_class = User
 
     @gen.coroutine
     @authenticated
-    def delete(self, identifier):
+    def delete(self, resource, **kwargs):
         db = self.application.db
+        try:
+            identifier = int(resource.identifier)
+        except ValueError:
+            raise exceptions.NotFound()
 
         try:
             db.remove_user(id=identifier)
@@ -32,15 +35,13 @@ class User(Resource):
 
     @gen.coroutine
     @authenticated
-    def create(self, representation):
-        name = representation["name"]
+    def create(self, resource, **kwargs):
+        name = resource.name
 
         db = self.application.db
         try:
-            id = db.create_user(name)
+            resource.identifier = str(db.create_user(name))
         except db_exceptions.Exists:
             raise exceptions.Exists()
         except db_exceptions.UnsupportedOperation:
             raise exceptions.Unable()
-
-        return id
