@@ -30,11 +30,16 @@ define([
                 return this.current_app.app_data.image.policy;
             },
             app_source: function() {
-                return urlutils.path_join(
+                var url = urlutils.path_join(
                     window.apidata.base_url,
                     'containers',
                     this.current_app.app_data.container.url_id
                 );
+                var output = this.current_app.delayed ? url : url + '/';
+
+                this.current_app.delayed = false;
+
+                return output;
             },
             iframe_size: function() {
                 return utils.max_iframe_size();
@@ -47,6 +52,7 @@ define([
                 var current_app = this.current_app;
 
                 current_app.status = Status.STARTING;
+                current_app.delayed = true;
 
                 var configurables_data = {};
                 current_app.configurables.forEach(function(configurable) {

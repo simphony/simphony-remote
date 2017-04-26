@@ -64,6 +64,12 @@ define([
 
                 this._update_configurables(data_idx);
                 this._update_status(data_idx);
+
+                if (this.app_list[data_idx].status === Status.RUNNING) {
+                    this.app_list[data_idx].delayed = false;
+                } else {
+                    this.app_list[data_idx].delayed = true;
+                }
             }.bind(this));
         }.bind(this));
     };
