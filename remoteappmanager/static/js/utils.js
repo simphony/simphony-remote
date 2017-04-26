@@ -45,6 +45,13 @@ define([
         return [width, height];
     };
 
+    var Status = {
+        RUNNING: "RUNNING",
+        STARTING: "STARTING",
+        STOPPING: "STOPPING",
+        STOPPED: "STOPPED"
+    };
+
     // Temporary: will be registered in Vue globally
     var filters = {
         icon_src: function(icon_data) {
@@ -58,15 +65,11 @@ define([
         },
         app_name: function(image) {
             return image.ui_name? image.ui_name: image.name;
+        },
+        is_starting: function(application) {
+            return application.status === Status.STARTING;
         }
     }
-
-    var Status = {
-        RUNNING: "RUNNING",
-        STARTING: "STARTING",
-        STOPPING: "STOPPING",
-        STOPPED: "STOPPED"
-    };
 
     return {
         all : all,

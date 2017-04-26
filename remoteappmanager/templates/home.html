@@ -103,9 +103,16 @@
           <h4>Configuration</h4>
           <form class="configuration"><fieldset></fieldset></form>
         </div>
+
+        <!-- Start Button -->
         <div class="box-footer">
-          <button @click="start_application()" class="btn btn-primary pull-right start-button">Start</button>
+          <button class="btn btn-primary pull-right start-button"
+                  @click="start_application()"
+                  :disabled="current_app | is_starting">
+            Start
+          </button>
         </div>
+
       </div>
     </div>
   </div>
