@@ -60,6 +60,13 @@ define([
 
             this.app_list = [];
 
+            // Sort application list by names
+            app_data.sort(function(app1, app2) {
+                var app1_name = app1.image.ui_name? app1.image.ui_name: app1.image.name;
+                var app2_name = app2.image.ui_name? app2.image.ui_name: app2.image.name;
+                return app1_name < app2_name? -1: 1;
+            });
+
             // Add the options for some image types
             app_data.forEach(function(application_data, data_idx) {
                 this.app_list[data_idx] = { app_data: application_data };
