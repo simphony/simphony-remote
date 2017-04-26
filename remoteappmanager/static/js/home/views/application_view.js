@@ -1,4 +1,5 @@
 define([
+    'jquery',
     "urlutils",
     "utils",
     "gamodule",
@@ -6,7 +7,7 @@ define([
     "home/models",
     '../../components/vue/dist/vue.min',
     "jsapi/v1/resources"
-], function (urlutils, utils, gamodule, dialogs, models, Vue, resources) {
+], function ($, urlutils, utils, gamodule, dialogs, models, Vue, resources) {
     "use strict";
 
     var ga = gamodule.init();
@@ -74,6 +75,8 @@ define([
                 });
             }
         },
+
+        updated: function() { $('iframe').focus(); },
 
         filters: utils.filters
     });
