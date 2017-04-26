@@ -10,7 +10,7 @@ define([
     "use strict";
 
     var ga = gamodule.init();
-    var Status = models.Status;
+    var Status = utils.Status;
 
     var ApplicationView = Vue.extend({
         el: 'section.content',

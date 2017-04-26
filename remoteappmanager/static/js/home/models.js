@@ -6,12 +6,7 @@ define([
 ], function ($, configurables, utils, resources) {
     "use strict";
 
-    var Status = {
-        RUNNING: "RUNNING",
-        STARTING: "STARTING",
-        STOPPING: "STOPPING",
-        STOPPED: "STOPPED"
-    };
+    var Status = utils.Status;
 
     var available_applications_info = function () {
         // Retrieve information from the various applications and
@@ -120,7 +115,6 @@ define([
     };
 
     return {
-        ApplicationListModel: ApplicationListModel,
-        Status: Status
+        ApplicationListModel: ApplicationListModel
     };
 });

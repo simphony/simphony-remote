@@ -61,11 +61,19 @@ define([
         }
     }
 
+    var Status = {
+        RUNNING: "RUNNING",
+        STARTING: "STARTING",
+        STOPPING: "STOPPING",
+        STOPPED: "STOPPED"
+    };
+
     return {
         all : all,
         update : update,
         max_iframe_size: max_iframe_size,
-        filters: filters
+        filters: filters,
+        Status: Status
     };
 
 });
