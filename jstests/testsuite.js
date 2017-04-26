@@ -20,7 +20,6 @@
     });
 
     require([
-        "home/init",
         "tests/home/test_configurables.js",
         "tests/home/test_models.js",
         "tests/home/test_views.js",
@@ -31,7 +30,6 @@
                 base_url: "/",
                 prefix: "/"
             };
-            init.handlebars();
 
             QUnit.load();
             QUnit.start();
