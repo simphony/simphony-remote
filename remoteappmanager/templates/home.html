@@ -53,7 +53,8 @@
 
         <button class="stop-button"
                 v-if="app.status === 'RUNNING'"
-                @click="stop_application(index)">
+                @click="stop_application(index)"
+                :disabled="app | is_stopping">
           <i class="fa fa-times"></i>
         </button>
 

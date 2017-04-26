@@ -68,6 +68,15 @@ define([
         },
         is_starting: function(application) {
             return application.status === Status.STARTING;
+        },
+        is_running: function(application) {
+            return application.status === Status.RUNNING;
+        },
+        is_stopping: function(application) {
+            return application.status === Status.STOPPING;
+        },
+        is_stopped: function(application) {
+            return application.status === Status.STOPPED;
         }
     }
 
