@@ -18,8 +18,7 @@ define([
         data: function() {
             return {
                 loading: true,
-                model: { app_list: [], selected_index: null },
-                selected_app_callback: function() {} // Temporary
+                model: { app_list: [], selected_index: null }
             };
         },
 

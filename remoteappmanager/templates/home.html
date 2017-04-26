@@ -42,7 +42,7 @@
     -->
     <li v-for="(app, index) in model.app_list"
         :class="{ active: index === model.selected_index }"
-        @click="model.selected_index = index; selected_app_callback()"
+        @click="model.selected_index = index"
         v-show="true" style="display: none;">
 
       <span :class="app.status.toLowerCase() + '-badge'"></span>
