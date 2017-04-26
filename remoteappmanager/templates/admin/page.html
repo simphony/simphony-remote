@@ -20,14 +20,16 @@
 {% endblock %}
 
 {% block main %}
-  <div class="row">
-    <div class="col-md-12">
-      <div class="box">
-        <div class="box-header with-border">{% block main_box_title %}{% endblock %}</div>
-        <div class="box-body">
-          {% block main_box_body %}{% endblock %}
+  <section class="content">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="box">
+          <div class="box-header with-border">{% block main_box_title %}{% endblock %}</div>
+          <div class="box-body">
+            {% block main_box_body %}{% endblock %}
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 {% endblock %}

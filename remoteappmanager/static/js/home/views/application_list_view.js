@@ -1,8 +1,13 @@
 define([
     'urlutils',
-    '../../components/vue/dist/vue.min'
-], function (urlutils, Vue) {
+    'utils',
+    "dialogs",
+    '../../components/vue/dist/vue.min',
+    "jsapi/v1/resources"
+], function (urlutils, utils, dialogs, Vue, resources) {
     'use strict';
+
+    var Status = utils.Status;
 
     /* Create application_list ViewModel
     (will next be wrapped in a main ViewModel which will contain the
@@ -13,32 +18,33 @@ define([
         data: function() {
             return {
                 loading: true,
-                model: { app_list: [], selected_index: null },
-                selected_app_callback: function() {}, // Temporary
-                stop_application_callback: function() {} // Temporary
+                model: { app_list: [], selected_index: null }
             };
         },
 
         methods: {
             stop_application: function(index) {
-                this.stop_application_callback(index);
+                var app_stopping = this.model.app_list[index];
+                app_stopping.status = Status.STOPPING;
+
+                var url_id = app_stopping.app_data.container.url_id;
+
+                resources.Container.delete(url_id)
+                .done(function() {
+                    this.model.update_idx(index)
+                    .fail(function(error) {
+                        app_stopping.status = Status.STOPPED;
+                        dialogs.webapi_error_dialog(error);
+                    });
+                }.bind(this))
+                .fail(function(error) {
+                    app_stopping.status = Status.STOPPED;
+                    dialogs.webapi_error_dialog(error);
+                });
             }
         },
 
-        filters: {
-            icon_src: function(icon_data) {
-                return (
-                    icon_data ?
-                    'data:image/png;base64,' + icon_data :
-                    urlutils.path_join(
-                        window.apidata.base_url, 'static', 'images', 'generic_appicon_128.png'
-                    )
-                );
-            },
-            app_name: function(image) {
-                return image.ui_name? image.ui_name: image.name;
-            }
-        }
+        filters: utils.filters
     });
 
     return {
