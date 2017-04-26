@@ -43,6 +43,8 @@ define([
         // Should be the index of the selected app_data,
         // or null if no selection.
         this.selected_index = null;
+
+        this.loading = true;
     };
 
     ApplicationListModel.prototype.update = function() {
@@ -71,6 +73,8 @@ define([
                     this.app_list[data_idx].delayed = true;
                 }
             }.bind(this));
+
+            this.loading = false;
         }.bind(this));
     };
 

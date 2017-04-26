@@ -19,8 +19,6 @@ require([
     var app_view = new application_view.ApplicationView();
 
     $.when(model.update()).done(function () {
-        app_list_view.loading = false;
-
         app_list_view.model = model;
         app_view.model = model;
     });

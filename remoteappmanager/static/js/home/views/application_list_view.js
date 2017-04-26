@@ -17,8 +17,7 @@ define([
 
         data: function() {
             return {
-                loading: true,
-                model: { app_list: [], selected_index: null }
+                model: { app_list: [], selected_index: null, loading: true }
             };
         },
 
