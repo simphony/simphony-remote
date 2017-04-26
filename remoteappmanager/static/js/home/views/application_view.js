@@ -40,9 +40,6 @@ define([
                 this.current_app.delayed = false;
 
                 return output;
-            },
-            iframe_size: function() {
-                return utils.max_iframe_size();
             }
         },
 
@@ -79,6 +76,9 @@ define([
                     current_app.status = Status.STOPPED;
                     dialogs.webapi_error_dialog(error);
                 });
+            },
+            get_iframe_size: function() {
+                return utils.max_iframe_size();
             }
         },
 
