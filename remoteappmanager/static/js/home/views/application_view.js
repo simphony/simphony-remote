@@ -14,7 +14,7 @@ define([
     var Status = utils.Status;
 
     var ApplicationView = Vue.extend({
-        el: 'section.content',
+        el: 'div.content-wrapper',
 
         data: function() {
             return {
