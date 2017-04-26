@@ -124,7 +124,7 @@
           id="application"
           frameBorder="0"
           :src="app_source"
-          style="min-width: 800px; min-height: 600px;">
+          :style="{ minWidth: iframe_size[0] + 'px', minHeight: iframe_size[1] + 'px' }">
   </iframe>
 {% endblock %}
 

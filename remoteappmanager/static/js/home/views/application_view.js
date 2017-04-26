@@ -34,6 +34,9 @@ define([
                     'containers',
                     this.current_app.app_data.container.url_id
                 );
+            },
+            iframe_size: function() {
+                return utils.max_iframe_size();
             }
         },
 
