@@ -20,10 +20,10 @@ class TestStats(WebAPITestCase):
         self.assertEqual(code, httpstatus.OK)
         self.assertEqual(data, {
             'num_active_users': 1,
-             'num_images': 2,
-             'num_running_containers': 1,
-             'num_total_users': 1,
-             'realm': 'remoteexec'})
+            'num_images': 2,
+            'num_running_containers': 1,
+            'num_total_users': 1,
+            'realm': 'remoteexec'})
 
     def cookie_auth_token(self):
         return "jupyter-hub-token-johndoe=johndoe"
