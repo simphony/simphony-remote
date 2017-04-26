@@ -21,6 +21,9 @@ define([
         computed: {
             current_app: function() {
                 return this.model.app_list[this.model.selected_index] || null;
+            },
+            app_policy: function() {
+                return this.current_app.app_data.image.policy;
             }
         },
 

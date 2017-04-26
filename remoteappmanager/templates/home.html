@@ -81,7 +81,25 @@
         </div>
         <div class="box-body">
           <h4>Policy</h4>
-          <ul class="policy"></ul>
+
+          <ul class="policy">
+            <!-- Workspace -->
+            <li v-if="app_policy.allow_home">
+                Workspace accessible
+            </li>
+            <li v-else>
+                Workspace not accessible
+            </li>
+
+            <!-- Volume mounted -->
+            <li v-if="app_policy.volume_source && app_policy.volume_target && app_policy.volume_mode">
+              {% raw %} Volume mounted: {{ app_policy.volume_source }} &#x2192; {{ app_policy.volume_target }} ({{ app_policy.volume_mode }}) {% endraw %}
+            </li>
+            <li v-else>
+              No volumes mounted
+            </li>
+          </ul>
+
           <h4>Configuration</h4>
           <form class="configuration"><fieldset></fieldset></form>
         </div>
