@@ -72,7 +72,8 @@
       The line 'v-show="true" style="display: none;"' is here to fix displaying
       issues when the javascript is not loaded yet (temporary ? will be removed when using .vue files for templates)
     -->
-  <div v-if="current_app !== null"
+  <!-- Start Form -->
+  <div v-if="current_app !== null && current_app.status !== 'RUNNING'"
        v-show="true" style="display: none;" class="row">
     <div class="col-md-offset-2 col-md-8">
       <div class="box box-primary">
@@ -117,6 +118,14 @@
       </div>
     </div>
   </div>
+
+  <!-- Application View -->
+  <iframe v-if="current_app !== null && current_app.status === 'RUNNING'"
+          id="application"
+          frameBorder="0"
+          :src="app_source"
+          style="min-width: 800px; min-height: 600px;">
+  </iframe>
 {% endblock %}
 
 {% block script_init %}

@@ -27,6 +27,13 @@ define([
             },
             app_policy: function() {
                 return this.current_app.app_data.image.policy;
+            },
+            app_source: function() {
+                return urlutils.path_join(
+                    window.apidata.base_url,
+                    'containers',
+                    this.current_app.app_data.container.url_id
+                );
             }
         },
 
