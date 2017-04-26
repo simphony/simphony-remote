@@ -141,8 +141,8 @@ class BaseApplication(web.Application, LoggingMixin):
     def _registry_default(self):
         reg = Registry()
         reg.authenticator = HubAuthenticator
-        for resource_class in self._webapi_resources():
-            reg.register(resource_class)
+        for resource_handler in self._webapi_resources():
+            reg.register(resource_handler)
         return reg
 
     # Public

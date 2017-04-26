@@ -1,4 +1,6 @@
 from tornado import gen
+from tornadowebapi.resource_handler import ResourceHandler
+from tornadowebapi.traitlets import Absent, Unicode, Bool
 
 from remoteappmanager.utils import parse_volume_string
 from tornadowebapi import exceptions
@@ -9,47 +11,47 @@ from remoteappmanager.db import exceptions as db_exceptions
 
 
 class Accounting(Resource):
-    __collection_name__ = "accounting"
+    user_name = Unicode(allow_empty=False, strip=True)
+    image_name = Unicode(allow_empty=False, strip=True)
+    allow_home = Bool()
+    volume = Unicode(optional=True, allow_empty=False, strip=True)
 
-    def validate_representation(self, representation):
-        representation["user_name"] = _not_empty_str(
-            representation["user_name"])
-        representation["image_name"] = _not_empty_str(
-            representation["image_name"])
-        representation["allow_home"] = bool(
-            representation["allow_home"])
+    @classmethod
+    def collection_name(cls):
+        return "accounting"
 
-        if "volume" in representation:
-            representation["volume"] = _not_empty_str(
-                representation["volume"])
-            parse_volume_string(representation["volume"])
-        return representation
+
+class AccountingHandler(ResourceHandler):
+    resource_class = Accounting
 
     @gen.coroutine
     @authenticated
-    def create(self, representation):
+    def create(self, resource, **kwargs):
         db = self.application.db
+
+        volume = {} if resource.volume == Absent else resource.volume
+        parse_volume_string(volume)
 
         try:
             id = db.grant_access(
-                representation["image_name"],
-                representation["user_name"],
-                representation["allow_home"],
+                resource.image_name,
+                resource.user_name,
+                resource.allow_home,
                 True,
-                representation.get("volume")
+                volume,
                 )
         except db_exceptions.NotFound:
             raise exceptions.NotFound()
 
-        return id
+        resource.identifier = id
 
     @gen.coroutine
     @authenticated
-    def delete(self, identifier):
+    def delete(self, resource, **kwargs):
         db = self.application.db
 
         try:
-            db.revoke_access_by_id(identifier)
+            db.revoke_access_by_id(resource.identifier)
         except db_exceptions.NotFound:
             raise exceptions.NotFound()
 
