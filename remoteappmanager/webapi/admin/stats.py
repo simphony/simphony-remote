@@ -15,7 +15,7 @@ class Stats(SingletonResource):
     #: Total number of users currently running at least one container
     num_active_users = Int()
     #: Total number of available applications.
-    num_application = Int()
+    num_applications = Int()
     #: Total number of running containers.
     num_running_containers = Int()
 
