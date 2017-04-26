@@ -1,13 +1,16 @@
 define([
-    "jquery",
     "urlutils",
-    "handlebars",
     "utils",
-    "underscore",
+    "gamodule",
+    "dialogs",
     "home/models",
-    '../../components/vue/dist/vue.min'
-], function ($, urlutils, hb, utils, _, models, Vue) {
+    '../../components/vue/dist/vue.min',
+    "jsapi/v1/resources"
+], function (urlutils, utils, gamodule, dialogs, models, Vue, resources) {
     "use strict";
+
+    var ga = gamodule.init();
+    var Status = models.Status;
 
     var ApplicationView = Vue.extend({
         el: 'section.content',
@@ -24,6 +27,41 @@ define([
             },
             app_policy: function() {
                 return this.current_app.app_data.image.policy;
+            }
+        },
+
+        methods: {
+            start_application: function() {
+                var selected_index = this.model.selected_index;
+                var current_app = this.current_app;
+
+                current_app.status = Status.STARTING;
+
+                var configurables_data = {};
+                current_app.configurables.forEach(function(configurable) {
+                    var tag = configurable.tag;
+                    configurables_data[tag] = configurable.as_config_dict();
+                });
+
+                resources.Container.create({
+                    mapping_id: current_app.app_data.mapping_id,
+                    configurables: configurables_data
+                }).done(function() {
+                    ga("send", "event", {
+                        eventCategory: "Application",
+                        eventAction: "start",
+                        eventLabel: current_app.app_data.image.name
+                    });
+
+                    this.model.update_idx(selected_index)
+                        .fail(function(error) {
+                            current_app.status = Status.STOPPED;
+                            dialogs.webapi_error_dialog(error);
+                        });
+                }.bind(this)).fail(function(error) {
+                    current_app.status = Status.STOPPED;
+                    dialogs.webapi_error_dialog(error);
+                });
             }
         },
 
