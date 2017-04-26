@@ -6,8 +6,9 @@
 // Distributed under the terms of the Modified BSD License.
 
 define([
-    'jquery'
-], function ($) {
+    'jquery',
+    'urlutils'
+], function ($, urlutils) {
     "use strict";
 
     var all = function (promises) {
@@ -78,7 +79,7 @@ define([
         is_stopped: function(application) {
             return application.status === Status.STOPPED;
         }
-    }
+    };
 
     return {
         all : all,
