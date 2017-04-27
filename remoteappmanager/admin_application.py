@@ -18,7 +18,8 @@ class AdminApplication(BaseApplication):
         return [admin.ContainerHandler,
                 admin.ApplicationHandler,
                 admin.UserHandler,
-                admin.AccountingHandler]
+                admin.AccountingHandler,
+                admin.StatsHandler]
 
     def _web_handlers(self):
         base_urlpath = self.command_line_config.base_urlpath
