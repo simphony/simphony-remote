@@ -53,39 +53,10 @@ define([
         STOPPED: "STOPPED"
     };
 
-    // Temporary: will be registered in Vue globally
-    var filters = {
-        icon_src: function(icon_data) {
-            return (
-                icon_data ?
-                'data:image/png;base64,' + icon_data :
-                urlutils.path_join(
-                    window.apidata.base_url, 'static', 'images', 'generic_appicon_128.png'
-                )
-            );
-        },
-        app_name: function(image) {
-            return image.ui_name? image.ui_name: image.name;
-        },
-        is_starting: function(application) {
-            return application.status === Status.STARTING;
-        },
-        is_running: function(application) {
-            return application.status === Status.RUNNING;
-        },
-        is_stopping: function(application) {
-            return application.status === Status.STOPPING;
-        },
-        is_stopped: function(application) {
-            return application.status === Status.STOPPED;
-        }
-    };
-
     return {
         all : all,
         update : update,
         max_iframe_size: max_iframe_size,
-        filters: filters,
         Status: Status
     };
 
