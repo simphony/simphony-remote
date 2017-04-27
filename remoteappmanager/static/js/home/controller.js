@@ -15,12 +15,12 @@ require([
     // It is only synchronized at initial load.
     var model = new models.ApplicationListModel();
 
-    var app_list_view = new application_list_view.ApplicationListView({
+    new application_list_view.ApplicationListView({ // jshint ignore:line
         el: '#applist',
         data: function() { return { model: model }; }
     });
 
-    var app_view = new application_view.ApplicationView({
+    new application_view.ApplicationView({ // jshint ignore:line
         el: 'div.content-wrapper',
         data: function() { return { model: model }; }
     });
