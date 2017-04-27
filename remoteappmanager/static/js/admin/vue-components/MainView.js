@@ -1,6 +1,7 @@
 define([
-  "components/vue/dist/vue.min"
-], function(Vue) {
+  "components/vue/dist/vue.min",
+  "jsapi/v1/resources"
+], function(Vue, resources) {
   "use strict";
   
   return {
@@ -13,7 +14,7 @@ define([
     <div class="col-lg-4">Total users</div><div class="col-lg-8">{{ num_total_users }}</div>
   </div>
   <div class="row">
-    <div class="col-lg-4">Number of images</div><div class="col-lg-8">{{ num_images }}</div>
+    <div class="col-lg-4">Number of applications</div><div class="col-lg-8">{{ num_applications }}</div>
   </div>
   <hr />
   <div class="row">
@@ -26,15 +27,23 @@ define([
   </div>`,
     data: function() {
       return {
-        realm: "foo",
-        num_total_users: 3,
-        num_images: 5,
-        num_active_users: 4,
-        num_running_containers: 5
+        realm: "",
+        num_total_users: "",
+        num_applications: "",
+        num_active_users: "",
+        num_running_containers: ""
       };
     },
     mounted: function() {
       this.$data.realm = "bar";
+      resources.Stats.retrieve()
+        .done((function(rep) { 
+          this.$data.realm = rep.realm;
+          this.$data.num_total_users = rep.num_total_users;
+          this.$data.num_applications = rep.num_applications;
+          this.$data.num_active_users = rep.num_active_users;
+          this.$data.num_running_containers = rep.num_running_containers;
+        }).bind(this));
     }
   };
 });
