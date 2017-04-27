@@ -172,7 +172,7 @@ define([
             current_app.status = Status.STOPPED;
             dialogs.webapi_error_dialog(error);
         });
-    }
+    };
 
     ApplicationListModel.prototype.stop_application = function(index) {
         var app_stopping = this.app_list[index];
@@ -192,7 +192,7 @@ define([
             app_stopping.status = Status.STOPPED;
             dialogs.webapi_error_dialog(error);
         });
-    }
+    };
 
     return {
         ApplicationListModel: ApplicationListModel

@@ -6,8 +6,6 @@ define([
 ], function ($, urlutils, utils, Vue) {
     "use strict";
 
-    var Status = utils.Status;
-
     var ApplicationView = Vue.extend({
         computed: {
             current_app: function() {
