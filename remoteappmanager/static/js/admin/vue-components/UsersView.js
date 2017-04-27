@@ -1,6 +1,7 @@
 define([
-  "components/vue/dist/vue.min"
-], function(Vue) {
+  "components/vue/dist/vue.min",
+  "jsapi/v1/resources"
+], function(Vue, resources) {
   "use strict";
 
   return {
@@ -15,14 +16,15 @@ define([
           <tr>
               <th>ID</th>
               <th>Username</th>
-              <th>Actions</th>
+              <th>Accounting</th>
+              <th>Remove</th>
           </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr v-for="u in users">
               <td>{{ u.id }}</td>
               <td>{{ u.name }}</td>
-              <td><a href="{{ base_url }}users/{{ u.id }}/accounting/">Show</a></td>
+              <td> <router-link :to="{ name: 'user_accounting', params: { id: u.id }}">Show</router-link></td>
               <td><button class="btn btn-danger"
                           data-value="{{ u.id }}"
                           data-name="{{ u.name }}"
@@ -37,9 +39,25 @@ define([
   </div>
 </div>`,
     data: function () {
-      return {};
+      return {
+        users: []
+      };
     },
     mounted: function () {
+      resources.User.items()
+        .done(
+          (function (identifiers, items) {
+            var users = [];
+            identifiers.forEach(function(id) {
+              users.push({
+                id: id,
+                name: items[id].name
+              });
+            })
+            this.$data.users = users;
+          }).bind(this))
+        .fail(function () {
+        });
     }
   };
 });

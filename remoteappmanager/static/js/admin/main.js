@@ -24,6 +24,7 @@ require([
       { path: '/', component: MainView },
       { path: '/containers', component: ContainersView },
       { path: '/users', component: UsersView },
+      { name: "user_accounting", path: '/users/:id/accounting', component: UsersView },
       { path: '/applications', component: ApplicationsView }
     ]
   });

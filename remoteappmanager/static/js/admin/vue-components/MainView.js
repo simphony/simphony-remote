@@ -48,7 +48,6 @@ define([
       };
     },
     mounted: function() {
-      this.$data.realm = "bar";
       resources.Stats.retrieve()
         .done((function(rep) { 
           this.$data.realm = rep.realm;
