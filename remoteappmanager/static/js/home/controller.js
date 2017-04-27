@@ -15,11 +15,15 @@ require([
     // It is only synchronized at initial load.
     var model = new models.ApplicationListModel();
 
-    var app_list_view = new application_list_view.ApplicationListView();
-    var app_view = new application_view.ApplicationView();
-
-    $.when(model.update()).done(function () {
-        app_list_view.model = model;
-        app_view.model = model;
+    var app_list_view = new application_list_view.ApplicationListView({
+        el: '#applist',
+        data: function() { return { model: model }; }
     });
+
+    var app_view = new application_view.ApplicationView({
+        el: 'div.content-wrapper',
+        data: function() { return { model: model }; }
+    });
+
+    model.update();
 });

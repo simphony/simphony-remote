@@ -13,14 +13,6 @@ define([
     (will next be wrapped in a main ViewModel which will contain the
     applicationListView and the applicationView) */
     var ApplicationListView = Vue.extend({
-        el: '#applist',
-
-        data: function() {
-            return {
-                model: { app_list: [], selected_index: null, loading: true }
-            };
-        },
-
         methods: {
             stop_application: function(index) {
                 var app_stopping = this.model.app_list[index];

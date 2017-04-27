@@ -14,14 +14,6 @@ define([
     var Status = utils.Status;
 
     var ApplicationView = Vue.extend({
-        el: 'div.content-wrapper',
-
-        data: function() {
-            return {
-                model: { app_list: [], selected_index: null, loading: true }
-            };
-        },
-
         computed: {
             current_app: function() {
                 return this.model.app_list[this.model.selected_index] || null;

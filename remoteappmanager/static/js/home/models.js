@@ -69,7 +69,13 @@ define([
 
             // Add the options for some image types
             app_data.forEach(function(application_data, data_idx) {
-                this.app_list[data_idx] = { app_data: application_data };
+                this.app_list.push({
+                    app_data: application_data,
+                    // Default values, will be overwritten
+                    status: Status.STOPPED,
+                    delayed: true,
+                    configurables: []
+                });
 
                 this._update_configurables(data_idx);
                 this._update_status(data_idx);
@@ -102,11 +108,6 @@ define([
     ApplicationListModel.prototype._update_configurables = function(index) {
         // Updates the configurables submodel for a given application index.
         var image = this.app_list[index].app_data.image;
-
-        // Contains the submodels for the configurables.
-        // It is a dictionary that maps a supported (by the image) configurable tag
-        // to its client-side model.
-        this.app_list[index].configurables = [];
 
         image.configurables.forEach(function(tag) {
             // If this returns null, the tag has not been recognized
