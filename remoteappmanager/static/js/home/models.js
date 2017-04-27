@@ -2,11 +2,14 @@ define([
     'jquery',
     'home/configurables',
     'utils',
-    'jsapi/v1/resources'
-], function ($, configurables, utils, resources) {
+    'jsapi/v1/resources',
+    "gamodule",
+    "dialogs"
+], function ($, configurables, utils, resources, gamodule, dialogs) {
     "use strict";
 
     var Status = utils.Status;
+    var ga = gamodule.init();
 
     var available_applications_info = function () {
         // Retrieve information from the various applications and
@@ -136,6 +139,60 @@ define([
             this.app_list[index].status = Status.RUNNING;
         }
     };
+
+    ApplicationListModel.prototype.start_application = function() {
+        var selected_index = this.selected_index;
+        var current_app = this.app_list[selected_index];
+
+        current_app.status = Status.STARTING;
+        current_app.delayed = true;
+
+        var configurables_data = {};
+        current_app.configurables.forEach(function(configurable) {
+            var tag = configurable.tag;
+            configurables_data[tag] = configurable.as_config_dict();
+        });
+
+        resources.Container.create({
+            mapping_id: current_app.app_data.mapping_id,
+            configurables: configurables_data
+        }).done(function() {
+            ga("send", "event", {
+                eventCategory: "Application",
+                eventAction: "start",
+                eventLabel: current_app.app_data.image.name
+            });
+
+            this.update_idx(selected_index)
+            .fail(function(error) {
+                current_app.status = Status.STOPPED;
+                dialogs.webapi_error_dialog(error);
+            });
+        }.bind(this)).fail(function(error) {
+            current_app.status = Status.STOPPED;
+            dialogs.webapi_error_dialog(error);
+        });
+    }
+
+    ApplicationListModel.prototype.stop_application = function(index) {
+        var app_stopping = this.app_list[index];
+        app_stopping.status = Status.STOPPING;
+
+        var url_id = app_stopping.app_data.container.url_id;
+
+        resources.Container.delete(url_id)
+        .done(function() {
+            this.update_idx(index)
+            .fail(function(error) {
+                app_stopping.status = Status.STOPPED;
+                dialogs.webapi_error_dialog(error);
+            });
+        }.bind(this))
+        .fail(function(error) {
+            app_stopping.status = Status.STOPPED;
+            dialogs.webapi_error_dialog(error);
+        });
+    }
 
     return {
         ApplicationListModel: ApplicationListModel

@@ -1,11 +1,9 @@
 /*globals: require, console*/
 require([
-    "urlutils",
     "home/models",
     "home/views/application_list_view",
     "home/views/application_view"
 ], function(
-    urlutils,
     models,
     application_list_view,
     application_view) {
