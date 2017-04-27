@@ -5,7 +5,7 @@ from remoteappmanager.services.reverse_proxy import ReverseProxy
 from tornado import gen, testing
 
 
-class TestReverseProxy(testing.AsyncTestCase):
+class TestReverseProxy(testing.AsyncTestCase, testing.LogTrapTestCase):
     @testing.gen_test
     def test_reverse_proxy_operations(self):
         coroutine_out = None
