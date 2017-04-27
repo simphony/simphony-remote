@@ -109,6 +109,11 @@ define([
         // Updates the configurables submodel for a given application index.
         var image = this.app_list[index].app_data.image;
 
+        // Contains the submodels for the configurables.
+        // It is a dictionary that maps a supported (by the image) configurable tag
+        // to its client-side model.
+        this.app_list[index].configurables = [];
+
         image.configurables.forEach(function(tag) {
             // If this returns null, the tag has not been recognized
             // by the client. skip it and let the server deal with the
