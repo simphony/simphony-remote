@@ -29,6 +29,27 @@ require([
     ]
   });
 
+  Vue.component("modal-dialog",
+    {
+      template: `
+        <transition name="modal">
+          <div class="modal-mask" @click="close" v-show="show">
+            <div class="modal-wrapper">
+              <div class="modal-container" @click.stop>
+                <slot>
+                </slot>
+              </div>
+            </div>
+          </div>
+        </transition>`,
+      props: ['show', 'onClose'],
+      methods: {
+        close: function () {
+          this.onClose();
+        }
+      }
+    });
+  
   const app = new Vue({
     router
   }).$mount('#app');
