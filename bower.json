@@ -27,9 +27,10 @@
         "respond": "~1.4.2",
         "vue": "^2.2.6",
         "vue-router": "^2.5.2",
-        "vue-form": "^4.0.0"
+        "vue-form": "^4.0.0",
+        "lodash" : "~4.17.4"
     },
     "devDependencies": {
         "blanket": "^1.1.7"
     }
-}
+
