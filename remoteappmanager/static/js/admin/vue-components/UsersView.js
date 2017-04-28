@@ -67,13 +67,16 @@ define([
             this.$emit("closed");
           }).bind(this)
         );
+      },
+      reset: function() {
+        console.log("resetting");
+         Object.assign(this.$data, this.$options.data());
       }
     },
     watch: {
       "show": function(value) {
         if (value) {
-          this.model.name = "";
-          this.formstate = {};
+          this.reset();
         }
       }
     }
@@ -97,18 +100,19 @@ define([
         this.$emit("closed");
       },
       removeUser: function() {
-        if (this.userToRemove.id !== null) {
-          resources.User.delete(this.userToRemove.id)
-          .done((function () {
-            this.$emit("removed");
-          }).bind(this))
-          .fail(
-            (function () {
-              this.$emit("closed");
-            }).bind(this)
-          );
+        if (this.userToRemove.id === null) {
+          this.$emit("closed");
+          return;
         }
-        this.close();
+        resources.User.delete(this.userToRemove.id)
+        .done((function () {
+          this.$emit("removed");
+        }).bind(this))
+        .fail(
+          (function () {
+            this.$emit("closed");
+          }).bind(this)
+        );
       }
     }
   };
@@ -146,13 +150,13 @@ define([
           </tbody>
         </table>
         <new-user-dialog 
-          v-show="showNewUserDialog"
+          v-if="showNewUserDialog"
           :show="showNewUserDialog"
           @created="newUserCreated"
           @closed="newUserDialogClosed"></new-user-dialog>
           
         <remove-user-dialog 
-          v-show="showRemoveUserDialog"
+          v-if="showRemoveUserDialog"
           :userToRemove="userToRemove"
           @removed="userRemoved"
           @closed="removeDialogClosed"></remove-user-dialog>
@@ -168,7 +172,7 @@ define([
         userToRemove: {
           name: "",
           id: null
-        },
+        }
       };
     },
     mounted: function () {
