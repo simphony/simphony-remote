@@ -9,7 +9,6 @@ define([
     "use strict";
 
     var Status = utils.Status;
-    // var ga = gamodule.init();
 
     var available_applications_info = function () {
         // Retrieve information from the various applications and
@@ -157,12 +156,6 @@ define([
             mapping_id: current_app.app_data.mapping_id,
             configurables: configurables_data
         }).done(function() {
-            /*ga("send", "event", {
-                eventCategory: "Application",
-                eventAction: "start",
-                eventLabel: current_app.app_data.image.name
-            });*/
-
             this.update_idx(selected_index)
             .fail(function(error) {
                 current_app.status = Status.STOPPED;
