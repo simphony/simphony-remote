@@ -29,7 +29,7 @@ require([
     ]
   });
 
-  Vue.component("modal-dialog",
+  Vue.component("modal",
     {
       template: `
         <transition name="modal">

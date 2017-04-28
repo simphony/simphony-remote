@@ -5,6 +5,88 @@ define([
 ], function($, Vue, resources) {
   "use strict";
 
+  Vue.component('new-user-dialog', {
+    template: `
+      <modal :show="show" :on-close="close">
+         <div class="modal-header"><h4>Create New User</h4></div>
+         <div class="modal-body">
+         <form>
+         <label for="user-name">User name</label>
+          <input type="text" class="form-control" id="user-name" v-model="name">
+          <div class="alert alert-danger" role="alert" v-show="name.length === 0">User name cannot be empty</div>
+         </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" @click="close()">Cancel</button>
+          <button type="button" class="btn btn-primary primary" :disabled="name.length === 0" @click="createNewUser">Create</button>
+        </div>
+    </modal>`,
+    props: ['show'],
+    data: function () {
+      return {
+        name: ''
+      };
+    },
+    methods: {
+      close: function () {
+        this.$emit('closed');
+      },
+      createNewUser: function() {
+        var user_name = $.trim(this.name);
+        resources.User.create({ name: user_name })
+        .done((
+          function() {
+            this.$emit('created');
+          }).bind(this)
+        )
+        .fail(
+          (function() {
+            this.$emit("closed");
+          }).bind(this)
+        );
+      }
+    }
+  });
+
+  Vue.component('remove-user-dialog', {
+    template: `
+    <modal :show="show" :on-close="close">
+        <div class="modal-header"><h4>Remove User</h4></div>
+        <div class="modal-body">Do you want to remove the user?</div>
+
+        <div class="modal-footer text-right">
+            <button type="button" class="btn btn-default" @click="close()">Cancel</button>
+            <button class="btn btn-primary primary" @click="removeUser()">Remove</button>
+        </div>
+    </modal>
+    `,
+    props: ['show'],
+    data: function () {
+      return {
+        id: null
+      };
+    },
+    methods: {
+      close: function () {
+        this.id = null;
+        this.$emit("closed");
+      },
+      removeUser: function() {
+        resources.User.delete(this.id)
+          .done((function() {
+            this.$emit("removed");
+          }).bind(this))
+          .fail(
+            (function() {
+              this.$emit("closed");
+            }).bind(this)
+          );
+        this.close();
+      }
+    }
+  });
+
+
   return {
     template: `
 <div class="row">
@@ -13,9 +95,7 @@ define([
       <div class="box-header with-border">Users</div>
       <div class="box-body">
         <div class="pull-right">
-          <button class="btn btn-primary createnew"
-                  data-toggle="modal"
-                  data-target="#create-new-dialog">Create New</button>
+          <button class="btn btn-primary createnew" @click="showNewUserDialog = true">Create New</button>
         </div>
         <table id="datatable" class="display dataTable">
           <thead>
@@ -30,50 +110,29 @@ define([
             <tr v-for="u in users">
               <td>{{ u.id }}</td>
               <td>{{ u.name }}</td>
-              <td> <router-link :to="{ name: 'user_accounting', params: { id: u.id }}">Show</router-link></td>
-              <td><button class="btn btn-danger"
-                          data-value="{{ u.id }}"
-                          data-name="{{ u.name }}"
-                          data-toggle="modal"
-                          data-target="#action-dialog">Remove</button>
-              </td>
+              <td><router-link :to="{ name: 'user_accounting', params: { id: u.id }}">Show</router-link></td>
+              <td><button class="btn btn-danger" @click="showRemoveUserDialog = true">Remove</button></td>
             </tr>
           </tbody>
         </table>
-        <div class="modal fade" id="create-new-dialog" tabindex="-1" role="dialog" aria-labelledby="create-new-label" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close modal-close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="create-new-label">Create New User</h4>
-              </div>
-              <div class="modal-body">
-                <form>
-                    <label for="user-name">User name</label>
-                    <input type="text" class="form-control" id="user-name" v-model="new_name">
-                    <div class="alert alert-danger" role="alert" v-show="new_name.length === 0">User name cannot be empty</div>
-                </form>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default modal-close" data-dismiss="modal">Cancel</button>
-                <button type="button" 
-                        class="btn btn-primary primary" 
-                        data-dismiss="modal" 
-                        :disabled="new_name.length === 0"
-                        @click="createNewUser">Create</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <new-user-dialog 
+          :show="showNewUserDialog"
+          v-on:created="newUserCreated"
+          v-on:closed="showNewUserDialog=false"></new-user-dialog>
+          
+        <remove-user-dialog 
+          :show="showRemoveUserDialog"
+          v-on:removed="userRemoved"
+          v-on:closed="showRemoveUserDialog=false"></remove-user-dialog>
       </div>
     </div>
   </div>
-</div>
-`,
+</div>`,
     data: function () {
       return {
         users: [],
-        new_name: "hello",
+        showNewUserDialog: false,
+        showRemoveUserDialog: false
       };
     },
     mounted: function () {
@@ -82,26 +141,30 @@ define([
     methods: {
       update: function() {
         resources.User.items()
-          .done(
-            (function (identifiers, items) {
-              var users = [];
-              identifiers.forEach(function(id) {
-                users.push({
-                  id: id,
-                  name: items[id].name
-                });
+        .done(
+          (function (identifiers, items) {
+            var users = [];
+            identifiers.forEach(function(id) {
+              users.push({
+                id: id,
+                name: items[id].name
               });
-              this.$data.users = users;
-            }).bind(this))
-          .fail(function () {
-          });
+            });
+            this.$data.users = users;
+          }).bind(this))
+        .fail(function () {
+        });
       },
-      createNewUser: function() {
-        var user_name = $.trim(this.$data.new_name);
-        resources.User.create({ name: user_name })
-          .done((function() { this.update(); }).bind(this))
-          .fail(function() {});
+      newUserCreated: function() {
+        this.showNewUserDialog = false;
+        this.update();
+      },
+      userRemoved: function() {
+        this.showRemoveUserDialog = false;
+        this.update();
       }
-    }
+    },
   };
 });
+
+

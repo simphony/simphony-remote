@@ -5,10 +5,6 @@ define([
 ], function ($, dialogs, resources) {
     "use strict";
 
-    $('#create-new-dialog').on('shown.bs.modal', function () {
-        $("#user-name").focus();
-    });
-
     $('#action-dialog').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget);
         var id = button.data('value');
