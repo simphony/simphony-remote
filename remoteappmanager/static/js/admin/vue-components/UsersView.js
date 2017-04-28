@@ -1,38 +1,61 @@
 define([
   "jquery",
-  "components/vue/dist/vue.min",
+  "components/vue/dist/vue",
   "jsapi/v1/resources"
 ], function($, Vue, resources) {
   "use strict";
 
-  Vue.component('new-user-dialog', {
+  var NewUserDialog = {
     template: `
-      <modal :show="show" :on-close="close">
-         <div class="modal-header"><h4>Create New User</h4></div>
-         <div class="modal-body">
-         <form>
-         <label for="user-name">User name</label>
-          <input type="text" class="form-control" id="user-name" v-model="name">
-          <div class="alert alert-danger" role="alert" v-show="name.length === 0">User name cannot be empty</div>
-         </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" @click="close()">Cancel</button>
-          <button type="button" class="btn btn-primary primary" :disabled="name.length === 0" @click="createNewUser">Create</button>
+      <modal>
+        <div class="modal-header"><h4>Create New User</h4></div>
+        <div class="modal-body">
+          <vue-form :state="formstate" v-model="formstate" @submit.prevent="createNewUser">
+            <validate auto-label class="form-group required-field" :class="fieldClassName(formstate.name)">
+              <label class="control-label">User Name</label>
+              <input type="text" name="name" class="form-control" required v-model="model.name">
+
+              <field-messages name="name" show="$touched || $submitted">
+                <span class="help-block" slot="required">User Name cannot be empty</span>
+              </field-messages>
+            </validate>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" @click="close()">Cancel</button>
+              <button class="btn btn-primary" type="submit" :disabled="formstate.$invalid">Submit</button>
+            </div>
+          </vue-form> 
         </div>
     </modal>`,
     props: ['show'],
+    
     data: function () {
       return {
-        name: ''
+        formstate: {},
+        model: {
+          name: ''
+        }
       };
     },
     methods: {
       close: function () {
         this.$emit('closed');
       },
+      fieldClassName: function (field) {
+        if(!field) {
+          return '';
+        }
+        if((field.$touched || field.$submitted) && field.$invalid) {
+          return 'has-error';
+        } else {
+          return '';
+        }
+      },
       createNewUser: function() {
-        var user_name = $.trim(this.name);
+        if (! this.formstate.$valid) {
+          return;
+        }
+        var user_name = $.trim(this.model.name);
         resources.User.create({ name: user_name })
         .done((
           function() {
@@ -45,49 +68,56 @@ define([
           }).bind(this)
         );
       }
+    },
+    watch: {
+      "show": function(value) {
+        if (value) {
+          this.model.name = "";
+          this.formstate = {};
+        }
+      }
     }
-  });
+  };
 
-  Vue.component('remove-user-dialog', {
+  var RemoveUserDialog = {
     template: `
-    <modal :show="show" :on-close="close">
+    <modal>
         <div class="modal-header"><h4>Remove User</h4></div>
-        <div class="modal-body">Do you want to remove the user?</div>
+        <div class="modal-body">Do you want to remove user {{ userToRemove.name }}?</div>
 
         <div class="modal-footer text-right">
-            <button type="button" class="btn btn-default" @click="close()">Cancel</button>
-            <button class="btn btn-primary primary" @click="removeUser()">Remove</button>
+            <button type="button" class="btn btn-default" @click="close">Cancel</button>
+            <button class="btn btn-primary primary" @click="removeUser">Remove</button>
         </div>
     </modal>
     `,
-    props: ['show'],
-    data: function () {
-      return {
-        id: null
-      };
-    },
+    props: ['userToRemove'],
     methods: {
       close: function () {
-        this.id = null;
         this.$emit("closed");
       },
       removeUser: function() {
-        resources.User.delete(this.id)
-          .done((function() {
+        if (this.userToRemove.id !== null) {
+          resources.User.delete(this.userToRemove.id)
+          .done((function () {
             this.$emit("removed");
           }).bind(this))
           .fail(
-            (function() {
+            (function () {
               this.$emit("closed");
             }).bind(this)
           );
+        }
         this.close();
       }
     }
-  });
-
+  };
 
   return {
+    components: {
+      'new-user-dialog': NewUserDialog,
+      'remove-user-dialog': RemoveUserDialog
+    },
     template: `
 <div class="row">
   <div class="col-md-12">
@@ -107,23 +137,25 @@ define([
           </tr>
           </thead>
           <tbody>
-            <tr v-for="u in users">
+            <tr v-for="(u, index) in users">
               <td>{{ u.id }}</td>
               <td>{{ u.name }}</td>
               <td><router-link :to="{ name: 'user_accounting', params: { id: u.id }}">Show</router-link></td>
-              <td><button class="btn btn-danger" @click="showRemoveUserDialog = true">Remove</button></td>
+              <td><button class="btn btn-danger" @click="removeAction(index)">Remove</button></td>
             </tr>
           </tbody>
         </table>
         <new-user-dialog 
+          v-show="showNewUserDialog"
           :show="showNewUserDialog"
-          v-on:created="newUserCreated"
-          v-on:closed="showNewUserDialog=false"></new-user-dialog>
+          @created="newUserCreated"
+          @closed="newUserDialogClosed"></new-user-dialog>
           
         <remove-user-dialog 
-          :show="showRemoveUserDialog"
-          v-on:removed="userRemoved"
-          v-on:closed="showRemoveUserDialog=false"></remove-user-dialog>
+          v-show="showRemoveUserDialog"
+          :userToRemove="userToRemove"
+          @removed="userRemoved"
+          @closed="removeDialogClosed"></remove-user-dialog>
       </div>
     </div>
   </div>
@@ -132,14 +164,18 @@ define([
       return {
         users: [],
         showNewUserDialog: false,
-        showRemoveUserDialog: false
+        showRemoveUserDialog: false,
+        userToRemove: {
+          name: "",
+          id: null
+        },
       };
     },
     mounted: function () {
-      this.update();
+      this.updateTable();
     },
     methods: {
-      update: function() {
+      updateTable: function() {
         resources.User.items()
         .done(
           (function (identifiers, items) {
@@ -157,13 +193,27 @@ define([
       },
       newUserCreated: function() {
         this.showNewUserDialog = false;
-        this.update();
+        this.updateTable();
+      },
+      newUserDialogClosed: function() {
+        this.showNewUserDialog = false;
       },
       userRemoved: function() {
         this.showRemoveUserDialog = false;
-        this.update();
+        this.updateTable();
+      },
+      removeAction: function(index) {
+        this.userToRemove = this.users[index];
+        this.showRemoveUserDialog = true;
+      },
+      removeDialogClosed: function(index) {
+        this.showRemoveUserDialog = false;
+        this.userToRemove = {
+          name: "",
+          id: null
+        };
       }
-    },
+    }
   };
 });
 

@@ -1,7 +1,8 @@
 /*globals: require, console*/
 require([
-  "components/vue/dist/vue.min",
-  "components/vue-router/dist/vue-router.min",
+  "components/vue/dist/vue",
+  "components/vue-router/dist/vue-router",
+  "components/vue-form/dist/vue-form",
   "admin/vue-components/MainView",
   "admin/vue-components/ContainersView",
   "admin/vue-components/UsersView",
@@ -9,6 +10,7 @@ require([
 ], function(
   Vue, 
   VueRouter,
+  VueForm,
   MainView,
   ContainersView,
   UsersView,
@@ -18,6 +20,12 @@ require([
 
   // install router
   Vue.use(VueRouter);
+  Vue.use(VueForm, {
+    inputClasses: {
+      valid: 'form-control-success',
+      invalid: 'form-control-danger'
+    }
+  });
   
   const router = new VueRouter({
     routes: [
@@ -33,21 +41,15 @@ require([
     {
       template: `
         <transition name="modal">
-          <div class="modal-mask" @click="close" v-show="show">
+          <div class="modal-mask">
             <div class="modal-wrapper">
-              <div class="modal-container" @click.stop>
+              <div class="modal-container">
                 <slot>
                 </slot>
               </div>
             </div>
           </div>
         </transition>`,
-      props: ['show', 'onClose'],
-      methods: {
-        close: function () {
-          this.onClose();
-        }
-      }
     });
   
   const app = new Vue({
