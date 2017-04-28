@@ -22,7 +22,7 @@ require([
     });
 
     new application_view.ApplicationView({ // jshint ignore:line
-        el: 'div.content-wrapper',
+        el: '#appview',
         data: function() { return { model: model }; }
     });
 
