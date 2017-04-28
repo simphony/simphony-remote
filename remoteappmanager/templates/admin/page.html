@@ -149,18 +149,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <section class="sidebar">
         <ul class="sidebar-menu" id="adminoptions">
           <li class="header">ADMIN</li>
-          <li {% if tab == "home" %}class="active"{% endif %}>
-            <router-link to="/">Home</router-link>
-          </li>
-          <li {% if tab == "containers" %}class="active"{% endif %}>
-            <router-link to="/containers">Containers</router-link>
-          </li>
-          <li {% if tab == "users" %}class="active"{% endif %}>
-            <router-link to="/users">Users</router-link>
-          </li>
-          <li {% if tab == "applications" %}class="active"{% endif %}>
-            <router-link to="/applications">Applications</router-link>
-          </li>
+          <router-link to="/" tag="li" exact-active-class="active"><a>Home</a></router-link>
+          <router-link to="/containers" tag="li" exact-active-class="active"><a>Containers</a></router-link>
+          <router-link to="/users" tag="li" active-class="active"><a>Users</a></router-link>
+          <router-link to="/applications" tag="li" exact-active-class="active"><a>Applications</a></router-link>
         </ul>
       </section>
     </aside>

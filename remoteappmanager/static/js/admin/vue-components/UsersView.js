@@ -189,7 +189,7 @@ define([
                 name: items[id].name
               });
             });
-            this.$data.users = users;
+            this.users = users;
           }).bind(this))
         .fail(function () {
         });
