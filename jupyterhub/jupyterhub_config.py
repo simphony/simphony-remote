@@ -7,7 +7,7 @@ c = get_config()  # noqa
 c.JupyterHub.ssl_key = 'test.key'
 c.JupyterHub.ssl_cert = 'test.crt'
 
-c.JupyterHub.hub_ip = public_ips()[0]
+c.JupyterHub.hub_ip = public_ips()[0] if len(public_ips()) else '127.0.0.1'
 
 # Choose between system-user mode and virtual-user mode
 setting_mode = ('system_user', 'virtual_user')[1]
