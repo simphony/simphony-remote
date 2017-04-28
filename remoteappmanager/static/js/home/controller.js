@@ -5,14 +5,16 @@ require([
     "home/views/application_view",
     "components/vue/dist/vue.min",
     "gamodule",
-    "utils"
+    "utils",
+    'urlutils'
 ], function(
     models,
     application_list_view,
     application_view,
     Vue,
     gamodule,
-    utils) {
+    utils,
+    urlutils) {
     "use strict";
 
     var Status = utils.Status;

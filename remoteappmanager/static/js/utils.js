@@ -6,9 +6,8 @@
 // Distributed under the terms of the Modified BSD License.
 
 define([
-    'jquery',
-    'urlutils'
-], function ($, urlutils) {
+    'jquery'
+], function ($) {
     "use strict";
 
     var all = function (promises) {
