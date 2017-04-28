@@ -4,7 +4,7 @@ from remoteappmanager.base_application import BaseApplication
 from remoteappmanager.handlers.api import (
     AdminHomeHandler,
     AccountingHandler,
-    ApplicationsHandler)
+)
 from remoteappmanager.webapi import admin
 from remoteappmanager.utils import url_path_join, with_end_slash
 
@@ -26,9 +26,6 @@ class AdminApplication(BaseApplication):
             (with_end_slash(
                 url_path_join(base_urlpath, "users", "(\d+)", 'accounting')
             ), AccountingHandler),
-            (with_end_slash(
-                url_path_join(base_urlpath, "applications")
-            ), ApplicationsHandler),
             (base_urlpath.rstrip('/'),
              web.RedirectHandler, {"url": base_urlpath}),
         ]

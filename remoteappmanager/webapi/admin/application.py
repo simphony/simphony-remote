@@ -46,3 +46,16 @@ class ApplicationHandler(ResourceHandler):
             raise exceptions.Unable()
 
         resource.identifier = str(id)
+
+    @gen.coroutine
+    @authenticated
+    def items(self, items_response, **kwargs):
+        db = self.application.db
+        apps = db.list_applications()
+
+        items = []
+        for app in apps:
+            item = Application(image_name=app.image)
+            items.append(item)
+
+        items_response.set(items)
