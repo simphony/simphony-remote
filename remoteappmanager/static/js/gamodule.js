@@ -2,12 +2,9 @@
 // MUST not be renamed to analytics. Some blockers rely on name
 // matching to prevent loading.
 define([
-    "utils",
     "components/vue/dist/vue.min"
-], function (utils, Vue) {
+], function (Vue) {
     "use strict";
-
-    var Status = utils.Status;
 
     function init() {
         var module;
@@ -37,7 +34,7 @@ define([
 
         watch: {
             'current_app.status': function() {
-                if(this.current_app.status === Status.STARTING) {
+                if(this.current_app.is_starting()) {
                     this.ga("send", "event", {
                         eventCategory: "Application",
                         eventAction: "start",

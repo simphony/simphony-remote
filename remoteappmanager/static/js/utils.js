@@ -46,13 +46,6 @@ define([
         return [width, height];
     };
 
-    var Status = {
-        RUNNING: "RUNNING",
-        STARTING: "STARTING",
-        STOPPING: "STOPPING",
-        STOPPED: "STOPPED"
-    };
-
     // Temporary: will be registered in Vue globally
     var filters = {
         icon_src: function(icon_data) {
@@ -66,18 +59,6 @@ define([
         },
         app_name: function(image) {
             return image.ui_name? image.ui_name: image.name;
-        },
-        is_starting: function(application) {
-            return application.status === Status.STARTING;
-        },
-        is_running: function(application) {
-            return application.status === Status.RUNNING;
-        },
-        is_stopping: function(application) {
-            return application.status === Status.STOPPING;
-        },
-        is_stopped: function(application) {
-            return application.status === Status.STOPPED;
         }
     };
 
@@ -85,8 +66,7 @@ define([
         all : all,
         update : update,
         max_iframe_size: max_iframe_size,
-        filters: filters,
-        Status: Status
+        filters: filters
     };
 
 });

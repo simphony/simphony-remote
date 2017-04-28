@@ -1,13 +1,17 @@
 define([
     "jquery",
     "home/configurables",
-    "utils",
     "jsapi/v1/resources",
     "dialogs"
-], function ($, configurables, utils, resources, dialogs) {
+], function ($, configurables, resources, dialogs) {
     "use strict";
 
-    var Status = utils.Status;
+    var Status = {
+        RUNNING: "RUNNING",
+        STARTING: "STARTING",
+        STOPPING: "STOPPING",
+        STOPPED: "STOPPED"
+    };
 
     var available_applications_info = function () {
         // Retrieve information from the various applications and
@@ -75,13 +79,17 @@ define([
                     // Default values, will be overwritten
                     status: Status.STOPPED,
                     delayed: true,
-                    configurables: []
+                    configurables: [],
+                    is_running: function() {return this.status === Status.RUNNING;},
+                    is_stopped: function() {return this.status === Status.STOPPED;},
+                    is_starting: function() {return this.status === Status.STARTING;},
+                    is_stopping: function() {return this.status === Status.STOPPING;}
                 };
 
                 this._update_configurables(app);
                 this._update_status(app);
 
-                app.delayed = app.status !== Status.RUNNING;
+                app.delayed = !app.is_running();
                 app_list.push(app);
             }.bind(this));
 

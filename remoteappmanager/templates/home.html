@@ -52,9 +52,9 @@
              :src="app.app_data.image.icon_128 | icon_src">
 
         <button class="stop-button"
-                v-if="app.status === 'RUNNING'"
+                v-if="app.is_running()"
                 @click="model.stop_application(index)"
-                :disabled="app | is_stopping">
+                :disabled="app.is_stopping()">
           <i class="fa fa-times"></i>
         </button>
 
@@ -74,9 +74,9 @@
     -->
   <section id="appview"
            v-if="current_app !== null"
-           :class="{ content: true, 'no-padding': current_app.status === 'RUNNING' }">
+           :class="{ content: true, 'no-padding': current_app.is_running() }">
     <!-- Start Form -->
-    <div v-if="current_app.status !== 'RUNNING'"
+    <div v-if="!current_app.is_running()"
          v-show="true" style="display: none;" class="row">
       <div class="col-md-offset-2 col-md-8">
         <div class="box box-primary">
@@ -113,7 +113,7 @@
           <div class="box-footer">
             <button class="btn btn-primary pull-right start-button"
                     @click="model.start_application()"
-                    :disabled="current_app | is_starting">
+                    :disabled="current_app.is_starting()">
               Start
             </button>
           </div>
@@ -123,7 +123,7 @@
     </div>
 
     <!-- Application View -->
-    <iframe v-if="current_app.status === 'RUNNING'"
+    <iframe v-if="current_app.is_running()"
             id="application"
             frameBorder="0"
             :src="app_source"
