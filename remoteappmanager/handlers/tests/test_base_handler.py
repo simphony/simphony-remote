@@ -1,3 +1,4 @@
+from tornado.testing import LogTrapTestCase
 from remoteappmanager.file_config import FileConfig
 
 from remoteappmanager.tests import utils
@@ -5,7 +6,7 @@ from remoteappmanager.tests.mocking import dummy
 from remoteappmanager.tests.temp_mixin import TempMixin
 
 
-class TestBaseHandler(TempMixin, utils.AsyncHTTPTestCase):
+class TestBaseHandler(TempMixin, utils.AsyncHTTPTestCase, LogTrapTestCase):
     def get_file_config(self):
         file_config = FileConfig()
         file_config.accounting_class = \

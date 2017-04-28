@@ -1,5 +1,5 @@
 import os
-import unittest
+from tornado.testing import LogTrapTestCase
 from unittest import mock
 
 from click.testing import CliRunner
@@ -14,7 +14,7 @@ def create_docker_client():
     return VirtualDockerClient.with_containers()
 
 
-class TestRemoteAppDbCLI(TempMixin, unittest.TestCase):
+class TestRemoteAppDbCLI(TempMixin, LogTrapTestCase):
     def setUp(self):
         super().setUp()
         self.db = os.path.join(self.tempdir, "test.db")

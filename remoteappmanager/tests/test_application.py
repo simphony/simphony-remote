@@ -15,7 +15,9 @@ class DummyAccounting:
         pass
 
 
-class TestApplication(TempMixin, testing.AsyncTestCase):
+class TestApplication(TempMixin,
+                      testing.AsyncTestCase,
+                      testing.LogTrapTestCase):
     def setUp(self):
         super().setUp()
 

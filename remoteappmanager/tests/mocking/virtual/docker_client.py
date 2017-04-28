@@ -1,4 +1,5 @@
 import json
+import logging
 import hashlib
 import uuid
 import requests
@@ -10,6 +11,8 @@ from remoteappmanager.docker.docker_labels import (
     SIMPHONY_NS,
     SIMPHONY_NS_ENV,
     SIMPHONY_NS_RUNINFO)
+
+log = logging.getLogger(__name__)
 
 # internal, convenience classes. Do not export (risks name collisions with
 # container manager similarly named entities.
@@ -245,10 +248,10 @@ class VirtualDockerClient(object):
             return None
 
     def start(self, *args, **kwargs):
-        print("VirtualDockerClient.start called with ", args, kwargs)
+        log.info("VirtualDockerClient.start called with ", args, kwargs)
 
     def stop(self, *args, **kwargs):
-        print("VirtualDockerClient.stop called with ", args, kwargs)
+        log.info("VirtualDockerClient.stop called with ", args, kwargs)
 
     def remove_container(self, container, *args, **kwargs):
         container = self._find_container(container)
