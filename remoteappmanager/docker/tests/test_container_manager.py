@@ -1,7 +1,7 @@
 import os
 from unittest import mock
 
-from tornado.testing import AsyncTestCase, gen_test
+from tornado.testing import AsyncTestCase, gen_test, LogTrapTestCase
 
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.docker_labels import SIMPHONY_NS_RUNINFO
@@ -13,7 +13,7 @@ from remoteappmanager.tests.mocking.virtual.docker_client import (
     VirtualDockerClient)
 
 
-class TestContainerManager(AsyncTestCase):
+class TestContainerManager(AsyncTestCase, LogTrapTestCase):
     def setUp(self):
         super().setUp()
         self.manager = ContainerManager(docker_config={}, realm="myrealm")

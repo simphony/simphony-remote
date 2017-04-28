@@ -1,8 +1,9 @@
+from tornado.testing import LogTrapTestCase
 from remoteappmanager.tests import utils
 from remoteappmanager.tests.mocking import dummy
 
 
-class TestBaseAccess(utils.AsyncHTTPTestCase):
+class TestBaseAccess(utils.AsyncHTTPTestCase, LogTrapTestCase):
     #: which url to poke
     url = "/user/johndoe"
 
