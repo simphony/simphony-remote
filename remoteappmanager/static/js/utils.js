@@ -45,18 +45,10 @@ define([
         return [width, height];
     };
 
-    var Status = {
-        RUNNING: "RUNNING",
-        STARTING: "STARTING",
-        STOPPING: "STOPPING",
-        STOPPED: "STOPPED"
-    };
-
     return {
         all : all,
         update : update,
-        max_iframe_size: max_iframe_size,
-        Status: Status
+        max_iframe_size: max_iframe_size
     };
 
 });

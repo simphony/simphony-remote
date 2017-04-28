@@ -1,8 +1,8 @@
-import unittest
+from tornado.testing import LogTrapTestCase
 from remoteappmanager import utils
 
 
-class TestUtils(unittest.TestCase):
+class TestUtils(LogTrapTestCase):
     def test_parse_volume_string(self):
         self.assertEqual(utils.parse_volume_string("/foo:/bar:ro"),
                          ("/foo", "/bar", "ro"))

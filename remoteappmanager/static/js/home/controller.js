@@ -28,20 +28,9 @@ require([
             )
         );
     });
+
     Vue.filter('app_name', function(image) {
         return image.ui_name? image.ui_name: image.name;
-    });
-    Vue.filter('is_starting', function(application) {
-        return application.status === Status.STARTING;
-    });
-    Vue.filter('is_running', function(application) {
-        return application.status === Status.RUNNING;
-    });
-    Vue.filter('is_stopping', function(application) {
-        return application.status === Status.STOPPING;
-    });
-    Vue.filter('is_stopped', function(application) {
-        return application.status === Status.STOPPED;
     });
 
     // This model keeps the retrieved content from the REST query locally.
@@ -55,7 +44,7 @@ require([
     });
 
     new application_view.ApplicationView({ // jshint ignore:line
-        el: 'div.content-wrapper',
+        el: '#appview',
         data: function() { return { model: model }; }
     });
 

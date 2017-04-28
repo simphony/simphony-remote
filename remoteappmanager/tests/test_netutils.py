@@ -1,6 +1,6 @@
 from unittest import mock
 from tornado import web
-from tornado.testing import AsyncHTTPTestCase, gen_test
+from tornado.testing import AsyncHTTPTestCase, gen_test, LogTrapTestCase
 
 from remoteappmanager.tests.utils import mock_coro_new_callable
 from remoteappmanager.netutils import wait_for_http_server_2xx
@@ -23,7 +23,7 @@ class LongHandler(ShortHandler):
     error_count = 100000
 
 
-class TestUtils(AsyncHTTPTestCase):
+class TestUtils(AsyncHTTPTestCase, LogTrapTestCase):
     def get_app(self):
 
         app = web.Application(handlers=[('/short', ShortHandler),
