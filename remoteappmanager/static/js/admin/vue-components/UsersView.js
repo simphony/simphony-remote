@@ -69,7 +69,6 @@ define([
         );
       },
       reset: function() {
-        console.log("resetting");
          Object.assign(this.$data, this.$options.data());
       }
     },
@@ -220,5 +219,3 @@ define([
     }
   };
 });
-
-
