@@ -1,12 +1,18 @@
 define([
-    'jquery',
-    'home/configurables',
-    'utils',
-    'jsapi/v1/resources'
-], function ($, configurables, utils, resources) {
+    "jquery",
+    "home/configurables",
+    "jsapi/v1/resources",
+    "gamodule",
+    "dialogs"
+], function ($, configurables, resources, gamodule, dialogs) {
     "use strict";
 
-    var Status = utils.Status;
+    var Status = {
+        RUNNING: "RUNNING",
+        STARTING: "STARTING",
+        STOPPING: "STOPPING",
+        STOPPED: "STOPPED"
+    };
 
     var available_applications_info = function () {
         // Retrieve information from the various applications and
@@ -43,6 +49,8 @@ define([
         // Should be the index of the selected app_data,
         // or null if no selection.
         this.selected_index = null;
+
+        this.loading = true;
     };
 
     ApplicationListModel.prototype.update = function() {
@@ -56,48 +64,62 @@ define([
         ).done(function (app_data) {
             // app_data contains the data retrieved from the remote API
 
-            this.app_list = [];
+            var app_list = [];
+
+            // Sort application list by names
+            app_data.sort(function(app1, app2) {
+                var app1_name = app1.image.ui_name? app1.image.ui_name: app1.image.name;
+                var app2_name = app2.image.ui_name? app2.image.ui_name: app2.image.name;
+                return app1_name < app2_name? -1: 1;
+            });
 
             // Add the options for some image types
-            app_data.forEach(function(application_data, data_idx) {
-                this.app_list[data_idx] = { app_data: application_data };
+            app_data.forEach(function(application_data) {
+                var app = {
+                    app_data: application_data,
+                    // Default values, will be overwritten
+                    status: Status.STOPPED,
+                    delayed: true,
+                    configurables: [],
+                    is_running: function() {return this.status === Status.RUNNING;},
+                    is_stopped: function() {return this.status === Status.STOPPED;},
+                    is_starting: function() {return this.status === Status.STARTING;},
+                    is_stopping: function() {return this.status === Status.STOPPING;}
+                };
 
-                this._update_configurables(data_idx);
-                this._update_status(data_idx);
+                this._update_configurables(app);
+                this._update_status(app);
 
-                if (this.app_list[data_idx].status === Status.RUNNING) {
-                    this.app_list[data_idx].delayed = false;
-                } else {
-                    this.app_list[data_idx].delayed = true;
-                }
+                app.delayed = !app.is_running();
+                app_list.push(app);
             }.bind(this));
+
+            this.app_list = app_list;
+            this.loading = false;
         }.bind(this));
     };
 
     ApplicationListModel.prototype.update_idx = function(index) {
         // Refetches and updates the entry at the given index.
-        var entry = this.app_list[index].app_data;
-        var mapping_id = entry.mapping_id;
+        var app = this.app_list[index];
+        var mapping_id = app.app_data.mapping_id;
 
         return resources.Application.retrieve(mapping_id)
         .done(function(new_data) {
-            this.app_list[index].app_data = new_data;
+            app.app_data = new_data;
 
-            this._update_configurables(index);
-            this._update_status(index);
+            this._update_configurables(app);
+            this._update_status(app);
         }.bind(this));
     };
 
-    ApplicationListModel.prototype._update_configurables = function(index) {
-        // Updates the configurables submodel for a given application index.
-        var image = this.app_list[index].app_data.image;
-
+    ApplicationListModel.prototype._update_configurables = function(app) {
         // Contains the submodels for the configurables.
         // It is a dictionary that maps a supported (by the image) configurable tag
         // to its client-side model.
-        this.app_list[index].configurables = [];
+        app.configurables = [];
 
-        image.configurables.forEach(function(tag) {
+        app.app_data.image.configurables.forEach(function(tag) {
             // If this returns null, the tag has not been recognized
             // by the client. skip it and let the server deal with the
             // missing data, either by using a default or throwing
@@ -105,19 +127,65 @@ define([
             var ConfigurableCls = configurables.from_tag(tag);
 
             if (ConfigurableCls !== null) {
-                this.app_list[index].configurables.push(new ConfigurableCls());
+                app.configurables.push(new ConfigurableCls());
             }
-        }.bind(this));
+        });
     };
 
-    ApplicationListModel.prototype._update_status = function(index) {
-        var app_data = this.app_list[index].app_data;
-
-        if (app_data.container === undefined) {
-            this.app_list[index].status = Status.STOPPED;
+    ApplicationListModel.prototype._update_status = function(app) {
+        if (app.app_data.container === undefined) {
+            app.status = Status.STOPPED;
         } else {
-            this.app_list[index].status = Status.RUNNING;
+            app.status = Status.RUNNING;
         }
+    };
+
+    ApplicationListModel.prototype.start_application = function() {
+        var selected_index = this.selected_index;
+        var current_app = this.app_list[selected_index];
+
+        current_app.status = Status.STARTING;
+        current_app.delayed = true;
+
+        var configurables_data = {};
+        current_app.configurables.forEach(function(configurable) {
+            var tag = configurable.tag;
+            configurables_data[tag] = configurable.as_config_dict();
+        });
+
+        resources.Container.create({
+            mapping_id: current_app.app_data.mapping_id,
+            configurables: configurables_data
+        }).done(function() {
+            this.update_idx(selected_index)
+            .fail(function(error) {
+                current_app.status = Status.STOPPED;
+                dialogs.webapi_error_dialog(error);
+            });
+        }.bind(this)).fail(function(error) {
+            current_app.status = Status.STOPPED;
+            dialogs.webapi_error_dialog(error);
+        });
+    };
+
+    ApplicationListModel.prototype.stop_application = function(index) {
+        var app_stopping = this.app_list[index];
+        app_stopping.status = Status.STOPPING;
+
+        var url_id = app_stopping.app_data.container.url_id;
+
+        resources.Container.delete(url_id)
+        .done(function() {
+            this.update_idx(index)
+            .fail(function(error) {
+                app_stopping.status = Status.STOPPED;
+                dialogs.webapi_error_dialog(error);
+            });
+        }.bind(this))
+        .fail(function(error) {
+            app_stopping.status = Status.STOPPED;
+            dialogs.webapi_error_dialog(error);
+        });
     };
 
     return {

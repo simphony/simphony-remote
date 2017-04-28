@@ -13,15 +13,15 @@ define([
             { model: model }
         );
 
-        assert.ok(view.loading);
+        assert.ok(model.loading);
 
         model.update()
             .done(function() {
                 view.model = model;
-                view.loading = false;
+                model.loading = false;
             } )
             .done(function() {
-                assert.notOk(view.loading);
+                assert.notOk(model.loading);
             });
     });
 });
