@@ -60,7 +60,7 @@ define([
         ).done(function (app_data) {
             // app_data contains the data retrieved from the remote API
 
-            this.app_list = [];
+            var app_list = [];
 
             // Sort application list by names
             app_data.sort(function(app1, app2) {
@@ -70,53 +70,48 @@ define([
             });
 
             // Add the options for some image types
-            app_data.forEach(function(application_data, data_idx) {
-                this.app_list.push({
+            app_data.forEach(function(application_data) {
+                var app = {
                     app_data: application_data,
                     // Default values, will be overwritten
                     status: Status.STOPPED,
                     delayed: true,
                     configurables: []
-                });
+                };
 
-                this._update_configurables(data_idx);
-                this._update_status(data_idx);
+                this._update_configurables(app);
+                this._update_status(app);
 
-                if (this.app_list[data_idx].status === Status.RUNNING) {
-                    this.app_list[data_idx].delayed = false;
-                } else {
-                    this.app_list[data_idx].delayed = true;
-                }
+                app.delayed = app.status !== Status.RUNNING;
+                app_list.push(app);
             }.bind(this));
 
+            this.app_list = app_list;
             this.loading = false;
         }.bind(this));
     };
 
     ApplicationListModel.prototype.update_idx = function(index) {
         // Refetches and updates the entry at the given index.
-        var entry = this.app_list[index].app_data;
-        var mapping_id = entry.mapping_id;
+        var app = this.app_list[index];
+        var mapping_id = app.app_data.mapping_id;
 
         return resources.Application.retrieve(mapping_id)
         .done(function(new_data) {
-            this.app_list[index].app_data = new_data;
+            app.app_data = new_data;
 
-            this._update_configurables(index);
-            this._update_status(index);
+            this._update_configurables(app);
+            this._update_status(app);
         }.bind(this));
     };
 
-    ApplicationListModel.prototype._update_configurables = function(index) {
-        // Updates the configurables submodel for a given application index.
-        var image = this.app_list[index].app_data.image;
-
+    ApplicationListModel.prototype._update_configurables = function(app) {
         // Contains the submodels for the configurables.
         // It is a dictionary that maps a supported (by the image) configurable tag
         // to its client-side model.
-        this.app_list[index].configurables = [];
+        app.configurables = [];
 
-        image.configurables.forEach(function(tag) {
+        app.app_data.image.configurables.forEach(function(tag) {
             // If this returns null, the tag has not been recognized
             // by the client. skip it and let the server deal with the
             // missing data, either by using a default or throwing
@@ -124,18 +119,16 @@ define([
             var ConfigurableCls = configurables.from_tag(tag);
 
             if (ConfigurableCls !== null) {
-                this.app_list[index].configurables.push(new ConfigurableCls());
+                app.configurables.push(new ConfigurableCls());
             }
-        }.bind(this));
+        });
     };
 
-    ApplicationListModel.prototype._update_status = function(index) {
-        var app_data = this.app_list[index].app_data;
-
-        if (app_data.container === undefined) {
-            this.app_list[index].status = Status.STOPPED;
+    ApplicationListModel.prototype._update_status = function(app) {
+        if (app.app_data.container === undefined) {
+            app.status = Status.STOPPED;
         } else {
-            this.app_list[index].status = Status.RUNNING;
+            app.status = Status.RUNNING;
         }
     };
 
