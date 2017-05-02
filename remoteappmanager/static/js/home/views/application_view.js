@@ -7,64 +7,64 @@ define([
     "use strict";
 
     var ApplicationView = Vue.extend({
-        template: `
-            <!-- Application View -->
-            <section id="appview"
-                     v-if="current_app !== null"
-                     :class="{ content: true, 'no-padding': current_app.is_running() }">
-              <!-- Start Form -->
-              <div v-if="!current_app.is_running()" class="row">
-                <div class="col-md-offset-2 col-md-8">
-                  <div class="box box-primary">
-                    <div class="box-header with-border">
-                      <h3 class="box-title">{{ current_app.app_data.image | app_name }}</h3>
-                      <div class="box-tools pull-right"></div>
-                    </div>
-                    <div class="box-body">
-                      <h4>Policy</h4>
+        template:
+            '<!-- Application View -->' +
+            '<section id="appview"' +
+            '         v-if="current_app !== null"' +
+            '         :class="{ content: true, \'no-padding\': current_app.is_running() }">' +
+            '  <!-- Start Form -->' +
+            '  <div v-if="!current_app.is_running()" class="row">' +
+            '    <div class="col-md-offset-2 col-md-8">' +
+            '      <div class="box box-primary">' +
+            '        <div class="box-header with-border">' +
+            '          <h3 class="box-title">{{ current_app.app_data.image | app_name }}</h3>' +
+            '          <div class="box-tools pull-right"></div>' +
+            '        </div>' +
+            '        <div class="box-body">' +
+            '          <h4>Policy</h4>' +
 
-                      <ul class="policy">
-                        <!-- Workspace -->
-                        <li v-if="app_policy.allow_home">
-                            Workspace accessible
-                        </li>
-                        <li v-else>
-                            Workspace not accessible
-                        </li>
+            '          <ul class="policy">' +
+            '            <!-- Workspace -->' +
+            '            <li v-if="app_policy.allow_home">' +
+            '                Workspace accessible' +
+            '            </li>' +
+            '            <li v-else>' +
+            '                Workspace not accessible' +
+            '            </li>' +
 
-                        <!-- Volume mounted -->
-                        <li v-if="app_policy.volume_source && app_policy.volume_target && app_policy.volume_mode">
-                          Volume mounted: {{ app_policy.volume_source }} &#x2192; {{ app_policy.volume_target }} ({{ app_policy.volume_mode }})
-                        </li>
-                        <li v-else>
-                          No volumes mounted
-                        </li>
-                      </ul>
+            '            <!-- Volume mounted -->' +
+            '            <li v-if="app_policy.volume_source && app_policy.volume_target && app_policy.volume_mode">' +
+            '              Volume mounted: {{ app_policy.volume_source }} &#x2192; {{ app_policy.volume_target }} ({{ app_policy.volume_mode }})' +
+            '            </li>' +
+            '            <li v-else>' +
+            '              No volumes mounted' +
+            '            </li>' +
+            '          </ul>' +
 
-                      <h4>Configuration</h4>
-                      <form class="configuration"><fieldset></fieldset></form>
-                    </div>
+            '          <h4>Configuration</h4>' +
+            '          <form class="configuration"><fieldset></fieldset></form>' +
+            '        </div>' +
 
-                    <!-- Start Button -->
-                    <div class="box-footer">
-                      <button class="btn btn-primary pull-right start-button"
-                              @click="start_application()"
-                              :disabled="current_app.is_starting()">
-                        Start
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            '        <!-- Start Button -->' +
+            '        <div class="box-footer">' +
+            '          <button class="btn btn-primary pull-right start-button"' +
+            '                  @click="start_application()"' +
+            '                  :disabled="current_app.is_starting()">' +
+            '            Start' +
+            '          </button>' +
+            '        </div>' +
+            '      </div>' +
+            '    </div>' +
+            '  </div>' +
 
-              <!-- Application View -->
-              <iframe v-if="current_app.is_running()"
-                      id="application"
-                      frameBorder="0"
-                      :src="app_source"
-                      :style="{ minWidth: get_iframe_size()[0] + 'px', minHeight: get_iframe_size()[1] + 'px' }">
-              </iframe>
-            </section>`,
+            '  <!-- Application View -->' +
+            '  <iframe v-if="current_app.is_running()"' +
+            '          id="application"' +
+            '          frameBorder="0"' +
+            '          :src="app_source"' +
+            '          :style="{ minWidth: get_iframe_size()[0] + \'px\', minHeight: get_iframe_size()[1] + \'px\' }">' +
+            '  </iframe>' +
+            '</section>',
 
         computed: {
             current_app: function() {
