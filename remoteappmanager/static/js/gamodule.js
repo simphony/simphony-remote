@@ -1,9 +1,7 @@
 // This module contains the setup for google analytics.
 // MUST not be renamed to analytics. Some blockers rely on name
 // matching to prevent loading.
-define([
-    "components/vue/dist/vue.min"
-], function (Vue) {
+define([], function () {
     "use strict";
 
     function init() {
