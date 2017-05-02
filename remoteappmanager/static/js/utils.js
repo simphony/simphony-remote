@@ -6,9 +6,8 @@
 // Distributed under the terms of the Modified BSD License.
 
 define([
-    'jquery',
-    'urlutils'
-], function ($, urlutils) {
+    'jquery'
+], function ($) {
     "use strict";
 
     var all = function (promises) {
@@ -46,27 +45,10 @@ define([
         return [width, height];
     };
 
-    // Temporary: will be registered in Vue globally
-    var filters = {
-        icon_src: function(icon_data) {
-            return (
-                icon_data ?
-                'data:image/png;base64,' + icon_data :
-                urlutils.path_join(
-                    window.apidata.base_url, 'static', 'images', 'generic_appicon_128.png'
-                )
-            );
-        },
-        app_name: function(image) {
-            return image.ui_name? image.ui_name: image.name;
-        }
-    };
-
     return {
         all : all,
         update : update,
-        max_iframe_size: max_iframe_size,
-        filters: filters
+        max_iframe_size: max_iframe_size
     };
 
 });

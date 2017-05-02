@@ -38,9 +38,7 @@ define([
             }
         },
 
-        updated: function() { $('iframe').focus(); },
-
-        filters: utils.filters
+        updated: function() { $('iframe').focus(); }
     });
 
     return {
