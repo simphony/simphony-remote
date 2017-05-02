@@ -55,7 +55,7 @@ class ApplicationHandler(ResourceHandler):
 
         items = []
         for app in apps:
-            item = Application(identifier=app.id, image_name=app.image)
+            item = Application(identifier=str(app.id), image_name=app.image)
             items.append(item)
 
         items_response.set(items)
