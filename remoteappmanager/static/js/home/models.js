@@ -2,9 +2,8 @@ define([
     "jquery",
     "home/configurables",
     "jsapi/v1/resources",
-    "gamodule",
     "dialogs"
-], function ($, configurables, resources, gamodule, dialogs) {
+], function ($, configurables, resources, dialogs) {
     "use strict";
 
     var Status = {
