@@ -5,7 +5,6 @@ require([
     "home/views/application_view",
     "components/vue/dist/vue.min",
     "gamodule",
-    "utils",
     'urlutils'
 ], function(
     models,
@@ -13,11 +12,8 @@ require([
     application_view,
     Vue,
     gamodule,
-    utils,
     urlutils) {
     "use strict";
-
-    var Status = utils.Status;
 
     Vue.filter('icon_src', function(icon_data) {
         return (
