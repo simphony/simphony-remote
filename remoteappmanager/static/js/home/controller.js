@@ -43,14 +43,16 @@ require([
         data: function() { return { model: model }; }
     });
 
-    new application_view.ApplicationView({ // jshint ignore:line
+    var app_view = new application_view.ApplicationView({
         el: '#appview',
         data: function() { return { model: model }; }
     });
 
-    // Create GA Vue object
-    new gamodule.GaView({ // jshint ignore:line
-        data: function() { return { model: model }; }
+    // Create GA observer
+    var ga_observer = new gamodule.GaObserver();
+
+    app_view.$on('start_application', function(application) {
+        ga_observer.trigger_application_starting(application.app_data.image.name);
     });
 
     model.update();

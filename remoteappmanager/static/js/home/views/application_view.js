@@ -29,6 +29,10 @@ define([
         },
 
         methods: {
+            start_application: function() {
+                this.$emit('start_application', this.current_app);
+                this.model.start_application();
+            },
             get_iframe_size: function() {
                 return utils.max_iframe_size();
             }
