@@ -56,18 +56,24 @@ define([
           <!-- /.sidebar -->`,
 
         data: function() {
-            return { 'search_input': '' }
+            return { 'search_input': '' };
         },
 
         computed: {
             'entries_visible': function() {
-                return this.search_input === '' ?
-                    new Array(this.model.app_list.length).fill(true) :
+                var entries_visible = this.search_input === ''?
+                    new Array(this.model.app_list.length).fill(true):
                     this.model.app_list.map(function(app) {
                         var image = app.app_data.image;
                         var name = image.ui_name? image.ui_name: image.name;
                         return name.toLowerCase().includes(this.search_input.toLowerCase());
                     }.bind(this));
+
+                // Deselect current selected application if it's not in the list anymore
+                this.model.selected_index = entries_visible[this.model.selected_index]?
+                    this.model.selected_index:
+                    null;
+                return entries_visible;
             }
         }
     });
