@@ -1,7 +1,6 @@
 define([
-    'utils',
     '../../components/vue/dist/vue.min',
-], function (utils, Vue) {
+], function (Vue) {
     'use strict';
 
     var ApplicationListView = Vue.extend({
