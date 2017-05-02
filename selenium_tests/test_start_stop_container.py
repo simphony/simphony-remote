@@ -9,14 +9,15 @@ class TestContainerInteraction(SeleniumTestBase):
         with self.login():
             self.wait_for(lambda:
                 driver.find_element_by_css_selector(
-                    "#applist > li > a > span").text != "Loading")
+                    "#applistentries > li > a > span").text != "Loading")
 
-            self.click_by_css_selector("#applist > li > a > img")
+            self.click_by_css_selector("#applistentries > li > a > img")
             self.click_by_css_selector(".start-button")
 
             driver.find_element_by_id("application")
             ActionChains(driver).move_to_element(
-                driver.find_element_by_css_selector("#applist .app-icon")
+                driver.find_element_by_css_selector(
+                    "#applistentries .app-icon")
                 ).click(driver.find_element_by_css_selector(".stop-button")
             ).perform()
 
@@ -32,6 +33,6 @@ class TestContainerInteraction(SeleniumTestBase):
 
             self.assertNotEqual(iframe, self.driver.switch_to.active_element)
 
-            self.click_by_css_selector("#applist > li > a > img")
+            self.click_by_css_selector("#applistentries > li > a > img")
 
             self.assertEqual(iframe, self.driver.switch_to.active_element)
