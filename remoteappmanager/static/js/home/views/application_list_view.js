@@ -8,14 +8,8 @@ define([
             <section class="sidebar">
 
             <!-- Search form -->
-            <form action="#" method="get" class="sidebar-form">
-              <div class="input-group">
-                <input type="text" name="q" class="form-control" placeholder="Search...">
-                <span class="input-group-btn">
-                  <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-                  </button>
-                </span>
-              </div>
+            <form action="#" class="sidebar-form">
+              <input type="text" name="q" class="form-control" placeholder="Search..." v-model="search_input">
             </form>
 
             <!-- Sidebar Menu -->
@@ -37,6 +31,7 @@ define([
               <!-- Application list -->
               <li v-for="(app, index) in model.app_list"
                   :class="{ active: index === model.selected_index }"
+                  v-show="entries_visible[index]"
                   @click="model.selected_index = index; $('iframe').focus();">
 
                 <span :class="app.status.toLowerCase() + '-badge'"></span>
@@ -58,7 +53,23 @@ define([
             </ul>
             <!-- /.sidebar-menu -->
           </section>
-          <!-- /.sidebar -->`
+          <!-- /.sidebar -->`,
+
+        data: function() {
+            return { 'search_input': '' }
+        },
+
+        computed: {
+            'entries_visible': function() {
+                return this.search_input === '' ?
+                    new Array(this.model.app_list.length).fill(true) :
+                    this.model.app_list.map(function(app) {
+                        var image = app.app_data.image;
+                        var name = image.ui_name? image.ui_name: image.name;
+                        return name.toLowerCase().includes(this.search_input.toLowerCase());
+                    }.bind(this));
+            }
+        }
     });
 
     return {
