@@ -123,10 +123,10 @@ define([
             // by the client. skip it and let the server deal with the
             // missing data, either by using a default or throwing
             // an error.
-            var ConfigurableCls = configurables.from_tag(tag);
+            var ConfigurableComp = configurables[tag];
 
-            if (ConfigurableCls !== null) {
-                app.configurables.push(new ConfigurableCls());
+            if (ConfigurableComp !== null) {
+                app.configurables.push(new ConfigurableComp());
             }
         });
     };
@@ -148,8 +148,7 @@ define([
 
         var configurables_data = {};
         current_app.configurables.forEach(function(configurable) {
-            var tag = configurable.tag;
-            configurables_data[tag] = configurable.as_config_dict();
+            configurables_data[configurable.tag] = configurable.config_dict;
         });
 
         resources.Container.create({

@@ -42,7 +42,11 @@ define([
             '          </ul>' +
 
             '          <h4>Configuration</h4>' +
-            '          <form class="configuration"><fieldset></fieldset></form>' +
+            '          <form class="configuration">' +
+            '            <fieldset v-if="current_app.configurables.length === 0">No configurable options for this image</fieldset>' +
+            '            <fieldset v-else>' +
+            '            </fieldset>' +
+            '          </form>' +
             '        </div>' +
 
             '        <!-- Start Button -->' +
