@@ -7,10 +7,10 @@ define([
     var ResolutionComp = Vue.component('app-resolution', {
         template:
             '<div class="form-group">' +
-            '  <label for="resolution-model-{{index}}">Resolution</label>' +
+            '  <label>Resolution</label>' +
             '  <select class="form-control" v-model="resolution">' +
-            '    <option v-for="resolution_option in resolution_options"'+
-            '            value="resolution_option">resolution_option' +
+            '    <option v-for="resolution_option in resolution_options">' +
+            '      {{resolution_option}}' +
             '    </option>' +
             '</div>',
 

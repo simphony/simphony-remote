@@ -45,6 +45,7 @@ define([
             '          <form class="configuration">' +
             '            <fieldset v-if="current_app.configurables.length === 0">No configurable options for this image</fieldset>' +
             '            <fieldset v-else>' +
+            '              <div v-for="(configurable, id_conf) in current_app.configurables" :id="\'conf-\'+id_conf"></div>' +
             '            </fieldset>' +
             '          </form>' +
             '        </div>' +
@@ -101,7 +102,13 @@ define([
             }
         },
 
-        updated: function() { $('iframe').focus(); }
+        updated: function() {
+            $('iframe').focus();
+
+            this.current_app.configurables.forEach(function(config, idx) {
+                config.$mount('#conf-'+idx);
+            }.bind(this));
+        }
     });
 
     return {
