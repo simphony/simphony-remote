@@ -2,7 +2,7 @@ import os
 import unittest
 
 from remoteappmanager.db.csv_db import (
-    CSVApplication, CSVApplicationPolicy, CSVUser, CSVAccounting)
+    CSVApplication, CSVApplicationPolicy, CSVUser, CSVAccounting, CSVDatabase)
 from remoteappmanager.db.tests.abc_test_interfaces import (
     ABCTestDatabaseInterface)
 from remoteappmanager.tests.temp_mixin import TempMixin
@@ -57,8 +57,8 @@ def write_csv_file(file_name, headers, records):
             print(*record, sep=',', file=csv_file)
 
 
-class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
-                        unittest.TestCase):
+class TestCSVDatabase(TempMixin, ABCTestDatabaseInterface,
+                      unittest.TestCase):
     def setUp(self):
         # Setup temporary directory
         super().setUp()
@@ -103,25 +103,25 @@ class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
                 )}
         return mappings[user.name]
 
-    def create_accounting(self):
-        return CSVAccounting(self.csv_file)
+    def create_database(self):
+        return CSVDatabase(self.csv_file)
 
     def test_get_user(self):
-        accounting = self.create_accounting()
+        database = self.create_database()
 
-        user = accounting.get_user(user_name='markdoe')
+        user = database.get_user(user_name='markdoe')
         self.assertIsInstance(user, CSVUser)
         self.assertEqual(user.name, 'markdoe')
 
-        user = accounting.get_user(id=0)
+        user = database.get_user(id=0)
         self.assertIsInstance(user, CSVUser)
         self.assertEqual(user.name, 'markdoe')
 
-        user = accounting.get_user(user_name='unknown')
+        user = database.get_user(user_name='unknown')
         self.assertIsNone(user)
 
         with self.assertRaises(ValueError):
-            accounting.get_user(user_name='unknown', id=123)
+            database.get_user(user_name='unknown', id=123)
 
     def test_error_with_missing_headers(self):
         write_csv_file(self.csv_file,
@@ -129,11 +129,11 @@ class TestCSVAccounting(TempMixin, ABCTestDatabaseInterface,
                        BadTableMissingHeaders.records)
 
         with self.assertRaisesRegex(ValueError, "Missing headers"):
-            self.create_accounting()
+            self.create_database()
 
     def test_load_csv_file_with_good_headers_different_order(self):
         """ Test loading a good table with headers of different orders """
         write_csv_file(self.csv_file,
                        GoodTableWithDifferentHeaders.headers,
                        GoodTableWithDifferentHeaders.records)
-        self.create_accounting()
+        self.create_database()

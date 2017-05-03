@@ -9,9 +9,9 @@ from remoteappmanager.tests.temp_mixin import TempMixin
 class TestBaseHandler(TempMixin, utils.AsyncHTTPTestCase, LogTrapTestCase):
     def get_file_config(self):
         file_config = FileConfig()
-        file_config.accounting_class = \
-            'remoteappmanager.tests.mocking.dummy.DummyDBAccounting'
-        file_config.accounting_kwargs = {}
+        file_config.database_class = \
+            'remoteappmanager.tests.mocking.dummy.DummyDB'
+        file_config.database_kwargs = {}
         return file_config
 
     def get_app(self):
@@ -29,7 +29,7 @@ class TestBaseHandler(TempMixin, utils.AsyncHTTPTestCase, LogTrapTestCase):
 class TestBaseHandlerInvalidAccounting(TestBaseHandler):
     def get_file_config(self):
         file_config = super().get_file_config()
-        file_config.accounting_class = 'this_should_fail'
+        file_config.database_class = 'this_should_fail'
         return file_config
 
     def test_home_internal_error(self):
@@ -47,7 +47,7 @@ class TestBaseHandlerInvalidAccounting(TestBaseHandler):
 class TestBaseHandlerDatabaseError(TestBaseHandler):
     def get_file_config(self):
         file_config = super().get_file_config()
-        file_config.accounting_class = "remoteappmanager.db.orm.AppAccounting"
+        file_config.database_class = "remoteappmanager.db.orm.ORMDatabase"
         return file_config
 
     def test_home_internal_error(self):

@@ -89,7 +89,7 @@ class ABCDatabase(metaclass=ABCMeta):
 
     @abstractmethod
     def get_accounting_for_user(self, user):
-        """ Return an iterable of ApplicationConfig for a given user
+        """ Returns the accounting information for a given user
 
         Parameters
         ----------

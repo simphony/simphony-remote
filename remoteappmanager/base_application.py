@@ -119,11 +119,11 @@ class BaseApplication(web.Application, LoggingMixin):
     @default("db")
     def _db_default(self):
         """Initializes the database connection."""
-        class_path = self.file_config.accounting_class
+        class_path = self.file_config.database_class
         module_path, _, cls_name = class_path.rpartition('.')
         cls = getattr(importlib.import_module(module_path), cls_name)
         try:
-            return cls(**self.file_config.accounting_kwargs)
+            return cls(**self.file_config.database_kwargs)
         except Exception:
             reason = 'The database is not initialised properly.'
             self.log.exception(reason)

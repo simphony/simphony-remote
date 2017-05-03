@@ -192,7 +192,7 @@ class CSVDatabase(ABCDatabase):
 
     def get_accounting_for_user(self, user):
         if user is not None:
-            return tuple(self.all_records.get(user.name, []))
+            return self.all_records.get(user.name, [])
         else:
             return []
 

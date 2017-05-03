@@ -41,13 +41,13 @@ class FileConfig(HasTraits):
         help="The docker realm. Identifies which containers belong to a "
              "specific instance of simphony-remote.")
 
-    accounting_class = Unicode(
-        default_value="remoteappmanager.db.orm.AppAccounting",
-        help="The import path to a subclass of ABCAccounting")
+    database_class = Unicode(
+        default_value="remoteappmanager.db.orm.ORMDatabase",
+        help="The import path to a subclass of ABCDatabase")
 
-    accounting_kwargs = Dict(
+    database_kwargs = Dict(
         default_value={'url': 'sqlite:///remoteappmanager.db'},
-        help="The keyword arguments for initialising the Accounting instance")
+        help="The keyword arguments for initialising the Database instance")
 
     login_url = Unicode(default_value="/hub",
                         help=("The url to be redirected to if the user is not "

@@ -7,7 +7,7 @@ from tornado.testing import LogTrapTestCase
 from remoteappmanager.db import orm
 from remoteappmanager.db import exceptions
 from remoteappmanager.db.orm import (Database, transaction, Accounting,
-                                     AppAccounting)
+                                     ORMDatabase)
 from remoteappmanager.db.tests.abc_test_interfaces import (
     ABCTestDatabaseInterface)
 from remoteappmanager.tests import utils
@@ -107,40 +107,40 @@ class TestOrm(TempMixin, LogTrapTestCase):
             self.assertIn("docker/image0",
                           [acc.application.image for acc in res])
 
-    def test_apps_for_user(self):
+    def test_accounting_for_user(self):
         db = Database(url="sqlite:///"+self.sqlite_file_path)
         session = db.create_session()
         fill_db(session)
         with transaction(session):
             # verify back population
             users = session.query(orm.User).all()
-            res = orm.apps_for_user(session, users[1])
+            res = orm.accounting_for_user(session, users[1])
             self.assertEqual(len(res), 2)
             self.assertIn("docker/image0",
-                          [acc[1].image for acc in res])
+                          [acc.application.image for acc in res])
             self.assertIn("docker/image2",
-                          [acc[1].image for acc in res])
+                          [acc.application.image for acc in res])
 
-            res = orm.apps_for_user(session, users[2])
+            res = orm.accounting_for_user(session, users[2])
             self.assertEqual(len(res), 0)
 
             # User 0 should have access to app 1
-            res = orm.apps_for_user(session, users[0])
+            res = orm.accounting_for_user(session, users[0])
             self.assertEqual(len(res), 1)
             self.assertIn("docker/image1",
-                          [acc[1].image for acc in res])
+                          [acc.application.image for acc in res])
 
-            res = orm.apps_for_user(session, users[3])
+            res = orm.accounting_for_user(session, users[3])
             self.assertEqual(len(res), 1)
             self.assertIn("docker/image0",
-                          [acc[1].image for acc in res])
+                          [acc.application.image for acc in res])
 
-            res = orm.apps_for_user(session, None)
+            res = orm.accounting_for_user(session, None)
             self.assertEqual(len(res), 0)
 
 
-class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
-                           LogTrapTestCase):
+class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
+                      LogTrapTestCase):
     def setUp(self):
         # Setup temporary directory
         super().setUp()
@@ -171,238 +171,238 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
             'user4': ((apps[0], policy),)}
         return mappings[user.name]
 
-    def create_accounting(self):
-        accounting = AppAccounting(
+    def create_database(self):
+        database = ORMDatabase(
             url="sqlite:///"+self.sqlite_file_path)
 
         # Fill the database
-        with contextlib.closing(accounting.db.create_session()) as session:
+        with contextlib.closing(database.db.create_session()) as session:
             fill_db(session)
 
-        return accounting
+        return database
 
     def test_get_user(self):
-        accounting = self.create_accounting()
+        database = self.create_database()
 
-        user = accounting.get_user(user_name='user1')
+        user = database.get_user(user_name='user1')
         self.assertIsInstance(user, orm.User)
 
-        user = accounting.get_user(id=1)
+        user = database.get_user(id=1)
         self.assertIsInstance(user, orm.User)
 
         # user not found, result should be None
-        user = accounting.get_user(user_name='foo')
+        user = database.get_user(user_name='foo')
         self.assertIsNone(user)
 
-        user = accounting.get_user(id=124)
+        user = database.get_user(id=124)
         self.assertIsNone(user)
 
         with self.assertRaises(ValueError):
-            accounting.get_user(id=1, user_name="foo")
+            database.get_user(id=1, user_name="foo")
 
     def test_get_accounting_for_user_across_sessions(self):
-        accounting = self.create_accounting()
+        database = self.create_database()
 
         # user is retrieved from one session
-        user = accounting.get_user(user_name='user1')
+        user = database.get_user(user_name='user1')
 
         # apps is retrieved from another sessions
-        actual_app, actual_policy = accounting.get_accounting_for_user(user)[0][1:]
+        accounting = database.get_accounting_for_user(user)[0]
 
         expected_config = self.create_expected_configs(orm.User(name='user1'))
 
-        self.assertEqual(actual_app, expected_config[0][0])
-        self.assertEqual(actual_policy, expected_config[0][1])
+        self.assertEqual(accounting.application, expected_config[0][0])
+        self.assertEqual(accounting.application_policy, expected_config[0][1])
 
     def test_no_file_creation_if_sqlite_database_not_exist(self):
         temp_file_path = os.path.join(self.tempdir, 'some.db')
 
         with self.assertRaises(IOError):
-            AppAccounting(
+            ORMDatabase(
                 url="sqlite:///"+temp_file_path)
 
         self.assertFalse(os.path.exists(temp_file_path))
 
     def test_create_user(self):
-        accounting = self.create_accounting()
-        prev_length = len(accounting.list_users())
+        database = self.create_database()
+        prev_length = len(database.list_users())
 
-        id = accounting.create_user("ciccio")
+        id = database.create_user("ciccio")
 
-        user = accounting.get_user(user_name="ciccio")
+        user = database.get_user(user_name="ciccio")
         self.assertIsNotNone(user)
         self.assertIsNotNone(id)
-        self.assertEqual(len(accounting.list_users()), prev_length + 1)
+        self.assertEqual(len(database.list_users()), prev_length + 1)
 
         with self.assertRaises(exceptions.Exists):
-            accounting.create_user("ciccio")
+            database.create_user("ciccio")
 
     def test_remove_user_by_name(self):
-        accounting = self.create_accounting()
-        prev_length = len(accounting.list_users())
+        database = self.create_database()
+        prev_length = len(database.list_users())
 
-        accounting.remove_user(user_name="user1")
+        database.remove_user(user_name="user1")
 
-        self.assertIsNone(accounting.get_user(user_name="ciccio"))
-        self.assertEqual(len(accounting.list_users()), prev_length - 1)
+        self.assertIsNone(database.get_user(user_name="ciccio"))
+        self.assertEqual(len(database.list_users()), prev_length - 1)
 
         # This should be neutral
-        accounting.remove_user(user_name="user1")
+        database.remove_user(user_name="user1")
 
     def test_remove_user_by_id(self):
-        accounting = self.create_accounting()
-        user = accounting.get_user(user_name="user1")
+        database = self.create_database()
+        user = database.get_user(user_name="user1")
         id = user.id
-        prev_length = len(accounting.list_users())
+        prev_length = len(database.list_users())
 
-        accounting.remove_user(id=id)
-        self.assertIsNone(accounting.get_user(user_name="user1"))
-        self.assertEqual(len(accounting.list_users()), prev_length - 1)
+        database.remove_user(id=id)
+        self.assertIsNone(database.get_user(user_name="user1"))
+        self.assertEqual(len(database.list_users()), prev_length - 1)
 
         # This should be neutral
-        accounting.remove_user(id=id)
+        database.remove_user(id=id)
 
     def test_remove_user_one_arg(self):
-        accounting = self.create_accounting()
+        database = self.create_database()
 
         with self.assertRaises(ValueError):
-            accounting.remove_user(user_name="foo", id=3)
+            database.remove_user(user_name="foo", id=3)
 
         with self.assertRaises(ValueError):
-            accounting.remove_user()
+            database.remove_user()
 
     def test_create_application(self):
-        accounting = self.create_accounting()
-        prev_length = len(accounting.list_applications())
+        database = self.create_database()
+        prev_length = len(database.list_applications())
 
-        id = accounting.create_application("simphonyremote/amazing")
+        id = database.create_application("simphonyremote/amazing")
         self.assertIsNotNone(id)
-        app_list = accounting.list_applications()
+        app_list = database.list_applications()
         self.assertEqual(len(app_list), prev_length + 1)
 
         apps = [a for a in app_list if a.id == id]
         self.assertEqual(len(apps), 1)
 
         with self.assertRaises(exceptions.Exists):
-            accounting.create_application("simphonyremote/amazing")
+            database.create_application("simphonyremote/amazing")
 
     def test_remove_application(self):
-        accounting = self.create_accounting()
-        prev_length = len(accounting.list_applications())
+        database = self.create_database()
+        prev_length = len(database.list_applications())
 
-        accounting.remove_application(app_name="docker/image0")
+        database.remove_application(app_name="docker/image0")
 
-        self.assertEqual(len(accounting.list_applications()), prev_length - 1)
+        self.assertEqual(len(database.list_applications()), prev_length - 1)
 
         # This should be neutral
-        accounting.remove_application(app_name="docker/image0")
+        database.remove_application(app_name="docker/image0")
 
     def test_remove_application_by_id(self):
-        accounting = self.create_accounting()
-        app_list = accounting.list_applications()
+        database = self.create_database()
+        app_list = database.list_applications()
         id = app_list[0].id
         prev_length = len(app_list)
 
-        accounting.remove_application(id=id)
+        database.remove_application(id=id)
 
-        self.assertEqual(len(accounting.list_applications()), prev_length - 1)
+        self.assertEqual(len(database.list_applications()), prev_length - 1)
 
         # This should be neutral
-        accounting.remove_application(id=id)
+        database.remove_application(id=id)
 
     def test_remove_application_one_arg(self):
-        accounting = self.create_accounting()
+        database = self.create_database()
 
         with self.assertRaises(ValueError):
-            accounting.remove_application(app_name="foo", id=3)
+            database.remove_application(app_name="foo", id=3)
 
         with self.assertRaises(ValueError):
-            accounting.remove_application()
+            database.remove_application()
 
     def test_grant_revoke_access(self):
-        accounting = self.create_accounting()
+        database = self.create_database()
 
         with self.assertRaises(exceptions.NotFound):
-            accounting.grant_access("simphonyremote/amazing", "ciccio",
-                                    True, False, "/foo:/bar:ro")
-        accounting.create_user("ciccio")
+            database.grant_access("simphonyremote/amazing", "ciccio",
+                                  True, False, "/foo:/bar:ro")
+        database.create_user("ciccio")
 
         with self.assertRaises(exceptions.NotFound):
-            accounting.grant_access("simphonyremote/amazing", "ciccio",
-                                    True, False, "/foo:/bar:ro")
+            database.grant_access("simphonyremote/amazing", "ciccio",
+                                  True, False, "/foo:/bar:ro")
 
-        accounting.create_application("simphonyremote/amazing")
+        database.create_application("simphonyremote/amazing")
 
-        id = accounting.grant_access("simphonyremote/amazing", "ciccio",
-                                     True, False, "/foo:/bar:ro")
+        id = database.grant_access("simphonyremote/amazing", "ciccio",
+                                   True, False, "/foo:/bar:ro")
         self.assertIsNotNone(id)
 
-        user = accounting.get_user(user_name="ciccio")
-        apps = accounting.get_accounting_for_user(user)
-        self.assertEqual(apps[0][0], id)
-        self.assertEqual(apps[0][1].image, "simphonyremote/amazing")
-        self.assertEqual(apps[0][2].allow_home, True)
-        self.assertEqual(apps[0][2].allow_view, False)
-        self.assertEqual(apps[0][2].volume_source, "/foo")
-        self.assertEqual(apps[0][2].volume_target, "/bar")
-        self.assertEqual(apps[0][2].volume_mode, "ro")
+        user = database.get_user(user_name="ciccio")
+        acc = database.get_accounting_for_user(user)
+        self.assertEqual(acc[0].id, id)
+        self.assertEqual(acc[0].application.image, "simphonyremote/amazing")
+        self.assertEqual(acc[0].application_policy.allow_home, True)
+        self.assertEqual(acc[0].application_policy.allow_view, False)
+        self.assertEqual(acc[0].application_policy.volume_source, "/foo")
+        self.assertEqual(acc[0].application_policy.volume_target, "/bar")
+        self.assertEqual(acc[0].application_policy.volume_mode, "ro")
 
         # Do it twice to check idempotency
-        id2 = accounting.grant_access("simphonyremote/amazing", "ciccio",
-                                      True, False, "/foo:/bar:ro")
+        id2 = database.grant_access("simphonyremote/amazing", "ciccio",
+                                    True, False, "/foo:/bar:ro")
         self.assertEqual(id, id2)
 
-        accounting.revoke_access("simphonyremote/amazing", "ciccio",
-                                 True, False, "/foo:/bar:ro")
+        database.revoke_access("simphonyremote/amazing", "ciccio",
+                               True, False, "/foo:/bar:ro")
 
-        self.assertEqual(len(accounting.get_accounting_for_user(user)), 0)
+        self.assertEqual(len(database.get_accounting_for_user(user)), 0)
 
         with self.assertRaises(exceptions.NotFound):
-            accounting.revoke_access("simphonyremote/amazing", "hello",
-                                     True, False, "/foo:/bar:ro")
+            database.revoke_access("simphonyremote/amazing", "hello",
+                                   True, False, "/foo:/bar:ro")
 
     def test_grant_revoke_access_volume(self):
-        accounting = self.create_accounting()
+        database = self.create_database()
 
-        accounting.create_user("ciccio")
-        accounting.create_application("simphonyremote/amazing")
-        accounting.grant_access("simphonyremote/amazing", "ciccio",
-                                True, False, None)
+        database.create_user("ciccio")
+        database.create_application("simphonyremote/amazing")
+        database.grant_access("simphonyremote/amazing", "ciccio",
+                              True, False, None)
 
-        user = accounting.get_user(user_name="ciccio")
-        apps = accounting.get_accounting_for_user(user)
-        self.assertEqual(apps[0][1].image, "simphonyremote/amazing")
-        self.assertEqual(apps[0][2].allow_home, True)
-        self.assertEqual(apps[0][2].allow_view, False)
-        self.assertEqual(apps[0][2].volume_source, None)
-        self.assertEqual(apps[0][2].volume_target, None)
-        self.assertEqual(apps[0][2].volume_mode, None)
+        user = database.get_user(user_name="ciccio")
+        acc = database.get_accounting_for_user(user)
+        self.assertEqual(acc[0].application.image, "simphonyremote/amazing")
+        self.assertEqual(acc[0].application_policy.allow_home, True)
+        self.assertEqual(acc[0].application_policy.allow_view, False)
+        self.assertEqual(acc[0].application_policy.volume_source, None)
+        self.assertEqual(acc[0].application_policy.volume_target, None)
+        self.assertEqual(acc[0].application_policy.volume_mode, None)
 
-        accounting.revoke_access("simphonyremote/amazing", "ciccio",
+        database.revoke_access("simphonyremote/amazing", "ciccio",
                                  True, False, None)
 
-        self.assertEqual(len(accounting.get_accounting_for_user(user)), 0)
+        self.assertEqual(len(database.get_accounting_for_user(user)), 0)
 
     def test_revoke_by_id(self):
-        accounting = self.create_accounting()
+        database = self.create_database()
 
-        accounting.create_user("ciccio")
-        accounting.create_application("simphonyremote/amazing")
-        id = accounting.grant_access("simphonyremote/amazing", "ciccio",
-                                     True, False, None)
+        database.create_user("ciccio")
+        database.create_application("simphonyremote/amazing")
+        id = database.grant_access("simphonyremote/amazing", "ciccio",
+                                   True, False, None)
 
-        user = accounting.get_user(user_name="ciccio")
-        apps = accounting.get_accounting_for_user(user)
+        user = database.get_user(user_name="ciccio")
+        apps = database.get_accounting_for_user(user)
         self.assertEqual(len(apps), 1)
         self.assertIsNotNone(id)
 
-        accounting.revoke_access_by_id(id)
-        user = accounting.get_user(user_name="ciccio")
-        apps = accounting.get_accounting_for_user(user)
+        database.revoke_access_by_id(id)
+        user = database.get_user(user_name="ciccio")
+        apps = database.get_accounting_for_user(user)
         self.assertEqual(len(apps), 0)
 
         # Id not present, should do nothing
-        accounting.revoke_access_by_id(3441)
+        database.revoke_access_by_id(3441)
 
     def test_unsupported_ops(self):
         """Override to silence the base class assumption that most of

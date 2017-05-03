@@ -8,7 +8,7 @@ from sqlalchemy import (
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker, relationship, joinedload
 from sqlalchemy.orm.exc import DetachedInstanceError, NoResultFound
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
@@ -437,24 +437,27 @@ def transaction(session):
 
 
 def accounting_for_user(session, user):
-    """Returns a tuple of tuples, each containing an application and the
-    associated policy that the specified orm user is allowed to run.
+    """Returns a list of Accounting objects, each containing
+    an application and the associated policy that the specified orm user is
+    allowed to run.
     If the user is None, the default is to return an empty list.
-    The mapping_id is a unique string identifying the combination of
+    The id is a unique string identifying the combination of
     application and policy. It is not unique per user.
+
     Parameters
     ----------
     session : Session
         The current session
     user : User or None
         the orm User, or None.
+
     Returns
     -------
     A list of Accounting objects
     """
 
     if user is None:
-        return ()
+        return []
 
     try:
         user_name = user.name
@@ -466,8 +469,10 @@ def accounting_for_user(session, user):
         session.add(user)
         user_name = user.name
 
-    res = session.query(Accounting).join(
-        Accounting.user, aliased=True).filter_by(
-            name=user_name).all()
+    res = session.query(Accounting) \
+        .join(Accounting.user, aliased=True) \
+        .options(joinedload(Accounting.application)) \
+        .options(joinedload(Accounting.application_policy)) \
+        .filter_by(name=user_name).all()
 
     return res
