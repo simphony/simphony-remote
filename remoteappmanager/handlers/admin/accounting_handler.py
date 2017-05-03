@@ -16,7 +16,7 @@ class AccountingHandler(BaseHandler):
         if acc_user is None:
             raise web.HTTPError(404)
 
-        apps = db.get_apps_for_user(acc_user)
+        apps = db.get_accounting_for_user(acc_user)
 
         info = [{"mapping_id": mapping_id,
                  "app": app,

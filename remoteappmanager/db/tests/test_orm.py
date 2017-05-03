@@ -200,14 +200,14 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
         with self.assertRaises(ValueError):
             accounting.get_user(id=1, user_name="foo")
 
-    def test_get_apps_for_user_across_sessions(self):
+    def test_get_accounting_for_user_across_sessions(self):
         accounting = self.create_accounting()
 
         # user is retrieved from one session
         user = accounting.get_user(user_name='user1')
 
         # apps is retrieved from another sessions
-        actual_app, actual_policy = accounting.get_apps_for_user(user)[0][1:]
+        actual_app, actual_policy = accounting.get_accounting_for_user(user)[0][1:]
 
         expected_config = self.create_expected_configs(orm.User(name='user1'))
 
@@ -338,7 +338,7 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
         self.assertIsNotNone(id)
 
         user = accounting.get_user(user_name="ciccio")
-        apps = accounting.get_apps_for_user(user)
+        apps = accounting.get_accounting_for_user(user)
         self.assertEqual(apps[0][0], id)
         self.assertEqual(apps[0][1].image, "simphonyremote/amazing")
         self.assertEqual(apps[0][2].allow_home, True)
@@ -355,7 +355,7 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
         accounting.revoke_access("simphonyremote/amazing", "ciccio",
                                  True, False, "/foo:/bar:ro")
 
-        self.assertEqual(len(accounting.get_apps_for_user(user)), 0)
+        self.assertEqual(len(accounting.get_accounting_for_user(user)), 0)
 
         with self.assertRaises(exceptions.NotFound):
             accounting.revoke_access("simphonyremote/amazing", "hello",
@@ -370,7 +370,7 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
                                 True, False, None)
 
         user = accounting.get_user(user_name="ciccio")
-        apps = accounting.get_apps_for_user(user)
+        apps = accounting.get_accounting_for_user(user)
         self.assertEqual(apps[0][1].image, "simphonyremote/amazing")
         self.assertEqual(apps[0][2].allow_home, True)
         self.assertEqual(apps[0][2].allow_view, False)
@@ -381,7 +381,7 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
         accounting.revoke_access("simphonyremote/amazing", "ciccio",
                                  True, False, None)
 
-        self.assertEqual(len(accounting.get_apps_for_user(user)), 0)
+        self.assertEqual(len(accounting.get_accounting_for_user(user)), 0)
 
     def test_revoke_by_id(self):
         accounting = self.create_accounting()
@@ -392,13 +392,13 @@ class TestOrmAppAccounting(TempMixin, ABCTestDatabaseInterface,
                                      True, False, None)
 
         user = accounting.get_user(user_name="ciccio")
-        apps = accounting.get_apps_for_user(user)
+        apps = accounting.get_accounting_for_user(user)
         self.assertEqual(len(apps), 1)
         self.assertIsNotNone(id)
 
         accounting.revoke_access_by_id(id)
         user = accounting.get_user(user_name="ciccio")
-        apps = accounting.get_apps_for_user(user)
+        apps = accounting.get_accounting_for_user(user)
         self.assertEqual(len(apps), 0)
 
         # Id not present, should do nothing

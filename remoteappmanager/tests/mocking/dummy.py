@@ -64,7 +64,7 @@ class DummyDBAccounting(interfaces.ABCAccounting):
         user = [u for u in self.users.values() if u.name == user_name]
         return user[0] if len(user) else None
 
-    def get_apps_for_user(self, account):  # pragma: no cover
+    def get_accounting_for_user(self, account):  # pragma: no cover
         return tuple(
             [(mapping_id, application, policy)
              for mapping_id, (user, application, policy)

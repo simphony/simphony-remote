@@ -42,7 +42,7 @@ class ApplicationHandler(ResourceHandler):
     @gen.coroutine
     @authenticated
     def retrieve(self, resource, **kwargs):
-        apps = self.application.db.get_apps_for_user(
+        apps = self.application.db.get_accounting_for_user(
             self.current_user.account
         )
         identifier = resource.identifier
@@ -90,7 +90,7 @@ class ApplicationHandler(ResourceHandler):
     def items(self, items_response, **kwargs):
         """Retrieves a dictionary containing the image and the associated
         container, if active, as values."""
-        apps = self.application.db.get_apps_for_user(self.current_user.account)
+        apps = self.application.db.get_accounting_for_user(self.current_user.account)
 
         result = []
         for mapping_id, _, _ in apps:

@@ -183,7 +183,7 @@ class CSVAccounting(ABCAccounting):
         else:
             raise RuntimeError("Impossible condition")  # pragma: no cover
 
-    def get_apps_for_user(self, user):
+    def get_accounting_for_user(self, user):
         if user is not None:
             return tuple(self.all_records.get(user.name, ()))
         else:

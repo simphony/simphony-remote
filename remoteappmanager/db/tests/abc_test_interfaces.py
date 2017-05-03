@@ -42,19 +42,19 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
     def test_get_user(self):
         """ Test ABCDatabase.get_user """
 
-    def test_get_apps_for_user(self):
-        """ Test get_apps_for_user returns an iterable of ApplicationConfig
+    def test_get_accounting_for_user(self):
+        """ Test get_accounting_for_user returns an iterable of ApplicationConfig
         """
         accounting = self.create_accounting()
 
-        self.assertEqual(accounting.get_apps_for_user(None), ())
+        self.assertEqual(accounting.get_accounting_for_user(None), ())
 
         for user in self.create_expected_users():
             expected_configs = self.create_expected_configs(user)
 
             # should be ((mapping_id, Application, ApplicationPolicy),
             #            (mapping_id, Application, ApplicationPolicy) ... )
-            actual_id_configs = accounting.get_apps_for_user(user)
+            actual_id_configs = accounting.get_accounting_for_user(user)
 
             # should be ( (Application, ApplicationPolicy),
             #             (Application, ApplicationPolicy) ... )
@@ -85,7 +85,7 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
             if temp:
                 self.fail('These are not expected: {}'.format(temp))
 
-    def test_get_apps_for_user_mapping_id_rest_compliant(self):
+    def test_get_accounting_for_user_mapping_id_rest_compliant(self):
         ''' Test if the mapping_id to be rest identifier complient '''
         allowed_chars = set(string.ascii_letters+string.digits)
         accounting = self.create_accounting()
@@ -93,7 +93,7 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
         for user in self.create_expected_users():
             # should be ((mapping_id, Application, ApplicationPolicy),
             #            (mapping_id, Application, ApplicationPolicy) ... )
-            actual_id_configs = accounting.get_apps_for_user(user)
+            actual_id_configs = accounting.get_accouting_for_user(user)
 
             if not actual_id_configs:
                 continue

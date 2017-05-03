@@ -31,7 +31,7 @@ class ContainerHandler(ResourceHandler):
 
         webapp = self.application
         account = self.current_user.account
-        all_apps = webapp.db.get_apps_for_user(account)
+        all_apps = webapp.db.get_accounting_for_user(account)
         container_manager = webapp.container_manager
 
         choice = [(m_id, app, policy)
@@ -144,7 +144,7 @@ class ContainerHandler(ResourceHandler):
         """"Return the list of containers we are currently running."""
         container_manager = self.application.container_manager
 
-        apps = self.application.db.get_apps_for_user(
+        apps = self.application.db.get_accounting_for_user(
             self.current_user.account)
 
         running_containers = []

@@ -226,7 +226,7 @@ class AppAccounting(ABCAccounting):
 
         return user
 
-    def get_apps_for_user(self, user):
+    def get_accounting_for_user(self, user):
         # We create a session here to make sure it is only
         # used in one thread
         with contextlib.closing(self.db.create_session()) as session:

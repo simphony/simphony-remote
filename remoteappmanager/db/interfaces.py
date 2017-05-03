@@ -80,7 +80,7 @@ class ABCAccounting(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def get_apps_for_user(self, user):
+    def get_accounting_for_user(self, user):
         """ Return an iterable of ApplicationConfig for a given user
 
         Parameters

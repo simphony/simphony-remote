@@ -29,7 +29,7 @@ class Accounting(ABCAccounting):
     def get_user(self, *, user_name=None, id=None):
         return User(id=0, name=user_name)
 
-    def get_apps_for_user(self, user):
+    def get_accounting_for_user(self, user):
         if user is None:
             return ()
 
