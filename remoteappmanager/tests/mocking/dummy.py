@@ -29,7 +29,7 @@ class DummyDBApplicationPolicy(interfaces.ABCApplicationPolicy):
 User = namedtuple('User', ('id', 'name'))
 
 
-class DummyDBAccounting(interfaces.ABCAccounting):
+class DummyDBAccounting(interfaces.ABCDatabase):
     def __init__(self):
         self.users = {
             0: User(0, "johndoe")

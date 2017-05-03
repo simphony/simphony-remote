@@ -47,7 +47,7 @@ import csv
 import uuid
 
 from remoteappmanager.db.interfaces import (
-    ABCAccounting, ABCApplication, ABCApplicationPolicy)
+    ABCDatabase, ABCApplication, ABCApplicationPolicy, ABCAccounting)
 from remoteappmanager.db.exceptions import UnsupportedOperation
 from remoteappmanager.utils import mergedocs, one
 
@@ -57,6 +57,10 @@ class CSVApplication(ABCApplication):
 
 
 class CSVApplicationPolicy(ABCApplicationPolicy):
+    pass
+
+
+class CSVAccounting(ABCAccounting):
     pass
 
 
@@ -80,9 +84,9 @@ _HEADERS = ('user.name',
             'policy.volume_mode')
 
 
-@mergedocs(ABCAccounting)
-class CSVAccounting(ABCAccounting):
-    """ Accounting class that reads a CSV file and is used by the
+@mergedocs(ABCDatabase)
+class CSVDatabase(ABCDatabase):
+    """ Database class that reads a CSV file and is used by the
     remoteappmanager.  Currently only accepts one csv file.
     """
 
@@ -167,10 +171,13 @@ class CSVAccounting(ABCAccounting):
 
                 # Save the configuration
                 # Note that we don't filter existing duplicate entry
-                self.all_records.setdefault(user.name, []).append((
-                     uuid.uuid4().hex,
-                     application,
-                     application_policy))
+                self.all_records.setdefault(user.name, []).append(
+                    CSVAccounting(
+                        id=uuid.uuid4().hex,
+                        user=user,
+                        application=application,
+                        application_policy=application_policy)
+                )
 
     def get_user(self, *, user_name=None, id=None):
         if not one([user_name, id]):
@@ -185,9 +192,9 @@ class CSVAccounting(ABCAccounting):
 
     def get_accounting_for_user(self, user):
         if user is not None:
-            return tuple(self.all_records.get(user.name, ()))
+            return tuple(self.all_records.get(user.name, []))
         else:
-            return ()
+            return []
 
     def create_user(self, user_name):
         raise UnsupportedOperation()

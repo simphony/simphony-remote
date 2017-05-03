@@ -8,7 +8,7 @@ import unittest
 from collections import namedtuple
 
 from remoteappmanager.db.interfaces import (
-    ABCApplication, ABCApplicationPolicy, ABCAccounting)
+    ABCApplication, ABCApplicationPolicy, ABCDatabase)
 from remoteappmanager.db import exceptions
 from remoteappmanager.db.tests.abc_test_interfaces import (
     ABCTestDatabaseInterface)
@@ -24,7 +24,7 @@ class ApplicationPolicy(ABCApplicationPolicy):
     pass
 
 
-class Accounting(ABCAccounting):
+class Accounting(ABCDatabase):
 
     def get_user(self, *, user_name=None, id=None):
         return User(id=0, name=user_name)

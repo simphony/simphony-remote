@@ -12,7 +12,7 @@ from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.orm.exc import DetachedInstanceError, NoResultFound
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
-from remoteappmanager.db.interfaces import ABCAccounting
+from remoteappmanager.db.interfaces import ABCDatabase
 from remoteappmanager.db import exceptions
 from remoteappmanager.utils import parse_volume_string, mergedocs, one
 
@@ -163,8 +163,8 @@ class Database(LoggingMixin):
         Base.metadata.create_all(self.engine)
 
 
-@mergedocs(ABCAccounting)
-class AppAccounting(ABCAccounting):
+@mergedocs(ABCDatabase)
+class ORMDatabase(ABCDatabase):
 
     def __init__(self, url, **kwargs):
         ''' Initialiser
@@ -230,7 +230,7 @@ class AppAccounting(ABCAccounting):
         # We create a session here to make sure it is only
         # used in one thread
         with contextlib.closing(self.db.create_session()) as session:
-            result = apps_for_user(session, user)
+            result = accounting_for_user(session, user)
 
             # Removing internal references to the session is
             # required such that the objects can be reused
@@ -436,7 +436,7 @@ def transaction(session):
         session.commit()
 
 
-def apps_for_user(session, user):
+def accounting_for_user(session, user):
     """Returns a tuple of tuples, each containing an application and the
     associated policy that the specified orm user is allowed to run.
     If the user is None, the default is to return an empty list.
@@ -450,7 +450,7 @@ def apps_for_user(session, user):
         the orm User, or None.
     Returns
     -------
-    A tuple of tuples (mapping_id, orm.Application, orm.ApplicationPolicy)
+    A list of Accounting objects
     """
 
     if user is None:
@@ -470,6 +470,4 @@ def apps_for_user(session, user):
         Accounting.user, aliased=True).filter_by(
             name=user_name).all()
 
-    return tuple(((acc.id,
-                   acc.application,
-                   acc.application_policy) for acc in res))
+    return res
