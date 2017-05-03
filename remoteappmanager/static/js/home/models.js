@@ -94,6 +94,9 @@ define([
             }.bind(this));
 
             this.app_list = app_list;
+
+            if(app_list.length) {this.selected_index = 0;}
+
             this.loading = false;
         }.bind(this));
     };
