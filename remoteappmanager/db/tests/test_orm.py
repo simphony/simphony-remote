@@ -379,7 +379,7 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         self.assertEqual(acc[0].application_policy.volume_mode, None)
 
         database.revoke_access("simphonyremote/amazing", "ciccio",
-                                 True, False, None)
+                               True, False, None)
 
         self.assertEqual(len(database.get_accounting_for_user(user)), 0)
 

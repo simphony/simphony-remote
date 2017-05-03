@@ -104,7 +104,7 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
                     "Got : {}".format(allowed_chars, entry.id))
 
     def test_list_users(self):
-        database= self.create_database()
+        database = self.create_database()
 
         expected_names = sorted([user.name
                                  for user in self.create_expected_users()])
@@ -113,7 +113,7 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
         self.assertEqual(expected_names, obtained_names)
 
     def test_list_applications(self):
-        database= self.create_database()
+        database = self.create_database()
 
         expected_images = set()
         for user in self.create_expected_users():

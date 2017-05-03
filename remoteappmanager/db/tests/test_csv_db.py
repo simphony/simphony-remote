@@ -2,7 +2,7 @@ import os
 import unittest
 
 from remoteappmanager.db.csv_db import (
-    CSVApplication, CSVApplicationPolicy, CSVUser, CSVAccounting, CSVDatabase)
+    CSVApplication, CSVApplicationPolicy, CSVUser, CSVDatabase)
 from remoteappmanager.db.tests.abc_test_interfaces import (
     ABCTestDatabaseInterface)
 from remoteappmanager.tests.temp_mixin import TempMixin
