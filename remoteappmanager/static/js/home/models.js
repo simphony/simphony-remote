@@ -110,7 +110,6 @@ define([
         .done(function(new_data) {
             app.app_data = new_data;
 
-            this._update_configurables(app);
             this._update_status(app);
         }.bind(this));
     };
