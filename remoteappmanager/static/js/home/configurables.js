@@ -41,9 +41,9 @@ define([
         },
 
         watch: {
-            value: function() {this.output = this.value},
-            output: function() {this.$emit('update:output', this.output)},
-            config_dict: function() {this.$emit('update:config_dict', this.config_dict)}
+            value: function() {this.output = this.value;},
+            output: function() {this.$emit('update:output', this.output);},
+            config_dict: function() {this.$emit('update:config_dict', this.config_dict);}
         }
     });
 
