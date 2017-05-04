@@ -15,7 +15,7 @@ define([
                 <label class="control-label">Image Name</label>
                 <input type="text" name="image_name" class="form-control" required v-model="model.image_name">
 
-                <field-messages name="image_name" show="$touched || $submitted">
+                <field-messages name="image_name" show="$dirty || $submitted">
                   <span class="help-block" slot="required">Image Name cannot be empty</span>
                 </field-messages>
               </validate>
@@ -91,9 +91,18 @@ define([
         }
       },
       createNewAccounting: function () {
-        if (!this.formstate.$valid) {
+        var model = this.model;
+        var formstate = this.formstate;
+      
+        if (formstate.$invalid) {
           return;
         }
+        if ((model.volume_source.length === 0 && model.volume_target.length !== 0) ||
+            (model.volume_source.length !== 0 && model.volume_target.length === 0)) {
+          console.log("boom!");
+          return;
+        }
+        
         var image_name = $.trim(this.model.name);
         resources.Accounting.create({image_name: image_name})
           .done((
@@ -115,42 +124,6 @@ define([
       }
     },
     watch: {
-      "model.volume_source": function(value) {
-        var model = this.model;
-        model.volume_source_target = [value, model.volume_target];
-      },
-      "model.volume_target": function(value) {
-        var model = this.model;
-        model.volume_source_target = [model.volume_source, value];
-      },
-      "model.volume_source_target": function(value) {
-        var model = this.model;
-        var formstate = this.formstate;
-        var volume_source = value[0];
-        var volume_target = value[1];
-        if (formstate.volume_source.$invalid || formstate.volume_target.$invalid) {
-          delete formstate.volume_source.$error.volumesInconsistent;
-          delete formstate.volume_target.$error.volumesInconsistent;
-          return;
-        }
-        if ((volume_source.length === 0 && volume_target.length !== 0) ||
-            (volume_source.length !== 0 && volume_target.length === 0)) {
-            formstate.volume_source.$invalid = true;
-            formstate.volume_source.$valid = false;
-            formstate.volume_source.$error.volumesInconsistent = true;
-            formstate.volume_target.$invalid = true;
-            formstate.volume_target.$valid = false;
-            formstate.volume_target.$error.volumesInconsistent = true;
-        } else {
-          formstate.volume_source.$invalid = false;
-          formstate.volume_source.$valid = true;
-          delete formstate.volume_source.$error.volumesInconsistent;
-          formstate.volume_target.$invalid = false;
-          formstate.volume_target.$valid = true;
-          delete formstate.volume_target.$error.volumesInconsistent;
-        }
-        
-      },
       "show": function (value) {
         if (value) {
           this.reset();
@@ -160,6 +133,26 @@ define([
   };
 });
 
+
+// "model.volume_source_target": function(value) {
+//   if ((volume_source.length === 0 && volume_target.length !== 0) ||
+//     (volume_source.length !== 0 && volume_target.length === 0)) {
+//     formstate.volume_source.$invalid = true;
+//     formstate.volume_source.$valid = false;
+//     formstate.volume_source.$error.volumesInconsistent = true;
+//     formstate.volume_target.$invalid = true;
+//     formstate.volume_target.$valid = false;
+//     formstate.volume_target.$error.volumesInconsistent = true;
+//   } else {
+//     formstate.volume_source.$invalid = false;
+//     formstate.volume_source.$valid = true;
+//     delete formstate.volume_source.$error.volumesInconsistent;
+//     formstate.volume_target.$invalid = false;
+//     formstate.volume_target.$valid = true;
+//     delete formstate.volume_target.$error.volumesInconsistent;
+//   }
+//
+// },
 
 
 
