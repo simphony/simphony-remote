@@ -11,13 +11,12 @@ class TestHideApplication(SeleniumTestBase):
                 driver.find_element_by_css_selector(
                     "#applistentries > li > a > span").text != "Loading")
 
-            app_entry = driver.find_element_by_css_selector(
-                "#applistentries > li")
-
             # Click on the search box
             search_box = driver.find_element_by_id("search-box")
-            search_box.send_keys('foo bar')
+            search_box.send_keys('foo bar heho')
 
             self.wait_for(
                 lambda:
-                app_entry[0].value_of_css_property('display') == "none")
+                driver.find_element_by_css_selector(
+                    "#applistentries > li").value_of_css_property(
+                        'display') == "none")
