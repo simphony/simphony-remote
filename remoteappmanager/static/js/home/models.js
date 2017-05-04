@@ -128,8 +128,7 @@ define([
             var configurable = configurables[conf_name];
 
             if (configurable !== null) {
-                app.configurables.push(
-                    { tag: configurable.tag, value: configurable.value, as_config_dict: configurable.as_config_dict });
+                app.configurables.push($.extend(true, {}, configurable));
             }
         });
     };
