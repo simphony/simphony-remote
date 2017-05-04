@@ -121,15 +121,16 @@ define([
         // to its client-side model.
         app.configurables = [];
 
-        app.app_data.image.configurables.forEach(function(tag) {
+        app.app_data.image.configurables.forEach(function(conf_name) {
             // If this returns null, the tag has not been recognized
             // by the client. skip it and let the server deal with the
             // missing data, either by using a default or throwing
             // an error.
-            var ConfigurableComp = configurables[tag];
+            var configurable = configurables[conf_name];
 
-            if (ConfigurableComp !== null) {
-                app.configurables.push(new ConfigurableComp());
+            if (configurable !== null) {
+                app.configurables.push(
+                    { tag: configurable.tag, value: configurable.default });
             }
         });
     };
