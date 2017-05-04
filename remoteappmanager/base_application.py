@@ -8,7 +8,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from tornadowebapi.registry import Registry
 
-from remoteappmanager.db.interfaces import ABCAccounting
+from remoteappmanager.db.interfaces import ABCDatabase
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.docker.container_manager import ContainerManager
 from remoteappmanager.jinja2_adapters import Jinja2LoaderAdapter, gravatar_id
@@ -33,7 +33,7 @@ class BaseApplication(web.Application, LoggingMixin):
 
     #: An accounting system that knows the allowed users, what applications
     #: they can run etc.
-    db = Instance(ABCAccounting, allow_none=True)
+    db = Instance(ABCDatabase, allow_none=True)
 
     #: API access to the configurable-http-proxy
     reverse_proxy = Instance(ReverseProxy)
@@ -119,11 +119,11 @@ class BaseApplication(web.Application, LoggingMixin):
     @default("db")
     def _db_default(self):
         """Initializes the database connection."""
-        class_path = self.file_config.accounting_class
+        class_path = self.file_config.database_class
         module_path, _, cls_name = class_path.rpartition('.')
         cls = getattr(importlib.import_module(module_path), cls_name)
         try:
-            return cls(**self.file_config.accounting_kwargs)
+            return cls(**self.file_config.database_kwargs)
         except Exception:
             reason = 'The database is not initialised properly.'
             self.log.exception(reason)

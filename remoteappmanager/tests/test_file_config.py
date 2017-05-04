@@ -21,8 +21,8 @@ docker_realm = "myrealm"
 '''
 
 GOOD_ACCOUNTING_CONFIG = '''
-accounting_class = "remoteappmanager.db.csv_db.CSVAccounting"
-accounting_kwargs = {"csv_file_path": "file_path.csv"}
+database_class = "remoteappmanager.db.csv_db.CSVDatabase"
+database_kwargs = {"csv_file_path": "file_path.csv"}
 '''
 
 GA_TRACKING = '''
@@ -102,9 +102,9 @@ class TestFileConfig(TempMixin, unittest.TestCase):
         config = FileConfig()
         config.parse_config(self.config_file)
 
-        self.assertEqual(config.accounting_class,
-                         "remoteappmanager.db.csv_db.CSVAccounting")
-        self.assertDictEqual(config.accounting_kwargs,
+        self.assertEqual(config.database_class,
+                         "remoteappmanager.db.csv_db.CSVDatabase")
+        self.assertDictEqual(config.database_kwargs,
                              {"csv_file_path": "file_path.csv"})
 
     def test_initialization_on_nonlocal_docker_machine(self):
