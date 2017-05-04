@@ -20,12 +20,11 @@
     });
 
     require([
-        "tests/home/test_configurables.js",
         "tests/home/test_models.js",
         "tests/home/test_views.js",
         "tests/test_utils.js",
         "tests/test_analytics.js"
-        ], function(init) {
+        ], function() {
             window.apidata = {
                 base_url: "/",
                 prefix: "/"
