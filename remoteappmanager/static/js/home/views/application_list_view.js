@@ -30,7 +30,7 @@ define([
               '  <!-- Application list -->' +
               '  <li v-for="(app, index) in model.app_list"' +
               '      :class="{ active: index === model.selected_index }"' +
-              '      v-show="entries_visible[index]"' +
+              '      v-show="$options.filters.app_name(app.app_data.image).toLowerCase().includes(search_input.toLowerCase())"' +
               '      @click="model.selected_index = index; $(\'iframe\').focus();">' +
 
               '    <span :class="app.status.toLowerCase() + \'-badge\'"></span>' +
@@ -55,18 +55,6 @@ define([
 
         data: function() {
             return { 'search_input': '' };
-        },
-
-        computed: {
-            'entries_visible': function() {
-                return this.search_input === ''?
-                    new Array(this.model.app_list.length).fill(true):
-                    this.model.app_list.map(function(app) {
-                        var image = app.app_data.image;
-                        var name = image.ui_name? image.ui_name: image.name;
-                        return name.toLowerCase().includes(this.search_input.toLowerCase());
-                    }.bind(this));
-            }
         }
     });
 
