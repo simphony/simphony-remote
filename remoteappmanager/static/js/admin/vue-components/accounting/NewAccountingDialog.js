@@ -33,7 +33,6 @@ define([
                 </div>
                 <field-messages name="volume_source">
                   <span class="help-block" slot="validatePath">Volume Source must be empty or an absolute path</span>
-                  <span class="help-block" slot="volumesInconsistent">Both Volume Source and Target must be defined</span>
                 </field-messages>
               </validate>
               
@@ -44,7 +43,6 @@ define([
                 </div>
                 <field-messages name="volume_target">
                   <span class="help-block" slot="validatePath">Volume Target must be empty or an absolute path</span>
-                  <span class="help-block" slot="volumesInconsistent">Both Volume Source and Target must be defined</span>
                 </field-messages>
               </validate>
               
@@ -53,6 +51,8 @@ define([
                   <input type="checkbox" name="volume_readonly" v-model="model.volume_readonly" /> Mount volume readonly
                 </label>
               </div>
+                 
+              <p v-if="crossValidationError" class="text-danger">Both Volume Source and Target must be defined</p>
 
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" @click="close()">Cancel</button>
@@ -61,11 +61,12 @@ define([
             </vue-form> 
           </div>
       </modal>`,
-    props: ['show'],
+    props: ['show', "userId"],
 
     data: function () {
       return {
         formstate: {},
+        crossValidationError: false,
         model: {
           image_name: '',
           allow_home: false,
@@ -99,12 +100,20 @@ define([
         }
         if ((model.volume_source.length === 0 && model.volume_target.length !== 0) ||
             (model.volume_source.length !== 0 && model.volume_target.length === 0)) {
-          console.log("boom!");
+          this.crossValidationError = true;
           return;
         }
-        
-        var image_name = $.trim(this.model.name);
-        resources.Accounting.create({image_name: image_name})
+
+        var rep = {
+          user_id: this.userId,
+          image_name: this.model.image_name,
+          allow_home: this.model.allow_home,
+          volume_source: this.model.volume_source,
+          volume_target: this.model.volume_target,
+          volume_mode: (model.volume_readonly ? "ro" : "rw")
+        };
+
+        resources.Accounting.create(rep)
           .done((
             function () {
               this.$emit('created');
@@ -115,6 +124,7 @@ define([
               this.$emit("closed");
             }).bind(this)
           );
+        
       },
       reset: function () {
         Object.assign(this.$data, this.$options.data());
@@ -128,106 +138,21 @@ define([
         if (value) {
           this.reset();
         }
+      },
+      "model.volume_source": function() {
+        delete this.formstate.volume_source.$error.volumesInconsistent;
+        delete this.formstate.volume_target.$error.volumesInconsistent;
+      },
+      "model.volume_target": function() {
+        delete this.formstate.volume_source.$error.volumesInconsistent;
+        delete this.formstate.volume_target.$error.volumesInconsistent;
       }
     }
   };
 });
 
-
-// "model.volume_source_target": function(value) {
-//   if ((volume_source.length === 0 && volume_target.length !== 0) ||
-//     (volume_source.length !== 0 && volume_target.length === 0)) {
-//     formstate.volume_source.$invalid = true;
-//     formstate.volume_source.$valid = false;
-//     formstate.volume_source.$error.volumesInconsistent = true;
-//     formstate.volume_target.$invalid = true;
-//     formstate.volume_target.$valid = false;
-//     formstate.volume_target.$error.volumesInconsistent = true;
-//   } else {
-//     formstate.volume_source.$invalid = false;
-//     formstate.volume_source.$valid = true;
-//     delete formstate.volume_source.$error.volumesInconsistent;
-//     formstate.volume_target.$invalid = false;
-//     formstate.volume_target.$valid = true;
-//     delete formstate.volume_target.$error.volumesInconsistent;
-//   }
-//
-// },
-
-
-
-
 /*
-var ok_callback = function () {
-  var image_name = $.trim($("#image_name").val());
-  var allow_home = $("#allow_home").prop("checked");
-  var volume_source = $.trim($("#volume_source").val());
-  var volume_target = $.trim($("#volume_target").val());
-  var volume_readonly = $("#volume_readonly").prop("checked");
-
-  $(dialog).find(".alert").hide();
-
-  if (volume_target.length !== 0 && volume_target[0] !== '/') {
-    $(dialog).find("#volume_target_alert")
-      .text("Must be an absolute path or empty")
-      .show();
-    return;
-  }
-
-  if (volume_source.length === 0 && volume_target.length !== 0) {
-    $(dialog).find("#volume_source_alert")
-      .text("Must not be empty if target is defined")
-      .show();
-    return;
-  }
-
-  if (volume_source.length !== 0 && volume_target.length === 0) {
-    $(dialog).find("#volume_target_alert")
-      .text("Must not be empty if source is defined")
-      .show();
-    return;
-  }
-
-  var rep = {
-    user_name: user_name,
-    image_name: image_name,
-    allow_home: allow_home
-  };
-
-  if (volume_source.length !== 0 && volume_target.length !== 0) {
-    var volume_mode;
-    if (volume_readonly) {
-      volume_mode = "ro";
-    } else {
-      volume_mode = "rw";
-    }
-    rep.volume = volume_source+":"+volume_target+":"+volume_mode;
-  }
-
-  dialog.modal('hide');
-
-  resources.Accounting.create(rep)
-    .done(function() { window.location.reload(); })
-    .fail(dialogs.webapi_error_dialog);
 };
 
-var cancel_callback = function () {
-  dialog.modal('hide');
-};
-
-$(dialog).find("form").on('submit', function(e) {
-  e.preventDefault();
-  ok_callback();
-});
-
-dialogs.config_dialog(
-  dialog,
-  null,
-  null,
-  ok_callback,
-  cancel_callback
-);
-});
-});
 */
 

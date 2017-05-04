@@ -1,5 +1,6 @@
 from tornado import gen
-from tornadowebapi.exceptions import NotFound, BadQueryArguments
+from tornadowebapi.exceptions import NotFound, BadQueryArguments, \
+    BadRepresentation
 from tornadowebapi.resource_handler import ResourceHandler
 from tornadowebapi.traitlets import Absent, Unicode, Bool
 
@@ -13,7 +14,7 @@ from remoteappmanager.db import exceptions as db_exceptions
 
 
 class Accounting(Resource):
-    user_name = Unicode(allow_empty=False, strip=True)
+    user_id = Unicode(allow_empty=False, strip=True)
     image_name = Unicode(allow_empty=False, strip=True)
     allow_home = Bool()
     volume_source = Unicode(allow_none=True)
@@ -33,13 +34,20 @@ class AccountingHandler(ResourceHandler):
     def create(self, resource, **kwargs):
         db = self.application.db
 
-        volume = {} if resource.volume == Absent else resource.volume
-        parse_volume_string(volume)
+        acc_user = db.get_user(id=int(resource.user_id))
+        if acc_user is None:
+            raise BadRepresentation()
+
+        volume = (resource.volume_source +
+                  ":"+resource.volume_target +
+                  ":"+resource.volume_mode)
+        if resource.volume_target == "" or resource.volume_source == "":
+            volume = None
 
         try:
             id = db.grant_access(
                 resource.image_name,
-                resource.user_name,
+                acc_user.name,
                 resource.allow_home,
                 True,
                 volume,
@@ -78,8 +86,8 @@ class AccountingHandler(ResourceHandler):
             response = []
             for acc in accountings:
                 entry = Accounting(
-                    identifier=acc.id,
-                    user_name=acc_user.name,
+                    identifier=str(acc.id),
+                    user_id=str(acc_user.id),
                     image_name=acc.application.image,
                     allow_home=acc.application_policy.allow_home,
                     volume_source=acc.application_policy.volume_source,

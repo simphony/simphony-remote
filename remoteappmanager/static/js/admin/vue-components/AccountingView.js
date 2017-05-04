@@ -47,6 +47,7 @@ define([
         <new-accounting-dialog 
           v-if="showNewAccountingDialog"
           :show="showNewAccountingDialog"
+          :userId="userId"
           @created="newAccountingCreated"
           @closed="newAccountingDialogClosed"></new-accounting-dialog>
           
@@ -64,6 +65,7 @@ define([
         accountings: [],
         showNewAccountingDialog: false,
         showRemoveAccountingDialog: false,
+        userId: this.$route.params.id,
         accToRemove: {
           id: null
         }
