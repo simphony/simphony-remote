@@ -12,9 +12,11 @@ define([
               '</form>' +
 
               '<!-- Sidebar Menu -->' +
-              '<ul id="applistentries" class="sidebar-menu">' +
+              '<ul class="sidebar-menu">' +
               '  <li class="header">APPLICATIONS</li>' +
+              '</ul>' +
 
+              '<ul id="applistentries" class="sidebar-menu">' +
               '  <li v-show="!model.loading && model.app_list.length === 0">' +
               '    <a href="#">No applications found</a>' +
               '  </li>' +

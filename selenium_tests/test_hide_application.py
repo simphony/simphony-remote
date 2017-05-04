@@ -15,8 +15,7 @@ class TestHideApplication(SeleniumTestBase):
             search_box = driver.find_element_by_name("q")
             search_box.clear()
             search_box.send_keys('foobarheho')
-            print(driver.find_element_by_css_selector(
-                    "#applistentries > li"))
+
             self.wait_for(
                 lambda:
                 driver.find_element_by_css_selector(
