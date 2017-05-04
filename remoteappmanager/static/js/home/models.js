@@ -130,7 +130,7 @@ define([
 
             if (configurable !== null) {
                 app.configurables.push(
-                    { tag: configurable.tag, value: configurable.default });
+                    { tag: configurable.tag, value: configurable.default, config_dict: null });
             }
         });
     };

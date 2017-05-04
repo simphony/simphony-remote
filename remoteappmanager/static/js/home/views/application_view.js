@@ -45,7 +45,11 @@ define([
             '          <form class="configuration">' +
             '            <fieldset v-if="current_app.configurables.length === 0">No configurable options for this image</fieldset>' +
             '            <fieldset v-else>' +
-            //'              <component v-for="configurable in current_app.configurables" :is="configurable.tag"></component>' +
+            '              <component v-for="configurable in current_app.configurables"' +
+            '                         :is="configurable.tag"' +
+            '                         :value="configurable.value"' +
+            '                         @update:output="val => configurable.value = val"' +
+            '                         @update:config_dict="val => configurable.config_dict = val"></component>' +
             '            </fieldset>' +
             '          </form>' +
             '        </div>' +
