@@ -129,7 +129,7 @@ define([
 
             if (configurable !== null) {
                 app.configurables.push(
-                    { tag: configurable.tag, value: configurable.default, config_dict: null });
+                    { tag: configurable.tag, value: configurable.value, as_config_dict: configurable.as_config_dict });
             }
         });
     };
@@ -151,7 +151,7 @@ define([
 
         var configurables_data = {};
         current_app.configurables.forEach(function(configurable) {
-            configurables_data[configurable.tag] = configurable.config_dict;
+            configurables_data[configurable.tag] = configurable.as_config_dict();
         });
 
         resources.Container.create({
