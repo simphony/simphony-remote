@@ -20,6 +20,7 @@
     });
 
     require([
+        "tests/home/test_configurables.js",
         "tests/home/test_models.js",
         "tests/home/test_views.js",
         "tests/test_utils.js",
