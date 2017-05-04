@@ -8,7 +8,7 @@ define([
             '<section class="sidebar">' +
               '<!-- Search form -->' +
               '<form action="#" class="sidebar-form">' +
-              '  <input type="text" name="q" id="search-box" class="form-control" placeholder="Search..." v-model="search_input">' +
+              '  <input type="text" name="q" class="form-control" placeholder="Search..." v-model="search_input">' +
               '</form>' +
 
               '<!-- Sidebar Menu -->' +

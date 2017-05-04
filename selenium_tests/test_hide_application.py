@@ -12,8 +12,9 @@ class TestHideApplication(SeleniumTestBase):
                     "#applistentries > li > a > span").text != "Loading")
 
             # Click on the search box
-            search_box = driver.find_element_by_id("search-box")
-            search_box.send_keys('foo bar heho')
+            search_box = driver.find_element_by_name("q")
+            search_box.clear()
+            search_box.send_keys('foobarheho')
 
             self.wait_for(
                 lambda:
