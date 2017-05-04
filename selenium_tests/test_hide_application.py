@@ -12,7 +12,7 @@ class TestHideApplication(SeleniumTestBase):
                     "#applistentries > li > a > span").text != "Loading")
 
             app_entry = driver.find_element_by_css_selector(
-                "#applistentries > li > a > img")
+                "#applistentries > li")
 
             # Click on the search box
             search_box = driver.find_element_by_id("search-box")
