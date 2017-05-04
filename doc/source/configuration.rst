@@ -80,6 +80,6 @@ docker setup.
    For example, to use CSV as the database, `/path/to/config.py` would
    contain the followings::
 
-     accounting_class = 'remoteappmanager.db.csv_db.CSVAccounting'
-     accounting_kwargs = {'url': '/path/to/csv_file'}
+     database_class = 'remoteappmanager.db.csv_db.CSVDatabase'
+     database_kwargs = {'url': '/path/to/csv_file'}
 

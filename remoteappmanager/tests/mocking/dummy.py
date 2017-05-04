@@ -26,10 +26,14 @@ class DummyDBApplicationPolicy(interfaces.ABCApplicationPolicy):
     pass
 
 
+class DummyDBAccounting(interfaces.ABCAccounting):
+    pass
+
+
 User = namedtuple('User', ('id', 'name'))
 
 
-class DummyDBAccounting(interfaces.ABCAccounting):
+class DummyDB(interfaces.ABCDatabase):
     def __init__(self):
         self.users = {
             0: User(0, "johndoe")
@@ -64,12 +68,16 @@ class DummyDBAccounting(interfaces.ABCAccounting):
         user = [u for u in self.users.values() if u.name == user_name]
         return user[0] if len(user) else None
 
-    def get_apps_for_user(self, account):  # pragma: no cover
-        return tuple(
-            [(mapping_id, application, policy)
-             for mapping_id, (user, application, policy)
-             in self.accounting.items()
-             if user == account])
+    def get_accounting_for_user(self, user):  # pragma: no cover
+        return [
+                DummyDBAccounting(
+                    id=id,
+                    user=user,
+                    application=application,
+                    application_policy=policy)
+                for id, (tbl_user, application, policy)
+                in self.accounting.items()
+                if tbl_user == user]
 
     def create_user(self, user_name):  # pragma: no cover
         if user_name in [u.name for u in self.list_users()]:
@@ -294,9 +302,9 @@ def _create_application_from_class(
 
     if file_config is None:
         file_config = FileConfig()
-        file_config.accounting_class = \
-            'remoteappmanager.tests.mocking.dummy.DummyDBAccounting'
-        file_config.accounting_kwargs = {}
+        file_config.database_class = \
+            'remoteappmanager.tests.mocking.dummy.DummyDB'
+        file_config.database_kwargs = {}
 
     if command_line_config is None:
         command_line_config = basic_command_line_config()

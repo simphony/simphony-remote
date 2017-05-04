@@ -10,16 +10,18 @@ from tornado import testing
 from traitlets.traitlets import TraitError
 
 
-class DummyAccounting:
+class DummyDB:
     def __init__(self, *args, **kwargs):
         pass
 
 
-class TestApplication(TempMixin, testing.AsyncTestCase):
+class TestApplication(TempMixin,
+                      testing.AsyncTestCase,
+                      testing.LogTrapTestCase):
     def setUp(self):
         super().setUp()
 
-        # File config with orm.AppAccounting
+        # File config with orm.ORMDatabase
         self.file_config = utils.basic_file_config()
         self.command_line_config = utils.basic_command_line_config()
         self.environment_config = utils.basic_environment_config()
@@ -29,9 +31,9 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
         sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
         utils.init_sqlite_db(sqlite_file_path)
 
-        self.file_config.accounting_class = (
-            "remoteappmanager.db.orm.AppAccounting")
-        self.file_config.accounting_kwargs = {
+        self.file_config.database_class = (
+            "remoteappmanager.db.orm.ORMDatabase")
+        self.file_config.database_kwargs = {
             "url": "sqlite:///"+sqlite_file_path}
 
         app = Application(self.command_line_config,
@@ -51,7 +53,7 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
         self.assertEqual(app.user.account, None)
 
     def test_error_default_value_with_unimportable_accounting(self):
-        self.file_config.accounting_class = "not.importable.Class"
+        self.file_config.database_class = "not.importable.Class"
         app = Application(self.command_line_config,
                           self.file_config,
                           self.environment_config)
@@ -60,8 +62,8 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
             app.db
 
     def test_db_default_value_with_accounting_wrong_subclass(self):
-        self.file_config.accounting_class = (
-            "remoteappmanager.tests.test_application.DummyAccounting")
+        self.file_config.database_class = (
+            "remoteappmanager.tests.test_application.DummyDB")
         app = Application(self.command_line_config,
                           self.file_config,
                           self.environment_config)
@@ -70,11 +72,11 @@ class TestApplication(TempMixin, testing.AsyncTestCase):
             app.db
 
     def test_initialization(self):
-        self.file_config.accounting_class = (
-            "remoteappmanager.db.csv_db.CSVAccounting")
+        self.file_config.database_class = (
+            "remoteappmanager.db.csv_db.CSVDatabase")
 
         csv_file = os.path.join(self.tempdir, 'testing.csv')
-        self.file_config.accounting_kwargs = {"csv_file_path": csv_file}
+        self.file_config.database_kwargs = {"csv_file_path": csv_file}
 
         test_csv_db.write_csv_file(csv_file,
                                    test_csv_db.GoodTable.headers,

@@ -101,7 +101,7 @@ test: pythontest jstest
 pythontest:
 	@echo "Running python testsuite"
 	@echo "------------------------"
-	python -m tornado.testing discover -s remoteappmanager -t . -v
+	python -m tornado.testing discover -s remoteappmanager -t .
 
 .PHONY: jstest
 jstest: 
