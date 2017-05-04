@@ -44,7 +44,7 @@ define([
             '          <h4>Configuration</h4>' +
             '          <form class="configuration">' +
             '            <fieldset v-if="current_app.configurables.length === 0">No configurable options for this image</fieldset>' +
-            '            <fieldset v-else>' +
+            '            <fieldset v-else :disabled="current_app.is_starting()">' +
             '              <component v-for="configurable in current_app.configurables"' +
             '                         :is="configurable.tag"' +
             '                         :value="configurable.value"' +
