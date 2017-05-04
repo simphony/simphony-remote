@@ -18,5 +18,6 @@ class TestHideApplication(SeleniumTestBase):
             search_box = driver.find_element_by_id("search-box")
             search_box.send_keys('foo bar')
 
-            self.wait_for(lambda:
-                          app_entry.value_of_css_property('display') == "none")
+            self.wait_for(
+                lambda:
+                app_entry[0].value_of_css_property('display') == "none")
