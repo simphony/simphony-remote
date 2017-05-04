@@ -1,9 +1,8 @@
 define([
   "components/vue/dist/vue",
   "jsapi/v1/resources",
-  "components/lodash/dist/lodash",
   "admin/vue-components/containers/StopContainerDialog"
-], function(Vue, resources, _, StopContainerDialog) {
+], function(Vue, resources, StopContainerDialog) {
   "use strict";
 
     return {
@@ -56,11 +55,6 @@ define([
       },
       mounted: function () {
         this.updateTable();
-      },
-      filters: {
-        truncate: function(value) {
-          return _.truncate(value, {'length': 12 });
-        }
       },
       methods: {
         updateTable: function() {

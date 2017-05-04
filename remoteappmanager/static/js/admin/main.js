@@ -1,20 +1,24 @@
 /*globals: require, console*/
 require([
+  "components/lodash/dist/lodash",
   "components/vue/dist/vue",
   "components/vue-router/dist/vue-router",
   "components/vue-form/dist/vue-form",
   "admin/vue-components/MainView",
   "admin/vue-components/ContainersView",
   "admin/vue-components/UsersView",
-  "admin/vue-components/ApplicationsView"
+  "admin/vue-components/ApplicationsView",
+  "admin/vue-components/AccountingView"
 ], function(
+  _,
   Vue, 
   VueRouter,
   VueForm,
   MainView,
   ContainersView,
   UsersView,
-  ApplicationsView) {
+  ApplicationsView,
+  AccountingView) {
   
   "use strict";
 
@@ -27,12 +31,17 @@ require([
     }
   });
   
+  Vue.filter("truncate", function(value) {
+      return _.truncate(value, {'length': 12 });
+    }
+  );
+
   const router = new VueRouter({
     routes: [
       { path: '/', component: MainView },
       { path: '/containers', component: ContainersView },
       { path: '/users', component: UsersView },
-      { name: "user_accounting", path: '/users/:id/accounting', component: UsersView },
+      { name: "user_accounting", path: '/users/:id/accounting', component: AccountingView },
       { path: '/applications', component: ApplicationsView }
     ]
   });

@@ -1,10 +1,12 @@
 from tornado import gen
+from tornadowebapi.exceptions import NotFound, BadQueryArguments
 from tornadowebapi.resource_handler import ResourceHandler
 from tornadowebapi.traitlets import Absent, Unicode, Bool
 
 from remoteappmanager.utils import parse_volume_string
 from tornadowebapi import exceptions
 from tornadowebapi.resource import Resource
+from tornadowebapi.filtering import And, Eq
 
 from remoteappmanager.webapi.decorators import authenticated
 from remoteappmanager.db import exceptions as db_exceptions
@@ -14,7 +16,9 @@ class Accounting(Resource):
     user_name = Unicode(allow_empty=False, strip=True)
     image_name = Unicode(allow_empty=False, strip=True)
     allow_home = Bool()
-    volume = Unicode(optional=True, allow_empty=False, strip=True)
+    volume_source = Unicode(allow_none=True)
+    volume_target = Unicode(allow_none=True)
+    volume_mode = Unicode(allow_none=True)
 
     @classmethod
     def collection_name(cls):
@@ -55,11 +59,35 @@ class AccountingHandler(ResourceHandler):
         except db_exceptions.NotFound:
             raise exceptions.NotFound()
 
+    @gen.coroutine
+    @authenticated
+    def items(self, item_response, filter_, **kwargs):
+        db = self.application.db
+        if (isinstance(filter_, And)
+            and len(filter_.filters) == 1
+            and isinstance(filter_.filters[0], Eq)
+            and filter_.filters[0].key == "user_id"):
 
-def _not_empty_str(value):
-    value = str(value).strip()
+            user_id = filter_.filters[0].value
+            acc_user = db.get_user(id=user_id)
+            if acc_user is None:
+                raise NotFound()
 
-    if len(value) == 0:
-        raise ValueError("Value cannot be empty")
+            accountings = db.get_accounting_for_user(acc_user)
 
-    return value
+            response = []
+            for acc in accountings:
+                entry = Accounting(
+                    identifier=acc.id,
+                    user_name=acc_user.name,
+                    image_name=acc.application.image,
+                    allow_home=acc.application_policy.allow_home,
+                    volume_source=acc.application_policy.volume_source,
+                    volume_target=acc.application_policy.volume_target,
+                    volume_mode=acc.application_policy.volume_mode
+                )
+                response.append(entry)
+            item_response.set(response)
+        else:
+            raise BadQueryArguments()
+
