@@ -14,7 +14,7 @@
     "dependencies": {
         "bootstrap": "components/bootstrap#~3.3.7",
         "font-awesome": "~4.5",
-        "ionicons" : "~2.0.1",
+        "ionicons": "~2.0.1",
         "jquery": "components/jquery#~2.0",
         "moment": "~2.7",
         "requirejs": "~2.1",
@@ -28,9 +28,9 @@
         "vue": "^2.2.6",
         "vue-router": "^2.5.2",
         "vue-form": "^4.0.0",
-        "lodash" : "~4.17.4"
+        "lodash": "~4.17.4"
     },
     "devDependencies": {
         "blanket": "^1.1.7"
     }
-
+}
