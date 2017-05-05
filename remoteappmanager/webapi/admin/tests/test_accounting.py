@@ -34,7 +34,7 @@ class TestAccounting(WebAPITestCase):
 
     def test_create(self):
         self.post("/user/johndoe/api/v1/accounting/",
-                  {"user_name": ""},
+                  {"user_id": ""},
                   httpstatus.BAD_REQUEST)
 
         self.post("/user/johndoe/api/v1/accounting/",
@@ -42,19 +42,23 @@ class TestAccounting(WebAPITestCase):
                   httpstatus.BAD_REQUEST)
 
         self.post("/user/johndoe/api/v1/accounting/",
-                  {"user_name": "johndoe",
+                  {"user_id": "0",
                    "image_name": "image_id1",
                    "allow_home": True,
-                   "volume": "/foo:/bar:ro"
+                   "volume_source": "/foo",
+                   "volume_target": "/bar",
+                   "volume_mode": "ro"
                    },
                   httpstatus.CREATED)
 
         # Post in this case is idempotent
         self.post("/user/johndoe/api/v1/accounting/",
-                  {"user_name": "johndoe",
+                  {"user_id": "0",
                    "image_name": "image_id1",
                    "allow_home": True,
-                   "volume": "/foo:/bar:ro"
+                   "volume_source": "/foo",
+                   "volume_target": "/bar",
+                   "volume_mode": "ro"
                    },
                   httpstatus.CREATED)
 
@@ -64,10 +68,12 @@ class TestAccounting(WebAPITestCase):
                         ) as mock_grant_access:
             mock_grant_access.side_effect = UnsupportedOperation()
             self.post("/user/johndoe/api/v1/accounting/",
-                      {"user_name": "johndoe",
+                      {"user_id": "0",
                        "image_name": "image_id1",
                        "allow_home": True,
-                       "volume": "/foo:/bar:ro"
+                       "volume_source": "/foo",
+                       "volume_target": "/bar",
+                       "volume_mode": "ro"
                        },
                       httpstatus.INTERNAL_SERVER_ERROR)
 
