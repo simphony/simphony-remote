@@ -106,13 +106,11 @@ class TestAccounting(WebAPITestCase):
             self.assertEqual(mock_grant_access.call_args[0][4], None)
 
     def test_items(self):
-        response, data = self.get("/user/johndoe/api/v1/accounting/",
-                                  httpstatus.BAD_REQUEST)
+        self.get("/user/johndoe/api/v1/accounting/", httpstatus.BAD_REQUEST)
+        self.get("/user/johndoe/api/v1/accounting/?filter={}",
+                 httpstatus.BAD_REQUEST)
 
-        response, data = self.get("/user/johndoe/api/v1/accounting/?filter={}",
-                                  httpstatus.BAD_REQUEST)
-
-        response, data = self.get("/user/johndoe/api/v1/accounting/?filter="+
+        response, data = self.get("/user/johndoe/api/v1/accounting/?filter=" +
                                   urllib.parse.quote("{\"user_id\":\"0\"}"),
                                   httpstatus.OK)
         self.assertEqual(len(data["identifiers"]), 2)
