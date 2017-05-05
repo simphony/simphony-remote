@@ -12,7 +12,7 @@ define([
         template:
             '<div class="form-group">' +
             '  <label>Resolution</label>' +
-            '  <select class="form-control" v-model="sel_value">' +
+            '  <select class="form-control" v-model="selected_value">' +
             '    <option v-for="resolution_option in resolution_options">' +
             '      {{resolution_option}}' +
             '    </option>' +
@@ -21,14 +21,14 @@ define([
 
         data: function() {
             return {
-                sel_value: this.value,
+                selected_value: this.value,
                 resolution_options: ['Window', '1920x1080', '1280x1024', '1280x800', '1024x768']
             };
         },
 
         watch: {
-            value: function() {this.sel_value = this.value;}, // model -> view update
-            sel_value: function() {this.$emit('update:value', this.sel_value);} // view -> model update
+            value: function() {this.selected_value = this.value;}, // model -> view update
+            selected_value: function() {this.$emit('update:value', this.selected_value);} // view -> model update
         }
     });
 
