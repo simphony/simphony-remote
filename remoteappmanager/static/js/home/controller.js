@@ -51,7 +51,7 @@ require([
         ga_observer.trigger_application_starting(application.app_data.image.name);
     });
 
-    app_list_view.$on('focus_iframe', function() { app_view.focus_iframe(); });
+    app_list_view.$on('entry_clicked', function() { app_view.focus_iframe(); });
 
     model.update();
 });
