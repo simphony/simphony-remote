@@ -156,6 +156,14 @@ li a .stop-button:hover {
     display: block;
 }
 
+/* transition effect */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0
+}
+
 .truncate {
     overflow: hidden;
     text-overflow: ellipsis;
