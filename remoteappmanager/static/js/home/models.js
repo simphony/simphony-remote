@@ -127,7 +127,7 @@ define([
             // an error.
             var configurable = configurables[conf_name];
 
-            if (configurable !== null) {
+            if (configurable !== undefined) {
                 app.configurables.push($.extend(true, {}, configurable));
             }
         });
