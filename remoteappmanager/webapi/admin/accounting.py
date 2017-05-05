@@ -2,9 +2,8 @@ from tornado import gen
 from tornadowebapi.exceptions import NotFound, BadQueryArguments, \
     BadRepresentation
 from tornadowebapi.resource_handler import ResourceHandler
-from tornadowebapi.traitlets import Absent, Unicode, Bool
+from tornadowebapi.traitlets import Unicode, Bool
 
-from remoteappmanager.utils import parse_volume_string
 from tornadowebapi import exceptions
 from tornadowebapi.resource import Resource
 from tornadowebapi.filtering import And, Eq
@@ -71,10 +70,10 @@ class AccountingHandler(ResourceHandler):
     @authenticated
     def items(self, item_response, filter_, **kwargs):
         db = self.application.db
-        if (isinstance(filter_, And)
-            and len(filter_.filters) == 1
-            and isinstance(filter_.filters[0], Eq)
-            and filter_.filters[0].key == "user_id"):
+        if (isinstance(filter_, And) and
+                len(filter_.filters) == 1 and
+                isinstance(filter_.filters[0], Eq) and
+                filter_.filters[0].key == "user_id"):
 
             user_id = filter_.filters[0].value
             acc_user = db.get_user(id=user_id)
@@ -98,4 +97,3 @@ class AccountingHandler(ResourceHandler):
             item_response.set(response)
         else:
             raise BadQueryArguments()
-

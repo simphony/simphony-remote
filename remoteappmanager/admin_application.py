@@ -5,7 +5,6 @@ from remoteappmanager.handlers.api import (
     AdminHomeHandler,
 )
 from remoteappmanager.webapi import admin
-from remoteappmanager.utils import url_path_join, with_end_slash
 
 
 class AdminApplication(BaseApplication):
