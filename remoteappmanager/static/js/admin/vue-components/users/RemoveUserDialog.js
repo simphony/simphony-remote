@@ -4,17 +4,15 @@ define([
 ], function(Vue, resources) {
   "use strict";
   return {
-    template: `
-      <modal>
-          <div class="modal-header"><h4>Remove User</h4></div>
-          <div class="modal-body">Do you want to remove user {{ userToRemove.name }}?</div>
-
-          <div class="modal-footer text-right">
-              <button type="button" class="btn btn-default" @click="close">Cancel</button>
-              <button class="btn btn-primary primary" @click="removeUser">Remove</button>
-          </div>
-      </modal>
-      `,
+    template: 
+      '<modal>' +
+      '    <div class="modal-header"><h4>Remove User</h4></div>' +
+      '    <div class="modal-body">Do you want to remove user {{ userToRemove.name }}?</div>' +
+      '    <div class="modal-footer text-right">' +
+      '        <button type="button" class="btn btn-default" @click="close">Cancel</button>' +
+      '        <button class="btn btn-primary primary" @click="removeUser">Remove</button>' +
+      '    </div>' +
+      '</modal>',
     props: ['userToRemove'],
     methods: {
       close: function () {

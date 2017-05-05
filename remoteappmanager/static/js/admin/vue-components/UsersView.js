@@ -11,48 +11,47 @@ define([
       'new-user-dialog': NewUserDialog,
       'remove-user-dialog': RemoveUserDialog
     },
-    template: `
-<div class="row">
-  <div class="col-md-12">
-    <div class="box">
-      <div class="box-header with-border">Users</div>
-      <div class="box-body">
-        <div class="pull-right">
-          <button class="btn btn-primary createnew" @click="showNewUserDialog = true">Create New</button>
-        </div>
-        <table id="datatable" class="display dataTable">
-          <thead>
-          <tr>
-              <th>ID</th>
-              <th>Username</th>
-              <th>Accounting</th>
-              <th>Remove</th>
-          </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(u, index) in users">
-              <td>{{ u.id }}</td>
-              <td>{{ u.name }}</td>
-              <td><router-link :to="{ name: 'user_accounting', params: { id: u.id }}">Show</router-link></td>
-              <td><button class="btn btn-danger" @click="removeAction(index)">Remove</button></td>
-            </tr>
-          </tbody>
-        </table>
-        <new-user-dialog 
-          v-if="showNewUserDialog"
-          :show="showNewUserDialog"
-          @created="newUserCreated"
-          @closed="newUserDialogClosed"></new-user-dialog>
-          
-        <remove-user-dialog 
-          v-if="showRemoveUserDialog"
-          :userToRemove="userToRemove"
-          @removed="userRemoved"
-          @closed="removeDialogClosed"></remove-user-dialog>
-      </div>
-    </div>
-  </div>
-</div>`,
+    template: 
+      '<div class="row">' +
+      '  <div class="col-md-12">' +
+      '    <div class="box">' +
+      '      <div class="box-header with-border">Users</div>' +
+      '      <div class="box-body">' +
+      '        <div class="pull-right">' +
+      '          <button class="btn btn-primary createnew" @click="showNewUserDialog = true">Create New</button>' +
+      '        </div>' +
+      '        <table id="datatable" class="display dataTable">' +
+      '          <thead>' +
+      '          <tr>' +
+      '              <th>ID</th>' +
+      '              <th>Username</th>' +
+      '              <th>Accounting</th>' +
+      '              <th>Remove</th>' +
+      '          </tr>' +
+      '          </thead>' +
+      '          <tbody>' +
+      '            <tr v-for="(u, index) in users">' +
+      '              <td>{{ u.id }}</td>' +
+      '              <td>{{ u.name }}</td>' +
+      '              <td><router-link :to="{ name: '+"'"+'user_accounting'+"'"+', params: { id: u.id }}">Show</router-link></td>' +
+      '              <td><button class="btn btn-danger" @click="removeAction(index)">Remove</button></td>' +
+      '            </tr>' +
+      '          </tbody>' +
+      '        </table>' +
+      '        <new-user-dialog ' +
+      '          v-if="showNewUserDialog"' +
+      '          :show="showNewUserDialog"' +
+      '          @created="newUserCreated"' +
+      '          @closed="newUserDialogClosed"></new-user-dialog>' +
+      '        <remove-user-dialog ' +
+      '          v-if="showRemoveUserDialog"' +
+      '          :userToRemove="userToRemove"' +
+      '          @removed="userRemoved"' +
+      '          @closed="removeDialogClosed"></remove-user-dialog>' +
+      '      </div>' +
+      '    </div>' +
+      '  </div>' +
+      '</div>',
     data: function () {
       return {
         users: [],
@@ -99,7 +98,7 @@ define([
         this.userToRemove = this.users[index];
         this.showRemoveUserDialog = true;
       },
-      removeDialogClosed: function(index) {
+      removeDialogClosed: function() {
         this.showRemoveUserDialog = false;
         this.userToRemove = {
           name: "",

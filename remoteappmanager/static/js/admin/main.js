@@ -36,7 +36,7 @@ require([
     }
   );
 
-  const router = new VueRouter({
+  var router = new VueRouter({
     routes: [
       { path: '/', component: MainView },
       { path: '/containers', component: ContainersView },
@@ -48,21 +48,21 @@ require([
 
   Vue.component("modal",
     {
-      template: `
-        <transition name="modal">
-          <div class="modal-mask">
-            <div class="modal-wrapper">
-              <div class="modal-container">
-                <slot>
-                </slot>
-              </div>
-            </div>
-          </div>
-        </transition>`,
+      template: 
+        '<transition name="modal">' +
+        '  <div class="modal-mask">' +
+        '    <div class="modal-wrapper">' +
+        '      <div class="modal-container">' +
+        '        <slot>' +
+        '        </slot>' +
+        '      </div>' +
+        '    </div>' +
+        '  </div>' +
+        '</transition>'
     });
   
-  const app = new Vue({
-    router
+  new Vue({
+    router: router
   }).$mount('#app');
 
 });

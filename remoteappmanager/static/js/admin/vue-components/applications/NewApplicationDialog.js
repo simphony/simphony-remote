@@ -6,27 +6,25 @@ define([
   "use strict";
 
   return {
-    template: `
-        <modal>
-          <div class="modal-header"><h4>Create New Application</h4></div>
-          <div class="modal-body">
-            <vue-form :state="formstate" v-model="formstate" @submit.prevent="createNewApplication">
-              <validate auto-label class="form-group required-field" :class="fieldClassName(formstate.name)">
-                <label class="control-label">Image Name</label>
-                <input type="text" name="name" class="form-control" required v-model="model.name">
-
-                <field-messages name="name" show="$touched || $submitted">
-                  <span class="help-block" slot="required">Image Name cannot be empty</span>
-                </field-messages>
-              </validate>
-
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default" @click="close()">Cancel</button>
-                <button class="btn btn-primary" type="submit" :disabled="formstate.$invalid">Submit</button>
-              </div>
-            </vue-form> 
-          </div>
-      </modal>`,
+    template: 
+    '    <modal>' +
+    '      <div class="modal-header"><h4>Create New Application</h4></div>' +
+    '      <div class="modal-body">' +
+    '        <vue-form :state="formstate" v-model="formstate" @submit.prevent="createNewApplication">' +
+    '          <validate auto-label class="form-group required-field" :class="fieldClassName(formstate.name)">' +
+    '            <label class="control-label">Image Name</label>' +
+    '            <input type="text" name="name" class="form-control" required v-model="model.name">' +
+    '              <field-messages name="name" show="$touched || $submitted">' +
+    '              <span class="help-block" slot="required">Image Name cannot be empty</span>' +
+    '            </field-messages>' +
+    '          </validate>' +
+    '          <div class="modal-footer">' +
+    '            <button type="button" class="btn btn-default" @click="close()">Cancel</button>' +
+    '            <button class="btn btn-primary" type="submit" :disabled="formstate.$invalid">Submit</button>' +
+    '          </div>' +
+    '        </vue-form> ' +
+    '      </div>' +
+    '  </modal>',
     props: ['show'],
 
     data: function () {
