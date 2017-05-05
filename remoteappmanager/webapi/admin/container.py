@@ -9,13 +9,13 @@ from remoteappmanager.webapi.decorators import authenticated
 
 
 class Container(Resource):
-    docker_id = Unicode()
-    name = Unicode()
-    image_name = Unicode()
-    image_id = Unicode()
-    mapping_id = Unicode()
-    user = Unicode()
-    realm = Unicode()
+    docker_id = Unicode(allow_empty=False, strip=True, scope="output")
+    name = Unicode(allow_empty=False, strip=True, scope="output")
+    image_name = Unicode(allow_empty=False, strip=True, scope="output")
+    image_id = Unicode(allow_empty=False, strip=True, scope="output")
+    mapping_id = Unicode(allow_empty=False, strip=True, scope="output")
+    user = Unicode(allow_empty=False, strip=True, scope="output")
+    realm = Unicode(allow_empty=False, strip=True, scope="output")
 
 
 class ContainerHandler(ResourceHandler):
