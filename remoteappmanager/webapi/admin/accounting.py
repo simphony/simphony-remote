@@ -68,14 +68,17 @@ class AccountingHandler(ResourceHandler):
 
     @gen.coroutine
     @authenticated
-    def items(self, item_response, filter_, **kwargs):
+    def items(self, item_response, filter_=None, **kwargs):
+        if filter_ is None:
+            raise BadQueryArguments("Filter is required")
+
         db = self.application.db
         if (isinstance(filter_, And) and
                 len(filter_.filters) == 1 and
                 isinstance(filter_.filters[0], Eq) and
                 filter_.filters[0].key == "user_id"):
 
-            user_id = filter_.filters[0].value
+            user_id = int(filter_.filters[0].value)
             acc_user = db.get_user(id=user_id)
             if acc_user is None:
                 raise NotFound()
@@ -96,4 +99,4 @@ class AccountingHandler(ResourceHandler):
                 response.append(entry)
             item_response.set(response)
         else:
-            raise BadQueryArguments()
+            raise BadQueryArguments("Empty filter specified")
