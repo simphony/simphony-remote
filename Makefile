@@ -10,11 +10,11 @@ venv:
 # too old for our software.
 .PHONY: dockerengine
 dockerengine:
-	sudo apt-get update
-	sudo apt-get install apt-transport-https ca-certificates
+	sudo apt-get -qq update
+	sudo apt-get -qq install apt-transport-https ca-certificates
 	sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
 	sudo bash -c 'echo "deb https://apt.dockerproject.org/repo ubuntu-trusty main" > /etc/apt/sources.list.d/docker.list'
-	sudo apt-get update
+	sudo apt-get -qq update
 
 .PHONY: deps
 deps:
@@ -24,39 +24,39 @@ deps:
 		echo "ERROR: Cannot run on non-Linux systems"; \
 		false; \
 	fi
-	-sudo apt-get update
+	-sudo apt-get -qq update
 	if [ `lsb_release -rs` = "14.04" ]; then \
 		plat_packages="docker-engine python3.4-venv"; \
 	else \
 		plat_packages="docker.io python3-venv"; \
 	fi; \
-		sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages nodejs python3-pip 
+		sudo apt-get -qq install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages nodejs python3-pip 
 	npm install 
 	`npm bin`/bower install 
 
 .PHONY: pythondeps
 pythondeps:
-	pip3 install --upgrade pip setuptools
-	pip3 install -r requirements.txt 
+	pip3 -q install --upgrade pip setuptools
+	pip3 -q install -r requirements.txt 
 
 .PHONY: devdeps
 devdeps:
 	@echo "Installing test dependencies"
 	@echo "----------------------------"
-	pip3 install -r dev-requirements.txt -r doc-requirements.txt
-	sudo apt-get install phantomjs
+	pip3 -q install -r dev-requirements.txt -r doc-requirements.txt
+	sudo apt-get -qq install phantomjs
 
 .PHONY: develop
 develop: 
 	@echo "Installing application"
 	@echo "----------------------"
-	python3 setup.py develop
+	python3 setup.py -q develop
 
 .PHONY: install
 install:
 	@echo "Installing application"
 	@echo "----------------------"
-	python3 setup.py install
+	python3 setup.py -q install
 
 .PHONY: certs
 certs: 
