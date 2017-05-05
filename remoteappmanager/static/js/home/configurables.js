@@ -4,8 +4,8 @@ define([
 ], function(utils, Vue) {
     "use strict";
 
-    var resolution_tag = 'resolution';
-    Vue.component(resolution_tag, {
+    var resolution_conf_tag = 'resolution';
+    Vue.component(resolution_conf_tag + '-component', {
         // Your configurable must have a "value" property
         props: ['value'],
 
@@ -36,7 +36,7 @@ define([
     // (must implement tag and value attributes and as_config_dict method)
     return {
         resolution: {
-            tag: resolution_tag,
+            tag: resolution_conf_tag,
             value: 'Window',
             as_config_dict: function() {
                 var resolution = this.value;
