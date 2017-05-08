@@ -61,7 +61,8 @@ require([
         '</transition>'
     });
   
-  new Vue({
+  var vm;
+  vm = new Vue({
     el: "#app",
     router: router
   });
