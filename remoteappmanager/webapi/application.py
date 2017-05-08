@@ -42,19 +42,20 @@ class ApplicationHandler(ResourceHandler):
     @gen.coroutine
     @authenticated
     def retrieve(self, resource, **kwargs):
-        apps = self.application.db.get_apps_for_user(
+        accs = self.application.db.get_accounting_for_user(
             self.current_user.account
         )
         identifier = resource.identifier
 
         # Convert the list of tuples in a dict
-        apps_dict = {mapping_id: (app, policy)
-                     for mapping_id, app, policy in apps}
+        accs_dict = {
+            acc.id: (acc.application, acc.application_policy)
+            for acc in accs}
 
-        if identifier not in apps_dict:
+        if identifier not in accs_dict:
             raise NotFound()
 
-        app, policy = apps_dict[identifier]
+        app, policy = accs_dict[identifier]
 
         container_manager = self.application.container_manager
         image = yield container_manager.image(app.image)
@@ -90,11 +91,12 @@ class ApplicationHandler(ResourceHandler):
     def items(self, items_response, **kwargs):
         """Retrieves a dictionary containing the image and the associated
         container, if active, as values."""
-        apps = self.application.db.get_apps_for_user(self.current_user.account)
+        accs = self.application.db.get_accounting_for_user(
+            self.current_user.account)
 
         result = []
-        for mapping_id, _, _ in apps:
-            resource = self.resource_class(identifier=mapping_id)
+        for entry in accs:
+            resource = self.resource_class(identifier=entry.id)
             try:
                 yield self.retrieve(resource)
             except NotFound:

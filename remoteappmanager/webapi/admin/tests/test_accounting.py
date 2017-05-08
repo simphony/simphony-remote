@@ -26,7 +26,7 @@ class TestAccounting(WebAPITestCase):
 
     def test_unable_to_delete(self):
         with mock.patch("remoteappmanager.tests.mocking."
-                        "dummy.DummyDBAccounting.revoke_access_by_id"
+                        "dummy.DummyDB.revoke_access_by_id"
                         ) as mock_delete_user:
             mock_delete_user.side_effect = UnsupportedOperation()
             self.delete("/user/johndoe/api/v1/accounting/cbaee2e8ef414f9fb0f1c97416b8aa6c/",  # noqa
@@ -60,7 +60,7 @@ class TestAccounting(WebAPITestCase):
 
     def test_unable_to_create(self):
         with mock.patch("remoteappmanager.tests.mocking."
-                        "dummy.DummyDBAccounting.grant_access"
+                        "dummy.DummyDB.grant_access"
                         ) as mock_grant_access:
             mock_grant_access.side_effect = UnsupportedOperation()
             self.post("/user/johndoe/api/v1/accounting/",

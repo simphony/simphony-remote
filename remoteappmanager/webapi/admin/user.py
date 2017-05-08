@@ -45,3 +45,19 @@ class UserHandler(ResourceHandler):
             raise exceptions.Exists()
         except db_exceptions.UnsupportedOperation:
             raise exceptions.Unable()
+
+    @gen.coroutine
+    @authenticated
+    def items(self, items_response, **kwargs):
+        """Produces a list of User items in the items_response object.
+
+        Parameters
+        ----------
+        items_response: ItemsResponse
+            an object to be filled with the appropriate information
+        """
+        users = self.application.db.list_users()
+
+        items_response.set([
+            User(identifier=str(u.id), name=u.name)
+            for u in users])

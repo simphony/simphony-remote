@@ -51,6 +51,12 @@ class TestContainer(WebAPITestCase):
         self.delete("/user/johndoe/api/v1/containers/found/",
                     httpstatus.NO_CONTENT)
 
+    def test_items(self):
+        response, data = self.get("/user/johndoe/api/v1/containers/",
+                                  httpstatus.OK)
+
+        self.assertEqual(len(data["identifiers"]), 1)
+
     def cookie_auth_token(self):
         return "jupyter-hub-token-johndoe=johndoe"
 

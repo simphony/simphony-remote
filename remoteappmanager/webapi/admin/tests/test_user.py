@@ -29,7 +29,7 @@ class TestUser(WebAPITestCase):
 
     def test_unable_to_delete(self):
         with mock.patch("remoteappmanager.tests.mocking."
-                        "dummy.DummyDBAccounting.remove_user"
+                        "dummy.DummyDB.remove_user"
                         ) as mock_delete_user:
             mock_delete_user.side_effect = UnsupportedOperation()
             self.delete("/user/johndoe/api/v1/users/1/",
@@ -54,7 +54,7 @@ class TestUser(WebAPITestCase):
 
     def test_unable_to_create(self):
         with mock.patch("remoteappmanager.tests.mocking."
-                        "dummy.DummyDBAccounting.create_user"
+                        "dummy.DummyDB.create_user"
                         ) as mock_create_user:
             mock_create_user.side_effect = UnsupportedOperation()
             self.post("/user/johndoe/api/v1/users/",
@@ -66,6 +66,11 @@ class TestUser(WebAPITestCase):
 
         self.delete("/user/johndoe/api/v1/users/0/",
                     httpstatus.NOT_FOUND)
+
+    def test_items(self):
+        response, data = self.get("/user/johndoe/api/v1/users/", httpstatus.OK)
+
+        self.assertEqual(data["items"]["0"]["name"], "johndoe")
 
     def cookie_auth_token(self):
         return "jupyter-hub-token-johndoe=johndoe"

@@ -53,9 +53,14 @@ class TestApplication(WebAPITestCase):
             volume_mode="ro",
         )
 
-        app.db.get_apps_for_user = Mock(return_value=[
-            ("one", application_mock_1, policy),
-            ("two", application_mock_2, policy),
+        app.db.get_accounting_for_user = Mock(return_value=[
+            Mock(id="one",
+                 application=application_mock_1,
+                 application_policy=policy),
+            Mock(
+                id="two",
+                application=application_mock_2,
+                application_policy=policy),
         ])
         return app
 
