@@ -6,10 +6,10 @@ class TestHideApplication(SeleniumTestBase):
     def test_hide_application(self):
         driver = self.driver
         with self.login():
-            self.wait_for(
-                lambda:
-                driver.find_element_by_css_selector(
-                    "#loading-spinner > a > span").text != "Loading")
+            self.wait_for(lambda:
+                          driver.find_element_by_css_selector(
+                              "#loading-spinner").value_of_css_property(
+                              'display') == "none")
 
             # Click on the search box
             search_box = driver.find_element_by_name("q")
