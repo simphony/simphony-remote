@@ -12,7 +12,7 @@ define([
     });
 
     QUnit.test("view", function (assert) {
-        var component = new configurables.resolution_component().$mount("#resolution-configurable");
+        var component = new configurables.resolution_component().$mount();
 
         assert.notEqual(component.$el.querySelector("select"), null);
         assert.equal(component.$el.querySelector("select").children.length, 5);
