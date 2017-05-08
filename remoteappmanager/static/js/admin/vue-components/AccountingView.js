@@ -17,6 +17,9 @@ define([
       '      <div class="box">' +
       '        <div class="box-header with-border">Accounting for user {{ $route.params.id }} </div>' +
       '        <div class="box-body">' +
+      '          <div class="alert alert-danger" v-if="communicationError">' +
+      '            <strong>Error:</strong> {{communicationError}}' +
+      '          </div>' +
       '          <div class="pull-right">' +
       '            <button class="btn btn-primary createnew" @click="showNewAccountingDialog = true">Create New</button>' +
       '          </div>' +
@@ -66,6 +69,7 @@ define([
         showNewAccountingDialog: false,
         showRemoveAccountingDialog: false,
         userId: this.$route.params.id,
+        communicationError: null,
         accToRemove: {
           id: null
         }
@@ -75,7 +79,8 @@ define([
       this.updateTable();
     },
     methods: {
-     updateTable: function() {
+      updateTable: function() {
+        this.communicationError = null;
         resources.Accounting.items({filter: JSON.stringify({user_id: this.$route.params.id })})
         .done(
           (function (identifiers, items) {
@@ -87,8 +92,11 @@ define([
             });
             this.accountings = accountings;
           }).bind(this))
-        .fail(function () {
-        });
+        .fail(
+          (function () {
+            this.communicationError = "The request could not be executed successfully";
+          }).bind(this)
+        );
       },
       newAccountingCreated: function() {
         this.showNewAccountingDialog = false;

@@ -17,6 +17,9 @@ define([
       '    <div class="box">' +
       '      <div class="box-header with-border">Applications</div>' +
       '      <div class="box-body">' +
+      '        <div class="alert alert-danger" v-if="communicationError">' +
+      '          <strong>Error:</strong> {{communicationError}}' +
+      '        </div>' +
       '        <div class="pull-right">' +
       '          <button class="btn btn-primary createnew" @click="showNewApplicationDialog = true">Create New</button>' +
       '        </div>' +
@@ -56,6 +59,7 @@ define([
         apps: [],
         showNewApplicationDialog: false,
         showRemoveApplicationDialog: false,
+        communicationError: null,
         appToRemove: {
           name: "",
           id: null
@@ -67,6 +71,7 @@ define([
     },
     methods: {
       updateTable: function() {
+        this.communicationError = null;
         resources.Application.items()
         .done(
           (function (identifiers, items) {
@@ -79,8 +84,11 @@ define([
             });
             this.apps = apps;
           }).bind(this))
-        .fail(function () {
-        });
+        .fail(
+          (function () {
+            this.communicationError = "The request could not be executed successfully";
+          }).bind(this)
+        );
       },
       newApplicationCreated: function() {
         this.showNewApplicationDialog = false;

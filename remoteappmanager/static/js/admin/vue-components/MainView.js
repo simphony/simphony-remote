@@ -11,6 +11,9 @@ define([
       '    <div class="box">' +
       '      <div class="box-header with-border">Statistics</div>' +
       '      <div class="box-body">' +
+      '        <div class="alert alert-danger" v-if="communicationError">' +
+      '          <strong>Error:</strong> {{communicationError}}' +
+      '        </div>' +
       '        <div class="container">' +
       '          <div class="row">' +
       '            <div class="col-lg-4">Realm</div>' +
@@ -40,6 +43,7 @@ define([
       '</div>',
     data: function() {
       return {
+        communicationError: null,
         realm: "",
         num_total_users: "",
         num_applications: "",
@@ -49,13 +53,21 @@ define([
     },
     mounted: function() {
       resources.Stats.retrieve()
-        .done((function(rep) { 
+        .done(
+          (function(rep) {
           this.$data.realm = rep.realm;
           this.$data.num_total_users = rep.num_total_users;
           this.$data.num_applications = rep.num_applications;
           this.$data.num_active_users = rep.num_active_users;
           this.$data.num_running_containers = rep.num_running_containers;
-        }).bind(this));
+        }).bind(this)
+        )
+        .fail(
+          (function() {
+            this.communicationError = "The request could not be executed successfully";
+          }).bind(this)
+
+        );
     }
   };
 });

@@ -20,6 +20,9 @@ define([
       '        <div class="pull-right">' +
       '          <button class="btn btn-primary createnew" @click="showNewUserDialog = true">Create New</button>' +
       '        </div>' +
+      '        <div class="alert alert-danger" v-if="communicationError">' +
+      '          <strong>Error:</strong> {{communicationError}}' +
+      '        </div>' +
       '        <table id="datatable" class="display dataTable">' +
       '          <thead>' +
       '          <tr>' +
@@ -57,6 +60,7 @@ define([
         users: [],
         showNewUserDialog: false,
         showRemoveUserDialog: false,
+        communicationError: null,
         userToRemove: {
           name: "",
           id: null
@@ -68,6 +72,7 @@ define([
     },
     methods: {
       updateTable: function() {
+        this.communicationError = null;
         resources.User.items()
         .done(
           (function (identifiers, items) {
@@ -80,8 +85,10 @@ define([
             });
             this.users = users;
           }).bind(this))
-        .fail(function () {
-        });
+        .fail(
+          (function () {
+            this.communicationError = "The request could not be executed successfully";
+           }).bind(this));
       },
       newUserCreated: function() {
         this.showNewUserDialog = false;

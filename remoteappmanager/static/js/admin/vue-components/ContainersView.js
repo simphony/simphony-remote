@@ -15,6 +15,9 @@ define([
         '    <div class="box">' +
         '      <div class="box-header with-border">Containers</div>' +
         '      <div class="box-body">' +
+        '        <div class="alert alert-danger" v-if="communicationError">' +
+        '          <strong>Error:</strong> {{communicationError}}' +
+        '        </div>' +
         '        <table id="datatable" class="display dataTable">' +
         '          <thead>' +
         '          <tr>' +
@@ -50,6 +53,7 @@ define([
         return {
           containers: [],
           showStopContainerDialog: false,
+          communicationError: null,
           containerToStop: null,
         };
       },
@@ -58,6 +62,7 @@ define([
       },
       methods: {
         updateTable: function() {
+          this.communicationError = null;
           resources.Container.items()
             .done(
               (function (identifiers, items) {
@@ -69,8 +74,11 @@ define([
                 });
                 this.containers = containers;
               }).bind(this))
-            .fail(function () {
-            });
+            .fail(
+              (function () {
+                this.communicationError = "The request could not be executed successfully";
+              }).bind(this)
+            );
         },
         containerStopped: function() {
           this.showStopContainerDialog = false;
