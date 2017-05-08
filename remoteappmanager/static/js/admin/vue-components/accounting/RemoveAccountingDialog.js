@@ -5,14 +5,14 @@ define([
   "use strict";
   return {
     template:
-      '<modal>' +
+      '<modal-dialog>' +
       '    <div class="modal-header"><h4>Remove Accounting</h4></div>' +
       '    <div class="modal-body">Do you want to remove accounting {{ accToRemove.id }}?</div>' +
       '    <div class="modal-footer text-right">' +
       '        <button type="button" class="btn btn-default" @click="close">Cancel</button>' +
       '        <button class="btn btn-primary primary" @click="removeAccounting">Remove</button>' +
       '    </div>' +
-      '</modal>',
+      '</modal-dialog>',
     props: ['accToRemove'],
     methods: {
       close: function () {

@@ -7,7 +7,7 @@ define([
 
   return {
     template: 
-        '<modal>' +
+        '<modal-dialog>' +
         '  <div class="modal-header"><h4>Create New User</h4></div>' +
         '  <div class="modal-body">' +
         '    <vue-form :state="formstate" v-model="formstate" @submit.prevent="createNewUser">' +
@@ -24,7 +24,7 @@ define([
         '      </div>' +
         '    </vue-form> ' +
         '  </div>' +
-        '</modal>',
+        '</modal-dialog>',
     props: ['show'],
 
     data: function () {

@@ -5,14 +5,14 @@ define([
   "use strict";
   return {
     template: 
-      '<modal>' +
+      '<modal-dialog>' +
       '    <div class="modal-header"><h4>Remove Application</h4></div>' +
       '    <div class="modal-body">Do you want to remove application {{ appToRemove.image_name }}?</div>' +
       '    <div class="modal-footer text-right">' +
       '        <button type="button" class="btn btn-default" @click="close">Cancel</button>' +
       '        <button class="btn btn-primary primary" @click="removeApplication">Remove</button>' +
       '    </div>' +
-      '</modal>',
+      '</modal-dialog>',
     props: ['appToRemove'],
     methods: {
       close: function () {

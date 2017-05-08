@@ -41,12 +41,12 @@ require([
       { path: '/', component: MainView },
       { path: '/containers', component: ContainersView },
       { path: '/users', component: UsersView },
-      { name: "user_accounting", path: '/users/:id/accounting', component: AccountingView },
+      { path: '/users/:id/accounting', component: AccountingView, name: "user_accounting" },
       { path: '/applications', component: ApplicationsView }
     ]
   });
 
-  Vue.component("modal",
+  Vue.component("modal-dialog",
     {
       template: 
         '<transition name="modal">' +
@@ -62,7 +62,8 @@ require([
     });
   
   new Vue({
+    el: "#app",
     router: router
-  }).$mount('#app');
+  });
 
 });
