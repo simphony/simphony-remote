@@ -49,11 +49,11 @@ define([
     var ResolutionModel = function() {
         this.tag = resolution_conf_tag;
         this.value = 'Window';
-        this.component = resolution_component;
     };
 
     // Export all your configurable models here
     return {
-        resolution: ResolutionModel
+        resolution: ResolutionModel,
+        resolution_component: resolution_component
     };
 });
