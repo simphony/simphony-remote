@@ -14,7 +14,7 @@
     "dependencies": {
         "bootstrap": "components/bootstrap#~3.1",
         "font-awesome": "~4.5",
-        "ionicons" : "~2.0.1",
+        "ionicons": "~2.0.1",
         "jquery": "components/jquery#~2.0",
         "moment": "~2.7",
         "requirejs": "~2.1",
@@ -24,7 +24,8 @@
         "handlebars": "~4.0.5",
         "underscore": "~1.8.3",
         "html5shiv": "~3.7.3",
-        "respond": "~1.4.2"
+        "respond": "~1.4.2",
+        "vue": "^2.2.6"
     },
     "devDependencies": {
         "blanket": "^1.1.7"
