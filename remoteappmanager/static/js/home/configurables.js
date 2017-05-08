@@ -32,23 +32,25 @@ define([
         }
     });
 
-    // Export all your configurable models here
-    // (must implement tag and value attributes and as_config_dict method)
-    return {
-        resolution: {
-            tag: resolution_conf_tag,
-            value: 'Window',
-            as_config_dict: function() {
-                var resolution = this.value;
+    // Your configurable class must implement tag and value attributes and as_config_dict method
+    var resolution_model = function() {
+        this.tag = resolution_conf_tag;
+        this.value = 'Window';
+        this.component = resolution_component;
+    };
+    resolution_model.prototype.as_config_dict = function() {
+        var resolution = this.value;
 
-                if (this.value === 'Window') {
-                    var max_size = utils.max_iframe_size();
-                    resolution = max_size[0] + 'x' + max_size[1];
-                }
-
-                return { 'resolution': resolution };
-            },
-            component: resolution_component
+        if (this.value === 'Window') {
+            var max_size = utils.max_iframe_size();
+            resolution = max_size[0] + 'x' + max_size[1];
         }
+
+        return { 'resolution': resolution };
+    };
+
+    // Export all your configurable models here
+    return {
+        resolution: resolution_model
     };
 });

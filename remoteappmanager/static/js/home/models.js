@@ -128,7 +128,7 @@ define([
             var configurable = configurables[conf_name];
 
             if (configurable !== undefined) {
-                app.configurables.push($.extend(true, {}, configurable));
+                app.configurables.push(new configurables[conf_name]());
             }
         });
     };
