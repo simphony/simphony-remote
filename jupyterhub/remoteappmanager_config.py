@@ -54,14 +54,14 @@
 #
 # # CSV database support
 #
-# accounting_class = "remoteappmanager.db.csv_db.CSVAccounting"
-# accounting_kwargs = {
+# database_class = "remoteappmanager.db.csv_db.CSVDatabase"
+# database_kwargs = {
 #     "csv_file_path": os.path.abspath("./remoteappmanager.csv")}
 #
 # # Sqlite database support
 #
-# accounting_class = "remoteappmanager.db.orm.AppAccounting"
-# accounting_kwargs = {
+# database_class = "remoteappmanager.db.orm.ORMDatabase"
+# database_kwargs = {
 #     "url": "sqlite:///"+os.path.abspath('./remoteappmanager.db')}
 
 # # ----------------

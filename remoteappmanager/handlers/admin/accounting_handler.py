@@ -16,12 +16,12 @@ class AccountingHandler(BaseHandler):
         if acc_user is None:
             raise web.HTTPError(404)
 
-        apps = db.get_apps_for_user(acc_user)
+        accountings = db.get_accounting_for_user(acc_user)
 
-        info = [{"mapping_id": mapping_id,
-                 "app": app,
-                 "policy": policy}
-                for mapping_id, app, policy in apps]
+        info = [{"mapping_id": accounting.id,
+                 "app": accounting.application,
+                 "policy": accounting.application_policy}
+                for accounting in accountings]
 
         self.render('admin/accounting.html',
                     info=info,

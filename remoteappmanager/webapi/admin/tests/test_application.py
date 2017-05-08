@@ -29,7 +29,7 @@ class TestApplication(WebAPITestCase):
 
     def test_unable_to_delete(self):
         with mock.patch("remoteappmanager.tests.mocking."
-                        "dummy.DummyDBAccounting.remove_application"
+                        "dummy.DummyDB.remove_application"
                         ) as mock_delete_app:
             mock_delete_app.side_effect = UnsupportedOperation()
             self.delete("/user/johndoe/api/v1/applications/1/",
@@ -46,7 +46,7 @@ class TestApplication(WebAPITestCase):
 
     def test_unable_to_create(self):
         with mock.patch("remoteappmanager.tests.mocking."
-                        "dummy.DummyDBAccounting.create_application"
+                        "dummy.DummyDB.create_application"
                         ) as mock_create_app:
             mock_create_app.side_effect = UnsupportedOperation()
             self.post("/user/johndoe/api/v1/applications/",
@@ -67,6 +67,13 @@ class TestApplication(WebAPITestCase):
 
         self.delete("/user/johndoe/api/v1/applications/0/",
                     httpstatus.NOT_FOUND)
+
+    def test_items(self):
+        response, data = self.get("/user/johndoe/api/v1/applications/",
+                                  httpstatus.OK)
+
+        self.assertEqual(data["items"]["0"]["image_name"],
+                         "simphonyproject/simphony-mayavi:0.6.0")
 
     def cookie_auth_token(self):
         return "jupyter-hub-token-johndoe=johndoe"

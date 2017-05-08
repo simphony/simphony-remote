@@ -6,22 +6,17 @@ define([
     var ApplicationListView = Vue.extend({
         template:
             '<section class="sidebar">' +
-
               '<!-- Search form -->' +
-              '<form action="#" method="get" class="sidebar-form">' +
-              '  <div class="input-group">' +
-              '    <input type="text" name="q" class="form-control" placeholder="Search...">' +
-              '    <span class="input-group-btn">' +
-              '      <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>' +
-              '      </button>' +
-              '    </span>' +
-              '  </div>' +
+              '<form action="#" class="sidebar-form">' +
+              '  <input type="text" name="q" class="form-control" placeholder="Search..." v-model="search_input">' +
               '</form>' +
 
               '<!-- Sidebar Menu -->' +
-              '<ul id="applistentries" class="sidebar-menu">' +
+              '<ul class="sidebar-menu">' +
               '  <li class="header">APPLICATIONS</li>' +
+              '</ul>' +
 
+              '<ul id="applistentries" class="sidebar-menu">' +
               '  <li v-show="!model.loading && model.app_list.length === 0">' +
               '    <a href="#">No applications found</a>' +
               '  </li>' +
@@ -35,7 +30,7 @@ define([
               '  </li>' +
 
               '  <!-- Application list -->' +
-              '  <li v-for="(app, index) in model.app_list"' +
+              '  <li v-for="(app, index) in visible_list"' +
               '      :class="{ active: index === model.selected_index }"' +
               '      @click="model.selected_index = index; $(\'iframe\').focus();">' +
 
@@ -51,14 +46,26 @@ define([
               '              :disabled="app.is_stopping()">' +
               '        <i class="fa fa-times"></i>' +
               '      </button>' +
-
               '      <span>{{ app.app_data.image | app_name }}</span>' +
               '    </a>' +
               '  </li>' +
               '</ul>' +
               '<!-- /.sidebar-menu -->' +
             '</section>' +
-            '<!-- /.sidebar -->'
+            '<!-- /.sidebar -->',
+
+        data: function() {
+            return { 'search_input': '' };
+        },
+
+        computed: {
+            visible_list: function() {
+                return this.model.app_list.filter(function(app) {
+                    var app_name = this.$options.filters.app_name(app.app_data.image).toLowerCase();
+                    return app_name.includes(this.search_input.toLowerCase());
+                }.bind(this));
+            }
+        }
     });
 
     return {

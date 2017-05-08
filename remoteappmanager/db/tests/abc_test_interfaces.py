@@ -35,31 +35,30 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def create_accounting(self):
+    def create_database(self):
         """ Create an object that complies with ABCAccounting """
 
     @abstractmethod
     def test_get_user(self):
         """ Test ABCDatabase.get_user """
 
-    def test_get_apps_for_user(self):
-        """ Test get_apps_for_user returns an iterable of ApplicationConfig
+    def test_get_accounting_for_user(self):
+        """ Test get_accounting_for_user returns an iterable of ApplicationConfig
         """
-        accounting = self.create_accounting()
+        database = self.create_database()
 
-        self.assertEqual(accounting.get_apps_for_user(None), ())
+        self.assertEqual(database.get_accounting_for_user(None), [])
 
         for user in self.create_expected_users():
             expected_configs = self.create_expected_configs(user)
 
-            # should be ((mapping_id, Application, ApplicationPolicy),
-            #            (mapping_id, Application, ApplicationPolicy) ... )
-            actual_id_configs = accounting.get_apps_for_user(user)
+            actual_id_configs = database.get_accounting_for_user(user)
 
             # should be ( (Application, ApplicationPolicy),
             #             (Application, ApplicationPolicy) ... )
-            actual_configs = tuple((app, policy)
-                                   for _, app, policy in actual_id_configs)
+            actual_configs = tuple((accounting.application,
+                                    accounting.application_policy)
+                                   for accounting in actual_id_configs)
 
             # Compare the content of list of (Application, ApplicationPolicy)
             # Note that their order does not matter
@@ -85,36 +84,36 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
             if temp:
                 self.fail('These are not expected: {}'.format(temp))
 
-    def test_get_apps_for_user_mapping_id_rest_compliant(self):
+    def test_get_accounting_for_user_mapping_id_rest_compliant(self):
         ''' Test if the mapping_id to be rest identifier complient '''
         allowed_chars = set(string.ascii_letters+string.digits)
-        accounting = self.create_accounting()
+        database = self.create_database()
 
         for user in self.create_expected_users():
             # should be ((mapping_id, Application, ApplicationPolicy),
             #            (mapping_id, Application, ApplicationPolicy) ... )
-            actual_id_configs = accounting.get_apps_for_user(user)
+            actual_id_configs = database.get_accounting_for_user(user)
 
             if not actual_id_configs:
                 continue
 
-            for mapping_id, _, _ in actual_id_configs:
+            for entry in actual_id_configs:
                 self.assertFalse(
-                    set(mapping_id) - allowed_chars,
+                    set(entry.id) - allowed_chars,
                     "mapping id should contain these characters only: {} "
-                    "Got : {}".format(allowed_chars, mapping_id))
+                    "Got : {}".format(allowed_chars, entry.id))
 
     def test_list_users(self):
-        accounting = self.create_accounting()
+        database = self.create_database()
 
         expected_names = sorted([user.name
                                  for user in self.create_expected_users()])
         obtained_names = sorted([user.name
-                                 for user in accounting.list_users()])
+                                 for user in database.list_users()])
         self.assertEqual(expected_names, obtained_names)
 
     def test_list_applications(self):
-        accounting = self.create_accounting()
+        database = self.create_database()
 
         expected_images = set()
         for user in self.create_expected_users():
@@ -124,13 +123,13 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
             )
 
         obtained_images = set(
-            [app.image for app in accounting.list_applications()]
+            [app.image for app in database.list_applications()]
         )
 
         self.assertEqual(expected_images, obtained_images)
 
     def test_unsupported_ops(self):
-        db = self.create_accounting()
+        db = self.create_database()
 
         for method in [db.create_user,
                        db.create_application,

@@ -8,7 +8,7 @@ import unittest
 from collections import namedtuple
 
 from remoteappmanager.db.interfaces import (
-    ABCApplication, ABCApplicationPolicy, ABCAccounting)
+    ABCApplication, ABCApplicationPolicy, ABCDatabase, ABCAccounting)
 from remoteappmanager.db import exceptions
 from remoteappmanager.db.tests.abc_test_interfaces import (
     ABCTestDatabaseInterface)
@@ -25,18 +25,30 @@ class ApplicationPolicy(ABCApplicationPolicy):
 
 
 class Accounting(ABCAccounting):
+    pass
+
+
+class Database(ABCDatabase):
 
     def get_user(self, *, user_name=None, id=None):
         return User(id=0, name=user_name)
 
-    def get_apps_for_user(self, user):
+    def get_accounting_for_user(self, user):
         if user is None:
-            return ()
+            return []
 
-        return (('abc1',
-                 Application(id=0, image=user.name+'1'), ApplicationPolicy()),
-                ('abc2',
-                 Application(id=1, image=user.name+'2'), ApplicationPolicy()))
+        return [
+            Accounting(
+                id='abc1',
+                user=user,
+                application=Application(id=0, image=user.name+'1'),
+                application_policy=ApplicationPolicy()
+            ),
+            Accounting(
+                id='abc2',
+                user=user,
+                application=Application(id=1, image=user.name+'2'),
+                application_policy=ApplicationPolicy())]
 
     def create_user(self, user_name):
         raise exceptions.UnsupportedOperation()
@@ -86,9 +98,9 @@ class TestDatabaseInterface(ABCTestDatabaseInterface, unittest.TestCase):
         return [(Application(id=0, image=user.name+'1'), ApplicationPolicy()),
                 (Application(id=1, image=user.name+'2'), ApplicationPolicy())]
 
-    def create_accounting(self):
-        return Accounting()
+    def create_database(self):
+        return Database()
 
     def test_get_user(self):
-        database = self.create_accounting()
+        database = self.create_database()
         self.assertEqual(database.get_user(user_name='foo'), User(0, 'foo'))

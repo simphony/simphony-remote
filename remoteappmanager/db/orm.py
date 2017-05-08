@@ -8,11 +8,11 @@ from sqlalchemy import (
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker, relationship, joinedload
 from sqlalchemy.orm.exc import DetachedInstanceError, NoResultFound
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
-from remoteappmanager.db.interfaces import ABCAccounting
+from remoteappmanager.db.interfaces import ABCDatabase
 from remoteappmanager.db import exceptions
 from remoteappmanager.utils import parse_volume_string, mergedocs, one
 
@@ -163,8 +163,8 @@ class Database(LoggingMixin):
         Base.metadata.create_all(self.engine)
 
 
-@mergedocs(ABCAccounting)
-class AppAccounting(ABCAccounting):
+@mergedocs(ABCDatabase)
+class ORMDatabase(ABCDatabase):
 
     def __init__(self, url, **kwargs):
         ''' Initialiser
@@ -226,11 +226,11 @@ class AppAccounting(ABCAccounting):
 
         return user
 
-    def get_apps_for_user(self, user):
+    def get_accounting_for_user(self, user):
         # We create a session here to make sure it is only
         # used in one thread
         with contextlib.closing(self.db.create_session()) as session:
-            result = apps_for_user(session, user)
+            result = accounting_for_user(session, user)
 
             # Removing internal references to the session is
             # required such that the objects can be reused
@@ -436,25 +436,28 @@ def transaction(session):
         session.commit()
 
 
-def apps_for_user(session, user):
-    """Returns a tuple of tuples, each containing an application and the
-    associated policy that the specified orm user is allowed to run.
+def accounting_for_user(session, user):
+    """Returns a list of Accounting objects, each containing
+    an application and the associated policy that the specified orm user is
+    allowed to run.
     If the user is None, the default is to return an empty list.
-    The mapping_id is a unique string identifying the combination of
+    The id is a unique string identifying the combination of
     application and policy. It is not unique per user.
+
     Parameters
     ----------
     session : Session
         The current session
     user : User or None
         the orm User, or None.
+
     Returns
     -------
-    A tuple of tuples (mapping_id, orm.Application, orm.ApplicationPolicy)
+    A list of Accounting objects
     """
 
     if user is None:
-        return ()
+        return []
 
     try:
         user_name = user.name
@@ -466,10 +469,10 @@ def apps_for_user(session, user):
         session.add(user)
         user_name = user.name
 
-    res = session.query(Accounting).join(
-        Accounting.user, aliased=True).filter_by(
-            name=user_name).all()
+    res = session.query(Accounting) \
+        .join(Accounting.user, aliased=True) \
+        .options(joinedload(Accounting.application)) \
+        .options(joinedload(Accounting.application_policy)) \
+        .filter_by(name=user_name).all()
 
-    return tuple(((acc.id,
-                   acc.application,
-                   acc.application_policy) for acc in res))
+    return res

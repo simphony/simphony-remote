@@ -1,8 +1,20 @@
 SimPhoNy Remote CHANGELOG
 =========================
 
-What's new in SimPhoNy Remote 1.2.0
+What's new in SimPhoNy Remote 2.0.0
 -----------------------------------
+
+- Renamed some entities to more appropriate names (#419)
+  - The term Accounting now refers exclusively to the relationship table
+    connecting users, applications and policies.
+  - The config file accounting_class and accounting_kwargs are now
+    database_class and database_kwargs.
+  - AppAccounting is now ORMDatabase. Similarly, CSVAccounting is now
+    CSVDatabase.
+  - The above two break compatibility with the old configuration files.
+    Old configuration files must be changed both in the options
+    and the class they refer to.
+
 
 What's new in SimPhoNy Remote 1.1.0
 -----------------------------------
