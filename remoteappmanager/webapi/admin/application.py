@@ -50,6 +50,13 @@ class ApplicationHandler(ResourceHandler):
     @gen.coroutine
     @authenticated
     def items(self, items_response, **kwargs):
+        """Produces a list of Application items in the items_response object.
+
+        Parameters
+        ----------
+        items_response: ItemsResponse
+            an object to be filled with the appropriate information
+        """
         db = self.application.db
         apps = db.list_applications()
 
