@@ -31,12 +31,14 @@ class ContainerHandler(ResourceHandler):
 
         webapp = self.application
         account = self.current_user.account
-        all_apps = webapp.db.get_apps_for_user(account)
+        accountings = webapp.db.get_accounting_for_user(account)
         container_manager = webapp.container_manager
 
-        choice = [(m_id, app, policy)
-                  for m_id, app, policy in all_apps
-                  if m_id == mapping_id]
+        choice = [(accounting.id,
+                   accounting.application,
+                   accounting.application_policy)
+                  for accounting in accountings
+                  if accounting.id == mapping_id]
 
         if not choice:
             self.log.warning("Could not find resource "
@@ -144,13 +146,13 @@ class ContainerHandler(ResourceHandler):
         """"Return the list of containers we are currently running."""
         container_manager = self.application.container_manager
 
-        apps = self.application.db.get_apps_for_user(
+        accountings = self.application.db.get_accounting_for_user(
             self.current_user.account)
 
         running_containers = []
 
-        for mapping_id, app, policy in apps:
-            image = yield container_manager.image(app.image)
+        for accounting in accountings:
+            image = yield container_manager.image(accounting.application.image)
 
             if image is None:
                 # The user has access to an application that is no longer
@@ -159,7 +161,7 @@ class ContainerHandler(ResourceHandler):
 
             container = yield container_manager.find_container(
                 user_name=self.current_user.name,
-                mapping_id=mapping_id)
+                mapping_id=accounting.id)
 
             rest_container = Container(identifier=container.url_id)
             rest_container.fill(container)

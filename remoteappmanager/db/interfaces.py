@@ -57,6 +57,14 @@ class ABCApplicationPolicy(metaclass=ABCMeta):
 
 
 class ABCAccounting(metaclass=ABCMeta):
+    def __init__(self, id, user, application, application_policy):
+        self.id = id
+        self.user = user
+        self.application = application
+        self.application_policy = application_policy
+
+
+class ABCDatabase(metaclass=ABCMeta):
     """ Main accounting interface required by the single user application.
     """
 
@@ -80,8 +88,8 @@ class ABCAccounting(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def get_apps_for_user(self, user):
-        """ Return an iterable of ApplicationConfig for a given user
+    def get_accounting_for_user(self, user):
+        """ Returns the accounting information for a given user
 
         Parameters
         ----------
@@ -90,10 +98,9 @@ class ABCAccounting(metaclass=ABCMeta):
 
         Returns
         -------
-        tuple
-           each item of the tuple should be a tuple of
-           (id, ABCApplication, ABCApplicationPolicy) where id is a string
-           used for identifying (ABCApplication, ABCApplicationPolicy)
+        list
+           each item of the list should be an instance satisfying the
+           ABCAccounting format (duck typing)
         """
 
     @abstractmethod
