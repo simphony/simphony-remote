@@ -2,8 +2,9 @@ define([
     "jquery",
     "home/configurables",
     "jsapi/v1/resources",
-    "dialogs"
-], function ($, configurables, resources, dialogs) {
+    "dialogs",
+    "underscore"
+], function ($, configurables, resources, dialogs, _) {
     "use strict";
 
     var Status = {
@@ -141,21 +142,21 @@ define([
         }
     };
 
-    ApplicationListModel.prototype.start_application = function() {
+    ApplicationListModel.prototype.start_application = function(app_configurables) {
         var selected_index = this.selected_index;
         var current_app = this.app_list[selected_index];
 
         current_app.status = Status.STARTING;
         current_app.delayed = true;
 
-        var configurables_data = {};
-        current_app.configurables.forEach(function(configurable) {
-            configurables_data[configurable.tag] = configurable.as_config_dict();
+        var config_dict = {};
+        app_configurables.forEach(function(configurable) {
+            _.extend(config_dict, configurable.as_config_dict());
         });
 
         resources.Container.create({
             mapping_id: current_app.app_data.mapping_id,
-            configurables: configurables_data
+            configurables: config_dict
         }).done(function() {
             this.update_idx(selected_index)
             .fail(function(error) {
