@@ -9,7 +9,7 @@ class TestHideApplication(SeleniumTestBase):
             self.wait_for(
                 lambda:
                 driver.find_element_by_css_selector(
-                    "#applistentries > li > a > span").text != "Loading")
+                    "#loading-spinner > a > span").text != "Loading")
 
             # Click on the search box
             search_box = driver.find_element_by_name("q")
