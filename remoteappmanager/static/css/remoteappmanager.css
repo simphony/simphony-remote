@@ -163,8 +163,20 @@ li a .stop-button:hover {
 .fade-leave-active {
   transition: opacity 2.0s
 }
-.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+.fade-enter, .fade-leave-to {
   opacity: 0
+}
+
+.list-enter, .list-leave-to {
+  opacity: 0;
+  transform: translateX(-50px);
+}
+.list-enter-active, .list-leave-active {
+  transition: all 0.5s;
+  position: absolute;
+}
+.list-move {
+  transition: transform .5s;
 }
 
 .truncate {
