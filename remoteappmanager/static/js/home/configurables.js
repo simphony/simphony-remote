@@ -33,12 +33,12 @@ define([
     });
 
     // Your configurable class must implement tag and value attributes and as_config_dict method
-    var resolution_model = function() {
+    var ResolutionModel = function() {
         this.tag = resolution_conf_tag;
         this.value = 'Window';
         this.component = resolution_component;
     };
-    resolution_model.prototype.as_config_dict = function() {
+    ResolutionModel.prototype.as_config_dict = function() {
         var resolution = this.value;
 
         if (this.value === 'Window') {
@@ -51,6 +51,6 @@ define([
 
     // Export all your configurable models here
     return {
-        resolution: resolution_model
+        resolution: ResolutionModel
     };
 });
