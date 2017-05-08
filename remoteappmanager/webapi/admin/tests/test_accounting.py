@@ -1,3 +1,4 @@
+import urllib.parse
 from unittest import mock
 
 from remoteappmanager.db.exceptions import UnsupportedOperation
@@ -34,7 +35,7 @@ class TestAccounting(WebAPITestCase):
 
     def test_create(self):
         self.post("/user/johndoe/api/v1/accounting/",
-                  {"user_name": ""},
+                  {"user_id": ""},
                   httpstatus.BAD_REQUEST)
 
         self.post("/user/johndoe/api/v1/accounting/",
@@ -42,19 +43,23 @@ class TestAccounting(WebAPITestCase):
                   httpstatus.BAD_REQUEST)
 
         self.post("/user/johndoe/api/v1/accounting/",
-                  {"user_name": "johndoe",
+                  {"user_id": "0",
                    "image_name": "image_id1",
                    "allow_home": True,
-                   "volume": "/foo:/bar:ro"
+                   "volume_source": "/foo",
+                   "volume_target": "/bar",
+                   "volume_mode": "ro"
                    },
                   httpstatus.CREATED)
 
         # Post in this case is idempotent
         self.post("/user/johndoe/api/v1/accounting/",
-                  {"user_name": "johndoe",
+                  {"user_id": "0",
                    "image_name": "image_id1",
                    "allow_home": True,
-                   "volume": "/foo:/bar:ro"
+                   "volume_source": "/foo",
+                   "volume_target": "/bar",
+                   "volume_mode": "ro"
                    },
                   httpstatus.CREATED)
 
@@ -64,12 +69,51 @@ class TestAccounting(WebAPITestCase):
                         ) as mock_grant_access:
             mock_grant_access.side_effect = UnsupportedOperation()
             self.post("/user/johndoe/api/v1/accounting/",
-                      {"user_name": "johndoe",
+                      {"user_id": "0",
                        "image_name": "image_id1",
                        "allow_home": True,
-                       "volume": "/foo:/bar:ro"
+                       "volume_source": "/foo",
+                       "volume_target": "/bar",
+                       "volume_mode": "ro"
                        },
                       httpstatus.INTERNAL_SERVER_ERROR)
+
+    def test_unexistent_user_at_create(self):
+        self.post("/user/johndoe/api/v1/accounting/",
+                  {"user_id": "234",
+                   "image_name": "image_id1",
+                   "allow_home": True,
+                   "volume_source": "/foo",
+                   "volume_target": "/bar",
+                   "volume_mode": "ro"
+                   },
+                  httpstatus.BAD_REQUEST)
+
+    def test_absent_volume(self):
+        with mock.patch("remoteappmanager.tests.mocking."
+                        "dummy.DummyDB.grant_access"
+                        ) as mock_grant_access:
+            mock_grant_access.return_value = "22"
+            self.post("/user/johndoe/api/v1/accounting/",
+                      {"user_id": "0",
+                       "image_name": "image_id1",
+                       "allow_home": True,
+                       "volume_source": "",
+                       "volume_target": "",
+                       "volume_mode": ""
+                       },
+                      httpstatus.CREATED)
+            self.assertEqual(mock_grant_access.call_args[0][4], None)
+
+    def test_items(self):
+        self.get("/user/johndoe/api/v1/accounting/", httpstatus.BAD_REQUEST)
+        self.get("/user/johndoe/api/v1/accounting/?filter={}",
+                 httpstatus.BAD_REQUEST)
+
+        response, data = self.get("/user/johndoe/api/v1/accounting/?filter=" +
+                                  urllib.parse.quote("{\"user_id\":\"0\"}"),
+                                  httpstatus.OK)
+        self.assertEqual(len(data["identifiers"]), 2)
 
     def test_delete_failed_auth(self):
         self._app.hub.verify_token.return_value = {}
