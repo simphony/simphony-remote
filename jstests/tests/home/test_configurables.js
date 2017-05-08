@@ -16,5 +16,8 @@ define([
 
         assert.notEqual(component.$el.querySelector("select"), null);
         assert.equal(component.$el.querySelector("select").children.length, 5);
+
+        component.selected_value = '1280x1024';
+        assert.equal(component.as_config_dict().resolution.resolution, '1280x1024');
     });
 });
