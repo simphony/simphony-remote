@@ -5,7 +5,7 @@ define([
     "use strict";
 
     var resolution_conf_tag = 'resolution';
-    Vue.component(resolution_conf_tag + '-component', {
+    var resolution_component = Vue.component(resolution_conf_tag + '-component', {
         // Your configurable must have a "value" property
         props: ['value'],
 
@@ -47,7 +47,8 @@ define([
                 }
 
                 return { 'resolution': resolution };
-            }
+            },
+            component: resolution_component
         }
     };
 });
