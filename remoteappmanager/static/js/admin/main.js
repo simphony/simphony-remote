@@ -9,7 +9,8 @@ require([
   "admin/vue-components/UsersView",
   "admin/vue-components/ApplicationsView",
   "admin/vue-components/AccountingView",
-  "admin/vue-components/adminlte/AdminLTEBox"
+  "admin/vue-components/adminlte/AdminLTEBox",
+  "admin/vue-components/DataTable"
 ], function(
   _,
   Vue, 

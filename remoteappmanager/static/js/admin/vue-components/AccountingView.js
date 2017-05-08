@@ -18,33 +18,12 @@ define([
       '          <div class="alert alert-danger" v-if="communicationError">' +
       '            <strong>Error:</strong> {{communicationError}}' +
       '          </div>' +
-      '          <div class="pull-right">' +
-      '            <button class="btn btn-primary createnew" @click="showNewAccountingDialog = true">Create New</button>' +
-      '          </div>' +
-      '          <table id="datatable" class="display dataTable">' +
-      '            <thead>' +
-      '            <tr>' +
-      '                <th>ID</th>' +
-      '                <th>Image</th>' +
-      '                <th>Workspace</th>' +
-      '                <th>Vol. source</th>' +
-      '                <th>Vol. target</th>' +
-      '                <th>Readonly</th>' +
-      '                <th>Remove</th>' +
-      '            </tr>' +
-      '            </thead>' +
-      '            <tbody>' +
-      '              <tr v-for="(a, index) in accountings">' +
-      '                <td>{{ a.identifier | truncate }}</td>' +
-      '                <td>{{ a.image_name }}</td>' +
-      '                <td class="dt-center"><i v-show="a.allow_home" class="fa fa-check" aria-hidden="true"></i></td>' +
-      '                <td>{{ a.volume_source }}</td>' +
-      '                <td>{{ a.volume_target }}</td>' +
-      '                <td class="dt-center"><i v-show="a.volume_mode == '+"'"+'ro'+"'"+'" class="fa fa-check" aria-hidden="true"></i></td>' +
-      '                <td><button class="btn btn-danger" @click="removeAction(index)">Remove</button></td>' +
-      '              </tr>' +
-      '            </tbody>' +
-      '          </table>' +
+      '          <data-table' +
+      '           :headers.once="headers"' +
+      '           :rows="rows"' +
+      '           :globalActions="globalActions"' +
+      '           :rowActions="rowActions">' +
+      '          </data-table>' +
       '          <new-accounting-dialog ' +
       '            v-if="showNewAccountingDialog"' +
       '            :show="showNewAccountingDialog"' +
@@ -60,8 +39,24 @@ define([
       '        </div>' +
       '  </adminlte-box>',
     data: function () {
+      var self = this;
       return {
-        accountings: [],
+        headers: [
+          "ID", "Image", "Workspace", "Vol. source", "Vol. target", "Readonly"
+        ],
+        rows: [],
+        globalActions: [
+          {
+            label: "Create New Entry",
+            callback: function() { self.showNewAccountingDialog = true; }
+          }
+        ],
+        rowActions: [
+          {
+            label: "Remove",
+            callback: this.removeAction
+          }
+        ],
         showNewAccountingDialog: false,
         showRemoveAccountingDialog: false,
         userId: this.$route.params.id,
@@ -76,22 +71,26 @@ define([
     },
     methods: {
       updateTable: function() {
+        var self = this;
         this.communicationError = null;
         resources.Accounting.items({filter: JSON.stringify({user_id: this.$route.params.id })})
         .done(
-          (function (identifiers, items) {
-            var accountings = [];
+          function (identifiers, items) {
             identifiers.forEach(function(id) {
               var item = items[id];
-              item.identifier = id;
-              accountings.push(item);
+              self.rows.push([
+                id, 
+                item.image_name, 
+                item.allow_home, 
+                item.volume_source,
+                item.volume_target,
+                item.volume_mode === "ro"]);
             });
-            this.accountings = accountings;
-          }).bind(this))
+          })
         .fail(
-          (function () {
-            this.communicationError = "The request could not be executed successfully";
-          }).bind(this)
+          function () {
+            self.communicationError = "The request could not be executed successfully";
+          }
         );
       },
       newAccountingCreated: function() {
@@ -105,8 +104,8 @@ define([
         this.showRemoveAccountingDialog = false;
         this.updateTable();
       },
-      removeAction: function(index) {
-        this.accToRemove = {id: this.accountings[index].identifier};
+      removeAction: function(row) {
+        this.accToRemove = {id: row[0]};
         this.showRemoveAccountingDialog = true;
       },
       removeDialogClosed: function() {
