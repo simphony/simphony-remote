@@ -49,6 +49,13 @@ class UserHandler(ResourceHandler):
     @gen.coroutine
     @authenticated
     def items(self, items_response, **kwargs):
+        """Produces a list of User items in the items_response object.
+
+        Parameters
+        ----------
+        items_response: ItemsResponse
+            an object to be filled with the appropriate information
+        """
         users = self.application.db.list_users()
 
         items_response.set([
