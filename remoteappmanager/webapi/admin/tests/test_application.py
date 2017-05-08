@@ -68,5 +68,12 @@ class TestApplication(WebAPITestCase):
         self.delete("/user/johndoe/api/v1/applications/0/",
                     httpstatus.NOT_FOUND)
 
+    def test_items(self):
+        response, data = self.get("/user/johndoe/api/v1/applications/",
+                                  httpstatus.OK)
+
+        self.assertEqual(data["items"]["0"]["image_name"],
+                         "simphonyproject/simphony-mayavi:0.6.0")
+
     def cookie_auth_token(self):
         return "jupyter-hub-token-johndoe=johndoe"
