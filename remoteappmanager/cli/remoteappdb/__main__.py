@@ -233,14 +233,14 @@ def list(ctx, no_decoration, show_apps):
             cur = [user.id, user.name]
             table.append(cur)
             if show_apps:
-                apps = [[app.image,
-                         policy.allow_home,
-                         policy.allow_view,
-                         policy.allow_common,
-                         policy.volume_source,
-                         policy.volume_target,
-                         policy.volume_mode]
-                        for _, app, policy in orm.apps_for_user(session, user)]
+                apps = [[entry.application.image,
+                         entry.application_policy.allow_home,
+                         entry.application_policy.allow_view,
+                         entry.application_policy.allow_common,
+                         entry.application_policy.volume_source,
+                         entry.application_policy.volume_target,
+                         entry.application_policy.volume_mode]
+                        for entry in orm.accounting_for_user(session, user)]
 
                 if len(apps) == 0:
                     apps = [['']*7]
