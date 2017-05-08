@@ -12,11 +12,9 @@ define([
       'remove-accounting-dialog': RemoveAccountingDialog
     },
     template: 
-      '  <div class="row">' +
-      '    <div class="col-md-12">' +
-      '      <div class="box">' +
-      '        <div class="box-header with-border">Accounting for user {{ $route.params.id }} </div>' +
-      '        <div class="box-body">' +
+      '  <adminlte-box>' +
+      '        <div slot="header">Accounting for user {{ $route.params.id }} </div>' +
+      '        <div slot="body">' +
       '          <div class="alert alert-danger" v-if="communicationError">' +
       '            <strong>Error:</strong> {{communicationError}}' +
       '          </div>' +
@@ -60,9 +58,7 @@ define([
       '            @removed="accRemoved"' +
       '            @closed="removeDialogClosed"></remove-accounting-dialog>' +
       '        </div>' +
-      '      </div>' +
-      '    </div>' +
-      '  </div>',
+      '  </adminlte-box>',
     data: function () {
       return {
         accountings: [],
