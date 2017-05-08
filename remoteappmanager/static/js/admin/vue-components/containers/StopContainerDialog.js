@@ -6,14 +6,22 @@ define([
   return {
     template: 
       '<modal-dialog>' +
-      '    <div class="modal-header"><h4>Stop Container</h4></div>' +
-      '    <div class="modal-body">Do you want to stop container {{ containerToStop }}?</div>' +
-      '    <div class="modal-footer text-right">' +
-      '        <button type="button" class="btn btn-default" @click="close">Cancel</button>' +
-      '        <button class="btn btn-primary primary" @click="stopContainer">Stop</button>' +
+      '  <div class="modal-header"><h4>Stop Container</h4></div>' +
+      '  <div class="modal-body">Do you want to stop container {{ containerToStop }}?</div>' +
+      '  <div class="modal-footer text-right">' +
+      '    <div class="alert alert-danger" v-if="communicationError">' +
+      '      <strong>Error:</strong> {{communicationError}}' +
       '    </div>' +
+      '    <button type="button" class="btn btn-default" @click="close">Cancel</button>' +
+      '    <button class="btn btn-primary primary" @click="stopContainer">Stop</button>' +
+      '  </div>' +
       '</modal-dialog>',
     props: ['containerToStop'],
+    data: function() {
+      return {
+        communicationError: null
+      };
+    },
     methods: {
       close: function () {
         this.$emit("closed");
@@ -29,7 +37,7 @@ define([
           }).bind(this))
           .fail(
             (function () {
-              this.$emit("closed");
+              this.communicationError = "The request could not be executed successfully";
             }).bind(this)
           );
       }

@@ -53,6 +53,9 @@ define([
       '           ' +
       '        <p v-if="crossValidationError" class="text-danger">Both Volume Source and Target must be defined</p>' +
       '        <div class="modal-footer">' +
+      '          <div class="alert alert-danger" v-if="communicationError">' +
+      '            <strong>Error:</strong> {{communicationError}}' + 
+      '          </div>' +
       '          <button type="button" class="btn btn-default" @click="close()">Cancel</button>' +
       '          <button class="btn btn-primary" type="submit" :disabled="formstate.$invalid">Submit</button>' +
       '        </div>' +
@@ -64,6 +67,7 @@ define([
       return {
         formstate: {},
         crossValidationError: false,
+        communicationError: null,
         model: {
           image_name: '',
           allow_home: false,
@@ -118,7 +122,7 @@ define([
           )
           .fail(
             (function () {
-              this.$emit("closed");
+              this.communicationError = "The request could not be executed successfully";
             }).bind(this)
           );
         

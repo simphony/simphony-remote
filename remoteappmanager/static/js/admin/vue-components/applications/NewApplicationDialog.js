@@ -19,6 +19,9 @@ define([
     '            </field-messages>' +
     '          </validate>' +
     '          <div class="modal-footer">' +
+    '          <div class="alert alert-danger" v-if="communicationError">' +
+    '            <strong>Error:</strong> {{communicationError}}' +
+    '          </div>' +
     '            <button type="button" class="btn btn-default" @click="close()">Cancel</button>' +
     '            <button class="btn btn-primary" type="submit" :disabled="formstate.$invalid">Submit</button>' +
     '          </div>' +
@@ -30,6 +33,7 @@ define([
     data: function () {
       return {
         formstate: {},
+        communicationError: null,
         model: {
           name: ''
         }
@@ -62,7 +66,7 @@ define([
           )
           .fail(
             (function () {
-              this.$emit("closed");
+              this.communicationError = "The request could not be executed successfully";
             }).bind(this)
           );
       },
