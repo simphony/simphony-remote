@@ -12,7 +12,7 @@
         "tests"
     ],
     "dependencies": {
-        "bootstrap": "components/bootstrap#~3.1",
+        "bootstrap": "components/bootstrap#~3.3.7",
         "font-awesome": "~4.5",
         "ionicons": "~2.0.1",
         "jquery": "components/jquery#~2.0",
@@ -20,12 +20,15 @@
         "requirejs": "~2.1",
         "datatables.net": "~1.10.12",
         "datatables.net-dt": "~1.10.12",
-        "admin-lte": "~2.3.8",
+        "admin-lte": "~2.3.11",
         "handlebars": "~4.0.5",
         "underscore": "~1.8.3",
         "html5shiv": "~3.7.3",
         "respond": "~1.4.2",
-        "vue": "^2.2.6"
+        "vue": "^2.2.6",
+        "vue-router": "^2.5.2",
+        "vue-form": "^4.0.0",
+        "lodash": "~4.17.4"
     },
     "devDependencies": {
         "blanket": "^1.1.7"
