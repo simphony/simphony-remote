@@ -8,8 +8,8 @@ define([
 
     QUnit.module("home.app_list_view");
     QUnit.test("rendering list", function (assert) {
-        // assert.expect(3);
-        var done = assert.async();
+        var update_done = assert.async();
+        var clear_done = assert.async();
 
         var model = new models.ApplicationListModel();
         var app_list_view = new application_list_view.ApplicationListView({
@@ -22,16 +22,34 @@ define([
             ""
         )
 
-        model.update().done(function() {
-            console.log(app_list_view.$el.querySelector("#loading-spinner").style.display)
-            Vue.nextTick(function() {
-                console.log("Calling nexttick")
-                assert.equal(
-                    app_list_view.$el.querySelector("#loading-spinner").style.display,
-                    "none"
-                )
-                done();
-            });
+        model.update().done(function() { Vue.nextTick(function() {
+            assert.equal(
+                app_list_view.$el.querySelector("#loading-spinner").style.display,
+                "none"
+            )
+
+            assert.equal(
+                app_list_view.$el.querySelector("#applistentries").children.length,
+                model.app_list.length + 2
+            )
+            update_done();
+        })});
+
+        // Clear the model's application list
+        model.app_list = [];
+
+        Vue.nextTick(function() {
+            assert.equal(
+                app_list_view.$el.querySelector("#applistentries > li > a").style.display,
+                ""
+            )
+
+            assert.equal(
+                app_list_view.$el.querySelector("#applistentries").children.length,
+                2
+            )
+
+            clear_done();
         });
     });
 });
