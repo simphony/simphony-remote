@@ -2,14 +2,12 @@ define([
   "components/vue/dist/vue",
   "jsapi/v1/resources",
   "admin/vue-components/accounting/NewAccountingDialog",
-  "admin/vue-components/accounting/RemoveAccountingDialog"
-], function(Vue, resources, NewAccountingDialog, RemoveAccountingDialog) {
+], function(Vue, resources, NewAccountingDialog) {
   "use strict";
 
   return {
     components: {
       'new-accounting-dialog': NewAccountingDialog,
-      'remove-accounting-dialog': RemoveAccountingDialog
     },
     template: 
       '  <adminlte-box>' +
@@ -31,11 +29,15 @@ define([
       '            @created="newAccountingCreated"' +
       '            @closed="newAccountingDialogClosed"></new-accounting-dialog>' +
       '            ' +
-      '          <remove-accounting-dialog ' +
-      '            v-if="removeAccountingDialog.show"' +
-      '            :accountingToRemove="removeAccountingDialog.accountingToRemove"' +
-      '            :okCallback="removeAccounting"' +
-      '            @closed="removeDialogClosed"></remove-accounting-dialog>' +
+      '          <confirm-dialog ' +
+      '             v-if="removeAccountingDialog.show"' +
+      '             title="Remove Accounting"' +
+      '             :okCallback="removeAccounting"' +
+      '             :closeCallback="removeDialogClosed">' +
+      '              <div>Do you want to remove accounting ' +
+      '                   {{ removeAccountingDialog.accountingToRemove }}?' +
+      '              </div>' +
+      '          </confirm-dialog>' +
       '        </div>' +
       '  </adminlte-box>',
     data: function () {
