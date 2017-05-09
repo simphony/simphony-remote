@@ -12,53 +12,57 @@ define([
       'remove-application-dialog': RemoveApplicationDialog
     },
     template: 
-      '<div class="row">' +
-      '  <div class="col-md-12">' +
-      '    <div class="box">' +
-      '      <div class="box-header with-border">Applications</div>' +
-      '      <div class="box-body">' +
-      '        <div class="alert alert-danger" v-if="communicationError">' +
-      '          <strong>Error:</strong> {{communicationError}}' +
-      '        </div>' +
-      '        <div class="pull-right">' +
-      '          <button class="btn btn-primary createnew" @click="showNewApplicationDialog = true">Create New</button>' +
-      '        </div>' +
-      '        <table id="datatable" class="display dataTable">' +
-      '          <thead>' +
-      '          <tr>' +
-      '              <th>ID</th>' +
-      '              <th>Image</th>' +
-      '              <th>Remove</th>' +
-      '          </tr>' +
-      '          </thead>' +
-      '          <tbody>' +
-      '            <tr v-for="(a, index) in apps">' +
-      '              <td>{{ a.id }}</td>' +
-      '              <td>{{ a.image_name }}</td>' +
-      '              <td><button class="btn btn-danger" @click="removeAction(index)">Remove</button></td>' +
-      '            </tr>' +
-      '          </tbody>' +
-      '        </table>' +
-      '        <new-application-dialog ' +
-      '          v-if="showNewApplicationDialog"' +
-      '          :show="showNewApplicationDialog"' +
-      '          @created="newApplicationCreated"' +
-      '          @closed="newApplicationDialogClosed"></new-application-dialog>' +
-      '          ' +
-      '        <remove-application-dialog ' +
-      '          v-if="showRemoveApplicationDialog"' +
-      '          :appToRemove="appToRemove"' +
-      '          @removed="appRemoved"' +
-      '          @closed="removeDialogClosed"></remove-application-dialog>' +
-      '      </div>' +
+      '<adminlte-box>' +
+      '  <div slot="header">Applications</div>' +
+      '  <div slot="body">' +
+      '    <div class="alert alert-danger" v-if="communicationError">' +
+      '      <strong>Error:</strong> {{communicationError}}' +
       '    </div>' +
+      '    <data-table' +
+      '       :headers.once="table.headers"' +
+      '       :rows="table.rows"' +
+      '       :globalActions="table.globalActions"' +
+      '       :rowActions="table.rowActions">' +
+      '    </data-table>' +
+      '    <new-application-dialog ' +
+      '      v-if="newApplicationDialog.show"' +
+      '      :show="newApplicationDialog.show"' +
+      '      @created="newApplicationCreated"' +
+      '      @closed="newApplicationDialogClosed"></new-application-dialog>' +
+      '      ' +
+      '    <remove-application-dialog ' +
+      '      v-if="removeApplicationDialog.show"' +
+      '      :appToRemove="appToRemove"' +
+      '      @removed="appRemoved"' +
+      '      @closed="removeDialogClosed"></remove-application-dialog>' +
       '  </div>' +
-      '</div>',
+      '</adminlte-box>',
     data: function () {
+      var self=this;
       return {
+        table: {
+          headers: ["ID", "Image"],
+          rows: [],
+          globalActions: [
+            {
+              label: "Create New Entry",
+              callback: function() { self.newApplicationDialog.show = true; }
+            }
+          ],
+          rowActions: [
+            {
+              label: "Remove",
+              callback: this.removeAction
+            }
+          ]
+        },
         apps: [],
-        showNewApplicationDialog: false,
-        showRemoveApplicationDialog: false,
+        newApplicationDialog: {
+          show: false
+        },
+        removeApplicationDialog: {
+          show: false
+        } 
         communicationError: null,
         appToRemove: {
           name: "",
@@ -71,18 +75,19 @@ define([
     },
     methods: {
       updateTable: function() {
+        var self = this;
         this.communicationError = null;
         resources.Application.items()
         .done(
           (function (identifiers, items) {
-            var apps = [];
+            self.table.rows = [];
             identifiers.forEach(function(id) {
-              apps.push({
-                id: id,
-                image_name: items[id].image_name
-              });
+              var item = items[id];
+              self.table.rows.push([
+                id,
+                item.image_name
+              ]);
             });
-            this.apps = apps;
           }).bind(this))
         .fail(
           (function () {
@@ -91,22 +96,22 @@ define([
         );
       },
       newApplicationCreated: function() {
-        this.showNewApplicationDialog = false;
+        this.newApplicationDialog.show = false;
         this.updateTable();
       },
       newApplicationDialogClosed: function() {
-        this.showNewApplicationDialog = false;
+        this.newApplicationDialog.show = false;
       },
       appRemoved: function() {
-        this.showRemoveApplicationDialog = false;
+        this.removeApplicationDialog.show = false;
         this.updateTable();
       },
       removeAction: function(index) {
         this.appToRemove = this.apps[index];
-        this.showRemoveApplicationDialog = true;
+        this.removeApplicationDialog.show = true;
       },
       removeDialogClosed: function() {
-        this.showRemoveApplicationDialog = false;
+        this.removeApplicationDialog.show = false;
         this.appToRemove = {
           name: "",
           id: null
