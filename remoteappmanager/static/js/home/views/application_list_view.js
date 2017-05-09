@@ -32,7 +32,7 @@ define([
               '  <!-- Application list -->' +
               '  <li v-for="(app, index) in visible_list"' +
               '      :class="{ active: index === model.selected_index }"' +
-              '      @click="model.selected_index = index; $(\'iframe\').focus();">' +
+              '      @click="model.selected_index = index; $emit(\'entry_clicked\');">' +
 
               '    <span :class="app.status.toLowerCase() + \'-badge\'"></span>' +
 

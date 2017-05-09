@@ -1,9 +1,8 @@
 define([
-    'jquery',
     "urlutils",
     "utils",
     '../../components/vue/dist/vue'
-], function ($, urlutils, utils, Vue) {
+], function (urlutils, utils, Vue) {
     "use strict";
 
     var ApplicationView = Vue.extend({
@@ -94,10 +93,16 @@ define([
             },
             get_iframe_size: function() {
                 return utils.max_iframe_size();
+            },
+            focus_iframe: function() {
+                var iframe = this.$el.querySelector('iframe');
+                if(iframe !== null) {
+                    iframe.focus();
+                }
             }
         },
 
-        updated: function() { $('iframe').focus(); }
+        updated: function() { this.focus_iframe(); }
     });
 
     return {
