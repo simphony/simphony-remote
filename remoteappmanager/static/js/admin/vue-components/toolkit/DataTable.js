@@ -8,8 +8,16 @@ define([
       "headers", "rows", "globalActions", "rowActions"
     ],
     methods: {
-      "isBoolean": function(value) {
+      isBoolean: function(value) {
         return typeof(value) === "boolean";
+      },
+      buttonClassFromType: function(value) { 
+        var cls = {"btn": true};
+        if (value === undefined) {
+          value = "danger";
+        }
+        cls["btn-" + value] = true;
+        return cls;
       }
     },
     template:
@@ -30,8 +38,11 @@ define([
     '          <td v-if="isBoolean(value)"><i class="fa fa-check" v-if="value"></i></td>' +
     '          <td v-else>{{value}}</td>' +
     '        </template>' +
-    '        <td v-for="action in rowActions">' +
-    '          <button class="btn btn-danger" @click="action.callback(row)">{{action.label}}</button></td>' +
+    '        <td>' +
+    '          <button v-for="action in rowActions" ' +
+    '                   :class="buttonClassFromType(action.type)"' +
+    '                   style="margin-right: 10px"' +
+    '                   @click="action.callback(row)">{{action.label}}</button>' +
     '        </td>' +
     '      </tr>' +
     '    </tbody>' +

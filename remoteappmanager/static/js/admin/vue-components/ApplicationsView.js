@@ -12,9 +12,8 @@ define([
       'remove-application-dialog': RemoveApplicationDialog
     },
     template: 
-      '<adminlte-box>' +
-      '  <div slot="header">Applications</div>' +
-      '  <div slot="body">' +
+      '<adminlte-box title="Applications">' +
+      '  <div>' +
       '    <div class="alert alert-danger" v-if="communicationError">' +
       '      <strong>Error:</strong> {{communicationError}}' +
       '    </div>' +
@@ -62,7 +61,7 @@ define([
         },
         removeApplicationDialog: {
           show: false
-        } 
+        },
         communicationError: null,
         appToRemove: {
           name: "",

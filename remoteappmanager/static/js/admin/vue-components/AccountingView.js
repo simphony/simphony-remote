@@ -10,36 +10,36 @@ define([
       'new-accounting-dialog': NewAccountingDialog,
     },
     template: 
-      '  <adminlte-box>' +
-      '        <div slot="header">Accounting for user {{ $route.params.id }} </div>' +
-      '        <div slot="body">' +
-      '          <div class="alert alert-danger" v-if="communicationError">' +
-      '            <strong>Error:</strong> {{communicationError}}' +
-      '          </div>' +
-      '          <data-table' +
-      '           :headers.once="table.headers"' +
-      '           :rows="table.rows"' +
-      '           :globalActions="table.globalActions"' +
-      '           :rowActions="table.rowActions">' +
-      '          </data-table>' +
-      '          <new-accounting-dialog ' +
-      '            v-if="newAccountingDialog.show"' +
-      '            :show="newAccountingDialog.show"' +
-      '            :userId="newAccountingDialog.userId"' +
-      '            @created="newAccountingCreated"' +
-      '            @closed="newAccountingDialogClosed"></new-accounting-dialog>' +
-      '            ' +
-      '          <confirm-dialog ' +
-      '             v-if="removeAccountingDialog.show"' +
-      '             title="Remove Accounting"' +
-      '             :okCallback="removeAccounting"' +
-      '             :closeCallback="removeDialogClosed">' +
-      '              <div>Do you want to remove accounting ' +
-      '                   {{ removeAccountingDialog.accountingToRemove }}?' +
-      '              </div>' +
-      '          </confirm-dialog>' +
+      '<adminlte-box>' +
+      '  <div slot="header">Accounting for user {{ $route.params.id }} </div>' +
+      '  <div>' +
+      '    <div class="alert alert-danger" v-if="communicationError">' +
+      '      <strong>Error:</strong> {{communicationError}}' +
+      '    </div>' +
+      '    <data-table' +
+      '     :headers.once="table.headers"' +
+      '     :rows="table.rows"' +
+      '     :globalActions="table.globalActions"' +
+      '     :rowActions="table.rowActions">' +
+      '    </data-table>' +
+      '    <new-accounting-dialog ' +
+      '      v-if="newAccountingDialog.show"' +
+      '      :show="newAccountingDialog.show"' +
+      '      :userId="newAccountingDialog.userId"' +
+      '      @created="newAccountingCreated"' +
+      '      @closed="newAccountingDialogClosed"></new-accounting-dialog>' +
+      '      ' +
+      '    <confirm-dialog ' +
+      '       v-if="removeAccountingDialog.show"' +
+      '       title="Remove Accounting"' +
+      '       :okCallback="removeAccounting"' +
+      '       :closeCallback="removeDialogClosed">' +
+      '        <div>Do you want to remove accounting ' +
+      '             {{ removeAccountingDialog.accountingToRemove }}?' +
       '        </div>' +
-      '  </adminlte-box>',
+      '    </confirm-dialog>' +
+      '  </div>' +
+      '</adminlte-box>',
     data: function () {
       var self = this;
       return {
@@ -113,7 +113,7 @@ define([
       },
       removeDialogClosed: function() {
         this.removeAccountingDialog.show = false;
-        this.accountingToRemove = null;
+        this.removeAccountingDialog.accountingToRemove = null;
       },
       removeAccounting: function () {
         if (this.removeAccountingDialog.accountingToRemove === null) {
