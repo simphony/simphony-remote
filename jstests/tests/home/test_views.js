@@ -50,4 +50,30 @@ define([
             });
         })});
     });
+
+    QUnit.test("search form", function (assert) {
+        var done = assert.async();
+
+        var model = new models.ApplicationListModel();
+        var app_list_view = new application_list_view.ApplicationListView({
+            data: function() { return { model: model }; }
+        }).$mount();
+
+        model.update().done(function() { Vue.nextTick(function() {
+            assert.notEqual(app_list_view.visible_list.length, 0);
+
+            app_list_view.search_input = "heho"
+
+            Vue.nextTick(function() {
+                assert.equal(app_list_view.visible_list.length, 0);
+
+                assert.equal(
+                    app_list_view.$el.querySelector("input[name=q]").value,
+                    "heho"
+                );
+
+                done();
+            })
+        })});
+    });
 });
