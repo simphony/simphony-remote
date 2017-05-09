@@ -1,5 +1,5 @@
 define([
-    '../../components/vue/dist/vue.min',
+    '../../components/vue/dist/vue',
 ], function (Vue) {
     'use strict';
 
