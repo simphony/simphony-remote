@@ -1,9 +1,9 @@
-require([
+define([
   "components/vue/dist/vue"
 ], function(Vue) {
   "use strict";
   
-  Vue.component("adminlte-box", {
+  return {
     template:
     '  <div class="row">' +
     '    <div class="col-md-12">' +
@@ -13,6 +13,6 @@ require([
     '      </div>' +
     '    </div>' +
     '  </div>'
-  });
+  };
   
 });
