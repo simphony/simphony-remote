@@ -1,6 +1,5 @@
 define([
-  "components/vue/dist/vue"
-], function(Vue) {
+], function() {
   "use strict";
   
   return {
