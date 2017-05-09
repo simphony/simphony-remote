@@ -43,22 +43,22 @@ class TestBaseAccess(utils.AsyncHTTPTestCase, LogTrapTestCase):
 
 
 class TestApplicationsHandler(TestBaseAccess):
-    url = "/user/johndoe/applications/"
+    url = "/user/johndoe/#/applications/"
     body_string = "datatable"
 
 
 class TestUsersHandler(TestBaseAccess):
-    url = "/user/johndoe/users/"
+    url = "/user/johndoe/#/users/"
     body_string = "datatable"
 
 
 class TestContainersHandler(TestBaseAccess):
-    url = "/user/johndoe/containers/"
+    url = "/user/johndoe/#/containers/"
     body_string = "datatable"
 
 
 class TestAccountingHandler(TestBaseAccess):
-    url = "/user/johndoe/users/0/accounting/"
+    url = "/user/johndoe/#/users/0/accounting/"
     body_string = "datatable"
 
     def test_unknown_id(self):
