@@ -3,7 +3,7 @@ require([
     "home/models",
     "home/views/application_list_view",
     "home/views/application_view",
-    "components/vue/dist/vue.min",
+    "components/vue/dist/vue",
     "gamodule",
     'urlutils'
 ], function(
