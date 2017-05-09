@@ -9,8 +9,7 @@ require([
   "admin/vue-components/ContainersView",
   "admin/vue-components/UsersView",
   "admin/vue-components/ApplicationsView",
-  "admin/vue-components/AccountingView",
-  "admin/vue-components/DataTable"
+  "admin/vue-components/AccountingView"
 ], function(
   _,
   Vue, 
@@ -21,8 +20,7 @@ require([
   ContainersView,
   UsersView,
   ApplicationsView,
-  AccountingView,
-  DataTable
+  AccountingView
   ) {
   
   "use strict";
