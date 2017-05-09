@@ -62,7 +62,7 @@ define([
             visible_list: function() {
                 return this.model.app_list.filter(function(app) {
                     var app_name = this.$options.filters.app_name(app.app_data.image).toLowerCase();
-                    return app_name.includes(this.search_input.toLowerCase());
+                    return app_name.indexOf(this.search_input.toLowerCase()) !== -1;
                 }.bind(this));
             }
         }
