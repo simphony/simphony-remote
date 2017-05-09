@@ -1,5 +1,5 @@
 define([
-    '../../components/vue/dist/vue.min',
+    '../../components/vue/dist/vue',
 ], function (Vue) {
     'use strict';
 
@@ -62,6 +62,7 @@ define([
             visible_list: function() {
                 return this.model.app_list.filter(function(app) {
                     var app_name = this.$options.filters.app_name(app.app_data.image).toLowerCase();
+                    console.log(app_name, typeof app_name);
                     return app_name.includes(this.search_input.toLowerCase());
                 }.bind(this));
             }
