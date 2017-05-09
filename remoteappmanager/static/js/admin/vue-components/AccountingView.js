@@ -19,21 +19,21 @@ define([
       '            <strong>Error:</strong> {{communicationError}}' +
       '          </div>' +
       '          <data-table' +
-      '           :headers.once="headers"' +
-      '           :rows="rows"' +
-      '           :globalActions="globalActions"' +
-      '           :rowActions="rowActions">' +
+      '           :headers.once="table.headers"' +
+      '           :rows="table.rows"' +
+      '           :globalActions="table.globalActions"' +
+      '           :rowActions="table.rowActions">' +
       '          </data-table>' +
       '          <new-accounting-dialog ' +
-      '            v-if="showNewAccountingDialog"' +
-      '            :show="showNewAccountingDialog"' +
-      '            :userId="userId"' +
+      '            v-if="newAccountingDialog.show"' +
+      '            :show="newAccountingDialog.show"' +
+      '            :userId="newAccountingDialog.userId"' +
       '            @created="newAccountingCreated"' +
       '            @closed="newAccountingDialogClosed"></new-accounting-dialog>' +
       '            ' +
       '          <remove-accounting-dialog ' +
-      '            v-if="showRemoveAccountingDialog"' +
-      '            :accToRemove="accToRemove"' +
+      '            v-if="removeAccountingDialog.show"' +
+      '            :accountingToRemove="removeAccountingDialog.accountingToRemove"' +
       '            @removed="accRemoved"' +
       '            @closed="removeDialogClosed"></remove-accounting-dialog>' +
       '        </div>' +
@@ -41,29 +41,33 @@ define([
     data: function () {
       var self = this;
       return {
-        headers: [
-          "ID", "Image", "Workspace", "Vol. source", "Vol. target", "Readonly"
-        ],
-        rows: [],
-        globalActions: [
-          {
-            label: "Create New Entry",
-            callback: function() { self.showNewAccountingDialog = true; }
-          }
-        ],
-        rowActions: [
-          {
-            label: "Remove",
-            callback: this.removeAction
-          }
-        ],
-        showNewAccountingDialog: false,
-        showRemoveAccountingDialog: false,
-        userId: this.$route.params.id,
-        communicationError: null,
-        accToRemove: {
-          id: null
-        }
+        table: {
+          headers: [
+            "ID", "Image", "Workspace", "Vol. source", "Vol. target", "Readonly"
+          ],
+          rows: [],
+          globalActions: [
+            {
+              label: "Create New Entry",
+              callback: function() { self.newAccountingDialog.show = true; }
+            }
+          ],
+          rowActions: [
+            {
+              label: "Remove",
+              callback: this.removeAction
+            }
+          ]
+        },
+        newAccountingDialog: {
+          show: false,
+          userId: this.$route.params.id
+        },
+        removeAccountingDialog: {
+          show: false,
+          accountingToRemove: null
+        },
+        communicationError: null
       };
     },
     mounted: function () {
@@ -76,9 +80,10 @@ define([
         resources.Accounting.items({filter: JSON.stringify({user_id: this.$route.params.id })})
         .done(
           function (identifiers, items) {
+            self.table.rows = [];
             identifiers.forEach(function(id) {
               var item = items[id];
-              self.rows.push([
+              self.table.rows.push([
                 id, 
                 item.image_name, 
                 item.allow_home, 
@@ -94,25 +99,23 @@ define([
         );
       },
       newAccountingCreated: function() {
-        this.showNewAccountingDialog = false;
+        this.newAccountingDialog.show = false;
         this.updateTable();
       },
       newAccountingDialogClosed: function() {
-        this.showNewAccountingDialog = false;
+        this.newAccountingDialog.show = false;
       },
       accRemoved: function() {
-        this.showRemoveAccountingDialog = false;
+        this.removeAccountingDialog.show = false;
         this.updateTable();
       },
       removeAction: function(row) {
-        this.accToRemove = {id: row[0]};
-        this.showRemoveAccountingDialog = true;
+        this.removeAccountingDialog.accountingToRemove = row[0];
+        this.removeAccountingDialog.show = true;
       },
       removeDialogClosed: function() {
-        this.showRemoveAccountingDialog = false;
-        this.accToRemove = {
-          id: null
-        };
+        this.removeAccountingDialog.show = false;
+        this.accountingToRemove = null;
       }
     }
   };
