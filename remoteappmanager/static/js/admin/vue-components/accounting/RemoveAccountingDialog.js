@@ -13,10 +13,10 @@ define([
       '            <strong>Error:</strong> {{communicationError}}' +
       '          </div>' +
       '        <button type="button" class="btn btn-default" @click="close">Cancel</button>' +
-      '        <button class="btn btn-primary primary" @click="removeAccounting">Remove</button>' +
+      '        <button class="btn btn-primary primary" @click="okCallback">Remove</button>' +
       '    </div>' +
       '</modal-dialog>',
-    props: ['accountingToRemove'],
+    props: ['accountingToRemove', "okCallback"],
     data: function() {
       return {
         communicationError: null
@@ -26,21 +26,6 @@ define([
       close: function () {
         this.$emit("closed");
       },
-      removeAccounting: function () {
-        if (this.accountingToRemove === null) {
-          this.$emit("closed");
-          return;
-        }
-        resources.Accounting.delete(this.accountingToRemove)
-          .done((function () {
-            this.$emit("removed");
-          }).bind(this))
-          .fail(
-            (function () {
-              this.communicationError = "The request could not be executed successfully";
-            }).bind(this)
-          );
-      }
     }
   };
 });

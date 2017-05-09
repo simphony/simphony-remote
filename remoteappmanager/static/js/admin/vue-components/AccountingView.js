@@ -34,7 +34,7 @@ define([
       '          <remove-accounting-dialog ' +
       '            v-if="removeAccountingDialog.show"' +
       '            :accountingToRemove="removeAccountingDialog.accountingToRemove"' +
-      '            @removed="accRemoved"' +
+      '            :okCallback="removeAccounting"' +
       '            @closed="removeDialogClosed"></remove-accounting-dialog>' +
       '        </div>' +
       '  </adminlte-box>',
@@ -105,10 +105,6 @@ define([
       newAccountingDialogClosed: function() {
         this.newAccountingDialog.show = false;
       },
-      accRemoved: function() {
-        this.removeAccountingDialog.show = false;
-        this.updateTable();
-      },
       removeAction: function(row) {
         this.removeAccountingDialog.accountingToRemove = row[0];
         this.removeAccountingDialog.show = true;
@@ -116,6 +112,21 @@ define([
       removeDialogClosed: function() {
         this.removeAccountingDialog.show = false;
         this.accountingToRemove = null;
+      },
+      removeAccounting: function () {
+        if (this.removeAccountingDialog.accountingToRemove === null) {
+          return;
+        }
+        resources.Accounting.delete(this.removeAccountingDialog.accountingToRemove)
+          .done((function () {
+              this.removeDialogClosed();
+              this.updateTable();
+          }).bind(this))
+          .fail(
+            (function () {
+              this.communicationError = "The request could not be executed successfully";
+            }).bind(this)
+          );
       }
     }
   };
