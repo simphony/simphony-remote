@@ -1,9 +1,9 @@
-require([
+define([
   "components/vue/dist/vue"
 ], function(Vue) {
   "use strict";
 
-  Vue.component("data-table", {
+  return {
     props: [
       "headers", "rows", "globalActions", "rowActions"
     ],
@@ -37,6 +37,6 @@ require([
     '    </tbody>' +
     '  </table>' +
     '</div>'
-  });
+  };
 
 });
