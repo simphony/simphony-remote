@@ -30,9 +30,9 @@ define([
               '  </li>' +
 
               '  <!-- Application list -->' +
-              '  <li v-for="(app, index) in visible_list"' +
-              '      :class="{ active: index === model.selected_index }"' +
-              '      @click="model.selected_index = index; $emit(\'entry_clicked\');">' +
+              '  <li v-for="app in visible_list"' +
+              '      :class="{ active: index_of(app) === model.selected_index }"' +
+              '      @click="model.selected_index = index_of(app); $emit(\'entry_clicked\');">' +
 
               '    <span :class="app.status.toLowerCase() + \'-badge\'"></span>' +
 
@@ -42,7 +42,7 @@ define([
 
               '      <button class="stop-button"' +
               '              v-if="app.is_running()"' +
-              '              @click="model.stop_application(index)"' +
+              '              @click="model.stop_application(index_of(app))"' +
               '              :disabled="app.is_stopping()">' +
               '        <i class="fa fa-times"></i>' +
               '      </button>' +
@@ -64,6 +64,12 @@ define([
                     var app_name = this.$options.filters.app_name(app.app_data.image).toLowerCase();
                     return app_name.indexOf(this.search_input.toLowerCase()) !== -1;
                 }.bind(this));
+            }
+        },
+
+        methods: {
+            index_of: function(app) {
+                return this.model.app_list.indexOf(app);
             }
         }
     });
