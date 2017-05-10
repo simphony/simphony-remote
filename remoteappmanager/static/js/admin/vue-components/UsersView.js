@@ -118,10 +118,7 @@ define([
         };
       },
       removeUser: function () {
-        if (this.removeUserDialog.userToRemove.id === null) {
-          return;
-        }
-        var self = this; 
+        var self = this;
         resources.User.delete(this.removeUserDialog.userToRemove.id)
           .done(function () {
               self.closeRemoveUserDialog();
