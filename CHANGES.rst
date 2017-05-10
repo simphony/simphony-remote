@@ -14,6 +14,9 @@ What's new in SimPhoNy Remote 2.0.0
   - The above two break compatibility with the old configuration files.
     Old configuration files must be changed both in the options
     and the class they refer to.
+- Renamed the Application table to Image, as well as any reference of the
+  same entity frontend and backend. Admin REST API for the Application is now
+  Image and therefore resolves from /images/ (#444)
 
 
 What's new in SimPhoNy Remote 1.1.0
