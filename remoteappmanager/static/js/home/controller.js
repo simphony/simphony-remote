@@ -3,38 +3,23 @@ require([
     "home/models",
     "home/views/application_list_view",
     "home/views/application_view",
-    "components/vue/dist/vue.min",
+    "components/vue/dist/vue",
     "gamodule",
-    'urlutils'
+    "vue/filters"
 ], function(
     models,
     application_list_view,
     application_view,
     Vue,
-    gamodule,
-    urlutils) {
+    gamodule) {
     "use strict";
-
-    Vue.filter('icon_src', function(icon_data) {
-        return (
-            icon_data ?
-            'data:image/png;base64,' + icon_data :
-            urlutils.path_join(
-                window.apidata.base_url, 'static', 'images', 'generic_appicon_128.png'
-            )
-        );
-    });
-
-    Vue.filter('app_name', function(image) {
-        return image.ui_name? image.ui_name: image.name;
-    });
 
     // This model keeps the retrieved content from the REST query locally.
     // It is only synchronized at initial load.
     var model = new models.ApplicationListModel();
 
     // Initialize views
-    new application_list_view.ApplicationListView({ // jshint ignore:line
+    var app_list_view = new application_list_view.ApplicationListView({
         el: '#applist',
         data: function() { return { model: model }; }
     });
@@ -50,6 +35,8 @@ require([
     app_view.$on('start_application', function(application) {
         ga_observer.trigger_application_starting(application.app_data.image.name);
     });
+
+    app_list_view.$on('entry_clicked', function() { app_view.focus_iframe(); });
 
     model.update();
 });
