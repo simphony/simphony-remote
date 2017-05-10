@@ -24,7 +24,7 @@ define([
       '      v-if="newUserDialog.show"' +
       '      :show="newUserDialog.show"' +
       '      @created="newUserCreated"' +
-      '      @closed="newUserDialogClosed"></new-user-dialog>' +
+      '      @closed="newUserDialog.show = false;"></new-user-dialog>' +
       '    <confirm-dialog ' +
       '      v-if="removeUserDialog.show"' +
       '      :okCallback="removeUser"' +
@@ -100,7 +100,6 @@ define([
         this.updateTable();
       },
       newUserDialogClosed: function() {
-        this.newUserDialog.show = false;
       },
       showPolicyAction: function(row) {
         this.$router.push({
