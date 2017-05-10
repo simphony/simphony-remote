@@ -82,11 +82,29 @@ class SeleniumTestBase(unittest.TestCase):
             self.driver.find_element_by_css_selector(css_selector))
 
     def click_button(self, button_text, number=0):
+        """
+        Clicks a button with a given text.
+
+        Parameters
+        ----------
+        button_text: str
+            The text of the button
+        number: int
+            If multiple buttons with the same label are found, click
+            the number-th (zero based). If not specified, the first (0th)
+            button will be clicked.
+        """
         buttons = [button
                    for button in self.driver.find_elements_by_tag_name("button")
                    if button.text == button_text]
 
-        self.driver.execute_script("arguments[0].click()", buttons[number])
+        try:
+            self.driver.execute_script("arguments[0].click()", buttons[number])
+        except IndexError:
+            raise IndexError(
+                "Could not find {}-th button with label {}".format(
+                    number, button_text
+                ))
 
     def tearDown(self):
         self.driver.quit()
