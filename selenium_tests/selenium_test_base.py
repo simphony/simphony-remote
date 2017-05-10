@@ -81,6 +81,13 @@ class SeleniumTestBase(unittest.TestCase):
             "arguments[0].click()",
             self.driver.find_element_by_css_selector(css_selector))
 
+    def click_button(self, button_text, number=0):
+        buttons = [button
+                   for button in self.driver.find_elements_by_tag_name("button")
+                   if button.text == button_text]
+
+        self.driver.execute_script("arguments[0].click()", buttons[number])
+
     def tearDown(self):
         self.driver.quit()
         self.assertEqual([], self.verificationErrors)
