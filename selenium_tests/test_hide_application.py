@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from selenium_tests.selenium_test_base import SeleniumTestBase
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 
 class TestHideApplication(SeleniumTestBase):
@@ -19,9 +17,6 @@ class TestHideApplication(SeleniumTestBase):
             search_box.clear()
             search_box.send_keys('foobarheho')
 
-            WebDriverWait(driver, 3).until(
-                EC.invisibility_of_element_located((
-                    By.CSS_SELECTOR, '#applistentries > li')))
-
-            self.assertFalse(self.is_element_present(
-                By.CSS_SELECTOR, '#applistentries > li'))
+            self.wait_for(lambda:
+                          not self.is_element_present(
+                              By.CSS_SELECTOR, '#applistentries > li'))
