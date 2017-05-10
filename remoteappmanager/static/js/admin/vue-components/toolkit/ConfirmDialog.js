@@ -15,12 +15,8 @@ define([
       okCallback: {
         type: Function,
         default: function() {}
-      },
-      errorMessage: {
-        type: String,
-        default: ""
       }
-    },
+   },
     template: '<transition name="modal">' +
     '  <div class="modal-mask">' +
     '    <div class="modal-wrapper">' +
