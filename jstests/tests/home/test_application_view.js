@@ -19,7 +19,10 @@ define([
             assert.equal(app_view.$el.children[0].tagName, 'DIV');
             assert.ok(app_view.$el.children[0].classList.contains('row'));
 
-            assert.equal(app_view.$el.querySelector('.box-title').innerHTML, 'Application 1');
+            assert.equal(
+                app_view.$el.querySelector('.box-title').innerHTML,
+                model.app_list[0].app_data.image.ui_name
+            );
 
             // Simulate application starting
             model.app_list[0].status = 'STARTING';
@@ -53,8 +56,11 @@ define([
                 model.selected_index = 1;
 
                 Vue.nextTick(function() {
-                    assert.equal(app_view.$el.children[0].tagName, 'DIV');
-                    assert.ok(app_view.$el.children[0].classList.contains('row'));
+                console.log(model.app_list[1].ui_name)
+                    assert.equal(
+                        app_view.$el.querySelector('.box-title').innerHTML,
+                        model.app_list[1].app_data.image.ui_name
+                    );
 
                     done();
                 });
