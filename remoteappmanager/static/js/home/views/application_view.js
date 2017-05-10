@@ -20,6 +20,9 @@ define([
             '          <div class="box-tools pull-right"></div>' +
             '        </div>' +
             '        <div class="box-body">' +
+            '          <h4>Description</h4>' +
+            '          <span>{{ current_app.app_data.image.description }}</span>' +
+
             '          <h4>Policy</h4>' +
 
             '          <ul class="policy">' +
