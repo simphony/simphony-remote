@@ -2,77 +2,74 @@ define([
   "components/vue/dist/vue",
   "jsapi/v1/resources",
   "admin/vue-components/accounting/NewAccountingDialog",
-  "admin/vue-components/accounting/RemoveAccountingDialog"
-], function(Vue, resources, NewAccountingDialog, RemoveAccountingDialog) {
+], function(Vue, resources, NewAccountingDialog) {
   "use strict";
 
   return {
     components: {
       'new-accounting-dialog': NewAccountingDialog,
-      'remove-accounting-dialog': RemoveAccountingDialog
     },
     template: 
-      '  <div class="row">' +
-      '    <div class="col-md-12">' +
-      '      <div class="box">' +
-      '        <div class="box-header with-border">Accounting for user {{ $route.params.id }} </div>' +
-      '        <div class="box-body">' +
-      '          <div class="alert alert-danger" v-if="communicationError">' +
-      '            <strong>Error:</strong> {{communicationError}}' +
-      '          </div>' +
-      '          <div class="pull-right">' +
-      '            <button class="btn btn-primary createnew" @click="showNewAccountingDialog = true">Create New</button>' +
-      '          </div>' +
-      '          <table id="datatable" class="display dataTable">' +
-      '            <thead>' +
-      '            <tr>' +
-      '                <th>ID</th>' +
-      '                <th>Image</th>' +
-      '                <th>Workspace</th>' +
-      '                <th>Vol. source</th>' +
-      '                <th>Vol. target</th>' +
-      '                <th>Readonly</th>' +
-      '                <th>Remove</th>' +
-      '            </tr>' +
-      '            </thead>' +
-      '            <tbody>' +
-      '              <tr v-for="(a, index) in accountings">' +
-      '                <td>{{ a.identifier | truncate }}</td>' +
-      '                <td>{{ a.image_name }}</td>' +
-      '                <td class="dt-center"><i v-show="a.allow_home" class="fa fa-check" aria-hidden="true"></i></td>' +
-      '                <td>{{ a.volume_source }}</td>' +
-      '                <td>{{ a.volume_target }}</td>' +
-      '                <td class="dt-center"><i v-show="a.volume_mode == '+"'"+'ro'+"'"+'" class="fa fa-check" aria-hidden="true"></i></td>' +
-      '                <td><button class="btn btn-danger" @click="removeAction(index)">Remove</button></td>' +
-      '              </tr>' +
-      '            </tbody>' +
-      '          </table>' +
-      '          <new-accounting-dialog ' +
-      '            v-if="showNewAccountingDialog"' +
-      '            :show="showNewAccountingDialog"' +
-      '            :userId="userId"' +
-      '            @created="newAccountingCreated"' +
-      '            @closed="newAccountingDialogClosed"></new-accounting-dialog>' +
-      '            ' +
-      '          <remove-accounting-dialog ' +
-      '            v-if="showRemoveAccountingDialog"' +
-      '            :accToRemove="accToRemove"' +
-      '            @removed="accRemoved"' +
-      '            @closed="removeDialogClosed"></remove-accounting-dialog>' +
-      '        </div>' +
-      '      </div>' +
+      '<adminlte-box>' +
+      '  <div slot="header">Accounting for user {{ $route.params.id }} </div>' +
+      '  <div>' +
+      '    <div class="alert alert-danger" v-if="communicationError">' +
+      '      <strong>Error:</strong> {{communicationError}}' +
       '    </div>' +
-      '  </div>',
+      '    <data-table' +
+      '     :headers.once="table.headers"' +
+      '     :rows="table.rows"' +
+      '     :globalActions="table.globalActions"' +
+      '     :rowActions="table.rowActions">' +
+      '    </data-table>' +
+      '    <new-accounting-dialog ' +
+      '      v-if="newAccountingDialog.show"' +
+      '      :show="newAccountingDialog.show"' +
+      '      :userId="newAccountingDialog.userId"' +
+      '      @created="newAccountingCreated"' +
+      '      @closed="newAccountingDialogClosed"></new-accounting-dialog>' +
+      '      ' +
+      '    <confirm-dialog ' +
+      '       v-if="removeAccountingDialog.show"' +
+      '       title="Remove Accounting"' +
+      '       :okCallback="removeAccounting"' +
+      '       :closeCallback="removeDialogClosed">' +
+      '        <div>Do you want to remove accounting ' +
+      '             {{ removeAccountingDialog.accountingToRemove }}?' +
+      '        </div>' +
+      '    </confirm-dialog>' +
+      '  </div>' +
+      '</adminlte-box>',
     data: function () {
+      var self = this;
       return {
-        accountings: [],
-        showNewAccountingDialog: false,
-        showRemoveAccountingDialog: false,
-        userId: this.$route.params.id,
-        communicationError: null,
-        accToRemove: {
-          id: null
-        }
+        table: {
+          headers: [
+            "ID", "Image", "Workspace", "Vol. source", "Vol. target", "Readonly"
+          ],
+          rows: [],
+          globalActions: [
+            {
+              label: "Create New Entry",
+              callback: function() { self.newAccountingDialog.show = true; }
+            }
+          ],
+          rowActions: [
+            {
+              label: "Remove",
+              callback: this.removeAction
+            }
+          ]
+        },
+        newAccountingDialog: {
+          show: false,
+          userId: this.$route.params.id
+        },
+        removeAccountingDialog: {
+          show: false,
+          accountingToRemove: null
+        },
+        communicationError: null
       };
     },
     mounted: function () {
@@ -80,44 +77,60 @@ define([
     },
     methods: {
       updateTable: function() {
+        var self = this;
         this.communicationError = null;
         resources.Accounting.items({filter: JSON.stringify({user_id: this.$route.params.id })})
         .done(
-          (function (identifiers, items) {
-            var accountings = [];
+          function (identifiers, items) {
+            self.table.rows = [];
             identifiers.forEach(function(id) {
               var item = items[id];
-              item.identifier = id;
-              accountings.push(item);
+              self.table.rows.push([
+                id, 
+                item.image_name, 
+                item.allow_home, 
+                item.volume_source,
+                item.volume_target,
+                item.volume_mode === "ro"]);
             });
-            this.accountings = accountings;
-          }).bind(this))
+          })
         .fail(
-          (function () {
-            this.communicationError = "The request could not be executed successfully";
-          }).bind(this)
+          function () {
+            self.communicationError = "The request could not be executed successfully";
+          }
         );
       },
       newAccountingCreated: function() {
-        this.showNewAccountingDialog = false;
+        this.newAccountingDialog.show = false;
         this.updateTable();
       },
       newAccountingDialogClosed: function() {
-        this.showNewAccountingDialog = false;
+        this.newAccountingDialog.show = false;
       },
-      accRemoved: function() {
-        this.showRemoveAccountingDialog = false;
-        this.updateTable();
-      },
-      removeAction: function(index) {
-        this.accToRemove = {id: this.accountings[index].identifier};
-        this.showRemoveAccountingDialog = true;
+      removeAction: function(row) {
+        this.removeAccountingDialog.accountingToRemove = row[0];
+        this.removeAccountingDialog.show = true;
       },
       removeDialogClosed: function() {
-        this.showRemoveAccountingDialog = false;
-        this.accToRemove = {
-          id: null
-        };
+        this.removeAccountingDialog.show = false;
+        this.removeAccountingDialog.accountingToRemove = null;
+      },
+      removeAccounting: function () {
+        if (this.removeAccountingDialog.accountingToRemove === null) {
+          return;
+        }
+        var self = this;
+        resources.Accounting.delete(this.removeAccountingDialog.accountingToRemove)
+          .done(function () {
+              self.removeDialogClosed();
+              self.updateTable();
+          })
+          .fail(
+            function () {
+              self.removeDialogClosed();
+              self.communicationError = "The request could not be executed successfully";
+            }
+          );
       }
     }
   };
