@@ -47,12 +47,12 @@ import csv
 import uuid
 
 from remoteappmanager.db.interfaces import (
-    ABCDatabase, ABCApplication, ABCApplicationPolicy, ABCAccounting)
+    ABCDatabase, ABCImage, ABCApplicationPolicy, ABCAccounting)
 from remoteappmanager.db.exceptions import UnsupportedOperation
 from remoteappmanager.utils import mergedocs, one
 
 
-class CSVApplication(ABCApplication):
+class CSVImage(ABCImage):
     pass
 
 
@@ -75,7 +75,7 @@ class CSVUser(object):
 
 # Required headers of the CSV files
 _HEADERS = ('user.name',
-            'application.image',
+            'image.name',
             'policy.allow_home',
             'policy.allow_view',
             'policy.allow_common',
@@ -205,20 +205,20 @@ class CSVDatabase(ABCDatabase):
     def list_users(self):
         return list(self.users.values())
 
-    def create_application(self, app_name):
+    def create_image(self, name):
         raise UnsupportedOperation()
 
-    def remove_application(self, *, app_name=None, id=None):
+    def remove_image(self, *, name=None, id=None):
         raise UnsupportedOperation()
 
-    def list_applications(self):
+    def list_images(self):
         return list(self.applications.values())
 
-    def grant_access(self, app_name, user_name,
+    def grant_access(self, image_name, user_name,
                      allow_home, allow_view, volume):
         raise UnsupportedOperation()
 
-    def revoke_access(self, app_name, user_name,
+    def revoke_access(self, image_name, user_name,
                       allow_home, allow_view, volume):
         raise UnsupportedOperation()
 

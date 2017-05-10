@@ -12,7 +12,7 @@ class AdminApplication(BaseApplication):
 
     def _webapi_resources(self):
         return [admin.ContainerHandler,
-                admin.ApplicationHandler,
+                admin.ImageHandler,
                 admin.UserHandler,
                 admin.AccountingHandler,
                 admin.StatsHandler]

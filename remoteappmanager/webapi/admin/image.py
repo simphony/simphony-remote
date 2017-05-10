@@ -9,12 +9,12 @@ from remoteappmanager.webapi.decorators import authenticated
 from remoteappmanager.db import exceptions as db_exceptions
 
 
-class Application(Resource):
-    image_name = Unicode(allow_empty=False, strip=True)
+class Image(Resource):
+    name = Unicode(allow_empty=False, strip=True)
 
 
-class ApplicationHandler(ResourceHandler):
-    resource_class = Application
+class ImageHandler(ResourceHandler):
+    resource_class = Image
 
     @gen.coroutine
     @authenticated
@@ -27,8 +27,8 @@ class ApplicationHandler(ResourceHandler):
             raise exceptions.NotFound()
 
         try:
-            db.remove_application(id=id)
-            self.log.info("Removed application with id {}".format(id))
+            db.remove_image(id=id)
+            self.log.info("Removed image with id {}".format(id))
         except db_exceptions.NotFound:
             raise exceptions.NotFound()
         except db_exceptions.UnsupportedOperation:
@@ -39,7 +39,7 @@ class ApplicationHandler(ResourceHandler):
     def create(self, resource, **kwargs):
         db = self.application.db
         try:
-            id = db.create_application(resource.image_name)
+            id = db.create_image(resource.name)
         except db_exceptions.Exists:
             raise exceptions.Exists()
         except db_exceptions.UnsupportedOperation:
@@ -50,7 +50,7 @@ class ApplicationHandler(ResourceHandler):
     @gen.coroutine
     @authenticated
     def items(self, items_response, **kwargs):
-        """Produces a list of Application items in the items_response object.
+        """Produces a list of Images items in the items_response object.
 
         Parameters
         ----------
@@ -58,11 +58,11 @@ class ApplicationHandler(ResourceHandler):
             an object to be filled with the appropriate information
         """
         db = self.application.db
-        apps = db.list_applications()
+        images = db.list_images()
 
         items = []
-        for app in apps:
-            item = Application(identifier=str(app.id), image_name=app.image)
+        for image in images:
+            item = Image(identifier=str(image.id), name=image.image)
             items.append(item)
 
         items_response.set(items)

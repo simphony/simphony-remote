@@ -2,18 +2,18 @@ from abc import ABCMeta, abstractmethod
 import inspect as _inspect
 
 
-class ABCApplication(metaclass=ABCMeta):
-    """ Description of an application """
+class ABCImage(metaclass=ABCMeta):
+    """ Description of an image in the database"""
 
-    def __init__(self, id, image):
+    def __init__(self, id, name):
         #: Numerical id
         self.id = id
 
         #: Name of the image
-        self.image = image
+        self.name = name
 
     def __repr__(self):
-        args = _inspect.getargs(ABCApplication.__init__.__code__).args[1:]
+        args = _inspect.getargs(ABCImage.__init__.__code__).args[1:]
 
         return "<{cls}({spec})>".format(
             cls=self.__class__.__name__,
@@ -147,64 +147,59 @@ class ABCDatabase(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def create_application(self, app_name):
-        """Creates a new application with the specified name.
-        Raises if an application with the same name already exists
+    def create_image(self, name):
+        """Creates a new image with the specified name.
+        Raises if an image with the same name already exists
 
         Parameters
         ----------
-        app_name: str
-            The name of the application
+        name: str
+            The name of the image
 
         Returns
         -------
         id: int
-            The id of the created application
+            The id of the created image
 
         Raises
         ------
         exceptions.Exists
-            If the application already exists.
+            If the image already exists.
         """
 
     @abstractmethod
-    def remove_application(self, *, app_name=None, id=None):
-        """Remove an existing application by name or id, depending
+    def remove_image(self, *, name=None, id=None):
+        """Remove an existing image by name or id, depending
         what is provided. Only one argument is allowed.
-        If the application is not present, does nothing.
+        If the image is not present, does nothing.
 
         Parameters
         ----------
-        app_name: str
-            The name of the application
+        name: str
+            The name of the image
 
         id: int
-            The id of the application
-
-        Raises
-        ------
-        exception.NotFound
-            If the application is not found.
+            The id of the image
         """
 
     @abstractmethod
-    def list_applications(self):
-        """List all available applications
+    def list_images(self):
+        """List all available images
 
         Returns
         -------
-        applications: list
-            A list of the available apps.
+        images: list
+            A list of the available images
         """
 
     @abstractmethod
-    def grant_access(self, app_name, user_name,
+    def grant_access(self, image_name, user_name,
                      allow_home, allow_view, volume):
-        """Grant access for user to application.
+        """Grant access for user to image.
 
         Parameters
         ----------
-        app_name: str
+        image_name: str
             The name of the application
 
         user_name: str
@@ -235,14 +230,14 @@ class ABCDatabase(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def revoke_access(self, app_name, user_name,
+    def revoke_access(self, image_name, user_name,
                       allow_home, allow_view, volume):
-        """Revoke access for user to application.
+        """Revoke access for user to image
 
         Parameters
         ----------
-        app_name: str
-            The name of the application
+        image_name: str
+            The name of the image
 
         user_name: str
             The name of the user

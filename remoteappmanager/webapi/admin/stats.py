@@ -14,8 +14,8 @@ class Stats(SingletonResource):
     num_total_users = Int()
     #: Total number of users currently running at least one container
     num_active_users = Int()
-    #: Total number of available applications.
-    num_applications = Int()
+    #: Total number of available images.
+    num_images = Int()
     #: Total number of running containers.
     num_running_containers = Int()
 
@@ -34,5 +34,5 @@ class StatsHandler(ResourceHandler):
         resource.realm = app.file_config.docker_realm
         resource.num_total_users = len(app.db.list_users())
         resource.num_active_users = len(set([c.user for c in containers]))
-        resource.num_applications = len(app.db.list_applications())
+        resource.num_images = len(app.db.list_images())
         resource.num_running_containers = len(containers)

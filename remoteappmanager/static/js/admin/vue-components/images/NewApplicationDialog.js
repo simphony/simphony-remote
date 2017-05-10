@@ -8,14 +8,14 @@ define([
   return {
     template: 
     '    <modal-dialog>' +
-    '      <div class="modal-header"><h4>Create New Application</h4></div>' +
+    '      <div class="modal-header"><h4>Create New Image</h4></div>' +
     '      <div class="modal-body">' +
-    '        <vue-form :state="formstate" v-model="formstate" @submit.prevent="createNewApplication">' +
+    '        <vue-form :state="formstate" v-model="formstate" @submit.prevent="createNewImage">' +
     '          <validate auto-label class="form-group required-field" :class="fieldClassName(formstate.name)">' +
-    '            <label class="control-label">Image Name</label>' +
+    '            <label class="control-label">Name</label>' +
     '            <input type="text" name="name" class="form-control" required v-model="model.name">' +
     '              <field-messages name="name" show="$touched || $submitted">' +
-    '              <span class="help-block" slot="required">Image Name cannot be empty</span>' +
+    '              <span class="help-block" slot="required">Name cannot be empty</span>' +
     '            </field-messages>' +
     '          </validate>' +
     '          <div class="modal-footer">' +
@@ -53,7 +53,7 @@ define([
           return '';
         }
       },
-      createNewApplication: function () {
+      createNewImage: function () {
         if (!this.formstate.$valid) {
           return;
         }

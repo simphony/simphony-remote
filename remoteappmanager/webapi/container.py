@@ -193,7 +193,7 @@ class ContainerHandler(ResourceHandler):
     @gen.coroutine
     def _start_container(self,
                          user_name,
-                         app,
+                         image,
                          policy,
                          mapping_id,
                          base_urlpath,
@@ -207,8 +207,8 @@ class ContainerHandler(ResourceHandler):
         user_name : str
             the username
 
-        app : ABCApplication
-            the application to start
+        image : ABCImage
+            the image to start
 
         policy : ABCApplicationPolicy
             The startup policy for the application
@@ -221,7 +221,7 @@ class ContainerHandler(ResourceHandler):
         remoteappmanager.docker.container.Container
         """
 
-        image_name = app.image
+        image_name = image.name
         mount_home = policy.allow_home
         volume_spec = (policy.volume_source,
                        policy.volume_target,
