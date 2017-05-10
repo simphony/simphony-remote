@@ -5,7 +5,7 @@ require([
     "home/views/application_view",
     "components/vue/dist/vue",
     "gamodule",
-    "filters"
+    "vue/filters"
 ], function(
     models,
     application_list_view,
@@ -19,7 +19,7 @@ require([
     var model = new models.ApplicationListModel();
 
     // Initialize views
-    new application_list_view.ApplicationListView({ // jshint ignore:line
+    var app_list_view = new application_list_view.ApplicationListView({
         el: '#applist',
         data: function() { return { model: model }; }
     });
@@ -35,6 +35,8 @@ require([
     app_view.$on('start_application', function(application) {
         ga_observer.trigger_application_starting(application.app_data.image.name);
     });
+
+    app_list_view.$on('entry_clicked', function() { app_view.focus_iframe(); });
 
     model.update();
 });

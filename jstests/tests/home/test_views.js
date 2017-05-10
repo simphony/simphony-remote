@@ -2,7 +2,7 @@ define([
     "home/models",
     "home/views/application_list_view",
     "components/vue/dist/vue",
-    "filters"
+    "vue/filters"
 ], function (models, application_list_view, Vue) {
     "use strict";
 
