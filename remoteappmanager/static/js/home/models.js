@@ -125,10 +125,10 @@ define([
             // by the client. skip it and let the server deal with the
             // missing data, either by using a default or throwing
             // an error.
-            var configurable = configurables[tag];
+            var ConfigurableCls = configurables[tag];
 
-            if (configurable !== undefined) {
-                app.configurables.push(new configurables[tag]());
+            if (ConfigurableCls !== undefined) {
+                app.configurables.push(new ConfigurableCls());
             }
         });
     };
@@ -148,14 +148,15 @@ define([
         current_app.status = Status.STARTING;
         current_app.delayed = true;
 
-        var config_dict = {};
+        var configurables_data = {};
         current_app.configurables.forEach(function(configurable) {
-            config_dict[configurable.tag] = configurable.as_config_dict();
+            var tag = configurable.tag;
+            configurables_data[tag] = configurable.as_config_dict();
         });
 
         resources.Container.create({
             mapping_id: current_app.app_data.mapping_id,
-            configurables: config_dict
+            configurables: configurables_data
         }).done(function() {
             this.update_idx(selected_index)
             .fail(function(error) {
