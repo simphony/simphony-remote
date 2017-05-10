@@ -1,70 +1,74 @@
 define([
   "components/vue/dist/vue",
   "jsapi/v1/resources",
-  "admin/vue-components/users/NewUserDialog",
-  "admin/vue-components/users/RemoveUserDialog",
-], function(Vue, resources, NewUserDialog, RemoveUserDialog) {
+  "admin/vue-components/users/NewUserDialog"
+], function(Vue, resources, NewUserDialog) {
   "use strict";
 
   return {
     components: {
       'new-user-dialog': NewUserDialog,
-      'remove-user-dialog': RemoveUserDialog
     },
     template: 
-      '<div class="row">' +
-      '  <div class="col-md-12">' +
-      '    <div class="box">' +
-      '      <div class="box-header with-border">Users</div>' +
-      '      <div class="box-body">' +
-      '        <div class="pull-right">' +
-      '          <button class="btn btn-primary createnew" @click="showNewUserDialog = true">Create New</button>' +
-      '        </div>' +
-      '        <div class="alert alert-danger" v-if="communicationError">' +
-      '          <strong>Error:</strong> {{communicationError}}' +
-      '        </div>' +
-      '        <table id="datatable" class="display dataTable">' +
-      '          <thead>' +
-      '          <tr>' +
-      '              <th>ID</th>' +
-      '              <th>Username</th>' +
-      '              <th>Accounting</th>' +
-      '              <th>Remove</th>' +
-      '          </tr>' +
-      '          </thead>' +
-      '          <tbody>' +
-      '            <tr v-for="(u, index) in users">' +
-      '              <td>{{ u.id }}</td>' +
-      '              <td>{{ u.name }}</td>' +
-      '              <td><router-link :to="{ name: '+"'"+'user_accounting'+"'"+', params: { id: u.id }}">Show</router-link></td>' +
-      '              <td><button class="btn btn-danger" @click="removeAction(index)">Remove</button></td>' +
-      '            </tr>' +
-      '          </tbody>' +
-      '        </table>' +
-      '        <new-user-dialog ' +
-      '          v-if="showNewUserDialog"' +
-      '          :show="showNewUserDialog"' +
-      '          @created="newUserCreated"' +
-      '          @closed="newUserDialogClosed"></new-user-dialog>' +
-      '        <remove-user-dialog ' +
-      '          v-if="showRemoveUserDialog"' +
-      '          :userToRemove="userToRemove"' +
-      '          @removed="userRemoved"' +
-      '          @closed="removeDialogClosed"></remove-user-dialog>' +
-      '      </div>' +
+      '<adminlte-box title="Users">' +
+      '    <div class="alert alert-danger" v-if="communicationError">' +
+      '      <strong>Error:</strong> {{communicationError}}' +
       '    </div>' +
-      '  </div>' +
-      '</div>',
+      '    <data-table' +
+      '     :headers.once="table.headers"' +
+      '     :rows="table.rows"' +
+      '     :globalActions="table.globalActions"' +
+      '     :rowActions="table.rowActions">' +
+      '    </data-table>' +
+      '    <new-user-dialog ' +
+      '      v-if="newUserDialog.show"' +
+      '      :show="newUserDialog.show"' +
+      '      @created="newUserCreated"' +
+      '      @closed="newUserDialogClosed"></new-user-dialog>' +
+      '    <confirm-dialog ' +
+      '      v-if="removeUserDialog.show"' +
+      '      :okCallback="removeUser"' +
+      '      :closeCallback="closeRemoveUserDialog">' +
+      '      <div>Do you want to remove User {{removeUserDialog.userToRemove.name}} ' +
+      '      ({{removeUserDialog.userToRemove.id}})</div>' +
+      '    </confirm-dialog>' +
+      '</adminlte-box>',
     data: function () {
+      var self = this;
       return {
+        table: {
+          headers: ["ID", "Username"],
+          rows: [],
+          globalActions: [
+            {
+              label: "Create New Entry",
+              callback: function() { self.newUserDialog.show = true; }
+            }
+          ],
+          rowActions: [
+            {
+              label: "Policies",
+              callback: this.showPolicyAction,
+              type: "info"
+            },
+            {
+              label: "Remove",
+              callback: this.removeAction
+            }
+          ]
+        },
         users: [],
-        showNewUserDialog: false,
-        showRemoveUserDialog: false,
-        communicationError: null,
-        userToRemove: {
-          name: "",
-          id: null
-        }
+        newUserDialog: {
+          show: false
+        },
+        removeUserDialog: {
+          show: false,
+          userToRemove: {
+            id: null,
+            name: ""
+          }
+        },
+        communicationError: null
       };
     },
     mounted: function () {
@@ -72,45 +76,66 @@ define([
     },
     methods: {
       updateTable: function() {
+        var self = this;
         this.communicationError = null;
         resources.User.items()
         .done(
-          (function (identifiers, items) {
-            var users = [];
+          function (identifiers, items) {
+            self.table.rows = [];
             identifiers.forEach(function(id) {
-              users.push({
-                id: id,
-                name: items[id].name
-              });
+              var item = items[id];
+              self.table.rows.push([
+                id,
+                item.name
+              ]);
             });
-            this.users = users;
-          }).bind(this))
+          })
         .fail(
-          (function () {
-            this.communicationError = "The request could not be executed successfully";
-           }).bind(this));
+          function () {
+            self.communicationError = "The request could not be executed successfully";
+          });
       },
       newUserCreated: function() {
-        this.showNewUserDialog = false;
+        this.newUserDialog.show = false;
         this.updateTable();
       },
       newUserDialogClosed: function() {
-        this.showNewUserDialog = false;
+        this.newUserDialog.show = false;
       },
-      userRemoved: function() {
-        this.showRemoveUserDialog = false;
-        this.updateTable();
+      showPolicyAction: function(row) {
+        this.$router.push({
+          name: 'user_accounting',
+          params: { id: row[0] }
+        });
       },
-      removeAction: function(index) {
-        this.userToRemove = this.users[index];
-        this.showRemoveUserDialog = true;
+      removeAction: function(row) {
+        this.removeUserDialog.userToRemove.id = row[0];
+        this.removeUserDialog.userToRemove.name = row[1];
+        this.removeUserDialog.show = true;
       },
-      removeDialogClosed: function() {
-        this.showRemoveUserDialog = false;
-        this.userToRemove = {
-          name: "",
-          id: null
+      closeRemoveUserDialog: function() {
+        this.removeUserDialog.show = false;
+        this.removeUserDialog.userToRemove = {
+          id: null,
+          name: ""
         };
+      },
+      removeUser: function () {
+        if (this.removeUserDialog.userToRemove.id === null) {
+          return;
+        }
+        var self = this; 
+        resources.User.delete(this.removeUserDialog.userToRemove.id)
+          .done(function () {
+              self.closeRemoveUserDialog();
+              self.updateTable();
+              }
+          )
+          .fail(
+            function () {
+              self.closeRemoveUserDialog();
+            }
+          );
       }
     }
   };
