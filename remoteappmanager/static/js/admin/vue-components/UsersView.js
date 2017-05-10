@@ -99,8 +99,6 @@ define([
         this.newUserDialog.show = false;
         this.updateTable();
       },
-      newUserDialogClosed: function() {
-      },
       showPolicyAction: function(row) {
         this.$router.push({
           name: 'user_accounting',
