@@ -47,8 +47,7 @@ define([
             '              <component v-for="configurable in current_app.configurables"' +
             '                         :key="configurable.tag"' +
             '                         :is="configurable.tag + \'-component\'"' +
-            '                         :config_dict="configurable.config_dict"' +
-            '                         @update:config_dict="config_dict => configurable.config_dict = config_dict"></component>' +
+            '                         :config_dict.sync="configurable.config_dict"></component>' +
             '            </fieldset>' +
             '          </form>' +
             '        </div>' +
