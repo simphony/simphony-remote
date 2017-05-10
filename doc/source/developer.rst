@@ -42,7 +42,7 @@ API reference
    remoteappmanager.logging.logging_mixin
    remoteappmanager.webapi.application
    remoteappmanager.webapi.container
-   remoteappmanager.webapi.admin.application
+   remoteappmanager.webapi.admin.image
    remoteappmanager.webapi.admin.container
    remoteappmanager.services.hub
    remoteappmanager.services.reverse_proxy
