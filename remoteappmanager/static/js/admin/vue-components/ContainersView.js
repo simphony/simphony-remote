@@ -75,9 +75,6 @@ define([
           this.stopContainerDialog.show = true;
         },
         stopContainer: function () {
-          if (this.stopContainerDialog.containerToStop === null) {
-            return;
-          }
           var self = this;
           resources.Container.delete(this.stopContainerDialog.containerToStop)
             .done(function () {
