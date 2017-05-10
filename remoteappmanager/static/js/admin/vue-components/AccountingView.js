@@ -113,9 +113,6 @@ define([
         this.removeAccountingDialog.accountingToRemove = null;
       },
       removeAccounting: function () {
-        if (this.removeAccountingDialog.accountingToRemove === null) {
-          return;
-        }
         var self = this;
         resources.Accounting.delete(this.removeAccountingDialog.accountingToRemove)
           .done(function () {
