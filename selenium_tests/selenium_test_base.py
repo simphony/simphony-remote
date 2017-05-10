@@ -94,17 +94,15 @@ class SeleniumTestBase(unittest.TestCase):
             the number-th (zero based). If not specified, the first (0th)
             button will be clicked.
         """
-        buttons = [button
-                   for button in self.driver.find_elements_by_tag_name("button")
-                   if button.text == button_text]
+        self.wait_for(
+            lambda: len(self.get_buttons_by_text(button_text)) > number)
 
-        try:
-            self.driver.execute_script("arguments[0].click()", buttons[number])
-        except IndexError:
-            raise IndexError(
-                "Could not find {}-th button with label {}".format(
-                    number, button_text
-                ))
+        button = self.get_buttons_by_text(button_text)[number]
+        self.driver.execute_script("arguments[0].click()", button)
+
+    def get_buttons_by_text(self, text):
+        return [button for button in self.driver.find_elements_by_tag_name("button")
+                if button.text == text]
 
     def tearDown(self):
         self.driver.quit()
