@@ -11,7 +11,6 @@ define([
         var done = assert.async();
 
         var model = new models.ApplicationListModel();
-
         var app_view = new application_view.ApplicationView({
             data: function() { return { model: model }; }
         }).$mount();
@@ -19,6 +18,8 @@ define([
         model.update().done(function() { Vue.nextTick(function() {
             assert.equal(app_view.$el.children[0].tagName, 'DIV');
             assert.ok(app_view.$el.children[0].classList.contains('row'));
+
+            assert.equal(app_view.$el.querySelector('.box-title').innerHTML, 'Application 1');
 
             // Simulate application starting
             model.app_list[0].status = 'STARTING';
@@ -31,5 +32,33 @@ define([
         })});
     });
 
-    // assert.equal(app_view.$el.children[0].tagName, 'IFRAME');
+    QUnit.test("rendering iframe", function (assert) {
+        var done = assert.async();
+
+        var model = new models.ApplicationListModel();
+        var app_view = new application_view.ApplicationView({
+            data: function() { return { model: model }; }
+        }).$mount();
+
+        model.update().done(function() {
+            // Simulate application running
+            model.app_list[0].status = 'RUNNING';
+            model.app_list[0].app_data.container = {};
+            model.app_list[0].app_data.container.url_id = 'blabla.com';
+
+            Vue.nextTick(function() {
+                assert.equal(app_view.$el.children[0].tagName, 'IFRAME');
+
+                // Render form again by selecting the other application which is stopped
+                model.selected_index = 1;
+
+                Vue.nextTick(function() {
+                    assert.equal(app_view.$el.children[0].tagName, 'DIV');
+                    assert.ok(app_view.$el.children[0].classList.contains('row'));
+
+                    done();
+                });
+            });
+        });
+    });
 });
