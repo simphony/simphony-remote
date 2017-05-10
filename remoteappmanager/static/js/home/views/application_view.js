@@ -1,172 +1,109 @@
 define([
-    "jquery", 
     "urlutils",
-    "handlebars",
     "utils",
-    "underscore",
-    "home/models"
-], function ($, urlutils, hb, utils, _, models) {
+    '../../components/vue/dist/vue'
+], function (urlutils, utils, Vue) {
     "use strict";
-    var templates = {
-       app_start_panel: hb.compile(
-           '<div class="row">' +
-           '  <div class="col-md-offset-2 col-md-8">' +
-           '    <div class="box box-primary">' +
-           '      <div class="box-header with-border">' +
-           '        <h3 class="box-title">{{image_name app_data}}</h3>' +
-           '        <div class="box-tools pull-right"></div>' +
-           '      </div>' +
-           '      <div class="box-body">' +
-           '        <h4>Policy</h4>' +
-           '        <ul class="policy">' +
-           '        </ul>' +
-           '        <h4>Configuration</h4>' +
-           '        <form class="configuration"><fieldset {{#if disabled}}disabled{{/if}}></fieldset></form>' +
-           '      </div>' +
-           '      <div class="box-footer">' +
-           '        <button data-index={{index}} class="btn btn-primary pull-right start-button" {{#if disabled}}disabled{{/if}}>Start</button>' +
-           '      </div>' +
-           '    </div>' +
-           '  </div>' +
-           '  </div>'
-       )
-    };
 
-    var ApplicationView = function(model) {
-        // (Constructor) Represents the main view where the application will be
-        // 
-        // Parameters
-        // model : ApplicationListModel
-        //     The data model.
-        var self = this;
-        self.model = model;
-        self.visualised_index = null;
-        self.base_url = window.apidata.base_url;
-    };
+    var ApplicationView = Vue.extend({
+        template:
+            '<!-- Application View -->' +
+            '<section id="appview"' +
+            '         v-if="current_app !== null"' +
+            '         :class="{ content: true, \'no-padding\': current_app.is_running() }">' +
+            '  <!-- Start Form -->' +
+            '  <div v-if="!current_app.is_running()" class="row">' +
+            '    <div class="col-md-offset-2 col-md-8">' +
+            '      <div class="box box-primary">' +
+            '        <div class="box-header with-border">' +
+            '          <h3 class="box-title">{{ current_app.app_data.image | app_name }}</h3>' +
+            '          <div class="box-tools pull-right"></div>' +
+            '        </div>' +
+            '        <div class="box-body">' +
+            '          <h4>Policy</h4>' +
 
-    ApplicationView.prototype.start_button_clicked = function(index) {}; // jshint ignore:line
+            '          <ul class="policy">' +
+            '            <!-- Workspace -->' +
+            '            <li v-if="app_policy.allow_home">' +
+            '                Workspace accessible' +
+            '            </li>' +
+            '            <li v-else>' +
+            '                Workspace not accessible' +
+            '            </li>' +
 
-    ApplicationView.prototype.render = function (delayed, fade_in) {
-        // Renders the ApplicationView.
-        // delayed:
-        //    When true, if the application is running it will redirect to
-        //    the waiting spinner, rather than the application itself.
-        //    Temporary measure. Will go away.
-        var self = this;
-        if (self.visualised_index === self.model.selected_index &&
-            self.visualised_status === self.model.status[self.model.selected_index]) {
-            $("iframe").focus();
-            return;
-        }
-        var html = self._render_for_model_state(delayed);
-        self.visualised_index = self.model.selected_index;
-        self.visualised_status = self.model.status[self.visualised_index];
-        if (fade_in) {
-            $(".content").html(html.hide().fadeIn(fade_in));
-        } else {
-            $(".content").html(html);
-        }
-        $("iframe").focus();
-    };
-   
-    ApplicationView.prototype._render_for_model_state = function(delayed) {
-        // Decides what to render according to the current model state
-        var self = this;
-        var index = self.model.selected_index;
+            '            <!-- Volume mounted -->' +
+            '            <li v-if="app_policy.volume_source && app_policy.volume_target && app_policy.volume_mode">' +
+            '              Volume mounted: {{ app_policy.volume_source }} &#x2192; {{ app_policy.volume_target }} ({{ app_policy.volume_mode }})' +
+            '            </li>' +
+            '            <li v-else>' +
+            '              No volumes mounted' +
+            '            </li>' +
+            '          </ul>' +
 
-        if (index === null) {
-            // render nothing.
-            return $("<div>");
-        }
+            '          <h4>Configuration</h4>' +
+            '          <form class="configuration"><fieldset></fieldset></form>' +
+            '        </div>' +
 
-        var app_status = self.model.status[index];
-        var html;
+            '        <!-- Start Button -->' +
+            '        <div class="box-footer">' +
+            '          <button class="btn btn-primary pull-right start-button"' +
+            '                  @click="start_application()"' +
+            '                  :disabled="current_app.is_starting()">' +
+            '            Start' +
+            '          </button>' +
+            '        </div>' +
+            '      </div>' +
+            '    </div>' +
+            '  </div>' +
 
-        if (app_status === models.Status.STARTING || app_status === models.Status.STOPPED) {
-            $("section.content").removeClass("no-padding");
-            html = self._render_form(index);
-        } else {
-            $("section.content").addClass("no-padding");
-            html = self._render_app(index, delayed);
-        }
-        return html;
-    };
-    
-    ApplicationView.prototype._render_form = function(index) {
-        // Renders the configuration form
-        var self = this;
-        var app_data = self.model.app_data[index];
-        var app_status = self.model.status[index];
+            '  <!-- Application View -->' +
+            '  <iframe v-if="current_app.is_running()"' +
+            '          id="application"' +
+            '          frameBorder="0"' +
+            '          :src="app_source"' +
+            '          :style="{ minWidth: get_iframe_size()[0] + \'px\', minHeight: get_iframe_size()[1] + \'px\' }">' +
+            '  </iframe>' +
+            '</section>',
 
-        var configurables = self.model.configurables[index];
-        var properties = Object.getOwnPropertyNames(configurables);
+        computed: {
+            current_app: function() {
+                return this.model.app_list[this.model.selected_index] || null;
+            },
+            app_policy: function() {
+                return this.current_app.app_data.image.policy;
+            },
+            app_source: function() {
+                var url = urlutils.path_join(
+                    window.apidata.base_url,
+                    'containers',
+                    this.current_app.app_data.container.url_id
+                );
+                var output = this.current_app.delayed ? url : url + '/';
 
-        var disabled = (app_status === models.Status.STARTING);
-        
-        var base = $(templates.app_start_panel({
-            app_data: app_data,
-            index: index,
-            disabled: disabled
-        }));
-        
-        base.find(".start-button").click(function() {
-            self.start_button_clicked($(this).attr("data-index"));
-        });
+                this.current_app.delayed = false;
 
+                return output;
+            }
+        },
 
-        var policy = app_data.image.policy;
-        var policy_ul = base.find(".policy");
-        
-        if (policy.allow_home) {
-            policy_ul.append($("<li>Workspace accessible</li>"));
-        } else {
-            policy_ul.append($("<li>Workspace not accessible</li>"));
-        }
-        
-        if (policy.volume_source && policy.volume_target && policy.volume_mode) {
-            policy_ul.append($(
-                "<li>Volume mounted: " + policy.volume_source +
-                " &#x2192; " + policy.volume_target +
-                " (" + policy.volume_mode + ")</li>"));
-        } else {
-            policy_ul.append($("<li>No volumes mounted</li>"));
-        }
-                
-        var fieldset = base.find("fieldset");
-        
-        if (properties.length === 0) {
-            fieldset.html("No configurable options for this image");
-        } else {
-            properties.forEach(
-                function(val) {  // jshint ignore:line
-                    var widget = configurables[val].view(index);
-                    fieldset.append(widget);
+        methods: {
+            start_application: function() {
+                this.$emit('start_application', this.current_app);
+                this.model.start_application();
+            },
+            get_iframe_size: function() {
+                return utils.max_iframe_size();
+            },
+            focus_iframe: function() {
+                var iframe = this.$el.querySelector('iframe');
+                if(iframe !== null) {
+                    iframe.focus();
                 }
-            );
-        }
+            }
+        },
 
-        return base;
-    };
-    
-    ApplicationView.prototype._render_app = function(index, delayed) {
-        // Renders the iframe with the application.
-        var self = this;
-        var app_data = self.model.app_data[index];
-        var location = urlutils.path_join(self.base_url, 
-            "containers", 
-            app_data.container.url_id
-        );
-        
-        if (!delayed) {
-            location = location+"/";
-        }    
-        
-        var iframe_size = utils.max_iframe_size();
-        var iframe = $('<iframe id="application" frameBorder="0" ' +
-            'src="' + location + '" ' +
-            'style="min-width: '+iframe_size[0]+'px; min-height: '+iframe_size[1]+'px;"></iframe>');
-        return iframe;
-    };
+        updated: function() { this.focus_iframe(); }
+    });
 
     return {
         ApplicationView : ApplicationView
