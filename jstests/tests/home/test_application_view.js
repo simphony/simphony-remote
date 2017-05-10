@@ -44,7 +44,7 @@ define([
             // Simulate application running
             model.app_list[0].status = 'RUNNING';
             model.app_list[0].app_data.container = {};
-            model.app_list[0].app_data.container.url_id = 'blabla.com';
+            model.app_list[0].app_data.container.url_id = 'https://127.0.0.1:1234/';
 
             Vue.nextTick(function() {
                 assert.equal(app_view.$el.children[0].tagName, 'IFRAME');
