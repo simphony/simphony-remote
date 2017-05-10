@@ -2,9 +2,8 @@ define([
     "jquery",
     "home/configurables",
     "jsapi/v1/resources",
-    "dialogs",
-    "underscore"
-], function ($, configurables, resources, dialogs, _) {
+    "dialogs"
+], function ($, configurables, resources, dialogs) {
     "use strict";
 
     var Status = {
@@ -121,15 +120,15 @@ define([
         // to its client-side model.
         app.configurables = [];
 
-        app.app_data.image.configurables.forEach(function(conf_name) {
+        app.app_data.image.configurables.forEach(function(tag) {
             // If this returns null, the tag has not been recognized
             // by the client. skip it and let the server deal with the
             // missing data, either by using a default or throwing
             // an error.
-            var configurable = configurables[conf_name];
+            var configurable = configurables[tag];
 
             if (configurable !== undefined) {
-                app.configurables.push(new configurables[conf_name]());
+                app.configurables.push(new configurables[tag]());
             }
         });
     };
@@ -142,7 +141,7 @@ define([
         }
     };
 
-    ApplicationListModel.prototype.start_application = function(app_configurables) {
+    ApplicationListModel.prototype.start_application = function() {
         var selected_index = this.selected_index;
         var current_app = this.app_list[selected_index];
 
@@ -150,8 +149,8 @@ define([
         current_app.delayed = true;
 
         var config_dict = {};
-        app_configurables.forEach(function(configurable) {
-            _.extend(config_dict, configurable.as_config_dict());
+        current_app.configurables.forEach(function(configurable) {
+            config_dict[configurable.tag] = configurable.as_config_dict();
         });
 
         resources.Container.create({

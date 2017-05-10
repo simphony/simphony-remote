@@ -45,10 +45,10 @@ define([
             '            <fieldset v-if="current_app.configurables.length === 0">No configurable options for this image</fieldset>' +
             '            <fieldset v-else :disabled="current_app.is_starting()">' +
             '              <component v-for="configurable in current_app.configurables"' +
-            '                         ref="configurables"' +
+            '                         :key="configurable.tag"' +
             '                         :is="configurable.tag + \'-component\'"' +
-            '                         :value="configurable.value"' +
-            '                         @update:value="value => configurable.value = value"></component>' +
+            '                         :config_dict="configurable.config_dict"' +
+            '                         @update:config_dict="config_dict => configurable.config_dict = config_dict"></component>' +
             '            </fieldset>' +
             '          </form>' +
             '        </div>' +
@@ -98,7 +98,7 @@ define([
         methods: {
             start_application: function() {
                 this.$emit('start_application', this.current_app);
-                this.model.start_application(this.$refs.configurables);
+                this.model.start_application();
             },
             get_iframe_size: function() {
                 return utils.max_iframe_size();
