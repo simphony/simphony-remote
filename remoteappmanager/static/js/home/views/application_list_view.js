@@ -1,5 +1,5 @@
 define([
-    '../../components/vue/dist/vue.min',
+    '../../components/vue/dist/vue',
 ], function (Vue) {
     'use strict';
 
@@ -32,9 +32,9 @@ define([
 
               '  <!-- Application list -->' +
               '<transition-group name="list" tag="ul" id="applistentries" class="sidebar-menu">' +
-              '  <li v-for="(app, index) in visible_list" v-bind:key="app"' +
-              '      :class="{ active: index === model.selected_index }"' +
-              '      @click="model.selected_index = index; $(\'iframe\').focus();">' +
+              '  <li v-for="app in visible_list" v-bind:key="app"' +
+              '      :class="{ active: index_of(app) === model.selected_index }"' +
+              '      @click="model.selected_index = index_of(app); $emit(\'entry_clicked\');">' +
 
               '    <span :class="app.status.toLowerCase() + \'-badge\'"></span>' +
 
@@ -44,7 +44,7 @@ define([
 
               '      <button class="stop-button"' +
               '              v-if="app.is_running()"' +
-              '              @click="model.stop_application(index)"' +
+              '              @click="model.stop_application(index_of(app))"' +
               '              :disabled="app.is_stopping()">' +
               '        <i class="fa fa-times"></i>' +
               '      </button>' +
@@ -64,8 +64,14 @@ define([
             visible_list: function() {
                 return this.model.app_list.filter(function(app) {
                     var app_name = this.$options.filters.app_name(app.app_data.image).toLowerCase();
-                    return app_name.includes(this.search_input.toLowerCase());
+                    return app_name.indexOf(this.search_input.toLowerCase()) !== -1;
                 }.bind(this));
+            }
+        },
+
+        methods: {
+            index_of: function(app) {
+                return this.model.app_list.indexOf(app);
             }
         }
     });
