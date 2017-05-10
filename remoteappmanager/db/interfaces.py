@@ -57,10 +57,10 @@ class ABCApplicationPolicy(metaclass=ABCMeta):
 
 
 class ABCAccounting(metaclass=ABCMeta):
-    def __init__(self, id, user, application, application_policy):
+    def __init__(self, id, user, image, application_policy):
         self.id = id
         self.user = user
-        self.application = application
+        self.image = image
         self.application_policy = application_policy
 
 

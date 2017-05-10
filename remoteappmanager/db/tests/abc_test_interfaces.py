@@ -2,19 +2,19 @@ from abc import abstractmethod, ABCMeta
 import inspect as _inspect
 import string
 
-from remoteappmanager.db.interfaces import ABCApplication, ABCApplicationPolicy
+from remoteappmanager.db.interfaces import ABCImage, ABCApplicationPolicy
 from remoteappmanager.db import exceptions
 
 
 class ABCTestDatabaseInterface(metaclass=ABCMeta):
-    def assertApplicationEqual(self, app1, app2, msg=None):
-        args = _inspect.getargs(ABCApplication.__init__.__code__).args[1:]
+    def assertImageEqual(self, img1, img2, msg=None):
+        args = _inspect.getargs(ABCImage.__init__.__code__).args[1:]
         for arg in args:
             if arg == 'id':
                 # Skip the id because our comparison objects may not have them.
                 continue
 
-            if getattr(app1, arg) != getattr(app2, arg):
+            if getattr(img1, arg) != getattr(img2, arg):
                 raise self.failureException(msg)
 
     def assertApplicationPolicyEqual(self, policy1, policy2, msg=None):
@@ -30,7 +30,7 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
 
     @abstractmethod
     def create_expected_configs(self, user):
-        """ Return a list of (Application, ApplicationPolicy) pair for
+        """ Return a list of (Image, ApplicationPolicy) pair for
         the given user.
         """
 
@@ -56,7 +56,7 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
 
             # should be ( (Application, ApplicationPolicy),
             #             (Application, ApplicationPolicy) ... )
-            actual_configs = tuple((accounting.application,
+            actual_configs = tuple((accounting.image,
                                     accounting.application_policy)
                                    for accounting in actual_id_configs)
 
@@ -112,18 +112,18 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
                                  for user in database.list_users()])
         self.assertEqual(expected_names, obtained_names)
 
-    def test_list_applications(self):
+    def test_list_images(self):
         database = self.create_database()
 
         expected_images = set()
         for user in self.create_expected_users():
             expected_images.update(
-                set([app.image
-                     for app, _ in self.create_expected_configs(user)])
+                set([image.name
+                     for image, _ in self.create_expected_configs(user)])
             )
 
         obtained_images = set(
-            [app.image for app in database.list_applications()]
+            [image.name for image in database.list_images()]
         )
 
         self.assertEqual(expected_images, obtained_images)
@@ -132,13 +132,13 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
         db = self.create_database()
 
         for method in [db.create_user,
-                       db.create_application,
+                       db.create_image,
                        ]:
             with self.assertRaises(exceptions.UnsupportedOperation):
                 method("bonkers")
 
         for method in [db.remove_user,
-                       db.remove_application
+                       db.remove_image
                        ]:
             with self.assertRaises(exceptions.UnsupportedOperation):
                 method(id=12345)

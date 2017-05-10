@@ -7,7 +7,7 @@ follows.  The types of their values in the tables are shown in parantheses.
 user.name (str)
     Name of the user.
 
-application.image (str)
+image.name (str)
     Image name of the application.
 
 policy.allow_home (str)
@@ -107,7 +107,7 @@ class CSVDatabase(ABCDatabase):
         self.all_records = {}
         self.users = {}
         self.users_by_id = {}
-        self.applications = {}
+        self.images = {}
         self.application_policies = {}
 
         with open(self.csv_file_path, **kwargs) as csv_file:
@@ -135,12 +135,12 @@ class CSVDatabase(ABCDatabase):
                     self.users[user_name] = user
                     self.users_by_id[id] = user
 
-                image = record[indices['application.image']]
-                application = self.applications.setdefault(
-                    image,
-                    CSVApplication(
-                        id=len(self.applications),
-                        image=image
+                image_name = record[indices['image.name']]
+                image = self.images.setdefault(
+                    image_name,
+                    CSVImage(
+                        id=len(self.images),
+                        name=image_name
                     )
                 )
 
@@ -175,7 +175,7 @@ class CSVDatabase(ABCDatabase):
                     CSVAccounting(
                         id=uuid.uuid4().hex,
                         user=user,
-                        application=application,
+                        image=image,
                         application_policy=application_policy)
                 )
 
@@ -212,7 +212,7 @@ class CSVDatabase(ABCDatabase):
         raise UnsupportedOperation()
 
     def list_images(self):
-        return list(self.applications.values())
+        return list(self.images.values())
 
     def grant_access(self, image_name, user_name,
                      allow_home, allow_view, volume):

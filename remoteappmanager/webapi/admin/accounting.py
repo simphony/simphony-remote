@@ -90,7 +90,7 @@ class AccountingHandler(ResourceHandler):
                 entry = Accounting(
                     identifier=str(acc.id),
                     user_id=str(acc_user.id),
-                    image_name=acc.application.image,
+                    image_name=acc.image.name,
                     allow_home=acc.application_policy.allow_home,
                     volume_source=acc.application_policy.volume_source,
                     volume_target=acc.application_policy.volume_target,

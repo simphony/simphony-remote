@@ -233,7 +233,7 @@ def list(ctx, no_decoration, show_apps):
             cur = [user.id, user.name]
             table.append(cur)
             if show_apps:
-                apps = [[entry.application.image,
+                apps = [[entry.image.name,
                          entry.application_policy.allow_home,
                          entry.application_policy.allow_view,
                          entry.application_policy.allow_common,
@@ -290,10 +290,10 @@ def create(ctx, image, verify):
     session = ctx.obj.session
     try:
         with orm.transaction(session):
-            orm_app = orm.Application(image=image)
+            orm_app = orm.Image(name=image)
             session.add(orm_app)
     except sqlalchemy.exc.IntegrityError:
-        print_error("Application for image {} already exists".format(image))
+        print_error("Image {} already exists".format(image))
     else:
         print(orm_app.id)
 
@@ -307,12 +307,12 @@ def remove(ctx, image):
 
     try:
         with orm.transaction(session):
-            app = session.query(orm.Application).filter(
-                orm.Application.image == image).one()
+            app = session.query(orm.Image).filter(
+                orm.Image.name == image).one()
 
             session.delete(app)
     except sqlalchemy.orm.exc.NoResultFound:
-        print_error("Could not find application for image {}".format(image))
+        print_error("Could not find image {}".format(image))
 
 
 @app.command()  # noqa
@@ -331,8 +331,8 @@ def list(ctx, no_decoration):
     table = []
     session = ctx.obj.session
     with orm.transaction(session):
-        for orm_app in session.query(orm.Application).all():
-            table.append([orm_app.id, orm_app.image])
+        for orm_image in session.query(orm.Image).all():
+            table.append([orm_image.id, orm_image.name])
 
     print(tabulate.tabulate(table, headers=headers, tablefmt=tablefmt))
 
@@ -365,11 +365,11 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
 
     session = ctx.obj.session
     with orm.transaction(session):
-        orm_app = session.query(orm.Application).filter(
-            orm.Application.image == image).one_or_none()
+        orm_image = session.query(orm.Image).filter(
+            orm.Image.name == image).one_or_none()
 
-        if orm_app is None:
-            raise click.BadParameter("Unknown application image {}".format(
+        if orm_image is None:
+            raise click.BadParameter("Unknown image {}".format(
                 image), param_hint="image")
 
         orm_user = session.query(orm.User).filter(
@@ -401,7 +401,7 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
         # Check if we already have the entry
         acc = session.query(orm.Accounting).filter(
             orm.Accounting.user == orm_user,
-            orm.Accounting.application == orm_app,
+            orm.Accounting.image == orm_image,
             orm.Accounting.application_policy == orm_policy
         ).one_or_none()
 
@@ -410,7 +410,7 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
             accounting = orm.Accounting(
                 id=id,
                 user=orm_user,
-                application=orm_app,
+                image=orm_image,
                 application_policy=orm_policy,
             )
             session.add(accounting)
@@ -449,15 +449,15 @@ def revoke(ctx, image, user, revoke_all, allow_home, allow_view, volume):
 
     session = ctx.obj.session
     with orm.transaction(session):
-        orm_app = session.query(orm.Application).filter(
-            orm.Application.image == image).one()
+        orm_image = session.query(orm.Image).filter(
+            orm.Image.name == image).one()
 
         orm_user = session.query(orm.User).filter(
             orm.User.name == user).one()
 
         if revoke_all:
             session.query(orm.Accounting).filter(
-                orm.Accounting.application == orm_app,
+                orm.Accounting.image == orm_image,
                 orm.Accounting.user == orm_user,
                 ).delete()
 
@@ -471,7 +471,7 @@ def revoke(ctx, image, user, revoke_all, allow_home, allow_view, volume):
                 orm.ApplicationPolicy.volume_mode == mode).one()
 
             session.query(orm.Accounting).filter(
-                orm.Accounting.application == orm_app,
+                orm.Accounting.image == orm_image,
                 orm.Accounting.user == orm_user,
                 orm.Accounting.application_policy == orm_policy,
             ).delete()

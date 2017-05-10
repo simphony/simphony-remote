@@ -38,17 +38,17 @@ class User(IdMixin, Base):
     name = Column(Unicode, index=True, unique=True)
 
 
-class Application(IdMixin, Base):
-    """ Describes an application that should be available for startup """
-    __tablename__ = "application"
+class Image(IdMixin, Base):
+    """ Describes an image that should be available for startup """
+    __tablename__ = "image"
 
     #: The docker image name where the application can be found
-    image = Column(Unicode, unique=True)
+    name = Column(Unicode, unique=True)
 
     @staticmethod
     def from_image_name(session, image_name):
-        return session.query(Application).filter(
-            Application.image == image_name
+        return session.query(Image).filter(
+            Image.name == image_name
         ).one()
 
 
@@ -84,9 +84,9 @@ class Accounting(Base):
     user_id = Column(Integer,
                      ForeignKey("user.id", ondelete="CASCADE"))
 
-    application_id = Column(Integer,
-                            ForeignKey("application.id", ondelete="CASCADE"),
-                            )
+    image_id = Column(Integer,
+                      ForeignKey("image.id", ondelete="CASCADE"),
+                      )
 
     application_policy_id = Column(
         Integer,
@@ -95,12 +95,12 @@ class Accounting(Base):
 
     user = relationship("User")
 
-    application = relationship("Application")
+    image = relationship("Image")
 
     application_policy = relationship("ApplicationPolicy")
 
     __table_args__ = (
-        UniqueConstraint('user_id', 'application_id', 'application_policy_id'),
+        UniqueConstraint('user_id', 'image_id', 'application_policy_id'),
     )
 
 
@@ -271,39 +271,39 @@ class ORMDatabase(ABCDatabase):
 
         return users
 
-    def create_application(self, app_name):
+    def create_image(self, name):
         with detached_session(self.db) as session:
             try:
                 with transaction(session):
-                    orm_app = Application(image=app_name)
+                    orm_app = Image(name=name)
                     session.add(orm_app)
             except IntegrityError:
                 raise exceptions.Exists()
 
             return orm_app.id
 
-    def remove_application(self, *, app_name=None, id=None):
-        if not one([app_name, id]):
+    def remove_image(self, *, name=None, id=None):
+        if not one([name, id]):
             raise ValueError("Strictly one argument allowed")
 
-        if app_name is not None:
-            filter = (Application.image == app_name)
+        if name is not None:
+            filter = (Image.name == name)
         elif id is not None:
-            filter = (Application.id == id)
+            filter = (Image.id == id)
         else:
             raise RuntimeError("Impossible condition")  # pragma: no cover
 
         with detached_session(self.db) as session:
             with transaction(session):
-                session.query(Application).filter(filter).delete()
+                session.query(Image).filter(filter).delete()
 
-    def list_applications(self):
+    def list_images(self):
         with detached_session(self.db) as session:
-            applications = session.query(Application).all()
+            images = session.query(Image).all()
 
-        return applications
+        return images
 
-    def grant_access(self, app_name, user_name,
+    def grant_access(self, image_name, user_name,
                      allow_home, allow_view, volume):
         allow_common = False
         source = target = mode = None
@@ -315,8 +315,8 @@ class ORMDatabase(ABCDatabase):
         with detached_session(self.db) as session:
             with transaction(session):
                 try:
-                    orm_app = session.query(Application).filter(
-                        Application.image == app_name).one()
+                    orm_image = session.query(Image).filter(
+                        Image.name == image_name).one()
 
                     orm_user = session.query(User).filter(
                         User.name == user_name).one()
@@ -345,7 +345,7 @@ class ORMDatabase(ABCDatabase):
                 # Check if we already have the entry
                 acc = session.query(Accounting).filter(
                     Accounting.user == orm_user,
-                    Accounting.application == orm_app,
+                    Accounting.image == orm_image,
                     Accounting.application_policy == orm_policy
                 ).one_or_none()
 
@@ -355,7 +355,7 @@ class ORMDatabase(ABCDatabase):
                     accounting = Accounting(
                         id=id,
                         user=orm_user,
-                        application=orm_app,
+                        image=orm_image,
                         application_policy=orm_policy,
                     )
                     session.add(accounting)
@@ -365,7 +365,7 @@ class ORMDatabase(ABCDatabase):
 
                 return id
 
-    def revoke_access(self, app_name, user_name,
+    def revoke_access(self, image_name, user_name,
                       allow_home, allow_view, volume):
         allow_common = False
         source = target = mode = None
@@ -377,8 +377,8 @@ class ORMDatabase(ABCDatabase):
         with detached_session(self.db) as session, \
                 transaction(session):
             try:
-                orm_app = session.query(Application).filter(
-                    Application.image == app_name).one()
+                orm_image = session.query(Image).filter(
+                    Image.name == image_name).one()
 
                 orm_user = session.query(User).filter(
                     User.name == user_name).one()
@@ -394,7 +394,7 @@ class ORMDatabase(ABCDatabase):
                 raise exceptions.NotFound()
 
             session.query(Accounting).filter(
-                Accounting.application == orm_app,
+                Accounting.image == orm_image,
                 Accounting.user == orm_user,
                 Accounting.application_policy == orm_policy,
                 ).delete()
@@ -471,7 +471,7 @@ def accounting_for_user(session, user):
 
     res = session.query(Accounting) \
         .join(Accounting.user, aliased=True) \
-        .options(joinedload(Accounting.application)) \
+        .options(joinedload(Accounting.image)) \
         .options(joinedload(Accounting.application_policy)) \
         .filter_by(name=user_name).all()
 

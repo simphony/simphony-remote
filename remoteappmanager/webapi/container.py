@@ -35,7 +35,7 @@ class ContainerHandler(ResourceHandler):
         container_manager = webapp.container_manager
 
         choice = [(accounting.id,
-                   accounting.application,
+                   accounting.image,
                    accounting.application_policy)
                   for accounting in accountings
                   if accounting.id == mapping_id]
@@ -46,9 +46,9 @@ class ContainerHandler(ResourceHandler):
             raise exceptions.BadRepresentation(
                 message="unrecognized mapping_id")
 
-        _, app, policy = choice[0]
+        _, db_image, policy = choice[0]
 
-        image = yield container_manager.image(app.image)
+        image = yield container_manager.image(db_image.name)
         if image is None:
             raise exceptions.BadRepresentation(message="unrecognized image")
 
@@ -62,7 +62,7 @@ class ContainerHandler(ResourceHandler):
         try:
             container = yield self._start_container(
                 self.current_user.name,
-                app,
+                db_image,
                 policy,
                 mapping_id,
                 self.application.command_line_config.base_urlpath,
@@ -152,7 +152,7 @@ class ContainerHandler(ResourceHandler):
         running_containers = []
 
         for accounting in accountings:
-            image = yield container_manager.image(accounting.application.image)
+            image = yield container_manager.image(accounting.image.name)
 
             if image is None:
                 # The user has access to an application that is no longer

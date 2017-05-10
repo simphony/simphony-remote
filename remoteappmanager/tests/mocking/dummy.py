@@ -18,7 +18,7 @@ from remoteappmanager.tests.mocking.virtual.docker_client import (
     VirtualDockerClient)
 
 
-class DummyDBApplication(interfaces.ABCApplication):
+class DummyDBImage(interfaces.ABCImage):
     pass
 
 
@@ -39,13 +39,13 @@ class DummyDB(interfaces.ABCDatabase):
             0: User(0, "johndoe")
         }
 
-        self.applications = {
-            0: DummyDBApplication(
+        self.images = {
+            0: DummyDBImage(
                 id=0,
-                image='simphonyproject/simphony-mayavi:0.6.0'),
-            1: DummyDBApplication(
+                name='simphonyproject/simphony-mayavi:0.6.0'),
+            1: DummyDBImage(
                 id=1,
-                image='simphonyproject/ubuntu-image:latest'),
+                name='simphonyproject/ubuntu-image:latest'),
         }
 
         self.policies = {
@@ -54,10 +54,10 @@ class DummyDB(interfaces.ABCDatabase):
 
         self.accounting = {
             'cbaee2e8ef414f9fb0f1c97416b8aa6c': (
-                self.users[0], self.applications[0], self.policies[0]
+                self.users[0], self.images[0], self.policies[0]
             ),
             'b7ca425a51bf40acbd305b3f782714b6': (
-                self.users[0], self.applications[1], self.policies[0]
+                self.users[0], self.images[1], self.policies[0]
             )
         }
 
@@ -73,9 +73,9 @@ class DummyDB(interfaces.ABCDatabase):
                 DummyDBAccounting(
                     id=id,
                     user=user,
-                    application=application,
+                    image=image,
                     application_policy=policy)
-                for id, (tbl_user, application, policy)
+                for id, (tbl_user, image, policy)
                 in self.accounting.items()
                 if tbl_user == user]
 
@@ -103,34 +103,33 @@ class DummyDB(interfaces.ABCDatabase):
     def list_users(self):  # pragma: no cover
         return self.users.values()
 
-    def create_application(self, app_name):  # pragma: no cover
-        if self._get_application_id_by_name(app_name) is not None:
+    def create_image(self, name):  # pragma: no cover
+        if self._get_image_id_by_name(name) is not None:
             raise exceptions.Exists()
 
-        id = len(self.applications)
-        self.applications[id] = DummyDBApplication(id, app_name)
+        id = len(self.images)
+        self.images[id] = DummyDBImage(id, name)
         return id
 
-    def remove_application(self, *,
-                           app_name=None, id=None):  # pragma: no cover
+    def remove_image(self, *, name=None, id=None):  # pragma: no cover
 
-        if app_name is not None:
-            id = self._get_application_id_by_name(app_name)
+        if name is not None:
+            id = self._get_image_id_by_name(name)
 
         if id is None:
             raise exceptions.NotFound()
 
         try:
-            del self.applications[id]
+            del self.images[id]
         except KeyError:
             raise exceptions.NotFound()
 
-    def list_applications(self):  # pragma: no cover
-        return self.applications.values()
+    def list_images(self):  # pragma: no cover
+        return self.images.values()
 
-    def grant_access(self, app_name, user_name,
+    def grant_access(self, image_name, user_name,
                      allow_home, allow_view, volume):
-        app = self._get_application_id_by_name(app_name)
+        app = self._get_image_id_by_name(image_name)
         user = self._get_user_id_by_name(user_name)
 
         source, target, mode = volume.split(':')
@@ -143,7 +142,7 @@ class DummyDB(interfaces.ABCDatabase):
 
         return id
 
-    def revoke_access(self, app_name, user_name,
+    def revoke_access(self, image_name, user_name,
                       allow_home, allow_view, volume):
         pass
 
@@ -153,10 +152,10 @@ class DummyDB(interfaces.ABCDatabase):
         except KeyError:
             raise exceptions.NotFound()
 
-    def _get_application_id_by_name(self, app_name):
-        app = [a for a in self.applications.values()
-               if a.image == app_name]
-        return app[0] if len(app) else None
+    def _get_image_id_by_name(self, image_name):
+        images = [a for a in self.images.values()
+                  if a.name == image_name]
+        return images[0] if len(images) else None
 
     def _get_user_id_by_name(self, user_name):
         user = [u for u in self.users.values()

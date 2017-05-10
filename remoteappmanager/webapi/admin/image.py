@@ -62,7 +62,7 @@ class ImageHandler(ResourceHandler):
 
         items = []
         for image in images:
-            item = Image(identifier=str(image.id), name=image.image)
+            item = Image(identifier=str(image.id), name=image.name)
             items.append(item)
 
         items_response.set(items)

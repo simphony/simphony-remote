@@ -8,7 +8,7 @@ import unittest
 from collections import namedtuple
 
 from remoteappmanager.db.interfaces import (
-    ABCApplication, ABCApplicationPolicy, ABCDatabase, ABCAccounting)
+    ABCImage, ABCApplicationPolicy, ABCDatabase, ABCAccounting)
 from remoteappmanager.db import exceptions
 from remoteappmanager.db.tests.abc_test_interfaces import (
     ABCTestDatabaseInterface)
@@ -16,7 +16,7 @@ from remoteappmanager.db.tests.abc_test_interfaces import (
 User = namedtuple('User', ('id', 'name'))
 
 
-class Application(ABCApplication):
+class Image(ABCImage):
     pass
 
 
@@ -41,13 +41,13 @@ class Database(ABCDatabase):
             Accounting(
                 id='abc1',
                 user=user,
-                application=Application(id=0, image=user.name+'1'),
+                image=Image(id=0, name=user.name+'1'),
                 application_policy=ApplicationPolicy()
             ),
             Accounting(
                 id='abc2',
                 user=user,
-                application=Application(id=1, image=user.name+'2'),
+                image=Image(id=1, name=user.name+'2'),
                 application_policy=ApplicationPolicy())]
 
     def create_user(self, user_name):
@@ -59,24 +59,24 @@ class Database(ABCDatabase):
     def list_users(self):
         return [User(0, 'foo'), User(1, 'bar')]
 
-    def create_application(self, app_name):
+    def create_image(self, name):
         raise exceptions.UnsupportedOperation()
 
-    def remove_application(self, *, app_name=None, id=None):
+    def remove_image(self, *, name=None, id=None):
         raise exceptions.UnsupportedOperation()
 
-    def list_applications(self):
-        return [Application(id=0, image="foo1"),
-                Application(id=1, image="foo2"),
-                Application(id=2, image="bar1"),
-                Application(id=3, image="bar2")
+    def list_images(self):
+        return [Image(id=0, name="foo1"),
+                Image(id=1, name="foo2"),
+                Image(id=2, name="bar1"),
+                Image(id=3, name="bar2")
                 ]
 
-    def grant_access(self, app_name, user_name,
+    def grant_access(self, image_name, user_name,
                      allow_home, allow_view, volume):
         raise exceptions.UnsupportedOperation()
 
-    def revoke_access(self, app_name, user_name,
+    def revoke_access(self, image_name, user_name,
                       allow_home, allow_view, volume):
         raise exceptions.UnsupportedOperation()
 
@@ -86,8 +86,8 @@ class Database(ABCDatabase):
 
 class TestDatabaseInterface(ABCTestDatabaseInterface, unittest.TestCase):
     def setUp(self):
-        self.addTypeEqualityFunc(Application,
-                                 self.assertApplicationEqual)
+        self.addTypeEqualityFunc(Image,
+                                 self.assertImageEqual)
         self.addTypeEqualityFunc(ApplicationPolicy,
                                  self.assertApplicationPolicyEqual)
 
@@ -95,8 +95,8 @@ class TestDatabaseInterface(ABCTestDatabaseInterface, unittest.TestCase):
         return [User(0, 'foo'), User(1, 'bar')]
 
     def create_expected_configs(self, user):
-        return [(Application(id=0, image=user.name+'1'), ApplicationPolicy()),
-                (Application(id=1, image=user.name+'2'), ApplicationPolicy())]
+        return [(Image(id=0, name=user.name+'1'), ApplicationPolicy()),
+                (Image(id=1, name=user.name+'2'), ApplicationPolicy())]
 
     def create_database(self):
         return Database()

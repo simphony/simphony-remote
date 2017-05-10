@@ -24,8 +24,8 @@ define([
       '            <div class="col-lg-8">{{ num_total_users }}</div>' +
       '          </div>' +
       '          <div class="row">' +
-      '            <div class="col-lg-4">Number of applications</div>' +
-      '            <div class="col-lg-8">{{ num_applications }}</div>' +
+      '            <div class="col-lg-4">Number of images</div>' +
+      '            <div class="col-lg-8">{{ num_images }}</div>' +
       '          </div>' +
       '          <hr />' +
       '          <div class="row">' +
@@ -46,7 +46,7 @@ define([
         communicationError: null,
         realm: "",
         num_total_users: "",
-        num_applications: "",
+        num_images: "",
         num_active_users: "",
         num_running_containers: ""
       };
@@ -57,7 +57,7 @@ define([
           (function(rep) {
           this.$data.realm = rep.realm;
           this.$data.num_total_users = rep.num_total_users;
-          this.$data.num_applications = rep.num_applications;
+          this.$data.num_images = rep.num_images;
           this.$data.num_active_users = rep.num_active_users;
           this.$data.num_running_containers = rep.num_running_containers;
         }).bind(this)

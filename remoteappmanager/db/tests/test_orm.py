@@ -20,9 +20,8 @@ def fill_db(session):
         session.add_all(users)
 
         # Create a few applications
-        apps = [orm.Application(image="docker/image"+str(i))
-                for i in range(3)]
-        session.add_all(apps)
+        images = [orm.Image(name="docker/image"+str(i)) for i in range(3)]
+        session.add_all(images)
 
         policy = orm.ApplicationPolicy(allow_home=False,
                                        allow_common=False,
@@ -35,19 +34,19 @@ def fill_db(session):
 
         accountings = []
 
-        for user, application in [
-                (users[1], apps[0]),
-                (users[3], apps[0]),
-                (users[4], apps[0]),
-                (users[0], apps[1]),
-                (users[1], apps[2])]:
+        for user, image in [
+                (users[1], images[0]),
+                (users[3], images[0]),
+                (users[4], images[0]),
+                (users[0], images[1]),
+                (users[1], images[2])]:
 
             id = uuid.uuid4().hex
 
             accountings.append(
                 orm.Accounting(id=id,
                                user=user,
-                               application=application,
+                               image=image,
                                application_policy=policy)
             )
 
@@ -81,9 +80,9 @@ class TestOrm(TempMixin, LogTrapTestCase):
 
             self.assertEqual(len(res), 2)
             self.assertIn("docker/image0",
-                          [acc.application.image for acc in res])
+                          [acc.image.name for acc in res])
             self.assertIn("docker/image2",
-                          [acc.application.image for acc in res])
+                          [acc.image.name for acc in res])
 
             # User 2 should have no access to apps
             res = session.query(Accounting).filter(
@@ -97,7 +96,7 @@ class TestOrm(TempMixin, LogTrapTestCase):
 
             self.assertEqual(len(res), 1)
             self.assertIn("docker/image1",
-                          [acc.application.image for acc in res])
+                          [acc.image.name for acc in res])
 
             # User 3 should have access to app 0 only
             res = session.query(Accounting).filter(
@@ -105,7 +104,7 @@ class TestOrm(TempMixin, LogTrapTestCase):
 
             self.assertEqual(len(res), 1)
             self.assertIn("docker/image0",
-                          [acc.application.image for acc in res])
+                          [acc.image.name for acc in res])
 
     def test_accounting_for_user(self):
         db = Database(url="sqlite:///"+self.sqlite_file_path)
@@ -117,9 +116,9 @@ class TestOrm(TempMixin, LogTrapTestCase):
             res = orm.accounting_for_user(session, users[1])
             self.assertEqual(len(res), 2)
             self.assertIn("docker/image0",
-                          [acc.application.image for acc in res])
+                          [acc.image.name for acc in res])
             self.assertIn("docker/image2",
-                          [acc.application.image for acc in res])
+                          [acc.image.name for acc in res])
 
             res = orm.accounting_for_user(session, users[2])
             self.assertEqual(len(res), 0)
@@ -128,12 +127,12 @@ class TestOrm(TempMixin, LogTrapTestCase):
             res = orm.accounting_for_user(session, users[0])
             self.assertEqual(len(res), 1)
             self.assertIn("docker/image1",
-                          [acc.application.image for acc in res])
+                          [acc.image.name for acc in res])
 
             res = orm.accounting_for_user(session, users[3])
             self.assertEqual(len(res), 1)
             self.assertIn("docker/image0",
-                          [acc.application.image for acc in res])
+                          [acc.image.name for acc in res])
 
             res = orm.accounting_for_user(session, None)
             self.assertEqual(len(res), 0)
@@ -149,7 +148,7 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         self.sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
         utils.init_sqlite_db(self.sqlite_file_path)
 
-        self.addTypeEqualityFunc(orm.Application, self.assertApplicationEqual)
+        self.addTypeEqualityFunc(orm.Image, self.assertImageEqual)
         self.addTypeEqualityFunc(orm.ApplicationPolicy,
                                  self.assertApplicationPolicyEqual)
 
@@ -157,8 +156,7 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         return tuple(orm.User(name='user'+str(i)) for i in range(5))
 
     def create_expected_configs(self, user):
-        apps = [orm.Application(image="docker/image"+str(i))
-                for i in range(3)]
+        apps = [orm.Image(name="docker/image"+str(i)) for i in range(3)]
         policy = orm.ApplicationPolicy(allow_home=False,
                                        allow_common=False,
                                        allow_view=False)
@@ -211,7 +209,7 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
 
         expected_config = self.create_expected_configs(orm.User(name='user1'))
 
-        self.assertEqual(accounting.application, expected_config[0][0])
+        self.assertEqual(accounting.image, expected_config[0][0])
         self.assertEqual(accounting.application_policy, expected_config[0][1])
 
     def test_no_file_creation_if_sqlite_database_not_exist(self):
@@ -271,53 +269,53 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         with self.assertRaises(ValueError):
             database.remove_user()
 
-    def test_create_application(self):
+    def test_create_image(self):
         database = self.create_database()
-        prev_length = len(database.list_applications())
+        prev_length = len(database.list_images())
 
-        id = database.create_application("simphonyremote/amazing")
+        id = database.create_image("simphonyremote/amazing")
         self.assertIsNotNone(id)
-        app_list = database.list_applications()
+        app_list = database.list_images()
         self.assertEqual(len(app_list), prev_length + 1)
 
         apps = [a for a in app_list if a.id == id]
         self.assertEqual(len(apps), 1)
 
         with self.assertRaises(exceptions.Exists):
-            database.create_application("simphonyremote/amazing")
+            database.create_image("simphonyremote/amazing")
 
-    def test_remove_application(self):
+    def test_remove_image(self):
         database = self.create_database()
-        prev_length = len(database.list_applications())
+        prev_length = len(database.list_images())
 
-        database.remove_application(app_name="docker/image0")
+        database.remove_image(name="docker/image0")
 
-        self.assertEqual(len(database.list_applications()), prev_length - 1)
+        self.assertEqual(len(database.list_images()), prev_length - 1)
 
         # This should be neutral
-        database.remove_application(app_name="docker/image0")
+        database.remove_image(name="docker/image0")
 
-    def test_remove_application_by_id(self):
+    def test_remove_image_by_id(self):
         database = self.create_database()
-        app_list = database.list_applications()
+        app_list = database.list_images()
         id = app_list[0].id
         prev_length = len(app_list)
 
-        database.remove_application(id=id)
+        database.remove_image(id=id)
 
-        self.assertEqual(len(database.list_applications()), prev_length - 1)
+        self.assertEqual(len(database.list_images()), prev_length - 1)
 
         # This should be neutral
-        database.remove_application(id=id)
+        database.remove_image(id=id)
 
-    def test_remove_application_one_arg(self):
+    def test_remove_image_one_arg(self):
         database = self.create_database()
 
         with self.assertRaises(ValueError):
-            database.remove_application(app_name="foo", id=3)
+            database.remove_image(name="foo", id=3)
 
         with self.assertRaises(ValueError):
-            database.remove_application()
+            database.remove_image()
 
     def test_grant_revoke_access(self):
         database = self.create_database()
@@ -331,7 +329,7 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
             database.grant_access("simphonyremote/amazing", "ciccio",
                                   True, False, "/foo:/bar:ro")
 
-        database.create_application("simphonyremote/amazing")
+        database.create_image("simphonyremote/amazing")
 
         id = database.grant_access("simphonyremote/amazing", "ciccio",
                                    True, False, "/foo:/bar:ro")
@@ -340,7 +338,7 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         user = database.get_user(user_name="ciccio")
         acc = database.get_accounting_for_user(user)
         self.assertEqual(acc[0].id, id)
-        self.assertEqual(acc[0].application.image, "simphonyremote/amazing")
+        self.assertEqual(acc[0].image.name, "simphonyremote/amazing")
         self.assertEqual(acc[0].application_policy.allow_home, True)
         self.assertEqual(acc[0].application_policy.allow_view, False)
         self.assertEqual(acc[0].application_policy.volume_source, "/foo")
@@ -365,13 +363,13 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         database = self.create_database()
 
         database.create_user("ciccio")
-        database.create_application("simphonyremote/amazing")
+        database.create_image("simphonyremote/amazing")
         database.grant_access("simphonyremote/amazing", "ciccio",
                               True, False, None)
 
         user = database.get_user(user_name="ciccio")
         acc = database.get_accounting_for_user(user)
-        self.assertEqual(acc[0].application.image, "simphonyremote/amazing")
+        self.assertEqual(acc[0].image.name, "simphonyremote/amazing")
         self.assertEqual(acc[0].application_policy.allow_home, True)
         self.assertEqual(acc[0].application_policy.allow_view, False)
         self.assertEqual(acc[0].application_policy.volume_source, None)
@@ -387,7 +385,7 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         database = self.create_database()
 
         database.create_user("ciccio")
-        database.create_application("simphonyremote/amazing")
+        database.create_image("simphonyremote/amazing")
         id = database.grant_access("simphonyremote/amazing", "ciccio",
                                    True, False, None)
 

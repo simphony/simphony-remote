@@ -2,14 +2,14 @@ import os
 import unittest
 
 from remoteappmanager.db.csv_db import (
-    CSVApplication, CSVApplicationPolicy, CSVUser, CSVDatabase)
+    CSVImage, CSVApplicationPolicy, CSVUser, CSVDatabase)
 from remoteappmanager.db.tests.abc_test_interfaces import (
     ABCTestDatabaseInterface)
 from remoteappmanager.tests.temp_mixin import TempMixin
 
 
 class GoodTable:
-    headers = ('user.name', 'application.image', 'policy.allow_home',
+    headers = ('user.name', 'image.name', 'policy.allow_home',
                'policy.allow_view', 'policy.allow_common',
                'policy.volume_source', 'policy.volume_target',
                'policy.volume_mode')
@@ -23,7 +23,7 @@ class GoodTable:
 
 class BadTableMissingHeaders:
     # policy.volume_source and policy.volume_target are missing
-    headers = ('user.name', 'application.image', 'policy.allow_home',
+    headers = ('user.name', 'image.name', 'policy.allow_home',
                'policy.allow_view', 'policy.allow_common',
                'policy.volume_mode')
 
@@ -40,7 +40,7 @@ class GoodTableWithDifferentHeaders:
     headers = ('policy.allow_view', 'policy.allow_common',
                'policy.volume_source', 'policy.volume_target',
                'policy.volume_mode',
-               'user.name', 'application.image', 'policy.allow_home',
+               'user.name', 'image.name', 'policy.allow_home',
                'extra_column')
 
     #  view, common, source, target, mode, name, image, home, extra
@@ -67,7 +67,7 @@ class TestCSVDatabase(TempMixin, ABCTestDatabaseInterface,
 
         write_csv_file(self.csv_file, GoodTable.headers, GoodTable.records)
 
-        self.addTypeEqualityFunc(CSVApplication, self.assertApplicationEqual)
+        self.addTypeEqualityFunc(CSVImage, self.assertImageEqual)
         self.addTypeEqualityFunc(CSVApplicationPolicy,
                                  self.assertApplicationPolicyEqual)
 
@@ -77,14 +77,14 @@ class TestCSVDatabase(TempMixin, ABCTestDatabaseInterface,
     def create_expected_configs(self, user):
         mappings = {
             'markdoe': (
-                (CSVApplication(id=0, image='simphonyproject/simphony-mayavi:0.6.0'),  # noqa
+                (CSVImage(id=0, name='simphonyproject/simphony-mayavi:0.6.0'),  # noqa
                  CSVApplicationPolicy(allow_home=True,
                                       allow_view=True,
                                       allow_common=False,
                                       volume_source=None,
                                       volume_target=None,
                                       volume_mode=None)),
-                (CSVApplication(id=1, image='simphonyproject/ubuntu-image:latest'),  # noqa
+                (CSVImage(id=1, name='simphonyproject/ubuntu-image:latest'),  # noqa
                  CSVApplicationPolicy(allow_home=True,
                                       allow_view=True,
                                       allow_common=True,
@@ -93,7 +93,7 @@ class TestCSVDatabase(TempMixin, ABCTestDatabaseInterface,
                                       volume_mode='ro'))
                 ),
             'johndoe': (
-                (CSVApplication(id=0, image='simphonyproject/simphony-mayavi:0.6.0'),  # noqa
+                (CSVImage(id=0, name='simphonyproject/simphony-mayavi:0.6.0'),  # noqa
                  CSVApplicationPolicy(allow_home=False,
                                       allow_view=False,
                                       allow_common=False,
