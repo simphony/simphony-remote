@@ -2,14 +2,12 @@ define([
   "components/vue/dist/vue",
   "jsapi/v1/resources",
   "admin/vue-components/applications/NewApplicationDialog",
-  "admin/vue-components/applications/RemoveApplicationDialog",
-], function(Vue, resources, NewApplicationDialog, RemoveApplicationDialog) {
+], function(Vue, resources, NewApplicationDialog) {
   "use strict";
 
   return {
     components: {
       'new-application-dialog': NewApplicationDialog,
-      'remove-application-dialog': RemoveApplicationDialog
     },
     template: 
       '<adminlte-box title="Applications">' +
@@ -29,11 +27,15 @@ define([
       '      @created="newApplicationCreated"' +
       '      @closed="newApplicationDialogClosed"></new-application-dialog>' +
       '      ' +
-      '    <remove-application-dialog ' +
+      '    <confirm-dialog ' +
       '      v-if="removeApplicationDialog.show"' +
-      '      :appToRemove="appToRemove"' +
-      '      @removed="appRemoved"' +
-      '      @closed="removeDialogClosed"></remove-application-dialog>' +
+      '      title="Remove Application"' +
+      '      :okCallback="removeApplication"' +
+      '      :closeCallback="removeDialogClosed">' +
+      '      <div>Do you want to remove Application ' +
+      '           {{removeApplicationDialog.applicationToRemove.name}} ' +
+      '          ({{removeApplicationDialog.applicationToRemove.id}})</div>' +
+      '    </confirm-dialog>' +
       '  </div>' +
       '</adminlte-box>',
     data: function () {
@@ -55,18 +57,17 @@ define([
             }
           ]
         },
-        apps: [],
         newApplicationDialog: {
           show: false
         },
         removeApplicationDialog: {
-          show: false
+          show: false,
+          applicationToRemove: {
+            id: null,
+            name: ""
+          }
         },
-        communicationError: null,
-        appToRemove: {
-          name: "",
-          id: null
-        }
+        communicationError: null
       };
     },
     mounted: function () {
@@ -78,7 +79,7 @@ define([
         this.communicationError = null;
         resources.Application.items()
         .done(
-          (function (identifiers, items) {
+          function (identifiers, items) {
             self.table.rows = [];
             identifiers.forEach(function(id) {
               var item = items[id];
@@ -87,11 +88,11 @@ define([
                 item.image_name
               ]);
             });
-          }).bind(this))
+          })
         .fail(
-          (function () {
-            this.communicationError = "The request could not be executed successfully";
-          }).bind(this)
+          function () {
+            self.communicationError = "The request could not be executed successfully";
+          }
         );
       },
       newApplicationCreated: function() {
@@ -101,17 +102,33 @@ define([
       newApplicationDialogClosed: function() {
         this.newApplicationDialog.show = false;
       },
-      appRemoved: function() {
-        this.removeApplicationDialog.show = false;
-        this.updateTable();
-      },
-      removeAction: function(index) {
-        this.appToRemove = this.apps[index];
+      removeAction: function(row) {
+        this.removeApplicationDialog.applicationToRemove = {
+          id: row[0],
+          name: row[1]
+        };
         this.removeApplicationDialog.show = true;
+      },
+      removeApplication: function () {
+        if (this.removeApplicationDialog.applicationToRemove.id === null) {
+          return;
+        }
+        var self = this; 
+        resources.Application.delete(this.removeApplicationDialog.applicationToRemove.id)
+          .done(function () {
+            self.removeDialogClosed();
+            self.updateTable();
+          })
+          .fail(
+            function () {
+              self.removeDialogClosed();
+              this.communicationError = "The request could not be executed successfully";
+            }
+          );
       },
       removeDialogClosed: function() {
         this.removeApplicationDialog.show = false;
-        this.appToRemove = {
+        this.removeApplicationDialog.applicationToRemove = {
           name: "",
           id: null
         };

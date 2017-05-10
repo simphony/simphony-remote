@@ -27,11 +27,13 @@ define([
       '      :show="newUserDialog.show"' +
       '      @created="newUserCreated"' +
       '      @closed="newUserDialogClosed"></new-user-dialog>' +
-      '    <remove-user-dialog ' +
+      '    <confirm-dialog ' +
       '      v-if="removeUserDialog.show"' +
-      '      :userToRemove="removeUserDialog.userToRemove"' +
-      '      @removed="userRemoved"' +
-      '      @closed="removeDialogClosed"></remove-user-dialog>' +
+      '      :okCallback="removeUser"' +
+      '      :closeCallback="closeRemoveDialog">' +
+      '      <div>Do you want to remove User {{removeUserDialog.userToRemove.name}} ' +
+      '      ({{removeUserDialog.userToRemove.id}})</div>' +
+      '</confirm-dialog>' +
       '</adminlte-box>',
     data: function () {
       var self = this;
@@ -59,14 +61,14 @@ define([
         },
         users: [],
         newUserDialog: {
-          show: false,
-          userToRemove: {
-            name: "",
-            id: null
-          }
+          show: false
         },
         removeUserDialog: {
-          show: false
+          show: false,
+          userToRemove: {
+            id: null,
+            name: ""
+          }
         },
         communicationError: null
       };
@@ -92,7 +94,7 @@ define([
         .fail(
           function () {
             self.communicationError = "The request could not be executed successfully";
-           });
+          });
       },
       newUserCreated: function() {
         this.newUserDialog.show = false;
@@ -101,27 +103,40 @@ define([
       newUserDialogClosed: function() {
         this.newUserDialog.show = false;
       },
-      userRemoved: function() {
-        this.removeUserDialog.show = false;
-        this.updateTable();
-      },
-      removeAction: function(row) {
-        this.removeUserDialog.userToRemove.id = row[0];
-        this.removeUserDialog.userToRemove.name = row[1];
-        this.removeUserDialog.show = true;
-      },
       showPolicyAction: function(row) {
         this.$router.push({
           name: 'user_accounting',
           params: { id: row[0] }
         });
       },
-      removeDialogClosed: function() {
+      removeAction: function(row) {
+        this.removeUserDialog.userToRemove.id = row[0];
+        this.removeUserDialog.userToRemove.name = row[1];
+        this.removeUserDialog.show = true;
+      },
+      closeRemoveDialog: function() {
         this.removeUserDialog.show = false;
-        this.userToRemove = {
-          name: "",
-          id: null
+        this.removeUserDialog.userToRemove = {
+          id: null,
+          name: ""
         };
+      },
+      removeUser: function () {
+        if (this.removeUserDialog.userToRemove.id === null) {
+          return;
+        }
+        var self = this; 
+        resources.User.delete(this.removeUserDialog.userToRemove.id)
+          .done(function () {
+              self.closeRemoveDialog();
+              self.updateTable();
+              }
+          )
+          .fail(
+            function () {
+              self.closeRemoveDialog();
+            }
+          );
       }
     }
   };

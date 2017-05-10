@@ -119,15 +119,17 @@ define([
         if (this.removeAccountingDialog.accountingToRemove === null) {
           return;
         }
+        var self = this;
         resources.Accounting.delete(this.removeAccountingDialog.accountingToRemove)
-          .done((function () {
-              this.removeDialogClosed();
-              this.updateTable();
-          }).bind(this))
+          .done(function () {
+              self.removeDialogClosed();
+              self.updateTable();
+          })
           .fail(
-            (function () {
-              this.communicationError = "The request could not be executed successfully";
-            }).bind(this)
+            function () {
+              self.removeDialogClosed();
+              self.communicationError = "The request could not be executed successfully";
+            }
           );
       }
     }

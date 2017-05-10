@@ -20,11 +20,13 @@ define([
         '    :globalActions="table.globalActions"' +
         '    :rowActions="table.rowActions">' +
         '  </data-table>' +
-        '  <stop-container-dialog ' +
+        '  <confirm-dialog ' +
         '    v-if="stopContainerDialog.show"' +
-        '    :containerToStop="stopContainerDialog.containerToStop"' +
-        '    @stopped="containerStopped"' +
-        '    @closed="stopContainerDialogClosed"></stop-container-dialog>' +
+        '    title="Stop container"' +
+        '    :okCallback="stopContainer"' +
+        '    :closeCallback="closeStopContainerDialog">' +
+        '    <div>Do you want to stop container {{ stopContainerDialog.containerToStop }}?</div>' +
+        '  </confirm-dialog>' +
         '</adminlte-box>',
       data: function () {
         return {
@@ -54,7 +56,7 @@ define([
           this.communicationError = null;
           resources.Container.items()
             .done(
-              (function (identifiers, items) {
+              function (identifiers, items) {
                 self.table.rows = [];
                 identifiers.forEach(function(id) {
                   var item = items[id];
@@ -65,22 +67,35 @@ define([
                     item.docker_id,
                     item.mapping_id]);
                 });
-              }))
+              })
             .fail(
               function () {
                 self.communicationError = "The request could not be executed successfully";
               }
             );
         },
-        containerStopped: function() {
-          this.stopContainerDialog.show = false;
-          this.updateTable();
-        },
         stopAction: function(row) {
           this.stopContainerDialog.containerToStop = row[0];
           this.stopContainerDialog.show = true;
         },
-        stopContainerDialogClosed: function() {
+        stopContainer: function () {
+          if (this.stopContainerDialog.containerToStop === null) {
+            return;
+          }
+          var self = this;
+          resources.Container.delete(this.stopContainerDialog.containerToStop)
+            .done(function () {
+              self.updateTable();
+              self.closeContainerDialog();
+            })
+            .fail(
+              function () {
+                self.closeStopContainerDialog();
+                self.communicationError = "The request could not be executed successfully";
+              }
+            );
+        },
+        closeStopContainerDialog: function() {
           this.stopContainerDialog.show = false;
           this.stopContainerDialog.containerToStop = null;
         }
