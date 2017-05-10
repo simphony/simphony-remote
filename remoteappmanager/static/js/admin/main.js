@@ -8,7 +8,7 @@ require([
   "admin/vue-components/MainView",
   "admin/vue-components/ContainersView",
   "admin/vue-components/UsersView",
-  "admin/vue-components/ApplicationsView",
+  "admin/vue-components/ImagesView",
   "admin/vue-components/AccountingView"
 ], function(
   _,
@@ -19,7 +19,7 @@ require([
   MainView,
   ContainersView,
   UsersView,
-  ApplicationsView,
+  ImagesView,
   AccountingView
   ) {
   
@@ -45,7 +45,7 @@ require([
       { path: '/containers', component: ContainersView },
       { path: '/users', component: UsersView },
       { path: '/users/:id/accounting', component: AccountingView, name: "user_accounting" },
-      { path: '/applications', component: ApplicationsView }
+      { path: '/images', component: ImagesView }
     ]
   });
 

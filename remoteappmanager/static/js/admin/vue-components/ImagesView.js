@@ -1,16 +1,16 @@
 define([
   "components/vue/dist/vue",
   "jsapi/v1/resources",
-  "admin/vue-components/applications/NewApplicationDialog"
-], function(Vue, resources, NewApplicationDialog) {
+  "admin/vue-components/images/NewImageDialog"
+], function(Vue, resources, NewImageDialog) {
   "use strict";
 
   return {
     components: {
-      'new-application-dialog': NewApplicationDialog
+      'new-image-dialog': NewImageDialog
     },
     template: 
-      '<adminlte-box title="Applications">' +
+      '<adminlte-box title="Images">' +
       '  <div>' +
       '    <div class="alert alert-danger" v-if="communicationError">' +
       '      <strong>Error:</strong> {{communicationError}}' +
@@ -21,20 +21,20 @@ define([
       '       :globalActions="table.globalActions"' +
       '       :rowActions="table.rowActions">' +
       '    </data-table>' +
-      '    <new-application-dialog ' +
-      '      v-if="newApplicationDialog.show"' +
-      '      :show="newApplicationDialog.show"' +
-      '      @created="newApplicationCreated"' +
-      '      @closed="newApplicationDialogClosed"></new-application-dialog>' +
+      '    <new-image-dialog ' +
+      '      v-if="newImageDialog.show"' +
+      '      :show="newImageDialog.show"' +
+      '      @created="newImageCreated"' +
+      '      @closed="newImageDialogClosed"></new-image-dialog>' +
       '      ' +
       '    <confirm-dialog ' +
-      '      v-if="removeApplicationDialog.show"' +
-      '      title="Remove Application"' +
-      '      :okCallback="removeApplication"' +
-      '      :closeCallback="closeRemoveApplicationDialog">' +
-      '      <div>Do you want to remove Application ' +
-      '           {{removeApplicationDialog.applicationToRemove.name}} ' +
-      '          ({{removeApplicationDialog.applicationToRemove.id}})</div>' +
+      '      v-if="removeImageDialog.show"' +
+      '      title="Remove Image"' +
+      '      :okCallback="removeImage"' +
+      '      :closeCallback="closeRemoveImageDialog">' +
+      '      <div>Do you want to remove Image' +
+      '           {{removeImageDialog.imageToRemove.name}} ' +
+      '          ({{removeImageDialog.imageToRemove.id}})</div>' +
       '    </confirm-dialog>' +
       '  </div>' +
       '</adminlte-box>',
@@ -47,7 +47,7 @@ define([
           globalActions: [
             {
               label: "Create New Entry",
-              callback: function() { self.newApplicationDialog.show = true; }
+              callback: function() { self.newImageDialog.show = true; }
             }
           ],
           rowActions: [
@@ -57,12 +57,12 @@ define([
             }
           ]
         },
-        newApplicationDialog: {
+        newImageDialog: {
           show: false
         },
-        removeApplicationDialog: {
+        removeImageDialog: {
           show: false,
-          applicationToRemove: {
+          imageToRemove: {
             id: null,
             name: ""
           }
@@ -77,7 +77,7 @@ define([
       updateTable: function() {
         var self = this;
         this.communicationError = null;
-        resources.Application.items()
+        resources.Image.items()
         .done(
           function (identifiers, items) {
             self.table.rows = [];
@@ -95,37 +95,37 @@ define([
           }
         );
       },
-      newApplicationCreated: function() {
-        this.newApplicationDialog.show = false;
+      newImageCreated: function() {
+        this.newImageDialog.show = false;
         this.updateTable();
       },
-      newApplicationDialogClosed: function() {
-        this.newApplicationDialog.show = false;
+      newImageDialogClosed: function() {
+        this.newImageDialog.show = false;
       },
       removeAction: function(row) {
-        this.removeApplicationDialog.applicationToRemove = {
+        this.removeImageDialog.imageToRemove = {
           id: row[0],
           name: row[1]
         };
-        this.removeApplicationDialog.show = true;
+        this.removeImageDialog.show = true;
       },
-      removeApplication: function () {
+      removeImage: function () {
         var self = this; 
-        resources.Application.delete(this.removeApplicationDialog.applicationToRemove.id)
+        resources.Image.delete(this.removeImageDialog.imageToRemove.id)
           .done(function () {
-            self.closeRemoveApplicationDialog();
+            self.closeRemoveImageDialog();
             self.updateTable();
           })
           .fail(
             function () {
-              self.closeRemoveApplicationDialog();
+              self.closeRemoveImageDialog();
               this.communicationError = "The request could not be executed successfully";
             }
           );
       },
-      closeRemoveApplicationDialog: function() {
-        this.removeApplicationDialog.show = false;
-        this.removeApplicationDialog.applicationToRemove = {
+      closeRemoveImageDialog: function() {
+        this.removeImageDialog.show = false;
+        this.removeImageDialog.imageToRemove = {
           name: "",
           id: null
         };
