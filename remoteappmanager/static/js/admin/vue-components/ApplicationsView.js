@@ -110,9 +110,6 @@ define([
         this.removeApplicationDialog.show = true;
       },
       removeApplication: function () {
-        if (this.removeApplicationDialog.applicationToRemove.id === null) {
-          return;
-        }
         var self = this; 
         resources.Application.delete(this.removeApplicationDialog.applicationToRemove.id)
           .done(function () {
