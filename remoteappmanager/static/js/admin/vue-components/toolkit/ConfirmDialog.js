@@ -1,6 +1,5 @@
 define([
-  "components/vue/dist/vue"
-], function(Vue) {
+], function() {
   "use strict";
   
   return {
@@ -16,12 +15,8 @@ define([
       okCallback: {
         type: Function,
         default: function() {}
-      },
-      errorMessage: {
-        type: String,
-        default: ""
       }
-    },
+   },
     template: '<transition name="modal">' +
     '  <div class="modal-mask">' +
     '    <div class="modal-wrapper">' +
