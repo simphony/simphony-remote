@@ -4,6 +4,7 @@ require([
   "components/vue/dist/vue",
   "components/vue-router/dist/vue-router",
   "components/vue-form/dist/vue-form",
+  "admin/vue-components/toolkit/toolkit",
   "admin/vue-components/MainView",
   "admin/vue-components/ContainersView",
   "admin/vue-components/UsersView",
@@ -14,11 +15,13 @@ require([
   Vue, 
   VueRouter,
   VueForm,
+  toolkit,
   MainView,
   ContainersView,
   UsersView,
   ApplicationsView,
-  AccountingView) {
+  AccountingView
+  ) {
   
   "use strict";
 
@@ -46,21 +49,6 @@ require([
     ]
   });
 
-  Vue.component("modal-dialog",
-    {
-      template: 
-        '<transition name="modal">' +
-        '  <div class="modal-mask">' +
-        '    <div class="modal-wrapper">' +
-        '      <div class="modal-container">' +
-        '        <slot>' +
-        '        </slot>' +
-        '      </div>' +
-        '    </div>' +
-        '  </div>' +
-        '</transition>'
-    });
-  
   var vm;
   vm = new Vue({
     el: "#app",
