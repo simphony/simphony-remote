@@ -21,7 +21,6 @@
         "datatables.net": "~1.10.12",
         "datatables.net-dt": "~1.10.12",
         "admin-lte": "~2.3.11",
-        "handlebars": "~4.0.5",
         "underscore": "~1.8.3",
         "html5shiv": "~3.7.3",
         "respond": "~1.4.2",

@@ -16,7 +16,7 @@ define([
               '  <li class="header">APPLICATIONS</li>' +
               '</ul>' +
 
-              '<ul id="applistentries" class="sidebar-menu">' +
+              '<ul class="sidebar-menu">' +
               '  <li v-show="!model.loading && model.appList.length === 0">' +
               '    <a href="#">No applications found</a>' +
               '  </li>' +
@@ -28,9 +28,11 @@ define([
               '      <span>Loading</span>' +
               '    </a>' +
               '  </li>' +
+              '</ul>' +
 
               '  <!-- Application list -->' +
-              '  <li v-for="app in visibleList"' +
+              '<transition-group name="list" tag="ul" id="applistentries" class="sidebar-menu">' +
+              '  <li v-for="app in visibleList" v-bind:key="app"' +
               '      :class="{ active: indexOf(app) === model.selectedIndex }"' +
               '      @click="model.selectedIndex = indexOf(app); $emit(\'entryClicked\');">' +
 
@@ -49,7 +51,7 @@ define([
               '      <span>{{ app.appData.image | appName }}</span>' +
               '    </a>' +
               '  </li>' +
-              '</ul>' +
+              '</transition-group>' +
               '<!-- /.sidebar-menu -->' +
             '</section>' +
             '<!-- /.sidebar -->',

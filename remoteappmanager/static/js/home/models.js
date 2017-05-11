@@ -110,7 +110,6 @@ define([
         .done(function(newData) {
             app.appData = newData;
 
-            this._updateConfigurables(app);
             this._updateStatus(app);
         }.bind(this));
     };
@@ -126,9 +125,9 @@ define([
             // by the client. skip it and let the server deal with the
             // missing data, either by using a default or throwing
             // an error.
-            var ConfigurableCls = configurables.from_tag(tag);
+            var ConfigurableCls = configurables[tag];
 
-            if (ConfigurableCls !== null) {
+            if (ConfigurableCls !== undefined) {
                 app.configurables.push(new ConfigurableCls());
             }
         });

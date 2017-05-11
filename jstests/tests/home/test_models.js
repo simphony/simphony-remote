@@ -10,7 +10,7 @@ define([
         model.update().done(function() {
             assert.equal(model.appList.length, 2);
             assert.equal(model.appList[0].appData.image.configurables[0], "resolution");
-            assert.equal(model.appList[0].configurables[0].resolution, "Window");
+            assert.equal(model.appList[0].configurables[0].config_dict.resolution, "Window");
         });
     });
 });
