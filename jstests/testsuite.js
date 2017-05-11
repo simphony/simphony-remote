@@ -7,7 +7,6 @@
           bootstrap: '../components/bootstrap/js/bootstrap.min',
           moment: "../components/moment/moment",
           "jsapi/v1/resources": "../../../jstests/tests/home/mock_jsapi",
-          handlebars: "../components/handlebars/handlebars.amd.min",
           underscore: "../components/underscore/underscore-min"
         },
         shim: {
