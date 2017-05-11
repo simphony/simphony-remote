@@ -56,7 +56,7 @@ define([
         if (!this.formstate.$valid) {
           return;
         }
-        resources.Application.create({image_name: this.model.name})
+        resources.Image.create({image_name: this.model.name})
           .done((
             function () {
               this.$emit('created');

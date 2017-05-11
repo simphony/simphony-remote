@@ -2,6 +2,7 @@ from unittest.mock import Mock
 
 from tornado import web, gen
 
+from remoteappmanager.db import orm
 from remoteappmanager.tests.utils import mock_coro_factory
 from tornadowebapi import registry
 from tornadowebapi.authenticator import NullAuthenticator
@@ -40,11 +41,11 @@ class TestApplication(WebAPITestCase):
             return_value=Image(name="boo", ui_name="foo_ui"))
         app.container_manager.find_containers = mock_coro_factory(
             return_value=[])
-        application_mock_1 = Mock()
-        application_mock_1.image = "hello1"
+        image_mock_1 = Mock(spec=orm.Image)
+        image_mock_1.name = "hello1"
 
-        application_mock_2 = Mock()
-        application_mock_2.image = "hello2"
+        image_mock_2 = Mock(spec=orm.Image)
+        image_mock_2.name = "hello2"
 
         policy = Mock(
             allow_home=True,
@@ -54,12 +55,13 @@ class TestApplication(WebAPITestCase):
         )
 
         app.db.get_accounting_for_user = Mock(return_value=[
-            Mock(id="one",
-                 application=application_mock_1,
+            Mock(spec=orm.Accounting,
+                 id="one",
+                 image=image_mock_1,
                  application_policy=policy),
-            Mock(
+            Mock(spec=orm.Accounting,
                 id="two",
-                application=application_mock_2,
+                image=image_mock_2,
                 application_policy=policy),
         ])
         return app

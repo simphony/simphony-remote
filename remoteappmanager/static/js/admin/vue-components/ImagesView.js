@@ -85,7 +85,7 @@ define([
               var item = items[id];
               self.table.rows.push([
                 id,
-                item.image_name
+                item.name
               ]);
             });
           })

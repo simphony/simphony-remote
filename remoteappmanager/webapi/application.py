@@ -46,19 +46,18 @@ class ApplicationHandler(ResourceHandler):
             self.current_user.account
         )
         identifier = resource.identifier
-
         # Convert the list of tuples in a dict
         accs_dict = {
-            acc.id: (acc.application, acc.application_policy)
+            acc.id: (acc.image, acc.application_policy)
             for acc in accs}
 
         if identifier not in accs_dict:
             raise NotFound()
 
-        app, policy = accs_dict[identifier]
+        image, policy = accs_dict[identifier]
 
         container_manager = self.application.container_manager
-        image = yield container_manager.image(app.image)
+        image = yield container_manager.image(image.name)
         if image is None:
             # The user has access to an application that is no longer
             # available in docker.
