@@ -32,11 +32,11 @@ require([
     // Create GA observer
     var gaObserver = new gamodule.GaObserver();
 
-    appView.$on('start_application', function(application) {
-        gaObserver.trigger_application_starting(application.app_data.image.name);
+    appView.$on('startApplication', function(application) {
+        gaObserver.triggerApplicationStarting(application.appData.image.name);
     });
 
-    appListView.$on('entry_clicked', function() { appView.focus_iframe(); });
+    appListView.$on('entryClicked', function() { appView.focusIframe(); });
 
     model.update();
 });
