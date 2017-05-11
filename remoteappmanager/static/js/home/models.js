@@ -1,9 +1,8 @@
 define([
     "jquery",
     "home/configurables",
-    "jsapi/v1/resources",
-    "dialogs"
-], function ($, configurables, resources, dialogs) {
+    "jsapi/v1/resources"
+], function ($, configurables, resources) {
     "use strict";
 
     var Status = {
@@ -154,18 +153,18 @@ define([
             configurablesData[tag] = configurable.asConfigDict();
         });
 
-        resources.Container.create({
+        return resources.Container.create({
             mapping_id: currentApp.appData.mapping_id,
             configurables: configurablesData
         }).done(function() {
             this.updateIdx(selectedIndex)
             .fail(function(error) {
                 currentApp.status = Status.STOPPED;
-                dialogs.webapi_error_dialog(error);
+                return error;
             });
         }.bind(this)).fail(function(error) {
             currentApp.status = Status.STOPPED;
-            dialogs.webapi_error_dialog(error);
+            return error;
         });
     };
 
@@ -175,17 +174,17 @@ define([
 
         var url_id = appStopping.appData.container.url_id;
 
-        resources.Container.delete(url_id)
+        return resources.Container.delete(url_id)
         .done(function() {
             this.updateIdx(index)
             .fail(function(error) {
                 appStopping.status = Status.STOPPED;
-                dialogs.webapi_error_dialog(error);
+                return error;
             });
         }.bind(this))
         .fail(function(error) {
             appStopping.status = Status.STOPPED;
-            dialogs.webapi_error_dialog(error);
+            return error;
         });
     };
 
