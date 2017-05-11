@@ -8,8 +8,9 @@ class TestContainerInteraction(SeleniumTestBase):
         driver = self.driver
         with self.login():
             self.wait_for(lambda:
-                driver.find_element_by_css_selector(
-                    "#applistentries > li > a > span").text != "Loading")
+                          driver.find_element_by_css_selector(
+                              "#loading-spinner").value_of_css_property(
+                              'display') == "none")
 
             self.click_by_css_selector("#applistentries > li > a > img")
             self.click_by_css_selector(".start-button")

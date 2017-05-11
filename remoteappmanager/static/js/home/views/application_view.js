@@ -12,7 +12,8 @@ define([
             '         v-if="current_app !== null"' +
             '         :class="{ content: true, \'no-padding\': current_app.is_running() }">' +
             '  <!-- Start Form -->' +
-            '  <div v-if="!current_app.is_running()" class="row">' +
+            '  <transition name="fade" v-if="!current_app.is_running()">' +
+            '  <div v-if="current_app.is_stopped()" class="row">' +
             '    <div class="col-md-offset-2 col-md-8">' +
             '      <div class="box box-primary">' +
             '        <div class="box-header with-border">' +
@@ -66,6 +67,7 @@ define([
             '      </div>' +
             '    </div>' +
             '  </div>' +
+            '  </transition>' +
 
             '  <!-- Application View -->' +
             '  <iframe v-if="current_app.is_running()"' +
