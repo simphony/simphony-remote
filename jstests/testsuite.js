@@ -7,7 +7,6 @@
           bootstrap: '../components/bootstrap/js/bootstrap.min',
           moment: "../components/moment/moment",
           "jsapi/v1/resources": "../../../jstests/tests/home/mock_jsapi",
-          handlebars: "../components/handlebars/handlebars.amd.min",
           underscore: "../components/underscore/underscore-min",
           vue: "../components/vue/dist/vue"
         },
@@ -25,7 +24,7 @@
         "tests/home/test_views.js",
         "tests/test_utils.js",
         "tests/test_analytics.js"
-        ], function(init) {
+        ], function() {
             window.apidata = {
                 base_url: "/",
                 prefix: "/"
