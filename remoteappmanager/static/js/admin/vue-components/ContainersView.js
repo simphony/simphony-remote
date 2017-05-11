@@ -1,60 +1,46 @@
 define([
   "components/vue/dist/vue",
-  "jsapi/v1/resources",
-  "admin/vue-components/containers/StopContainerDialog"
-], function(Vue, resources, StopContainerDialog) {
+  "jsapi/v1/resources"
+], function(Vue, resources) {
   "use strict";
 
     return {
-      components: {
-        'stop-container-dialog': StopContainerDialog
-      },
       template: 
-        '<div class="row">' +
-        '  <div class="col-md-12">' +
-        '    <div class="box">' +
-        '      <div class="box-header with-border">Containers</div>' +
-        '      <div class="box-body">' +
-        '        <div class="alert alert-danger" v-if="communicationError">' +
-        '          <strong>Error:</strong> {{communicationError}}' +
-        '        </div>' +
-        '        <table id="datatable" class="display dataTable">' +
-        '          <thead>' +
-        '          <tr>' +
-        '              <th>User</th>' +
-        '              <th>Image</th>' +
-        '              <th>Docker ID</th>' +
-        '              <th>Mapping ID</th>' +
-        '              <th>URL ID</th>' +
-        '              <th>Stop</th>' +
-        '          </tr>' +
-        '          </thead>' +
-        '          <tbody>' +
-        '            <tr v-for="(c, index) in containers">' +
-        '              <td>{{ c.user }}</td>' +
-        '              <td>{{ c.image_name }}</td>' +
-        '              <td>{{ c.docker_id | truncate }}</td>' +
-        '              <td>{{ c.mapping_id | truncate }}</td>' +
-        '              <td>{{ c.identifier | truncate }}</td>' +
-        '              <td><button class="btn btn-danger" @click="stopAction(index)">Stop</button></td>' +
-        '            </tr>' +
-        '          </tbody>' +
-        '        </table>' +
-        '        <stop-container-dialog ' +
-        '          v-if="showStopContainerDialog"' +
-        '          :containerToStop="containerToStop"' +
-        '          @stopped="containerStopped"' +
-        '          @closed="stopContainerDialogClosed"></stop-container-dialog>' +
-        '      </div>' +
-        '    </div>' +
+        '<adminlte-box title="Containers">' +
+        '  <div class="alert alert-danger" v-if="communicationError">' +
+        '    <strong>Error:</strong> {{communicationError}}' +
         '  </div>' +
-        '</div>',
+        '  <data-table' +
+        '    :headers.once="table.headers"' +
+        '    :rows="table.rows"' +
+        '    :globalActions="table.globalActions"' +
+        '    :rowActions="table.rowActions">' +
+        '  </data-table>' +
+        '  <confirm-dialog ' +
+        '    v-if="stopContainerDialog.show"' +
+        '    title="Stop container"' +
+        '    :okCallback="stopContainer"' +
+        '    :closeCallback="closeStopContainerDialog">' +
+        '    <div>Do you want to stop container {{ stopContainerDialog.containerToStop }}?</div>' +
+        '  </confirm-dialog>' +
+        '</adminlte-box>',
       data: function () {
         return {
-          containers: [],
-          showStopContainerDialog: false,
-          communicationError: null,
-          containerToStop: null,
+          table: {
+            headers: ["URL ID", "User", "Image", "Docker ID", "Mapping ID"],
+            rows: [],
+            rowActions: [
+              {
+                label: "Stop",
+                callback: this.stopAction
+              }
+            ]
+          },
+          stopContainerDialog: {
+            show: false,
+            containerToStop: null
+          },
+          communicationError: null
         };
       },
       mounted: function () {
@@ -62,35 +48,49 @@ define([
       },
       methods: {
         updateTable: function() {
+          var self = this;
           this.communicationError = null;
           resources.Container.items()
             .done(
-              (function (identifiers, items) {
-                var containers = [];
+              function (identifiers, items) {
+                self.table.rows = [];
                 identifiers.forEach(function(id) {
                   var item = items[id];
-                  item.identifier = id;
-                  containers.push(item);
+                  self.table.rows.push([
+                    id,
+                    item.user,
+                    item.image_name,
+                    item.docker_id,
+                    item.mapping_id]);
                 });
-                this.containers = containers;
-              }).bind(this))
+              })
             .fail(
-              (function () {
-                this.communicationError = "The request could not be executed successfully";
-              }).bind(this)
+              function () {
+                self.communicationError = "The request could not be executed successfully";
+              }
             );
         },
-        containerStopped: function() {
-          this.showStopContainerDialog = false;
-          this.updateTable();
+        stopAction: function(row) {
+          this.stopContainerDialog.containerToStop = row[0];
+          this.stopContainerDialog.show = true;
         },
-        stopAction: function(index) {
-          this.containerToStop = this.containers[index].identifier;
-          this.showStopContainerDialog = true;
+        stopContainer: function () {
+          var self = this;
+          resources.Container.delete(this.stopContainerDialog.containerToStop)
+            .done(function () {
+              self.updateTable();
+              self.closeStopContainerDialog();
+            })
+            .fail(
+              function () {
+                self.closeStopContainerDialog();
+                self.communicationError = "The request could not be executed successfully";
+              }
+            );
         },
-        stopContainerDialogClosed: function() {
-          this.showStopContainerDialog = false;
-          this.containerToStop = null;
+        closeStopContainerDialog: function() {
+          this.stopContainerDialog.show = false;
+          this.stopContainerDialog.containerToStop = null;
         }
       }
     };

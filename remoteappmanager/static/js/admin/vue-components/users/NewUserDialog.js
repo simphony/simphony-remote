@@ -1,19 +1,18 @@
 define([
-  "jquery",
   "components/vue/dist/vue",
   "jsapi/v1/resources"
-], function($, Vue, resources) {
+], function(Vue, resources) {
   "use strict";
 
   return {
-    template: 
+    template:
         '<modal-dialog>' +
         '  <div class="modal-header"><h4>Create New User</h4></div>' +
         '  <div class="modal-body">' +
         '    <vue-form :state="formstate" v-model="formstate" @submit.prevent="createNewUser">' +
         '      <validate auto-label class="form-group required-field" :class="fieldClassName(formstate.name)">' +
         '        <label class="control-label">User Name</label>' +
-        '        <input type="text" name="name" class="form-control" required v-model="model.name">' +
+        '        <input type="text" name="name" class="form-control" required v-model.trim="model.name">' +
         '        <field-messages name="name" show="$touched || $submitted">' +
         '          <span class="help-block" slot="required">User Name cannot be empty</span>' +
         '        </field-messages>' +
@@ -53,8 +52,7 @@ define([
         if (!this.formstate.$valid) {
           return;
         }
-        var user_name = $.trim(this.model.name);
-        resources.User.create({name: user_name})
+        resources.User.create({name: this.model.name})
           .done((
             function () {
               this.$emit('created');
