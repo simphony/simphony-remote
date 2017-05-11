@@ -12,7 +12,8 @@ define([
             '         v-if="current_app !== null"' +
             '         :class="{ content: true, \'no-padding\': current_app.is_running() }">' +
             '  <!-- Start Form -->' +
-            '  <div v-if="!current_app.is_running()" class="row">' +
+            '  <transition name="fade" v-if="!current_app.is_running()">' +
+            '  <div v-if="current_app.is_stopped()" class="row">' +
             '    <div class="col-md-offset-2 col-md-8">' +
             '      <div class="box box-primary">' +
             '        <div class="box-header with-border">' +
@@ -44,7 +45,15 @@ define([
             '          </ul>' +
 
             '          <h4>Configuration</h4>' +
-            '          <form class="configuration"><fieldset></fieldset></form>' +
+            '          <form class="configuration">' +
+            '            <fieldset v-if="current_app.configurables.length === 0">No configurable options for this image</fieldset>' +
+            '            <fieldset v-else :disabled="current_app.is_starting()">' +
+            '              <component v-for="configurable in current_app.configurables"' +
+            '                         :key="configurable.tag"' +
+            '                         :is="configurable.tag + \'-component\'"' +
+            '                         :config_dict.sync="configurable.config_dict"></component>' +
+            '            </fieldset>' +
+            '          </form>' +
             '        </div>' +
 
             '        <!-- Start Button -->' +
@@ -58,6 +67,7 @@ define([
             '      </div>' +
             '    </div>' +
             '  </div>' +
+            '  </transition>' +
 
             '  <!-- Application View -->' +
             '  <iframe v-if="current_app.is_running()"' +

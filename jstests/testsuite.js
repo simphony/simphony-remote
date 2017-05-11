@@ -25,7 +25,7 @@
         "tests/home/test_application_view.js",
         "tests/test_utils.js",
         "tests/test_analytics.js"
-        ], function(init) {
+        ], function() {
             window.apidata = {
                 base_url: "/",
                 prefix: "/"
