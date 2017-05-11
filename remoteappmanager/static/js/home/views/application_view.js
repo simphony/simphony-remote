@@ -1,7 +1,7 @@
 define([
     "urlutils",
     "utils",
-    '../../components/vue/dist/vue'
+    "../../components/vue/dist/vue"
 ], function (urlUtils, utils, Vue) {
     "use strict";
 
@@ -11,6 +11,12 @@ define([
             '<section id="appview"' +
             '         v-if="currentApp !== null"' +
             '         :class="{ content: true, \'no-padding\': currentApp.isRunning() }">' +
+            '  <!-- Error dialog -->' +
+            '  <modal-dialog v-show="showErrorDialog">' +
+            '    <div class="alert alert-danger" role="alert">{{ error.type }}</div>' +
+            '    <button type="button" class="btn btn-default" @click="showErrorDialog = false">Cancel</button>' +
+            '  </modal-dialog>' +
+
             '  <!-- Start Form -->' +
             '  <transition name="fade" v-if="!currentApp.isRunning()">' +
             '  <div v-if="currentApp.isStopped()" class="row">' +
@@ -78,6 +84,10 @@ define([
             '  </iframe>' +
             '</section>',
 
+        data: function() {
+            return { showErrorDialog: false };
+        },
+
         computed: {
             currentApp: function() {
                 return this.model.appList[this.model.selectedIndex] || null;
@@ -102,7 +112,10 @@ define([
         methods: {
             startApplication: function() {
                 this.$emit('startApplication', this.currentApp);
-                this.model.startApplication();
+                this.model.startApplication().fail(function(error) {
+                    console.log(error);
+                    this.showErrorDialog = true;
+                }.bind(this));
             },
             getIframeSize: function() {
                 return utils.maxIframeSize();

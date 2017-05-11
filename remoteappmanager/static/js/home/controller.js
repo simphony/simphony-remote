@@ -5,7 +5,8 @@ require([
     "home/views/application_view",
     "components/vue/dist/vue",
     "gamodule",
-    "vue/filters"
+    "vue/filters",
+    "admin/vue-components/toolkit/toolkit"
 ], function(
     models,
     applicationListView,
