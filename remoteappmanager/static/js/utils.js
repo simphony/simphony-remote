@@ -37,7 +37,7 @@ define([
         return d1;
     };
 
-    var max_iframe_size = function () {
+    var maxIframeSize = function () {
         // Returns the current iframe viewport size
         var body = $("body");
         var height = body.height() - $(".header").outerHeight();
@@ -48,7 +48,7 @@ define([
     return {
         all : all,
         update : update,
-        max_iframe_size: max_iframe_size
+        maxIframeSize: maxIframeSize
     };
 
 });

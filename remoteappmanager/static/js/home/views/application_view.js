@@ -86,7 +86,7 @@ define([
                 return this.currentApp.appData.image.policy;
             },
             appSource: function() {
-                var url = urlUtils.path_join(
+                var url = urlUtils.pathJoin(
                     window.apidata.base_url,
                     'containers',
                     this.currentApp.appData.container.url_id
@@ -105,7 +105,7 @@ define([
                 this.model.startApplication();
             },
             getIframeSize: function() {
-                return utils.max_iframe_size();
+                return utils.maxIframeSize();
             },
             focusIframe: function() {
                 var iframe = this.$el.querySelector('iframe');

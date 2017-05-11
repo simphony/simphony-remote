@@ -42,8 +42,8 @@ define([
         var resolution = this.configDict.resolution;
 
         if (resolution === 'Window') {
-            var max_size = utils.max_iframe_size();
-            resolution = max_size[0] + 'x' + max_size[1];
+            var maxSize = utils.maxIframeSize();
+            resolution = maxSize[0] + 'x' + maxSize[1];
         }
 
         return { resolution: resolution };

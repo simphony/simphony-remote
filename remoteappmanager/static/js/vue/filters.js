@@ -8,7 +8,7 @@ define([
         return (
             icon_data ?
             'data:image/png;base64,' + icon_data :
-            urlUtils.path_join(
+            urlUtils.pathJoin(
                 window.apidata.base_url, 'static', 'images', 'generic_appicon_128.png'
             )
         );
