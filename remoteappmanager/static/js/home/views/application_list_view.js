@@ -17,7 +17,7 @@ define([
               '</ul>' +
 
               '<ul class="sidebar-menu">' +
-              '  <li v-show="!model.loading && model.app_list.length === 0">' +
+              '  <li v-show="!model.loading && model.app_list.length === 0" id="no-app-msg">' +
               '    <a href="#">No applications found</a>' +
               '  </li>' +
 
