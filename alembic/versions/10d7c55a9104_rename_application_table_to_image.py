@@ -63,11 +63,11 @@ def upgrade():
 
     with connection.begin():
         for row in connection.execute(OldAccounting.select()):
-           connection.execute(TmpAccounting.insert(),
-                              id=row[0],
-                              user_id=row[1],
-                              image_id=row[2],
-                              application_policy_id=row[3])
+            connection.execute(TmpAccounting.insert(),
+                               id=row[0],
+                               user_id=row[1],
+                               image_id=row[2],
+                               application_policy_id=row[3])
 
     op.drop_table("accounting")
 
@@ -85,6 +85,7 @@ def upgrade():
 
     op.drop_table('application')
     op.drop_table('tmpaccounting')
+
 
 def downgrade():
     raise Exception("cannot downgrade")

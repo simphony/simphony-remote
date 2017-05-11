@@ -60,9 +60,9 @@ class TestApplication(WebAPITestCase):
                  image=image_mock_1,
                  application_policy=policy),
             Mock(spec=orm.Accounting,
-                id="two",
-                image=image_mock_2,
-                application_policy=policy),
+                 id="two",
+                 image=image_mock_2,
+                 application_policy=policy),
         ])
         return app
 
