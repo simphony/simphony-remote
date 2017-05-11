@@ -27,11 +27,17 @@ define([
             // Simulate application starting
             model.app_list[0].status = 'STARTING';
 
-            Vue.nextTick(function() {
-                assert.ok(app_view.$el.querySelector('.start-button').disabled);
+            assert.equal(
+                app_view.$el.querySelector('.box-title').innerHTML,
+                model.app_list[0].app_data.image.ui_name
+            );
 
-                done();
-            });
+            assert.equal(
+                app_view.$el.querySelector('#app-description').innerHTML,
+                model.app_list[0].app_data.image.description
+            );
+
+            done();
         })});
     });
 
