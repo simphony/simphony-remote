@@ -151,7 +151,7 @@ define([
         var configurablesData = {};
         currentApp.configurables.forEach(function(configurable) {
             var tag = configurable.tag;
-            configurablesData[tag] = configurable.as_config_dict();
+            configurablesData[tag] = configurable.asConfigDict();
         });
 
         resources.Container.create({

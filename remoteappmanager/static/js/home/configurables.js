@@ -4,42 +4,42 @@ define([
 ], function(utils, Vue) {
     "use strict";
 
-    var resolution_tag = 'resolution';
-    var resolution_component = Vue.component(resolution_tag + '-component', {
-        // Your configurable must have a "config_dict" property from the model
-        props: ['config_dict'],
+    var resolutionTag = 'resolution';
+    var resolutionComponent = Vue.component(resolutionTag + '-component', {
+        // Your configurable must have a "configDict" property from the model
+        props: ['configDict'],
 
         template:
             '<div class="form-group">' +
             '  <label>Resolution</label>' +
             '  <select class="form-control" v-model="resolution">' +
-            '    <option v-for="resolution_option in resolution_options">' +
-            '      {{resolution_option}}' +
+            '    <option v-for="resolutionOption in resolutionOptions">' +
+            '      {{resolutionOption}}' +
             '    </option>' +
             '  </select>' +
             '</div>',
 
         data: function() {
             return {
-                resolution: this.config_dict.resolution,
-                resolution_options: ['Window', '1920x1080', '1280x1024', '1280x800', '1024x768']
+                resolution: this.configDict.resolution,
+                resolutionOptions: ['Window', '1920x1080', '1280x1024', '1280x800', '1024x768']
             };
         },
 
         watch: {
-            config_dict: function() { this.resolution = this.config_dict.resolution; }, // model -> view update
-            resolution: function() { this.$emit('update:config_dict', { resolution: this.resolution }); } // view -> model update
+            configDict: function() { this.resolution = this.configDict.resolution; }, // model -> view update
+            resolution: function() { this.$emit('update:configDict', { resolution: this.resolution }); } // view -> model update
         }
     });
 
-    // Your configurable class must implement a tag and default config_dict
+    // Your configurable class must implement a tag and default configDict
     var ResolutionModel = function() {
-        this.tag = resolution_tag;
-        this.config_dict = { resolution: 'Window' };
+        this.tag = resolutionTag;
+        this.configDict = { resolution: 'Window' };
     };
 
-    ResolutionModel.prototype.as_config_dict = function() {
-        var resolution = this.config_dict.resolution;
+    ResolutionModel.prototype.asConfigDict = function() {
+        var resolution = this.configDict.resolution;
 
         if (resolution === 'Window') {
             var max_size = utils.max_iframe_size();
@@ -52,6 +52,6 @@ define([
     // Export all your configurable models here
     return {
         resolution: ResolutionModel,
-        resolution_component: resolution_component
+        resolutionComponent: resolutionComponent
     };
 });
