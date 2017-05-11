@@ -2,33 +2,33 @@ define([
     "urlutils",
     "utils",
     '../../components/vue/dist/vue'
-], function (urlutils, utils, Vue) {
+], function (urlUtils, utils, Vue) {
     "use strict";
 
     var ApplicationView = Vue.extend({
         template:
             '<!-- Application View -->' +
             '<section id="appview"' +
-            '         v-if="current_app !== null"' +
-            '         :class="{ content: true, \'no-padding\': current_app.is_running() }">' +
+            '         v-if="currentApp !== null"' +
+            '         :class="{ content: true, \'no-padding\': currentApp.isRunning() }">' +
             '  <!-- Start Form -->' +
-            '  <transition name="fade" v-if="!current_app.is_running()">' +
-            '  <div v-if="current_app.is_stopped()" class="row">' +
+            '  <transition name="fade" v-if="!currentApp.isRunning()">' +
+            '  <div v-if="currentApp.isStopped()" class="row">' +
             '    <div class="col-md-offset-2 col-md-8">' +
             '      <div class="box box-primary">' +
             '        <div class="box-header with-border">' +
-            '          <h3 class="box-title">{{ current_app.app_data.image | app_name }}</h3>' +
+            '          <h3 class="box-title">{{ currentApp.appData.image | appName }}</h3>' +
             '          <div class="box-tools pull-right"></div>' +
             '        </div>' +
             '        <div class="box-body">' +
             '          <h4>Description</h4>' +
-            '          <span id="app-description">{{ current_app.app_data.image.description }}</span>' +
+            '          <span id="app-description">{{ currentApp.appData.image.description }}</span>' +
 
             '          <h4>Policy</h4>' +
 
             '          <ul class="policy">' +
             '            <!-- Workspace -->' +
-            '            <li v-if="app_policy.allow_home">' +
+            '            <li v-if="appPolicy.allow_home">' +
             '                Workspace accessible' +
             '            </li>' +
             '            <li v-else>' +
@@ -36,8 +36,8 @@ define([
             '            </li>' +
 
             '            <!-- Volume mounted -->' +
-            '            <li v-if="app_policy.volume_source && app_policy.volume_target && app_policy.volume_mode">' +
-            '              Volume mounted: {{ app_policy.volume_source }} &#x2192; {{ app_policy.volume_target }} ({{ app_policy.volume_mode }})' +
+            '            <li v-if="appPolicy.volume_source && appPolicy.volume_target && appPolicy.volume_mode">' +
+            '              Volume mounted: {{ appPolicy.volume_source }} &#x2192; {{ appPolicy.volume_target }} ({{ appPolicy.volume_mode }})' +
             '            </li>' +
             '            <li v-else>' +
             '              No volumes mounted' +
@@ -46,12 +46,12 @@ define([
 
             '          <h4>Configuration</h4>' +
             '          <form class="configuration">' +
-            '            <fieldset v-if="current_app.configurables.length === 0">No configurable options for this image</fieldset>' +
-            '            <fieldset v-else :disabled="current_app.is_starting()">' +
-            '              <component v-for="configurable in current_app.configurables"' +
+            '            <fieldset v-if="currentApp.configurables.length === 0">No configurable options for this image</fieldset>' +
+            '            <fieldset v-else :disabled="currentApp.isStarting()">' +
+            '              <component v-for="configurable in currentApp.configurables"' +
             '                         :key="configurable.tag"' +
             '                         :is="configurable.tag + \'-component\'"' +
-            '                         :config_dict.sync="configurable.config_dict"></component>' +
+            '                         :configDict.sync="configurable.configDict"></component>' +
             '            </fieldset>' +
             '          </form>' +
             '        </div>' +
@@ -59,8 +59,8 @@ define([
             '        <!-- Start Button -->' +
             '        <div class="box-footer">' +
             '          <button class="btn btn-primary pull-right start-button"' +
-            '                  @click="start_application()"' +
-            '                  :disabled="current_app.is_starting()">' +
+            '                  @click="startApplication()"' +
+            '                  :disabled="currentApp.isStarting()">' +
             '            Start' +
             '          </button>' +
             '        </div>' +
@@ -70,44 +70,44 @@ define([
             '  </transition>' +
 
             '  <!-- Application View -->' +
-            '  <iframe v-if="current_app.is_running()"' +
+            '  <iframe v-if="currentApp.isRunning()"' +
             '          id="application"' +
             '          frameBorder="0"' +
-            '          :src="app_source"' +
-            '          :style="{ minWidth: get_iframe_size()[0] + \'px\', minHeight: get_iframe_size()[1] + \'px\' }">' +
+            '          :src="appSource"' +
+            '          :style="{ minWidth: getIframeSize()[0] + \'px\', minHeight: getIframeSize()[1] + \'px\' }">' +
             '  </iframe>' +
             '</section>',
 
         computed: {
-            current_app: function() {
-                return this.model.app_list[this.model.selected_index] || null;
+            currentApp: function() {
+                return this.model.appList[this.model.selectedIndex] || null;
             },
-            app_policy: function() {
-                return this.current_app.app_data.image.policy;
+            appPolicy: function() {
+                return this.currentApp.appData.image.policy;
             },
-            app_source: function() {
-                var url = urlutils.path_join(
+            appSource: function() {
+                var url = urlUtils.pathJoin(
                     window.apidata.base_url,
                     'containers',
-                    this.current_app.app_data.container.url_id
+                    this.currentApp.appData.container.url_id
                 );
-                var output = this.current_app.delayed ? url : url + '/';
+                var output = this.currentApp.delayed ? url : url + '/';
 
-                this.current_app.delayed = false;
+                this.currentApp.delayed = false;
 
                 return output;
             }
         },
 
         methods: {
-            start_application: function() {
-                this.$emit('start_application', this.current_app);
-                this.model.start_application();
+            startApplication: function() {
+                this.$emit('startApplication', this.currentApp);
+                this.model.startApplication();
             },
-            get_iframe_size: function() {
-                return utils.max_iframe_size();
+            getIframeSize: function() {
+                return utils.maxIframeSize();
             },
-            focus_iframe: function() {
+            focusIframe: function() {
                 var iframe = this.$el.querySelector('iframe');
                 if(iframe !== null) {
                     iframe.focus();
@@ -115,7 +115,7 @@ define([
             }
         },
 
-        updated: function() { this.focus_iframe(); }
+        updated: function() { this.focusIframe(); }
     });
 
     return {

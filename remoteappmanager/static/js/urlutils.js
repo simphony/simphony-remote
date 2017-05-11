@@ -8,7 +8,7 @@
 define(function () {
     "use strict";
 
-    var path_join = function () {
+    var pathJoin = function () {
         // join a sequence of url components with '/'
         var url = '', i = 0;
 
@@ -25,7 +25,7 @@ define(function () {
         url = url.replace(/\/\/+/, '/');
         return url;
     };
-    
+
     var parse = function (url) {
         // an `a` element with an href allows attr-access to the parsed segments of a URL
         // a = parse_url("http://localhost:8888/path/name#hash")
@@ -39,17 +39,17 @@ define(function () {
         a.href = url;
         return a;
     };
-    
-    var encode_uri_components = function (uri) {
+
+    var encodeUriComponents = function (uri) {
         // encode just the components of a multi-segment uri,
         // leaving '/' separators
         return uri.split('/').map(encodeURIComponent).join('/');
     };
-    
+
     return {
-        path_join : path_join,
-        encode_uri_components : encode_uri_components,
-        parse : parse
+        pathJoin: pathJoin,
+        encodeUriComponents: encodeUriComponents,
+        parse: parse
     };
-    
-}); 
+
+});

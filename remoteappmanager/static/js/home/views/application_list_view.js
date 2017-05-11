@@ -8,7 +8,7 @@ define([
             '<section class="sidebar">' +
               '<!-- Search form -->' +
               '<form action="#" class="sidebar-form">' +
-              '  <input type="text" name="q" class="form-control" placeholder="Search..." v-model="search_input">' +
+              '  <input type="text" name="q" class="form-control" placeholder="Search..." v-model="searchInput">' +
               '</form>' +
 
               '<!-- Sidebar Menu -->' +
@@ -17,7 +17,7 @@ define([
               '</ul>' +
 
               '<ul class="sidebar-menu">' +
-              '  <li v-show="!model.loading && model.app_list.length === 0" id="no-app-msg">' +
+              '  <li v-show="!model.loading && model.appList.length === 0" id="no-app-msg">' +
               '    <a href="#">No applications found</a>' +
               '  </li>' +
 
@@ -32,23 +32,23 @@ define([
 
               '  <!-- Application list -->' +
               '<transition-group name="list" tag="ul" id="applistentries" class="sidebar-menu">' +
-              '  <li v-for="app in visible_list" v-bind:key="app"' +
-              '      :class="{ active: index_of(app) === model.selected_index }"' +
-              '      @click="model.selected_index = index_of(app); $emit(\'entry_clicked\');">' +
+              '  <li v-for="app in visibleList" v-bind:key="app"' +
+              '      :class="{ active: indexOf(app) === model.selectedIndex }"' +
+              '      @click="model.selectedIndex = indexOf(app); $emit(\'entryClicked\');">' +
 
               '    <span :class="app.status.toLowerCase() + \'-badge\'"></span>' +
 
               '    <a href="#" class="truncate">' +
               '      <img class="app-icon"' +
-              '           :src="app.app_data.image.icon_128 | icon_src">' +
+              '           :src="app.appData.image.icon_128 | iconSrc">' +
 
               '      <button class="stop-button"' +
-              '              v-if="app.is_running()"' +
-              '              @click="model.stop_application(index_of(app))"' +
-              '              :disabled="app.is_stopping()">' +
+              '              v-if="app.isRunning()"' +
+              '              @click="model.stopApplication(indexOf(app))"' +
+              '              :disabled="app.isStopping()">' +
               '        <i class="fa fa-times"></i>' +
               '      </button>' +
-              '      <span>{{ app.app_data.image | app_name }}</span>' +
+              '      <span>{{ app.appData.image | appName }}</span>' +
               '    </a>' +
               '  </li>' +
               '</transition-group>' +
@@ -57,21 +57,21 @@ define([
             '<!-- /.sidebar -->',
 
         data: function() {
-            return { 'search_input': '' };
+            return { 'searchInput': '' };
         },
 
         computed: {
-            visible_list: function() {
-                return this.model.app_list.filter(function(app) {
-                    var app_name = this.$options.filters.app_name(app.app_data.image).toLowerCase();
-                    return app_name.indexOf(this.search_input.toLowerCase()) !== -1;
+            visibleList: function() {
+                return this.model.appList.filter(function(app) {
+                    var appName = this.$options.filters.appName(app.appData.image).toLowerCase();
+                    return appName.indexOf(this.searchInput.toLowerCase()) !== -1;
                 }.bind(this));
             }
         },
 
         methods: {
-            index_of: function(app) {
-                return this.model.app_list.indexOf(app);
+            indexOf: function(app) {
+                return this.model.appList.indexOf(app);
             }
         }
     });

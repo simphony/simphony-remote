@@ -8,8 +8,8 @@ require([
     "vue/filters"
 ], function(
     models,
-    application_list_view,
-    application_view,
+    applicationListView,
+    applicationView,
     Vue,
     gamodule) {
     "use strict";
@@ -19,24 +19,24 @@ require([
     var model = new models.ApplicationListModel();
 
     // Initialize views
-    var app_list_view = new application_list_view.ApplicationListView({
+    var appListView = new applicationListView.ApplicationListView({
         el: '#applist',
         data: function() { return { model: model }; }
     });
 
-    var app_view = new application_view.ApplicationView({
+    var appView = new applicationView.ApplicationView({
         el: '#appview',
         data: function() { return { model: model }; }
     });
 
     // Create GA observer
-    var ga_observer = new gamodule.GaObserver();
+    var gaObserver = new gamodule.GaObserver();
 
-    app_view.$on('start_application', function(application) {
-        ga_observer.trigger_application_starting(application.app_data.image.name);
+    appView.$on('startApplication', function(application) {
+        gaObserver.triggerApplicationStarting(application.appData.image.name);
     });
 
-    app_list_view.$on('entry_clicked', function() { app_view.focus_iframe(); });
+    appListView.$on('entryClicked', function() { appView.focusIframe(); });
 
     model.update();
 });

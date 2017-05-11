@@ -13,7 +13,7 @@ define([
         STOPPED: "STOPPED"
     };
 
-    var available_applications_info = function () {
+    var availableApplicationsInfo = function () {
         // Retrieve information from the various applications and
         // connect the cascading callbacks.
         // Returns a single promise. When resolved, the attached
@@ -42,12 +42,12 @@ define([
 
     var ApplicationListModel = function() {
         // (constructor) Model for the application list.
-        this.app_list = [];
+        this.appList = [];
 
         // Selection index for when we click on one entry.
-        // Should be the index of the selected app_data,
-        // or null if no selection.
-        this.selected_index = null;
+        // Should be the index of the selected application,
+        // or null if no application available (first app is clicked by default).
+        this.selectedIndex = null;
 
         this.loading = true;
     };
@@ -59,68 +59,68 @@ define([
         // data. Note that, in error conditions, this routine resolves
         // successfully in any case, and the data is set to empty list
         return $.when(
-            available_applications_info()
-        ).done(function (app_data) {
-            // app_data contains the data retrieved from the remote API
+            availableApplicationsInfo()
+        ).done(function (appData) {
+            // appData contains the data retrieved from the remote API
 
-            var app_list = [];
+            var appList = [];
 
             // Sort application list by names
-            app_data.sort(function(app1, app2) {
-                var app1_name = app1.image.ui_name? app1.image.ui_name: app1.image.name;
-                var app2_name = app2.image.ui_name? app2.image.ui_name: app2.image.name;
-                return app1_name < app2_name? -1: 1;
+            appData.sort(function(app1, app2) {
+                var app1Name = app1.image.ui_name? app1.image.ui_name: app1.image.name;
+                var app2Name = app2.image.ui_name? app2.image.ui_name: app2.image.name;
+                return app1Name < app2Name? -1: 1;
             });
 
             // Add the options for some image types
-            app_data.forEach(function(application_data) {
+            appData.forEach(function(applicationData) {
                 var app = {
-                    app_data: application_data,
+                    appData: applicationData,
                     // Default values, will be overwritten
                     status: Status.STOPPED,
                     delayed: true,
                     configurables: [],
-                    is_running: function() {return this.status === Status.RUNNING;},
-                    is_stopped: function() {return this.status === Status.STOPPED;},
-                    is_starting: function() {return this.status === Status.STARTING;},
-                    is_stopping: function() {return this.status === Status.STOPPING;}
+                    isRunning: function() {return this.status === Status.RUNNING;},
+                    isStopped: function() {return this.status === Status.STOPPED;},
+                    isStarting: function() {return this.status === Status.STARTING;},
+                    isStopping: function() {return this.status === Status.STOPPING;}
                 };
 
-                this._update_configurables(app);
-                this._update_status(app);
+                this._updateConfigurables(app);
+                this._updateStatus(app);
 
-                app.delayed = !app.is_running();
-                app_list.push(app);
+                app.delayed = !app.isRunning();
+                appList.push(app);
             }.bind(this));
 
-            this.app_list = app_list;
+            this.appList = appList;
 
-            if(app_list.length) {this.selected_index = 0;}
+            if(appList.length) {this.selectedIndex = 0;}
 
             this.loading = false;
         }.bind(this));
     };
 
-    ApplicationListModel.prototype.update_idx = function(index) {
+    ApplicationListModel.prototype.updateIdx = function(index) {
         // Refetches and updates the entry at the given index.
-        var app = this.app_list[index];
-        var mapping_id = app.app_data.mapping_id;
+        var app = this.appList[index];
+        var mapping_id = app.appData.mapping_id;
 
         return resources.Application.retrieve(mapping_id)
-        .done(function(new_data) {
-            app.app_data = new_data;
+        .done(function(newData) {
+            app.appData = newData;
 
-            this._update_status(app);
+            this._updateStatus(app);
         }.bind(this));
     };
 
-    ApplicationListModel.prototype._update_configurables = function(app) {
+    ApplicationListModel.prototype._updateConfigurables = function(app) {
         // Contains the submodels for the configurables.
         // It is a dictionary that maps a supported (by the image) configurable tag
         // to its client-side model.
         app.configurables = [];
 
-        app.app_data.image.configurables.forEach(function(tag) {
+        app.appData.image.configurables.forEach(function(tag) {
             // If this returns null, the tag has not been recognized
             // by the client. skip it and let the server deal with the
             // missing data, either by using a default or throwing
@@ -133,58 +133,58 @@ define([
         });
     };
 
-    ApplicationListModel.prototype._update_status = function(app) {
-        if (app.app_data.container === undefined) {
+    ApplicationListModel.prototype._updateStatus = function(app) {
+        if (app.appData.container === undefined) {
             app.status = Status.STOPPED;
         } else {
             app.status = Status.RUNNING;
         }
     };
 
-    ApplicationListModel.prototype.start_application = function() {
-        var selected_index = this.selected_index;
-        var current_app = this.app_list[selected_index];
+    ApplicationListModel.prototype.startApplication = function() {
+        var selectedIndex = this.selectedIndex;
+        var currentApp = this.appList[selectedIndex];
 
-        current_app.status = Status.STARTING;
-        current_app.delayed = true;
+        currentApp.status = Status.STARTING;
+        currentApp.delayed = true;
 
-        var configurables_data = {};
-        current_app.configurables.forEach(function(configurable) {
+        var configurablesData = {};
+        currentApp.configurables.forEach(function(configurable) {
             var tag = configurable.tag;
-            configurables_data[tag] = configurable.as_config_dict();
+            configurablesData[tag] = configurable.asConfigDict();
         });
 
         resources.Container.create({
-            mapping_id: current_app.app_data.mapping_id,
-            configurables: configurables_data
+            mapping_id: currentApp.appData.mapping_id,
+            configurables: configurablesData
         }).done(function() {
-            this.update_idx(selected_index)
+            this.updateIdx(selectedIndex)
             .fail(function(error) {
-                current_app.status = Status.STOPPED;
+                currentApp.status = Status.STOPPED;
                 dialogs.webapi_error_dialog(error);
             });
         }.bind(this)).fail(function(error) {
-            current_app.status = Status.STOPPED;
+            currentApp.status = Status.STOPPED;
             dialogs.webapi_error_dialog(error);
         });
     };
 
-    ApplicationListModel.prototype.stop_application = function(index) {
-        var app_stopping = this.app_list[index];
-        app_stopping.status = Status.STOPPING;
+    ApplicationListModel.prototype.stopApplication = function(index) {
+        var appStopping = this.appList[index];
+        appStopping.status = Status.STOPPING;
 
-        var url_id = app_stopping.app_data.container.url_id;
+        var url_id = appStopping.appData.container.url_id;
 
         resources.Container.delete(url_id)
         .done(function() {
-            this.update_idx(index)
+            this.updateIdx(index)
             .fail(function(error) {
-                app_stopping.status = Status.STOPPED;
+                appStopping.status = Status.STOPPED;
                 dialogs.webapi_error_dialog(error);
             });
         }.bind(this))
         .fail(function(error) {
-            app_stopping.status = Status.STOPPED;
+            appStopping.status = Status.STOPPED;
             dialogs.webapi_error_dialog(error);
         });
     };

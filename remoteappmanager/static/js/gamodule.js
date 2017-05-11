@@ -20,7 +20,7 @@ define([], function () {
         this.ga = init();
     };
 
-    GaObserver.prototype.trigger_application_starting = function(name) {
+    GaObserver.prototype.triggerApplicationStarting = function(name) {
         this.ga("send", "event", {
             eventCategory: "Application",
             eventAction: "start",
