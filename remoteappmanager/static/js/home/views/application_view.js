@@ -22,7 +22,7 @@ define([
             '        </div>' +
             '        <div class="box-body">' +
             '          <h4>Description</h4>' +
-            '          <span>{{ currentApp.appData.image.description }}</span>' +
+            '          <span id="app-description">{{ currentApp.appData.image.description }}</span>' +
 
             '          <h4>Policy</h4>' +
 

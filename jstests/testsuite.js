@@ -7,8 +7,7 @@
           bootstrap: '../components/bootstrap/js/bootstrap.min',
           moment: "../components/moment/moment",
           "jsapi/v1/resources": "../../../jstests/tests/home/mock_jsapi",
-          underscore: "../components/underscore/underscore-min",
-          vue: "../components/vue/dist/vue"
+          underscore: "../components/underscore/underscore-min"
         },
         shim: {
           bootstrap: {
@@ -21,7 +20,8 @@
     require([
         "tests/home/test_configurables.js",
         "tests/home/test_models.js",
-        "tests/home/test_views.js",
+        "tests/home/test_application_list_view.js",
+        "tests/home/test_application_view.js",
         "tests/test_utils.js",
         "tests/test_analytics.js"
         ], function() {
