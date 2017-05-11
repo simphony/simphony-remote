@@ -38,7 +38,7 @@ define([
 
               '    <a href="#" class="truncate">' +
               '      <img class="app-icon"' +
-              '           :src="app.app_data.image.icon_128 | icon_src">' +
+              '           :src="app.app_data.image.icon_128 | iconSrc">' +
 
               '      <button class="stop-button"' +
               '              v-if="app.is_running()"' +
@@ -46,7 +46,7 @@ define([
               '              :disabled="app.is_stopping()">' +
               '        <i class="fa fa-times"></i>' +
               '      </button>' +
-              '      <span>{{ app.app_data.image | app_name }}</span>' +
+              '      <span>{{ app.app_data.image | appName }}</span>' +
               '    </a>' +
               '  </li>' +
               '</ul>' +
@@ -61,8 +61,8 @@ define([
         computed: {
             visible_list: function() {
                 return this.model.app_list.filter(function(app) {
-                    var app_name = this.$options.filters.app_name(app.app_data.image).toLowerCase();
-                    return app_name.indexOf(this.search_input.toLowerCase()) !== -1;
+                    var appName = this.$options.filters.appName(app.app_data.image).toLowerCase();
+                    return appName.indexOf(this.search_input.toLowerCase()) !== -1;
                 }.bind(this));
             }
         },
