@@ -2,6 +2,7 @@
     require.config({
         baseUrl: "../remoteappmanager/static/js/",
         paths: {
+          jstests: '../../../jstests/',
           components: '../components',
           jquery: '../components/jquery/jquery.min',
           bootstrap: '../components/bootstrap/js/bootstrap.min',
@@ -22,6 +23,8 @@
         "tests/home/test_models.js",
         "tests/home/test_application_list_view.js",
         "tests/home/test_application_view.js",
+        "tests/vue/components/test_DataTable.js",
+        "tests/vue/components/test_ConfirmDialog.js",
         "tests/test_utils.js",
         "tests/test_analytics.js"
         ], function() {

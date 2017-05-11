@@ -6,7 +6,7 @@ class TestAdminNameHeaderBug(SeleniumTestBase):
         driver = self.driver
         with self.login("admin"):
             driver.find_element_by_link_text("Users").click()
-            driver.find_element_by_link_text("Show").click()
+            self.click_button("Policies")
             self.wait_for(lambda:
                 "admin" == driver.find_element_by_css_selector(
                     "span.hidden-xs").text

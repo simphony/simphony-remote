@@ -81,6 +81,29 @@ class SeleniumTestBase(unittest.TestCase):
             "arguments[0].click()",
             self.driver.find_element_by_css_selector(css_selector))
 
+    def click_button(self, button_text, number=0):
+        """
+        Clicks a button with a given text.
+
+        Parameters
+        ----------
+        button_text: str
+            The text of the button
+        number: int
+            If multiple buttons with the same label are found, click
+            the number-th (zero based). If not specified, the first (0th)
+            button will be clicked.
+        """
+        self.wait_for(
+            lambda: len(self.get_buttons_by_text(button_text)) > number)
+
+        button = self.get_buttons_by_text(button_text)[number]
+        self.driver.execute_script("arguments[0].click()", button)
+
+    def get_buttons_by_text(self, text):
+        return [button for button in self.driver.find_elements_by_tag_name("button")
+                if button.text == text]
+
     def tearDown(self):
         self.driver.quit()
         self.assertEqual([], self.verificationErrors)

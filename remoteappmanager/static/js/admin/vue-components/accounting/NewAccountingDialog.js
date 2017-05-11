@@ -1,12 +1,11 @@
 define([
-  "jquery",
   "components/vue/dist/vue",
   "jsapi/v1/resources"
-], function($, Vue, resources) {
+], function(Vue, resources) {
   "use strict";
 
   return {
-    template: 
+    template:
       '  <modal-dialog>' +
       '    <div class="modal-header"><h4>Create New Policy</h4></div>' +
       '    <div class="modal-body">' +
@@ -54,7 +53,7 @@ define([
       '        <p v-if="crossValidationError" class="text-danger">Both Volume Source and Target must be defined</p>' +
       '        <div class="modal-footer">' +
       '          <div class="alert alert-danger" v-if="communicationError">' +
-      '            <strong>Error:</strong> {{communicationError}}' + 
+      '            <strong>Error:</strong> {{communicationError}}' +
       '          </div>' +
       '          <button type="button" class="btn btn-default" @click="close()">Cancel</button>' +
       '          <button class="btn btn-primary" type="submit" :disabled="formstate.$invalid">Submit</button>' +
@@ -95,7 +94,7 @@ define([
       createNewAccounting: function () {
         var model = this.model;
         var formstate = this.formstate;
-      
+
         if (formstate.$invalid) {
           return;
         }
@@ -125,7 +124,7 @@ define([
               this.communicationError = "The request could not be executed successfully";
             }).bind(this)
           );
-        
+
       },
       reset: function () {
         Object.assign(this.$data, this.$options.data());
@@ -151,9 +150,3 @@ define([
     }
   };
 });
-
-/*
-};
-
-*/
-
