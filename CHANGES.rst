@@ -18,7 +18,8 @@ What's new in SimPhoNy Remote 2.0.0
   same entity frontend and backend. Admin REST API for the Application is now
   Image and therefore resolves from /images/ (#444)
   The database needs upgrading as well via alembic. Issue `alembic upgrade head`
-  to perform the migration.
+  to perform the migration. If you are using the CSV database, change the column
+  "application.image" to "image.name"
 
 
 What's new in SimPhoNy Remote 1.1.0
