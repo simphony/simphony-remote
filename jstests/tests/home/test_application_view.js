@@ -31,7 +31,6 @@ define([
                 app_view.$el.querySelector('.box-title').innerHTML,
                 model.app_list[0].app_data.image.ui_name
             );
-
             assert.equal(
                 app_view.$el.querySelector('#app-description').innerHTML,
                 model.app_list[0].app_data.image.description
