@@ -39,10 +39,8 @@ define([
 
     var maxIframeSize = function () {
         // Returns the current iframe viewport size
-        var body = $("body");
-        var height = body.height() - $(".header").outerHeight();
-        var width = body.width() - $(".main-sidebar").outerWidth();
-        return [width, height];
+        var box = document.querySelector(".content-wrapper").getBoundingClientRect();
+        return [box.width, box.height];
     };
 
     return {
