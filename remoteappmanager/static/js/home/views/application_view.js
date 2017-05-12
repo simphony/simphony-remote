@@ -12,10 +12,14 @@ define([
             '         v-if="currentApp !== null"' +
             '         :class="{ content: true, \'no-padding\': currentApp.isRunning() }">' +
             '  <!-- Error dialog -->' +
-            '  <modal-dialog v-show="showErrorDialog">' +
-            '    <div class="alert alert-danger" role="alert">{{ error.type }}</div>' +
-            '    <button type="button" class="btn btn-default" @click="showErrorDialog = false">Cancel</button>' +
-            '  </modal-dialog>' +
+            '  <confirm-dialog v-if="showErrorDialog"' +
+            '                  :title="getErrorTitle()"' +
+            '                  :okCallback="() => showErrorDialog = false">' +
+            '    <div class="alert alert-danger">' +
+            '      <strong>Code: {{startingError.code}}</strong>' +
+            '      <span>{{startingError.message}}</span>' +
+            '    </div>' +
+            '  </confirm-dialog>' +
 
             '  <!-- Start Form -->' +
             '  <transition name="fade" v-if="!currentApp.isRunning()">' +
@@ -85,7 +89,10 @@ define([
             '</section>',
 
         data: function() {
-            return { showErrorDialog: false };
+            return {
+                showErrorDialog: false,
+                startingError: {}
+            };
         },
 
         computed: {
@@ -111,11 +118,16 @@ define([
 
         methods: {
             startApplication: function() {
+                var startingAppName = this.$options.filters.appName(this.currentApp.appData.image);
                 this.$emit('startApplication', this.currentApp);
                 this.model.startApplication().fail(function(error) {
-                    console.log(error);
+                    this.startingError = error;
+                    this.startingError.appName = startingAppName;
                     this.showErrorDialog = true;
                 }.bind(this));
+            },
+            getErrorTitle: function() {
+                return 'Error when starting ' + this.startingError.appName;
             },
             getIframeSize: function() {
                 return utils.maxIframeSize();
