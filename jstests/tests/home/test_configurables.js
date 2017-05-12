@@ -5,7 +5,7 @@ define([
 
     QUnit.module("home.configurables");
     QUnit.test("instantiation", function (assert) {
-        var resolutionConf = new configurables.resolution();
+        var resolutionConf = new configurables.resolution.model();
 
         assert.equal(resolutionConf.tag, "resolution");
         assert.deepEqual(resolutionConf.configDict, { resolution: "Window" });
@@ -17,7 +17,7 @@ define([
 
     QUnit.test("view", function (assert) {
         var propsData = { configDict: { resolution: "Window" } };
-        var component = new configurables.resolutionComponent({propsData: propsData}).$mount();
+        var component = new configurables.resolution.component({propsData: propsData}).$mount();
 
         assert.notEqual(component.$el.querySelector("select"), null);
         assert.equal(component.$el.querySelector("select").children.length, 5);
