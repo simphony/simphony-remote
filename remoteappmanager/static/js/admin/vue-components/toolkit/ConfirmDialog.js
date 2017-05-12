@@ -1,7 +1,7 @@
 define([
 ], function() {
   "use strict";
-  
+
   return {
     props: {
       title: {
@@ -10,7 +10,7 @@ define([
       },
       closeCallback: {
         type: Function,
-        default: function() {}
+        default: undefined
       },
       okCallback: {
         type: Function,
@@ -24,7 +24,7 @@ define([
     '        <div class="modal-header"><slot name="header"><h4>{{ title }}</h4></slot></div>' +
     '        <div class="modal-body"><slot></slot></div>' +
     '        <div class="modal-footer text-right">' +
-    '          <button type="button" class="btn btn-default" @click="closeCallback">Cancel</button>' +
+    '          <button v-if="closeCallback !== undefined" type="button" class="btn btn-default" @click="closeCallback">Cancel</button>' +
     '          <button class="btn btn-primary primary" @click="okCallback">Ok</button>' +
     '        </div>' +
     '      </div>' +
