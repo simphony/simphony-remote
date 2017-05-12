@@ -1,12 +1,12 @@
 define([
 ], function() {
   "use strict";
-  
+
   return {
-    template: '<transition name="modal">' +
-    '  <div class="modal-mask">' +
-    '    <div class="modal-wrapper">' +
-    '      <div class="modal-container">' +
+    template: '<transition name="modal-fade">' +
+    '  <div class="modal modal-display">' +
+    '    <div class="modal-dialog">' +
+    '      <div class="modal-content">' +
     '        <slot>' +
     '        </slot>' +
     '      </div>' +
