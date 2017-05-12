@@ -13,7 +13,7 @@ define([
             '         v-if="currentApp !== null"' +
             '         :class="{ content: true, \'no-padding\': currentApp.isRunning() }">' +
             '  <!-- Error dialog -->' +
-            '  <confirm-dialog v-if="showErrorDialog"' +
+            '  <confirm-dialog v-if="startingError.show"' +
             '                  :title="\'Error when starting \' + startingError.appName"' +
             '                  :okCallback="closeDialog">' +
             '    <div class="alert alert-danger">' +
@@ -91,8 +91,7 @@ define([
 
         data: function() {
             return {
-                showErrorDialog: false,
-                startingError: {}
+                startingError: { show: false, appName: '', code: '', message: '' }
             };
         },
 
@@ -122,13 +121,14 @@ define([
                 var startingAppName = this.$options.filters.appName(this.currentApp.appData.image);
                 this.$emit('startApplication', this.currentApp);
                 this.model.startApplication().fail(function(error) {
-                    this.startingError = error;
+                    this.startingError.code = error.code;
+                    this.startingError.message = error.message;
                     this.startingError.appName = startingAppName;
-                    this.showErrorDialog = true;
+                    this.startingError.show = true;
                 }.bind(this));
             },
             closeDialog: function() {
-                this.showErrorDialog = false;
+                this.startingError.show = false;
             },
             getIframeSize: function() {
                 return utils.maxIframeSize();

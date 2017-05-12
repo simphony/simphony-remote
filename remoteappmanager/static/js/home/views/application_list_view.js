@@ -8,7 +8,7 @@ define([
         template:
               '<section class="sidebar">' +
               '  <!-- Error dialog -->' +
-              '  <confirm-dialog v-if="showErrorDialog"' +
+              '  <confirm-dialog v-if="stoppingError.show"' +
               '                  :title="\'Error when stopping \' + stoppingError.appName"' +
               '                  :okCallback="closeDialog">' +
               '    <div class="alert alert-danger">' +
@@ -70,8 +70,7 @@ define([
         data: function() {
             return {
                 'searchInput': '',
-                showErrorDialog: false,
-                stoppingError: {}
+                stoppingError: { show: false, appName: '', code: '', message: '' }
             };
         },
 
@@ -89,13 +88,14 @@ define([
                 var stoppingAppName = this.$options.filters.appName(
                     this.model.appList[index].appData.image);
                 this.model.stopApplication(index).fail(function(error) {
-                    this.stoppingError = error;
+                    this.stoppingError.code = error.code;
+                    this.stoppingError.message = error.message;
                     this.stoppingError.appName = stoppingAppName;
-                    this.showErrorDialog = true;
+                    this.stoppingError.show = true;
                 }.bind(this));
             },
             closeDialog: function() {
-                this.showErrorDialog = false;
+                this.stoppingError.show = false;
             },
             indexOf: function(app) {
                 return this.model.appList.indexOf(app);
