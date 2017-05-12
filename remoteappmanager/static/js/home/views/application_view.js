@@ -1,7 +1,8 @@
 define([
     "urlutils",
     "utils",
-    "../../components/vue/dist/vue"
+    "../../components/vue/dist/vue",
+    "admin/vue-components/toolkit/toolkit"
 ], function (urlUtils, utils, Vue) {
     "use strict";
 
@@ -14,7 +15,7 @@ define([
             '  <!-- Error dialog -->' +
             '  <confirm-dialog v-if="showErrorDialog"' +
             '                  :title="getErrorTitle()"' +
-            '                  :okCallback="() => showErrorDialog = false">' +
+            '                  :okCallback="closeDialog">' +
             '    <div class="alert alert-danger">' +
             '      <strong>Code: {{startingError.code}}</strong>' +
             '      <span>{{startingError.message}}</span>' +
@@ -128,6 +129,9 @@ define([
             },
             getErrorTitle: function() {
                 return 'Error when starting ' + this.startingError.appName;
+            },
+            closeDialog: function() {
+                this.showErrorDialog = false;
             },
             getIframeSize: function() {
                 return utils.maxIframeSize();
