@@ -153,19 +153,26 @@ define([
             configurablesData[tag] = configurable.asConfigDict();
         });
 
-        return resources.Container.create({
+        var startPromise = $.Deferred();
+
+        resources.Container.create({
             mapping_id: currentApp.appData.mapping_id,
             configurables: configurablesData
-        }).done(function() {
+        })
+        .done(function() {
             this.updateIdx(selectedIndex)
+            .done(startPromise.resolve)
             .fail(function(error) {
                 currentApp.status = Status.STOPPED;
-                return error;
+                startPromise.reject(error);
             });
-        }.bind(this)).fail(function(error) {
+        }.bind(this))
+        .fail(function(error) {
             currentApp.status = Status.STOPPED;
-            return error;
+            startPromise.reject(error);
         });
+
+        return startPromise;
     };
 
     ApplicationListModel.prototype.stopApplication = function(index) {
@@ -174,18 +181,23 @@ define([
 
         var url_id = appStopping.appData.container.url_id;
 
-        return resources.Container.delete(url_id)
+        var stopPromise = $.Deferred();
+
+        resources.Container.delete(url_id)
         .done(function() {
             this.updateIdx(index)
+            .done(stopPromise.resolve)
             .fail(function(error) {
                 appStopping.status = Status.STOPPED;
-                return error;
+                stopPromise.reject(error);
             });
         }.bind(this))
         .fail(function(error) {
             appStopping.status = Status.STOPPED;
-            return error;
+            stopPromise.reject(error);
         });
+
+        return stopPromise;
     };
 
     return {

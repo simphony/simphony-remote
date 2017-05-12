@@ -118,9 +118,13 @@ define([
 
         methods: {
             startApplication: function() {
-                var startingAppName = this.$options.filters.appName(this.currentApp.appData.image);
-                this.$emit('startApplication', this.currentApp);
-                this.model.startApplication().fail(function(error) {
+                var startingApp = this.currentApp;
+                var startingAppName = this.$options.filters.appName(startingApp.appData.image);
+                this.model.startApplication()
+                .done(function() {
+                    this.$emit('startApplication', startingApp);
+                }.bind(this))
+                .fail(function(error) {
                     this.startingError.code = error.code;
                     this.startingError.message = error.message;
                     this.startingError.appName = startingAppName;
