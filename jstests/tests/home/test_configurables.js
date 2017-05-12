@@ -5,22 +5,21 @@ define([
 
     QUnit.module("home.configurables");
     QUnit.test("instantiation", function (assert) {
-        var resolution_class = configurables.from_tag("resolution");
-        var resolution = new resolution_class();
-        assert.equal(resolution.tag, "resolution");
-        assert.equal(resolution.resolution, "Window");
-        
-        resolution.resolution = "1024x768";
-        assert.equal(resolution.as_config_dict().resolution, "1024x768");
-    });
-    
-    QUnit.test("view", function (assert) {
-        var resolution_class = configurables.from_tag("resolution");
-        var resolution = new resolution_class();
+        var resolutionConf = new configurables.resolution.model();
 
-        var view = resolution.view();
-        assert.notEqual(view.find("select"), null);
-        assert.equal(view.find("option").length, 
-            resolution.resolution_options.length);
+        assert.equal(resolutionConf.tag, "resolution");
+        assert.deepEqual(resolutionConf.configDict, { resolution: "Window" });
+        assert.notEqual(resolutionConf.asConfigDict().resolution, "Window");
+
+        resolutionConf.configDict = { resolution: '1280x1024' };
+        assert.equal(resolutionConf.asConfigDict().resolution, '1280x1024');
+    });
+
+    QUnit.test("view", function (assert) {
+        var propsData = { configDict: { resolution: "Window" } };
+        var component = new configurables.resolution.component({propsData: propsData}).$mount();
+
+        assert.notEqual(component.$el.querySelector("select"), null);
+        assert.equal(component.$el.querySelector("select").children.length, 5);
     });
 });

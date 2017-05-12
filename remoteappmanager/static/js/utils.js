@@ -9,7 +9,7 @@ define([
     'jquery'
 ], function ($) {
     "use strict";
-        
+
     var all = function (promises) {
         // A form of jQuery.when that handles an array of promises
         // and equalises the behavior regardless if there's one or more than
@@ -18,7 +18,7 @@ define([
             throw new Error("$.all() must be passed an array of promises");
         }
         return $.when.apply($, promises).then(function () {
-            // if single argument was expanded into multiple arguments, 
+            // if single argument was expanded into multiple arguments,
             // then put it back into an array for consistency
             if (promises.length === 1 && arguments.length > 1) {
                 // put arguments into an array
@@ -28,7 +28,7 @@ define([
             }
         });
     };
-    
+
     var update = function (d1, d2) {
         // Transfers the keys from d2 to d1. Returns d1
         $.map(d2, function (i, key) {
@@ -36,19 +36,17 @@ define([
         });
         return d1;
     };
-    
-    var max_iframe_size = function () {
-        // Returns the current iframe viewport size 
-        var body = $("body");
-        var height = body.height() - $(".header").outerHeight();
-        var width = body.width() - $(".main-sidebar").outerWidth();
-        return [width, height];
+
+    var maxIframeSize = function () {
+        // Returns the current iframe viewport size
+        var box = document.querySelector(".content-wrapper").getBoundingClientRect();
+        return [box.width, box.height];
     };
 
     return {
         all : all,
         update : update,
-        max_iframe_size: max_iframe_size  
+        maxIframeSize: maxIframeSize
     };
-    
-}); 
+
+});
