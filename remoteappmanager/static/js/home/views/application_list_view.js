@@ -1,5 +1,6 @@
 define([
-    '../../components/vue/dist/vue',
+    "../../components/vue/dist/vue",
+    "admin/vue-components/toolkit/toolkit"
 ], function (Vue) {
     'use strict';
 
