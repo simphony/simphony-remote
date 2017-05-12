@@ -23,8 +23,7 @@ define([
             '  </confirm-dialog>' +
 
             '  <!-- Start Form -->' +
-            '  <transition name="fade" v-if="!currentApp.isRunning()">' +
-            '  <div v-if="currentApp.isStopped()" class="row">' +
+            '  <div v-if="!currentApp.isRunning()" class="row">' +
             '    <div class="col-md-offset-2 col-md-8">' +
             '      <div class="box box-primary">' +
             '        <div class="box-header with-border">' +
@@ -78,7 +77,7 @@ define([
             '      </div>' +
             '    </div>' +
             '  </div>' +
-            '  </transition>' +
+
 
             '  <!-- Application View -->' +
             '  <iframe v-if="currentApp.isRunning()"' +
