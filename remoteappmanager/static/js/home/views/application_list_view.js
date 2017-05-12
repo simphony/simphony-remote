@@ -1,11 +1,22 @@
 define([
-    '../../components/vue/dist/vue',
+    "../../components/vue/dist/vue",
+    "admin/vue-components/toolkit/toolkit"
 ], function (Vue) {
     'use strict';
 
     var ApplicationListView = Vue.extend({
         template:
-            '<section class="sidebar">' +
+              '<section class="sidebar">' +
+              '  <!-- Error dialog -->' +
+              '  <confirm-dialog v-if="stoppingError.show"' +
+              '                  :title="\'Error when stopping \' + stoppingError.appName"' +
+              '                  :okCallback="closeDialog">' +
+              '    <div class="alert alert-danger">' +
+              '      <strong>Code: {{stoppingError.code}}</strong>' +
+              '      <span>{{stoppingError.message}}</span>' +
+              '    </div>' +
+              '  </confirm-dialog>' +
+
               '<!-- Search form -->' +
               '<form action="#" class="sidebar-form">' +
               '  <input type="text" name="q" class="form-control" placeholder="Search..." v-model="searchInput">' +
@@ -44,7 +55,7 @@ define([
 
               '      <button class="stop-button"' +
               '              v-if="app.isRunning()"' +
-              '              @click="model.stopApplication(indexOf(app))"' +
+              '              @click="stopApplication(indexOf(app))"' +
               '              :disabled="app.isStopping()">' +
               '        <i class="fa fa-times"></i>' +
               '      </button>' +
@@ -57,7 +68,10 @@ define([
             '<!-- /.sidebar -->',
 
         data: function() {
-            return { 'searchInput': '' };
+            return {
+                'searchInput': '',
+                stoppingError: { show: false, appName: '', code: '', message: '' }
+            };
         },
 
         computed: {
@@ -70,6 +84,19 @@ define([
         },
 
         methods: {
+            stopApplication: function(index) {
+                var stoppingAppName = this.$options.filters.appName(
+                    this.model.appList[index].appData.image);
+                this.model.stopApplication(index).fail(function(error) {
+                    this.stoppingError.code = error.code;
+                    this.stoppingError.message = error.message;
+                    this.stoppingError.appName = stoppingAppName;
+                    this.stoppingError.show = true;
+                }.bind(this));
+            },
+            closeDialog: function() {
+                this.stoppingError.show = false;
+            },
             indexOf: function(app) {
                 return this.model.appList.indexOf(app);
             }

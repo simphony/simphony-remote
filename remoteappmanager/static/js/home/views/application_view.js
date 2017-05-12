@@ -1,7 +1,8 @@
 define([
     "urlutils",
     "utils",
-    '../../components/vue/dist/vue'
+    "../../components/vue/dist/vue",
+    "admin/vue-components/toolkit/toolkit"
 ], function (urlUtils, utils, Vue) {
     "use strict";
 
@@ -11,6 +12,16 @@ define([
             '<section id="appview"' +
             '         v-if="currentApp !== null"' +
             '         :class="{ content: true, \'no-padding\': currentApp.isRunning() }">' +
+            '  <!-- Error dialog -->' +
+            '  <confirm-dialog v-if="startingError.show"' +
+            '                  :title="\'Error when starting \' + startingError.appName"' +
+            '                  :okCallback="closeDialog">' +
+            '    <div class="alert alert-danger">' +
+            '      <strong>Code: {{startingError.code}}</strong>' +
+            '      <span>{{startingError.message}}</span>' +
+            '    </div>' +
+            '  </confirm-dialog>' +
+
             '  <!-- Start Form -->' +
             '  <transition name="fade" v-if="!currentApp.isRunning()">' +
             '  <div v-if="currentApp.isStopped()" class="row">' +
@@ -78,6 +89,12 @@ define([
             '  </iframe>' +
             '</section>',
 
+        data: function() {
+            return {
+                startingError: { show: false, appName: '', code: '', message: '' }
+            };
+        },
+
         computed: {
             currentApp: function() {
                 return this.model.appList[this.model.selectedIndex] || null;
@@ -101,8 +118,21 @@ define([
 
         methods: {
             startApplication: function() {
-                this.$emit('startApplication', this.currentApp);
-                this.model.startApplication();
+                var startingApp = this.currentApp;
+                var startingAppName = this.$options.filters.appName(startingApp.appData.image);
+                this.model.startApplication()
+                .done(function() {
+                    this.$emit('startApplication', startingApp);
+                }.bind(this))
+                .fail(function(error) {
+                    this.startingError.code = error.code;
+                    this.startingError.message = error.message;
+                    this.startingError.appName = startingAppName;
+                    this.startingError.show = true;
+                }.bind(this));
+            },
+            closeDialog: function() {
+                this.startingError.show = false;
             },
             getIframeSize: function() {
                 return utils.maxIframeSize();
