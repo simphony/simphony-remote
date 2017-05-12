@@ -9,7 +9,7 @@ define([
               '<section class="sidebar">' +
               '  <!-- Error dialog -->' +
               '  <confirm-dialog v-if="showErrorDialog"' +
-              '                  :title="getErrorTitle()"' +
+              '                  :title="\'Error when stopping \' + stoppingError.appName"' +
               '                  :okCallback="closeDialog">' +
               '    <div class="alert alert-danger">' +
               '      <strong>Code: {{stoppingError.code}}</strong>' +
@@ -93,9 +93,6 @@ define([
                     this.stoppingError.appName = stoppingAppName;
                     this.showErrorDialog = true;
                 }.bind(this));
-            },
-            getErrorTitle: function() {
-                return 'Error when stopping ' + this.stoppingError.appName;
             },
             closeDialog: function() {
                 this.showErrorDialog = false;

@@ -14,7 +14,7 @@ define([
             '         :class="{ content: true, \'no-padding\': currentApp.isRunning() }">' +
             '  <!-- Error dialog -->' +
             '  <confirm-dialog v-if="showErrorDialog"' +
-            '                  :title="getErrorTitle()"' +
+            '                  :title="\'Error when starting \' + startingError.appName"' +
             '                  :okCallback="closeDialog">' +
             '    <div class="alert alert-danger">' +
             '      <strong>Code: {{startingError.code}}</strong>' +
@@ -126,9 +126,6 @@ define([
                     this.startingError.appName = startingAppName;
                     this.showErrorDialog = true;
                 }.bind(this));
-            },
-            getErrorTitle: function() {
-                return 'Error when starting ' + this.startingError.appName;
             },
             closeDialog: function() {
                 this.showErrorDialog = false;
