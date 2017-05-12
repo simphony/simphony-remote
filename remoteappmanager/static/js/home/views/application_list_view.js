@@ -5,7 +5,17 @@ define([
 
     var ApplicationListView = Vue.extend({
         template:
-            '<section class="sidebar">' +
+              '<section class="sidebar">' +
+              '  <!-- Error dialog -->' +
+              '  <confirm-dialog v-if="showErrorDialog"' +
+              '                  :title="getErrorTitle()"' +
+              '                  :okCallback="closeDialog">' +
+              '    <div class="alert alert-danger">' +
+              '      <strong>Code: {{stoppingError.code}}</strong>' +
+              '      <span>{{stoppingError.message}}</span>' +
+              '    </div>' +
+              '  </confirm-dialog>' +
+
               '<!-- Search form -->' +
               '<form action="#" class="sidebar-form">' +
               '  <input type="text" name="q" class="form-control" placeholder="Search..." v-model="searchInput">' +
@@ -44,7 +54,7 @@ define([
 
               '      <button class="stop-button"' +
               '              v-if="app.isRunning()"' +
-              '              @click="model.stopApplication(indexOf(app))"' +
+              '              @click="stopApplication(indexOf(app))"' +
               '              :disabled="app.isStopping()">' +
               '        <i class="fa fa-times"></i>' +
               '      </button>' +
@@ -57,7 +67,11 @@ define([
             '<!-- /.sidebar -->',
 
         data: function() {
-            return { 'searchInput': '' };
+            return {
+                'searchInput': '',
+                showErrorDialog: false,
+                stoppingError: {}
+            };
         },
 
         computed: {
@@ -70,6 +84,21 @@ define([
         },
 
         methods: {
+            stopApplication: function(index) {
+                var stoppingAppName = this.$options.filters.appName(
+                    this.model.appList[index].appData.image);
+                this.model.stopApplication(index).fail(function(error) {
+                    this.stoppingError = error;
+                    this.stoppingError.appName = stoppingAppName;
+                    this.showErrorDialog = true;
+                }.bind(this));
+            },
+            getErrorTitle: function() {
+                return 'Error when stopping ' + this.stoppingError.appName;
+            },
+            closeDialog: function() {
+                this.showErrorDialog = false;
+            },
             indexOf: function(app) {
                 return this.model.appList.indexOf(app);
             }
