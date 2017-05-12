@@ -77,6 +77,7 @@ define([
                     appData: applicationData,
                     // Default values, will be overwritten
                     status: Status.STOPPED,
+                    // If true the user will see the loading spinner (when starting the application)
                     delayed: true,
                     configurables: [],
                     isRunning: function() {return this.status === Status.RUNNING;},
