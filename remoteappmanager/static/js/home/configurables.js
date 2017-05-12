@@ -49,9 +49,13 @@ define([
         return { resolution: resolution };
     };
 
+    var outputConfigurables = {};
+
     // Export all your configurable models here
-    return {
-        resolution: ResolutionModel,
-        resolutionComponent: resolutionComponent
+    outputConfigurables[resolutionTag] = {
+        model: ResolutionModel,
+        component: resolutionComponent
     };
+
+    return outputConfigurables;
 });
