@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "jshint": "*",
-    "node-qunit-phantomjs": "*"
+    "node-qunit-phantomjs": "*",
+    "webpack": "^2.5.1"
   }
 }
