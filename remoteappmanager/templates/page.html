@@ -56,23 +56,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="{{static_url("components/requirejs/require.js") }}" type="text/javascript" charset="utf-8"></script>
   {% endblock %}
 
-  {% block script_init %}
-    <script type="text/javascript">
-      window.apidata = {
-        base_url: "{{base_url}}",
-        prefix: "{{prefix}}",
-        {% if user %}
-          user: "{{user.name}}",
-        {% endif %}
-        {% if analytics %}
-          analytics: {
-            tracking_id: "{{ analytics.tracking_id }}"
-          },
-        {% endif %}
-      }
-    </script>
-  {% endblock %}
-
   {% block meta %}
   {% endblock %}
 </head>
@@ -162,6 +145,23 @@ scratch. This page gets rid of all links and provides the needed markup only.
     The error
     </div>
   {% endcall %}
+  {% endblock %}
+
+  {% block script_init %}
+    <script type="text/javascript">
+      window.apidata = {
+        base_url: "{{base_url}}",
+        prefix: "{{prefix}}",
+        {% if user %}
+          user: "{{user.name}}",
+        {% endif %}
+        {% if analytics %}
+          analytics: {
+            tracking_id: "{{ analytics.tracking_id }}"
+          },
+        {% endif %}
+      }
+    </script>
   {% endblock %}
 
 </body>
