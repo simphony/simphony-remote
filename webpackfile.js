@@ -1,5 +1,5 @@
 var path = require("path");
-var components = path.resolve(__dirname, "remoteappmanager/static/components");
+var components = path.resolve(__dirname, "remoteappmanager/static/bower_components");
 var js = path.resolve(__dirname, "remoteappmanager/static/js");
 
 module.exports = {
@@ -30,5 +30,20 @@ module.exports = {
             filters: path.resolve(js, "vue/filters"),
             toolkit: path.resolve(js, "admin/vue-components/toolkit/toolkit"),
         }
+    },
+
+    module: {
+        rules: [
+            {
+                test: /\.js$/,
+                exclude: /(node_modules|bower_components)/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['env']
+                    }
+                }
+            }
+        ]
     }
 }

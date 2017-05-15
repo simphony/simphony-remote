@@ -10,12 +10,16 @@
   },
   "scripts": {
     "watch": "webpack --watch",
-    "build": "webpack -p"},
+    "build": "webpack -p"
+  },
   "dependencies": {
     "bower": "*",
     "configurable-http-proxy": "git://github.com/jupyterhub/configurable-http-proxy.git#2.0.1"
   },
   "devDependencies": {
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-preset-env": "^1.4.0",
     "jshint": "*",
     "node-qunit-phantomjs": "*",
     "webpack": "2.5.1"
