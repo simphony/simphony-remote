@@ -17,18 +17,15 @@ module.exports = {
         extensions: ["*", ".js"],
         alias: {
             jquery: path.resolve(components, "admin-lte/plugins/jQuery/jquery-2.2.3.min"),
-            vuejs: path.resolve(components, "vue/dist/vue.js"),
-            // resources: path.resolve(__dirname, "remoteappmanager/jsapi/v1/resources"),
+            vuejs: path.resolve(components, "vue/dist/vue"),
 
-            gamodule: path.resolve(js, "gamodule.js"),
+            resources: path.resolve(js, "resources"),
+            gamodule: path.resolve(js, "gamodule"),
             urlutils: path.resolve(js, "urlutils"),
             utils: path.resolve(js, "utils"),
 
-            filters: path.resolve(js, "vue/filters.js"),
-            toolkit: path.resolve(js, "admin/vue-components/toolkit/toolkit.js"),
+            filters: path.resolve(js, "vue/filters"),
+            toolkit: path.resolve(js, "admin/vue-components/toolkit/toolkit"),
         }
-    },
-    externals: {
-        resources: "commonjs " + path.resolve(__dirname, "remoteappmanager/jsapi/v1/resources")
     }
 }
