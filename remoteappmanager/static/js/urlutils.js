@@ -5,8 +5,6 @@
 // Modifications Copyright (c) Juptyer Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-"use strict";
-
 var pathJoin = function () {
     // join a sequence of url components with '/'
     var url = '', i = 0;

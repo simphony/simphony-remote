@@ -1,5 +1,3 @@
-"use strict";
-
 module.exports = {
     template: '<transition name="modal-fade">' +
         '  <div class="modal modal-display">' +

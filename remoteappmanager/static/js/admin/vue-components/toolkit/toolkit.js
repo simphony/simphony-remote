@@ -1,5 +1,3 @@
-"use strict";
-
 var Vue = require("vuejs");
 var ConfirmDialog = require("./ConfirmDialog");
 var ModalDialog = require("./ModalDialog");

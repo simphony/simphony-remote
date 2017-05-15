@@ -1,5 +1,3 @@
-"use strict";
-
 var path = require("path");
 var components = path.resolve(__dirname, "remoteappmanager/static/components");
 var js = path.resolve(__dirname, "remoteappmanager/static/js");

@@ -2,8 +2,6 @@
 // MUST not be renamed to analytics. Some blockers rely on name
 // matching to prevent loading.
 
-"use strict";
-
 function init() {
     if (window.apidata.analytics !== undefined) {
         window.ga('create', window.apidata.analytics.tracking_id, 'auto');

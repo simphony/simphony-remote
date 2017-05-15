@@ -1,5 +1,3 @@
-"use strict";
-
 var $ = require("jquery");
 var urlUtils = require("urlutils");
 var utils = require("utils");

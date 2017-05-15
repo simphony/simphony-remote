@@ -1,5 +1,3 @@
-"use strict";
-
 var $ = require("jquery");
 var resources = require("resources");
 var configurables = require("./configurables");

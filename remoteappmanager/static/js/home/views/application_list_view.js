@@ -1,5 +1,3 @@
-'use strict';
-
 var Vue = require("vuejs");
 require("toolkit");
 

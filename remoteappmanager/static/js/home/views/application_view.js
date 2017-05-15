@@ -1,5 +1,3 @@
-"use strict";
-
 var Vue = require("vuejs");
 var urlUtils = require("urlutils");
 var utils = require("utils");
