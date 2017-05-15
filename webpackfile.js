@@ -7,15 +7,19 @@ module.exports = {
         admin: path.resolve(js, "admin/main.js"),
         user: path.resolve(js, "home/controller.js")
     },
+
     output: {
         path: path.resolve(__dirname, "remoteappmanager/static/dist"),
         filename: "[name].js"
     },
+
     resolve: {
         extensions: ["*", ".js"],
         alias: {
             jquery: path.resolve(components, "admin-lte/plugins/jQuery/jquery-2.2.3.min"),
             vuejs: path.resolve(components, "vue/dist/vue"),
+            "vue-router": path.resolve(components, "vue-router/dist/vue-router"),
+            "vue-form": path.resolve(components, "vue-form/dist/vue-form"),
 
             resources: path.resolve(js, "resources"),
             gamodule: path.resolve(js, "gamodule"),
