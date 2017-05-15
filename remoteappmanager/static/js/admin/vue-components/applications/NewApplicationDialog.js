@@ -1,4 +1,4 @@
-var resources = require("resources");
+var resources = require("admin-resources");
 
 module.exports = {
     template:

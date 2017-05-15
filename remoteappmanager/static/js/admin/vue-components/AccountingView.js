@@ -1,4 +1,4 @@
-var resources = require("resources");
+var resources = require("admin-resources");
 var NewAccountingDialog = require("./accounting/NewAccountingDialog");
 
 module.exports = {

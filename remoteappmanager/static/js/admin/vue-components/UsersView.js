@@ -1,4 +1,4 @@
-var resources = require("resources");
+var resources = require("admin-resources");
 var NewUserDialog = require("./users/NewUserDialog")
 
 module.exports = {
