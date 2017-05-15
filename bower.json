@@ -17,7 +17,6 @@
         "ionicons": "~2.0.1",
         "jquery": "components/jquery#~2.0",
         "moment": "~2.7",
-        "requirejs": "~2.1",
         "datatables.net": "~1.10.12",
         "datatables.net-dt": "~1.10.12",
         "admin-lte": "~2.3.11",

@@ -52,8 +52,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
     {% if analytics %}
     <script src='https://www.google-analytics.com/analytics.js' async type="text/javascript"></script>
     {% endif %}
-    <!-- Will be removed when resources will not be load with require anymore -->
-    <script src="{{static_url("components/requirejs/require.js") }}" type="text/javascript" charset="utf-8"></script>
   {% endblock %}
 
   {% block meta %}
