@@ -44,30 +44,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
   {% if analytics %}
     <script src='https://www.google-analytics.com/analytics.js' async type="text/javascript"></script>
   {% endif %}
-  <script src="{{static_url("components/requirejs/require.js") }}" type="text/javascript" charset="utf-8"></script>
-
-  <script>
-    require.config({
-      {% if version_hash %}
-        urlArgs: "v={{version_hash}}",
-      {% endif %}
-      baseUrl: '{{static_url("js", include_version=False)}}',
-      paths: {
-        components: '../components',
-        jquery: '../components/admin-lte/plugins/jQuery/jquery-2.2.3.min',
-        moment: "../components/moment/moment",
-        datatables: "../components/datatables.net/js/jquery.dataTables",
-        jsapi: "../../jsapi",
-        handlebars: "../components/handlebars/handlebars.amd.min",
-        underscore: "../components/underscore/underscore-min"
-      },
-      shim: {
-        datatables: {
-          deps: ["jquery"]
-        }
-      }
-    });
-  </script>
 
   <script type="text/javascript">
     window.apidata = {
@@ -82,7 +58,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
         },
       {% endif %}
     };
-    require(["admin/main"]);
   </script>
 </head>
 <body class="hold-transition skin-red sidebar-mini">
@@ -180,6 +155,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <script src="{{ static_url("components/admin-lte/bootstrap/js/bootstrap.min.js") }}"></script>
   <script src="{{ static_url("components/admin-lte/dist/js/app.min.js") }}"></script>
 
+  <script src="{{ static_url("dist/admin.js") }}"></script>
 {% block dialogs %}
   {% call macros.modal_dlg('Error', btn_label='OK') %}
     <div class="error-msg">
