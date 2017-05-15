@@ -42,5 +42,8 @@
     "sub"           : false,
     "trailing"      : true,
     "white"         : false,
-    "indent"        : 4
+    "indent"        : 4,
+    "globals": {
+        "module": true
+    }
 }
