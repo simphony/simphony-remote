@@ -1,6 +1,6 @@
 var resources = require("resources");
 
-modules.exports = {
+module.exports = {
     template:
         '<div class="row">' +
         '  <div class="col-md-12">' +
