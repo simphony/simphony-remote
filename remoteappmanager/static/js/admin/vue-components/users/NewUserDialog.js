@@ -1,10 +1,6 @@
-define([
-  "components/vue/dist/vue",
-  "jsapi/v1/resources"
-], function(Vue, resources) {
-  "use strict";
+var resources = require("resources");
 
-  return {
+module.exports = {
     template:
         '<modal-dialog>' +
         '  <div class="modal-header"><h4>Create New User</h4></div>' +
@@ -24,56 +20,57 @@ define([
         '    </vue-form> ' +
         '  </div>' +
         '</modal-dialog>',
+
     props: ['show'],
 
     data: function () {
-      return {
-        formstate: {},
-        model: {
-          name: ''
-        }
-      };
+        return {
+            formstate: {},
+            model: {
+                name: ''
+            }
+        };
     },
+
     methods: {
-      close: function () {
-        this.$emit('closed');
-      },
-      fieldClassName: function (field) {
-        if (!field) {
-          return '';
+        close: function () {
+            this.$emit('closed');
+        },
+
+        fieldClassName: function (field) {
+            if (!field) {
+                return '';
+            }
+            if ((field.$touched || field.$submitted) && field.$invalid) {
+                return 'has-error';
+            } else {
+                return '';
+            }
+        },
+
+        createNewUser: function () {
+            if (!this.formstate.$valid) {
+                return;
+            }
+            resources.User.create({name: this.model.name})
+            .done((function () {
+                this.$emit('created');
+            }).bind(this))
+            .fail(function () {
+                this.$emit("closed");
+            }.bind(this));
+        },
+
+        reset: function () {
+            Object.assign(this.$data, this.$options.data());
         }
-        if ((field.$touched || field.$submitted) && field.$invalid) {
-          return 'has-error';
-        } else {
-          return '';
-        }
-      },
-      createNewUser: function () {
-        if (!this.formstate.$valid) {
-          return;
-        }
-        resources.User.create({name: this.model.name})
-          .done((
-            function () {
-              this.$emit('created');
-            }).bind(this)
-          )
-          .fail(
-            (function () {
-              this.$emit("closed");
-            }).bind(this)
-          );
-      },
-      reset: function () {
-        Object.assign(this.$data, this.$options.data());
-      }
     },
+
     watch: {
-      "show": function (value) {
-        if (value) {
-          this.reset();
+        "show": function (value) {
+            if (value) {
+                this.reset();
+            }
         }
-      }
     }
-  };
-});
+};

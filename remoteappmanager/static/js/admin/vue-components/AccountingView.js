@@ -1,4 +1,3 @@
-var Vue = require("vuejs");
 var resources = require("resources");
 var NewAccountingDialog = require("./accounting/NewAccountingDialog");
 
