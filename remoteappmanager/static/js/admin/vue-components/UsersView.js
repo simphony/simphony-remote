@@ -1,5 +1,5 @@
 var resources = require("admin-resources");
-var NewUserDialog = require("./users/NewUserDialog")
+var NewUserDialog = require("./users/NewUserDialog");
 
 module.exports = {
     components: {

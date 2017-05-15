@@ -15,10 +15,10 @@ var object_to_query_args = function (obj) {
         var key_enc = encodeURIComponent(key);
         if ($.isArray(value)) {
             for (var v in value) {
-                result.push(key_enc+"="+encodeURIComponent(v))
+                result.push(key_enc+"="+encodeURIComponent(v));
             }
         } else {
-            result.push(key_enc+"="+encodeURIComponent(value))
+            result.push(key_enc+"="+encodeURIComponent(value));
         }
     }
 
@@ -55,20 +55,20 @@ var API = (function () {
             )+'/';
 
         if (query_args) {
-            url = url + "?" + object_to_query_args(query_args)
+            url = url + "?" + object_to_query_args(query_args);
         }
         return $.ajax(url, options);
     };
     return self;
 })();
 
-var Error = function(code, message) {
+var RestError = function(code, message) {
     console.log("Creating error "+code+" message: "+message);
     this.code = code;
     this.message = message;
 };
 
-var fail_handler = function(promise, jqXHR, textStatus, error) {
+var fail_handler = function(promise, jqXHR) {
     var status = jqXHR.status;
     var payload = null;
     try {
@@ -77,7 +77,7 @@ var fail_handler = function(promise, jqXHR, textStatus, error) {
         // Suppress any syntax error and discard the payload
     }
 
-    var err = new Error(status, "");
+    var err = new RestError(status, "");
     if (payload !== null) {
         utils.update(err, payload);
     }
@@ -118,39 +118,6 @@ var create_handler = function(promise, data, textStatus, jqXHR) {
         return;
     }
     promise.resolve(id, location);
-};
-
-var create_singleton_handler = function(promise, data, textStatus, jqXHR) {
-    var status = jqXHR.status;
-
-    var payload = null;
-    try {
-        payload = JSON.parse(data);
-    } catch (e) {
-        // Suppress any syntax error and discard the payload
-    }
-
-    if (status !== 201) {
-        // Strange situation in which the call succeeded, but
-        // not with a 201. Just do our best.
-        console.log(
-          "Create succeded but response with status " +
-          status +
-          " instead of 201."
-        );
-        promise.reject(status, payload);
-        return;
-    }
-
-    var location;
-    try {
-        location = jqXHR.getResponseHeader('Location');
-    } catch (e) {
-        console.log("Response had invalid or absent Location header");
-        promise.reject(status, payload);
-        return;
-    }
-    promise.resolve(location);
 };
 
 var update_handler = function(promise, data, textStatus, jqXHR) {
@@ -241,8 +208,8 @@ var Resource = function(type) {
             .done(function(data, textStatus, jqXHR) {
                 create_handler(promise, data, textStatus, jqXHR);
             })
-            .fail(function(jqXHR, textStatus, error) {
-                fail_handler(promise, jqXHR, textStatus, error);
+            .fail(function(jqXHR) {
+                fail_handler(promise, jqXHR);
             });
 
         return promise;
@@ -254,11 +221,11 @@ var Resource = function(type) {
 
         API.request("PUT", urlUtils.pathJoin(type, id), body, query_args)
             .done(function(data, textStatus, jqXHR) {
-                update_handler(promise, data, textStatus, jqXHR)
+                update_handler(promise, data, textStatus, jqXHR);
               }
             )
-            .fail(function(jqXHR, textStatus, error) {
-                fail_handler(promise, jqXHR, textStatus, error);
+            .fail(function(jqXHR) {
+                fail_handler(promise, jqXHR);
             });
 
         return promise;
@@ -272,8 +239,8 @@ var Resource = function(type) {
                 delete_handler(promise, data, textStatus, jqXHR);
             }
             )
-            .fail(function(jqXHR, textStatus, error) {
-                fail_handler(promise, jqXHR, textStatus, error);
+            .fail(function(jqXHR) {
+                fail_handler(promise, jqXHR);
             });
 
         return promise;
@@ -287,8 +254,8 @@ var Resource = function(type) {
                 retrieve_handler(promise, data, textStatus, jqXHR);
             }
             )
-            .fail(function(jqXHR, textStatus, error) {
-                fail_handler(promise, jqXHR, textStatus, error);
+            .fail(function(jqXHR) {
+                fail_handler(promise, jqXHR);
             });
 
         return promise;
@@ -332,74 +299,9 @@ var Resource = function(type) {
                     payload.offset,
                     payload.total);
             })
-            .fail(function(jqXHR, textStatus, error) {
-                fail_handler(promise, jqXHR, textStatus, error);
+            .fail(function(jqXHR) {
+                fail_handler(promise, jqXHR);
             });
-
-        return promise;
-    };
-};
-
-var SingletonResource = function(type) {
-    this.type = type;
-    this.create = function(representation, query_args) {
-        var body = JSON.stringify(representation);
-        var promise = $.Deferred();
-
-        API.request("POST", type, body, query_args)
-          .done(function(data, textStatus, jqXHR) {
-              create_singleton_handler(promise, data, textStatus, jqXHR);
-          })
-          .fail(function(jqXHR, textStatus, error) {
-              fail_handler(promise, jqXHR, textStatus, error);
-          });
-
-        return promise;
-    };
-    this.update = function(representation, query_args) {
-        var body = JSON.stringify(representation);
-        var promise = $.Deferred();
-
-        API.request("PUT", type, body, query_args)
-          .done(function(data, textStatus, jqXHR) {
-                update_handler(promise, data, textStatus, jqXHR)
-            }
-          )
-          .fail(function(jqXHR, textStatus, error) {
-              fail_handler(promise, jqXHR, textStatus, error);
-          });
-
-        return promise;
-
-
-    };
-
-    this.delete = function(query_args) {
-        var promise = $.Deferred();
-
-        API.request("DELETE", type, null, query_args)
-          .done(function(data, textStatus, jqXHR) {
-                delete_handler(promise, data, textStatus, jqXHR);
-            }
-          )
-          .fail(function(jqXHR, textStatus, error) {
-              fail_handler(promise, jqXHR, textStatus, error);
-          });
-
-        return promise;
-    };
-
-    this.retrieve = function(query_args) {
-        var promise = $.Deferred();
-
-        API.request("GET", type, null, query_args)
-          .done(function(data, textStatus, jqXHR) {
-                retrieve_handler(promise, data, textStatus, jqXHR);
-            }
-          )
-          .fail(function(jqXHR, textStatus, error) {
-              fail_handler(promise, jqXHR, textStatus, error);
-          });
 
         return promise;
     };

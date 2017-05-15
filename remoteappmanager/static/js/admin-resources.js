@@ -15,10 +15,10 @@ var object_to_query_args = function (obj) {
         var key_enc = encodeURIComponent(key);
         if ($.isArray(value)) {
             for (var v in value) {
-                result.push(key_enc+"="+encodeURIComponent(v))
+                result.push(key_enc+"="+encodeURIComponent(v));
             }
         } else {
-            result.push(key_enc+"="+encodeURIComponent(value))
+            result.push(key_enc+"="+encodeURIComponent(value));
         }
     }
 
@@ -55,20 +55,20 @@ var API = (function () {
             )+'/';
 
         if (query_args) {
-            url = url + "?" + object_to_query_args(query_args)
+            url = url + "?" + object_to_query_args(query_args);
         }
         return $.ajax(url, options);
     };
     return self;
 })();
 
-var Error = function(code, message) {
+var RestError = function(code, message) {
     console.log("Creating error "+code+" message: "+message);
     this.code = code;
     this.message = message;
 };
 
-var fail_handler = function(promise, jqXHR, textStatus, error) {
+var fail_handler = function(promise, jqXHR) {
     var status = jqXHR.status;
     var payload = null;
     try {
@@ -77,7 +77,7 @@ var fail_handler = function(promise, jqXHR, textStatus, error) {
         // Suppress any syntax error and discard the payload
     }
 
-    var err = new Error(status, "");
+    var err = new RestError(status, "");
     if (payload !== null) {
         utils.update(err, payload);
     }
@@ -241,8 +241,8 @@ var Resource = function(type) {
             .done(function(data, textStatus, jqXHR) {
                 create_handler(promise, data, textStatus, jqXHR);
             })
-            .fail(function(jqXHR, textStatus, error) {
-                fail_handler(promise, jqXHR, textStatus, error);
+            .fail(function(jqXHR) {
+                fail_handler(promise, jqXHR);
             });
 
         return promise;
@@ -254,11 +254,11 @@ var Resource = function(type) {
 
         API.request("PUT", urlUtils.pathJoin(type, id), body, query_args)
             .done(function(data, textStatus, jqXHR) {
-                update_handler(promise, data, textStatus, jqXHR)
+                update_handler(promise, data, textStatus, jqXHR);
               }
             )
-            .fail(function(jqXHR, textStatus, error) {
-                fail_handler(promise, jqXHR, textStatus, error);
+            .fail(function(jqXHR) {
+                fail_handler(promise, jqXHR);
             });
 
         return promise;
@@ -272,8 +272,8 @@ var Resource = function(type) {
                 delete_handler(promise, data, textStatus, jqXHR);
             }
             )
-            .fail(function(jqXHR, textStatus, error) {
-                fail_handler(promise, jqXHR, textStatus, error);
+            .fail(function(jqXHR) {
+                fail_handler(promise, jqXHR);
             });
 
         return promise;
@@ -287,8 +287,8 @@ var Resource = function(type) {
                 retrieve_handler(promise, data, textStatus, jqXHR);
             }
             )
-            .fail(function(jqXHR, textStatus, error) {
-                fail_handler(promise, jqXHR, textStatus, error);
+            .fail(function(jqXHR) {
+                fail_handler(promise, jqXHR);
             });
 
         return promise;
@@ -332,8 +332,8 @@ var Resource = function(type) {
                     payload.offset,
                     payload.total);
             })
-            .fail(function(jqXHR, textStatus, error) {
-                fail_handler(promise, jqXHR, textStatus, error);
+            .fail(function(jqXHR) {
+                fail_handler(promise, jqXHR);
             });
 
         return promise;
@@ -350,8 +350,8 @@ var SingletonResource = function(type) {
           .done(function(data, textStatus, jqXHR) {
               create_singleton_handler(promise, data, textStatus, jqXHR);
           })
-          .fail(function(jqXHR, textStatus, error) {
-              fail_handler(promise, jqXHR, textStatus, error);
+          .fail(function(jqXHR) {
+              fail_handler(promise, jqXHR);
           });
 
         return promise;
@@ -362,11 +362,11 @@ var SingletonResource = function(type) {
 
         API.request("PUT", type, body, query_args)
           .done(function(data, textStatus, jqXHR) {
-                update_handler(promise, data, textStatus, jqXHR)
+                update_handler(promise, data, textStatus, jqXHR);
             }
           )
-          .fail(function(jqXHR, textStatus, error) {
-              fail_handler(promise, jqXHR, textStatus, error);
+          .fail(function(jqXHR) {
+              fail_handler(promise, jqXHR);
           });
 
         return promise;
@@ -382,8 +382,8 @@ var SingletonResource = function(type) {
                 delete_handler(promise, data, textStatus, jqXHR);
             }
           )
-          .fail(function(jqXHR, textStatus, error) {
-              fail_handler(promise, jqXHR, textStatus, error);
+          .fail(function(jqXHR) {
+              fail_handler(promise, jqXHR);
           });
 
         return promise;
@@ -397,8 +397,8 @@ var SingletonResource = function(type) {
                 retrieve_handler(promise, data, textStatus, jqXHR);
             }
           )
-          .fail(function(jqXHR, textStatus, error) {
-              fail_handler(promise, jqXHR, textStatus, error);
+          .fail(function(jqXHR) {
+              fail_handler(promise, jqXHR);
           });
 
         return promise;

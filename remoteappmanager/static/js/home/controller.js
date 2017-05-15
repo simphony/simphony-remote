@@ -1,4 +1,3 @@
-var Vue = require("vuejs");
 var gamodule = require("gamodule");
 var models = require("./models");
 var applicationListView = require("./views/application_list_view");
