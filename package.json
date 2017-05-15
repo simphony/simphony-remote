@@ -9,7 +9,6 @@
     "url": "https://github.com/simphony-remote/simphony-remote.git"
   },
   "scripts": {
-    "server": "python -m SimpleHTTPServer",
     "watch": "webpack --watch",
     "build": "webpack -p"},
   "dependencies": {
