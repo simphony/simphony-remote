@@ -1,28 +1,19 @@
-define([
-  "components/vue/dist/vue",
-  "admin/vue-components/toolkit/AdminLTEBox",
-  "admin/vue-components/toolkit/ConfirmDialog",
-  "admin/vue-components/toolkit/ModalDialog",
-  "admin/vue-components/toolkit/DataTable"
-], function(
-  Vue,
-  AdminLTEBox,
-  ConfirmDialog,
-  ModalDialog,
-  DataTable
-) {
-  "use strict";
+"use strict";
 
-  Vue.component("confirm-dialog", ConfirmDialog);
-  Vue.component("modal-dialog", ModalDialog);
-  Vue.component("adminlte-box", AdminLTEBox);
-  Vue.component("data-table", DataTable);
- 
-  return {
+var Vue = require("vuejs");
+var ConfirmDialog = require("./ConfirmDialog");
+var ModalDialog = require("./ModalDialog");
+var AdminLTEBox = require("./AdminLTEBox");
+var DataTable = require("./DataTable");
+
+Vue.component("confirm-dialog", ConfirmDialog);
+Vue.component("modal-dialog", ModalDialog);
+Vue.component("adminlte-box", AdminLTEBox);
+Vue.component("data-table", DataTable);
+
+module.exports = {
     ConfirmDialog: ConfirmDialog,
     AdminLTEBox: AdminLTEBox,
     ModalDialog: ModalDialog,
     DataTable: DataTable
-  };
-
-}); 
+};

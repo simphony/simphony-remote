@@ -1,109 +1,107 @@
-define([
-    "../../components/vue/dist/vue",
-    "admin/vue-components/toolkit/toolkit"
-], function (Vue) {
-    'use strict';
+'use strict';
 
-    var ApplicationListView = Vue.extend({
-        template:
-              '<section class="sidebar">' +
-              '  <!-- Error dialog -->' +
-              '  <confirm-dialog v-if="stoppingError.show"' +
-              '                  :title="\'Error when stopping \' + stoppingError.appName"' +
-              '                  :okCallback="closeDialog">' +
-              '    <div class="alert alert-danger">' +
-              '      <strong>Code: {{stoppingError.code}}</strong>' +
-              '      <span>{{stoppingError.message}}</span>' +
-              '    </div>' +
-              '  </confirm-dialog>' +
+var Vue = require("vuejs");
+require("toolkit");
 
-              '<!-- Search form -->' +
-              '<form action="#" class="sidebar-form">' +
-              '  <input type="text" name="q" class="form-control" placeholder="Search..." v-model="searchInput">' +
-              '</form>' +
+var ApplicationListView = Vue.extend({
+    template:
+          '<section class="sidebar">' +
+          '  <!-- Error dialog -->' +
+          '  <confirm-dialog v-if="stoppingError.show"' +
+          '                  :title="\'Error when stopping \' + stoppingError.appName"' +
+          '                  :okCallback="closeDialog">' +
+          '    <div class="alert alert-danger">' +
+          '      <strong>Code: {{stoppingError.code}}</strong>' +
+          '      <span>{{stoppingError.message}}</span>' +
+          '    </div>' +
+          '  </confirm-dialog>' +
 
-              '<!-- Sidebar Menu -->' +
-              '<ul class="sidebar-menu">' +
-              '  <li class="header">APPLICATIONS</li>' +
-              '</ul>' +
+          '<!-- Search form -->' +
+          '<form action="#" class="sidebar-form">' +
+          '  <input type="text" name="q" class="form-control" placeholder="Search..." v-model="searchInput">' +
+          '</form>' +
 
-              '<ul class="sidebar-menu">' +
-              '  <li v-show="!model.loading && model.appList.length === 0" id="no-app-msg">' +
-              '    <a href="#">No applications found</a>' +
-              '  </li>' +
+          '<!-- Sidebar Menu -->' +
+          '<ul class="sidebar-menu">' +
+          '  <li class="header">APPLICATIONS</li>' +
+          '</ul>' +
 
-              '  <!-- Loading spinner -->' +
-              '  <li v-show="model.loading" id="loading-spinner">' +
-              '    <a href="#">' +
-              '      <i class="fa fa-spinner fa-spin"></i>' +
-              '      <span>Loading</span>' +
-              '    </a>' +
-              '  </li>' +
-              '</ul>' +
+          '<ul class="sidebar-menu">' +
+          '  <li v-show="!model.loading && model.appList.length === 0" id="no-app-msg">' +
+          '    <a href="#">No applications found</a>' +
+          '  </li>' +
 
-              '  <!-- Application list -->' +
-              '<transition-group name="list" tag="ul" id="applistentries" class="sidebar-menu">' +
-              '  <li v-for="app in visibleList" v-bind:key="app"' +
-              '      :class="{ active: indexOf(app) === model.selectedIndex }"' +
-              '      @click="model.selectedIndex = indexOf(app); $emit(\'entryClicked\');">' +
+          '  <!-- Loading spinner -->' +
+          '  <li v-show="model.loading" id="loading-spinner">' +
+          '    <a href="#">' +
+          '      <i class="fa fa-spinner fa-spin"></i>' +
+          '      <span>Loading</span>' +
+          '    </a>' +
+          '  </li>' +
+          '</ul>' +
 
-              '    <span :class="app.status.toLowerCase() + \'-badge\'"></span>' +
+          '  <!-- Application list -->' +
+          '<transition-group name="list" tag="ul" id="applistentries" class="sidebar-menu">' +
+          '  <li v-for="app in visibleList" v-bind:key="app"' +
+          '      :class="{ active: indexOf(app) === model.selectedIndex }"' +
+          '      @click="model.selectedIndex = indexOf(app); $emit(\'entryClicked\');">' +
 
-              '    <a href="#" class="truncate">' +
-              '      <img class="app-icon"' +
-              '           :src="app.appData.image.icon_128 | iconSrc">' +
+          '    <span :class="app.status.toLowerCase() + \'-badge\'"></span>' +
 
-              '      <button class="stop-button"' +
-              '              v-if="app.isRunning()"' +
-              '              @click="stopApplication(indexOf(app))"' +
-              '              :disabled="app.isStopping()">' +
-              '        <i class="fa fa-times"></i>' +
-              '      </button>' +
-              '      <span>{{ app.appData.image | appName }}</span>' +
-              '    </a>' +
-              '  </li>' +
-              '</transition-group>' +
-              '<!-- /.sidebar-menu -->' +
-            '</section>' +
-            '<!-- /.sidebar -->',
+          '    <a href="#" class="truncate">' +
+          '      <img class="app-icon"' +
+          '           :src="app.appData.image.icon_128 | iconSrc">' +
 
-        data: function() {
-            return {
-                'searchInput': '',
-                stoppingError: { show: false, appName: '', code: '', message: '' }
-            };
-        },
+          '      <button class="stop-button"' +
+          '              v-if="app.isRunning()"' +
+          '              @click="stopApplication(indexOf(app))"' +
+          '              :disabled="app.isStopping()">' +
+          '        <i class="fa fa-times"></i>' +
+          '      </button>' +
+          '      <span>{{ app.appData.image | appName }}</span>' +
+          '    </a>' +
+          '  </li>' +
+          '</transition-group>' +
+          '<!-- /.sidebar-menu -->' +
+        '</section>' +
+        '<!-- /.sidebar -->',
 
-        computed: {
-            visibleList: function() {
-                return this.model.appList.filter(function(app) {
-                    var appName = this.$options.filters.appName(app.appData.image).toLowerCase();
-                    return appName.indexOf(this.searchInput.toLowerCase()) !== -1;
-                }.bind(this));
-            }
-        },
+    data: function() {
+        return {
+            'searchInput': '',
+            stoppingError: { show: false, appName: '', code: '', message: '' }
+        };
+    },
 
-        methods: {
-            stopApplication: function(index) {
-                var stoppingAppName = this.$options.filters.appName(
-                    this.model.appList[index].appData.image);
-                this.model.stopApplication(index).fail(function(error) {
-                    this.stoppingError.code = error.code;
-                    this.stoppingError.message = error.message;
-                    this.stoppingError.appName = stoppingAppName;
-                    this.stoppingError.show = true;
-                }.bind(this));
-            },
-            closeDialog: function() {
-                this.stoppingError.show = false;
-            },
-            indexOf: function(app) {
-                return this.model.appList.indexOf(app);
-            }
+    computed: {
+        visibleList: function() {
+            return this.model.appList.filter(function(app) {
+                var appName = this.$options.filters.appName(app.appData.image).toLowerCase();
+                return appName.indexOf(this.searchInput.toLowerCase()) !== -1;
+            }.bind(this));
         }
-    });
+    },
 
-    return {
-        ApplicationListView : ApplicationListView
-    };
+    methods: {
+        stopApplication: function(index) {
+            var stoppingAppName = this.$options.filters.appName(
+                this.model.appList[index].appData.image);
+            this.model.stopApplication(index).fail(function(error) {
+                this.stoppingError.code = error.code;
+                this.stoppingError.message = error.message;
+                this.stoppingError.appName = stoppingAppName;
+                this.stoppingError.show = true;
+            }.bind(this));
+        },
+        closeDialog: function() {
+            this.stoppingError.show = false;
+        },
+        indexOf: function(app) {
+            return this.model.appList.indexOf(app);
+        }
+    }
 });
+
+module.exports = {
+    ApplicationListView : ApplicationListView
+};

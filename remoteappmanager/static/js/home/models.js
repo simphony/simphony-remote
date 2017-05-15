@@ -1,10 +1,9 @@
-define([
-    "jquery",
-    "home/configurables",
-    "jsapi/v1/resources"
-], function ($, configurables, resources) {
-    "use strict";
+"use strict";
 
+var $ = require("jquery");
+var configurables = require("./configurables");
+
+require(["resources"], function(resources) {
     var Status = {
         RUNNING: "RUNNING",
         STARTING: "STARTING",

@@ -52,33 +52,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
     {% if analytics %}
     <script src='https://www.google-analytics.com/analytics.js' async type="text/javascript"></script>
     {% endif %}
+    <!-- Will be removed when resources will not be load with require anymore -->
     <script src="{{static_url("components/requirejs/require.js") }}" type="text/javascript" charset="utf-8"></script>
   {% endblock %}
 
   {% block script_init %}
-    <script>
-      require.config({
-        {% if version_hash %}
-          urlArgs: "v={{version_hash}}",
-        {% endif %}
-        baseUrl: '{{static_url("js", include_version=False)}}',
-        paths: {
-          components: '../components',
-          jquery: '../components/admin-lte/plugins/jQuery/jquery-2.2.3.min',
-          moment: "../components/moment/moment",
-          datatables: "../components/datatables.net/js/jquery.dataTables",
-          jsapi: "../../jsapi",
-          handlebars: "../components/handlebars/handlebars.amd.min",
-          underscore: "../components/underscore/underscore-min"
-        },
-        shim: {
-          datatables: {
-            deps: ["jquery"]
-          }
-        }
-      });
-    </script>
-
     <script type="text/javascript">
       window.apidata = {
         base_url: "{{base_url}}",
