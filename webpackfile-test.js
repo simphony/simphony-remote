@@ -28,8 +28,8 @@ module.exports = {
             utils: path.resolve(js, "utils"),
 
             filters: path.resolve(js, "vue/filters"),
-            toolkit: path.resolve(js, "admin/vue-components/toolkit/toolkit"),
-            "toolkit-dir": path.resolve(js, "admin/vue-components/toolkit"),
+            toolkit: path.resolve(js, "vue/toolkit/toolkit"),
+            "toolkit-dir": path.resolve(js, "vue/toolkit"),
 
             helpers: path.resolve(jstests, "helpers"),
 
