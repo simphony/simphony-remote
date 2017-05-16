@@ -1,15 +1,15 @@
 var path = require("path");
+var jstests = path.resolve(__dirname, "jstests");
 var components = path.resolve(__dirname, "remoteappmanager/static/bower_components");
 var js = path.resolve(__dirname, "remoteappmanager/static/js");
 
 module.exports = {
     entry: {
-        admin: path.resolve(js, "admin/main.js"),
-        user: path.resolve(js, "home/controller.js")
+        testsuite: path.resolve(jstests, "testsuite.js")
     },
 
     output: {
-        path: path.resolve(__dirname, "remoteappmanager/static/dist"),
+        path: path.resolve(jstests, "dist"),
         filename: "[name].js"
     },
 
@@ -22,14 +22,20 @@ module.exports = {
             "vue-router": path.resolve(components, "vue-router/dist/vue-router"),
             "vue-form": path.resolve(components, "vue-form/dist/vue-form"),
 
-            "admin-resources": path.resolve(js, "admin-resources"),
-            "home-resources": path.resolve(js, "home-resources"),
+            // "admin-resources": path.resolve(js, "admin-resources"),
+            "home-resources": path.resolve(jstests, "tests/home/mock_jsapi"),
             gamodule: path.resolve(js, "gamodule"),
             urlutils: path.resolve(js, "urlutils"),
             utils: path.resolve(js, "utils"),
 
             filters: path.resolve(js, "vue/filters"),
             toolkit: path.resolve(js, "admin/vue-components/toolkit/toolkit"),
+            "toolkit-dir": path.resolve(js, "admin/vue-components/toolkit"),
+
+            helpers: path.resolve(jstests, "helpers"),
+
+            admin: path.resolve(js, "admin"),
+            home: path.resolve(js, "home"),
         }
     },
 

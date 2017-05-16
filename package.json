@@ -9,8 +9,10 @@
     "url": "https://github.com/simphony-remote/simphony-remote.git"
   },
   "scripts": {
-    "watch": "webpack --watch",
-    "build": "webpack -p"
+    "watch": "webpack --config webpackfile.js --watch",
+    "build": "webpack --config webpackfile.js -p",
+    "watch-test": "webpack --config webpackfile-test.js --watch",
+    "build-test": "webpack --config webpackfile-test.js -p"
   },
   "dependencies": {
     "bower": "*",
