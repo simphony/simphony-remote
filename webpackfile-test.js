@@ -22,7 +22,6 @@ module.exports = {
             "vue-router": path.resolve(components, "vue-router/dist/vue-router"),
             "vue-form": path.resolve(components, "vue-form/dist/vue-form"),
 
-            // "admin-resources": path.resolve(js, "admin-resources"),
             "home-resources": path.resolve(jstests, "tests/home/mock_jsapi"),
             gamodule: path.resolve(js, "gamodule"),
             urlutils: path.resolve(js, "urlutils"),
