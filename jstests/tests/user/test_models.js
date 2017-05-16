@@ -1,6 +1,6 @@
-var models = require("home/models");
+var models = require("user/models");
 
-QUnit.module("home.models");
+QUnit.module("user.models");
 QUnit.test("instantiation", function (assert) {
     var model = new models.ApplicationListModel();
 

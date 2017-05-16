@@ -1,5 +1,5 @@
 var $ = require("jquery");
-var resources = require("home-resources");
+var resources = require("user-resources");
 var configurables = require("./configurables");
 
 var Status = {

@@ -22,7 +22,7 @@ module.exports = {
             "vue-router": path.resolve(components, "vue-router/dist/vue-router"),
             "vue-form": path.resolve(components, "vue-form/dist/vue-form"),
 
-            "home-resources": path.resolve(jstests, "tests/home/mock_jsapi"),
+            "user-resources": path.resolve(jstests, "tests/user/mock_jsapi"),
             gamodule: path.resolve(js, "gamodule"),
             urlutils: path.resolve(js, "urlutils"),
             utils: path.resolve(js, "utils"),
@@ -34,7 +34,7 @@ module.exports = {
             helpers: path.resolve(jstests, "helpers"),
 
             admin: path.resolve(js, "admin"),
-            home: path.resolve(js, "home"),
+            user: path.resolve(js, "user"),
         }
     },
 

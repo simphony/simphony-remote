@@ -1,9 +1,9 @@
 var Vue = require("vuejs");
-var models = require("home/models");
-var applicationListView = require("home/views/application_list_view");
+var models = require("user/models");
+var applicationListView = require("user/views/application_list_view");
 require("filters");
 
-QUnit.module("home.app_list_view");
+QUnit.module("user.app_list_view");
 QUnit.test("rendering list", function (assert) {
     var done = assert.async();
 
