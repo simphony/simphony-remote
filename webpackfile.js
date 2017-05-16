@@ -5,7 +5,7 @@ var js = path.resolve(__dirname, "remoteappmanager/static/js");
 module.exports = {
     entry: {
         admin: path.resolve(js, "admin/main.js"),
-        user: path.resolve(js, "home/controller.js")
+        user: path.resolve(js, "home/main.js")
     },
 
     output: {
