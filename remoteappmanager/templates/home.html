@@ -10,7 +10,5 @@
 
 {% block script_init %}
     {{  super() }}
-    <script type="text/javascript">
-    require(["home/controller"]);
-    </script>
+    <script src="{{ static_url("dist/user.js") }}"></script>
 {% endblock %}

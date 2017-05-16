@@ -1,35 +1,32 @@
 // This module contains the setup for google analytics.
 // MUST not be renamed to analytics. Some blockers rely on name
 // matching to prevent loading.
-define([], function () {
-    "use strict";
 
-    function init() {
-        if (window.apidata.analytics !== undefined) {
-            window.ga('create', window.apidata.analytics.tracking_id, 'auto');
-        } else {
-            window.ga = function() {};
-        }
-
-        return function() {
-            window.ga.apply(this, arguments);
-        };
+function init() {
+    if (window.apidata.analytics !== undefined) {
+        window.ga('create', window.apidata.analytics.tracking_id, 'auto');
+    } else {
+        window.ga = function() {};
     }
 
-    var GaObserver = function() {
-        this.ga = init();
+    return function() {
+        window.ga.apply(this, arguments);
     };
+}
 
-    GaObserver.prototype.triggerApplicationStarting = function(name) {
-        this.ga("send", "event", {
-            eventCategory: "Application",
-            eventAction: "start",
-            eventLabel: name
-        });
-    };
+var GaObserver = function() {
+    this.ga = init();
+};
 
-    return {
-        init: init, // For testing purpose
-        GaObserver: GaObserver
-    };
-});
+GaObserver.prototype.triggerApplicationStarting = function(name) {
+    this.ga("send", "event", {
+        eventCategory: "Application",
+        eventAction: "start",
+        eventLabel: name
+    });
+};
+
+module.exports = {
+    init: init, // For testing purpose
+    GaObserver: GaObserver
+};

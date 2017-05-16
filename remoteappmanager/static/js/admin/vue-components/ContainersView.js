@@ -1,11 +1,7 @@
-define([
-  "components/vue/dist/vue",
-  "jsapi/v1/resources"
-], function(Vue, resources) {
-  "use strict";
+var resources = require("admin-resources");
 
-    return {
-      template: 
+module.exports = {
+    template:
         '<adminlte-box title="Containers">' +
         '  <div class="alert alert-danger" v-if="communicationError">' +
         '    <strong>Error:</strong> {{communicationError}}' +
@@ -24,74 +20,73 @@ define([
         '    <div>Do you want to stop container {{ stopContainerDialog.containerToStop }}?</div>' +
         '  </confirm-dialog>' +
         '</adminlte-box>',
-      data: function () {
+
+    data: function () {
         return {
-          table: {
-            headers: ["URL ID", "User", "Image", "Docker ID", "Mapping ID"],
-            rows: [],
-            rowActions: [
-              {
-                label: "Stop",
-                callback: this.stopAction
-              }
-            ]
-          },
-          stopContainerDialog: {
-            show: false,
-            containerToStop: null
-          },
-          communicationError: null
+            table: {
+                headers: ["URL ID", "User", "Image", "Docker ID", "Mapping ID"],
+                rows: [],
+                rowActions: [{
+                    label: "Stop",
+                    callback: this.stopAction
+                }]
+            },
+            stopContainerDialog: {
+                show: false,
+                containerToStop: null
+            },
+            communicationError: null
         };
-      },
-      mounted: function () {
+    },
+
+    mounted: function () {
         this.updateTable();
-      },
-      methods: {
+    },
+
+    methods: {
         updateTable: function() {
-          var self = this;
-          this.communicationError = null;
-          resources.Container.items()
-            .done(
-              function (identifiers, items) {
+            var self = this;
+            this.communicationError = null;
+            resources.Container.items()
+            .done(function (identifiers, items) {
                 self.table.rows = [];
                 identifiers.forEach(function(id) {
-                  var item = items[id];
-                  self.table.rows.push([
-                    id,
-                    item.user,
-                    item.image_name,
-                    item.docker_id,
-                    item.mapping_id]);
+                    var item = items[id];
+                    self.table.rows.push([
+                        id,
+                        item.user,
+                        item.image_name,
+                        item.docker_id,
+                        item.mapping_id
+                    ]);
                 });
-              })
-            .fail(
-              function () {
-                self.communicationError = "The request could not be executed successfully";
-              }
-            );
-        },
-        stopAction: function(row) {
-          this.stopContainerDialog.containerToStop = row[0];
-          this.stopContainerDialog.show = true;
-        },
-        stopContainer: function () {
-          var self = this;
-          resources.Container.delete(this.stopContainerDialog.containerToStop)
-            .done(function () {
-              self.updateTable();
-              self.closeStopContainerDialog();
             })
-            .fail(
-              function () {
+            .fail(function () {
+                self.communicationError = "The request could not be executed successfully";
+            });
+        },
+
+        stopAction: function(row) {
+            this.stopContainerDialog.containerToStop = row[0];
+            this.stopContainerDialog.show = true;
+        },
+
+        stopContainer: function () {
+            var self = this;
+            resources.Container.delete(this.stopContainerDialog.containerToStop)
+            .done(function () {
+                self.updateTable();
+                self.closeStopContainerDialog();
+            })
+            .fail(function () {
                 self.closeStopContainerDialog();
                 self.communicationError = "The request could not be executed successfully";
-              }
-            );
+            });
         },
+
         closeStopContainerDialog: function() {
-          this.stopContainerDialog.show = false;
-          this.stopContainerDialog.containerToStop = null;
+            this.stopContainerDialog.show = false;
+            this.stopContainerDialog.containerToStop = null;
         }
-      }
-    };
-  });
+    }
+};

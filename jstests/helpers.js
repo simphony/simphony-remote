@@ -1,15 +1,11 @@
-define([
-  "components/vue/dist/vue"
-], function(Vue) {
-  "use strict";
-  
-  var getRenderedText = function(Component, propsData) {
+var Vue = require("vuejs");
+
+var getRenderedText = function(Component, propsData) {
     var Ctor = Vue.extend(Component);
     var vm = new Ctor({ propsData: propsData }).$mount();
     return vm.$el.textContent;
-  };
-  
-  return {
+};
+
+module.exports = {
     getRenderedText: getRenderedText
-  };
-});
+};

@@ -15,24 +15,24 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.6 -->
-  <link rel="stylesheet" href="{{ static_url("components/admin-lte/bootstrap/css/bootstrap.min.css") }}">
+  <link rel="stylesheet" href="{{ static_url("bower_components/admin-lte/bootstrap/css/bootstrap.min.css") }}">
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="{{ static_url("components/font-awesome/css/font-awesome.min.css") }}">
+  <link rel="stylesheet" href="{{ static_url("bower_components/font-awesome/css/font-awesome.min.css") }}">
   <!-- Ionicons -->
-  <link rel="stylesheet" href="{{ static_url("components/ionicons/css/ionicons.min.css") }}">
+  <link rel="stylesheet" href="{{ static_url("bower_components/ionicons/css/ionicons.min.css") }}">
   <!-- Theme style -->
-  <link rel="stylesheet" href="{{ static_url("components/admin-lte/dist/css/AdminLTE.min.css") }}">
+  <link rel="stylesheet" href="{{ static_url("bower_components/admin-lte/dist/css/AdminLTE.min.css") }}">
   <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
         page. However, you can choose any other skin. Make sure you
         apply the skin class to the body tag so the changes take effect.
   -->
-  <link rel="stylesheet" href="{{ static_url("components/admin-lte/dist/css/skins/"+skin+".min.css")}}">
+  <link rel="stylesheet" href="{{ static_url("bower_components/admin-lte/dist/css/skins/"+skin+".min.css")}}">
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
-  <script src="{{ static_url("components/html5shiv/dist/html5shiv.min.js") }}"></script>
-  <script src="{{ static_url("components/respond/dest/respond.min.js") }}"></script>
+  <script src="{{ static_url("bower_components/html5shiv/dist/html5shiv.min.js") }}"></script>
+  <script src="{{ static_url("bower_components/respond/dest/respond.min.js") }}"></script>
   <![endif]-->
 
   {% block stylesheet %}
@@ -52,47 +52,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
     {% if analytics %}
     <script src='https://www.google-analytics.com/analytics.js' async type="text/javascript"></script>
     {% endif %}
-    <script src="{{static_url("components/requirejs/require.js") }}" type="text/javascript" charset="utf-8"></script>
-  {% endblock %}
-
-  {% block script_init %}
-    <script>
-      require.config({
-        {% if version_hash %}
-          urlArgs: "v={{version_hash}}",
-        {% endif %}
-        baseUrl: '{{static_url("js", include_version=False)}}',
-        paths: {
-          components: '../components',
-          jquery: '../components/admin-lte/plugins/jQuery/jquery-2.2.3.min',
-          moment: "../components/moment/moment",
-          datatables: "../components/datatables.net/js/jquery.dataTables",
-          jsapi: "../../jsapi",
-          handlebars: "../components/handlebars/handlebars.amd.min",
-          underscore: "../components/underscore/underscore-min"
-        },
-        shim: {
-          datatables: {
-            deps: ["jquery"]
-          }
-        }
-      });
-    </script>
-
-    <script type="text/javascript">
-      window.apidata = {
-        base_url: "{{base_url}}",
-        prefix: "{{prefix}}",
-        {% if user %}
-          user: "{{user.name}}",
-        {% endif %}
-        {% if analytics %}
-          analytics: {
-            tracking_id: "{{ analytics.tracking_id }}"
-          },
-        {% endif %}
-      }
-    </script>
   {% endblock %}
 
   {% block meta %}
@@ -174,9 +133,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- /.content-wrapper -->
   </div>
 
-  <script src="{{ static_url("components/admin-lte/plugins/jQuery/jquery-2.2.3.min.js") }}"></script>
-  <script src="{{ static_url("components/admin-lte/bootstrap/js/bootstrap.min.js") }}"></script>
-  <script src="{{ static_url("components/admin-lte/dist/js/app.min.js") }}"></script>
+  <script src="{{ static_url("bower_components/admin-lte/plugins/jQuery/jquery-2.2.3.min.js") }}"></script>
+  <script src="{{ static_url("bower_components/admin-lte/bootstrap/js/bootstrap.min.js") }}"></script>
+  <script src="{{ static_url("bower_components/admin-lte/dist/js/app.min.js") }}"></script>
 
   {% block dialogs %}
     {% call macros.modal_dlg('Error', btn_label='OK') %}
@@ -184,6 +143,23 @@ scratch. This page gets rid of all links and provides the needed markup only.
     The error
     </div>
   {% endcall %}
+  {% endblock %}
+
+  {% block script_init %}
+    <script type="text/javascript">
+      window.apidata = {
+        base_url: "{{base_url}}",
+        prefix: "{{prefix}}",
+        {% if user %}
+          user: "{{user.name}}",
+        {% endif %}
+        {% if analytics %}
+          analytics: {
+            tracking_id: "{{ analytics.tracking_id }}"
+          },
+        {% endif %}
+      }
+    </script>
   {% endblock %}
 
 </body>

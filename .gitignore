@@ -9,7 +9,7 @@ jupyterhub_cookie_secret
 doc/build
 doc/source/api
 doc/source/remoteappmanager_help.txt
-remoteappmanager/static/components/
+remoteappmanager/static/bower_components/
 node_modules
 .coverage
 coverage/
