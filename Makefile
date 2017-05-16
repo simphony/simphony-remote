@@ -30,14 +30,14 @@ deps:
 	else \
 		plat_packages="docker.io python3-venv"; \
 	fi; \
-		sudo apt-get -qq install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages nodejs python3-pip 
-	npm install 
-	`npm bin`/bower install 
+		sudo apt-get -qq install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages nodejs python3-pip
+	npm install
+	`npm bin`/bower install
 
 .PHONY: pythondeps
 pythondeps:
 	pip3 -q install --upgrade pip setuptools
-	pip3 -q install -r requirements.txt 
+	pip3 -q install -r requirements.txt
 
 .PHONY: devdeps
 devdeps:
@@ -47,7 +47,7 @@ devdeps:
 	sudo apt-get -qq install phantomjs
 
 .PHONY: develop
-develop: 
+develop:
 	@echo "Installing application"
 	@echo "----------------------"
 	python3 setup.py -q develop
@@ -56,16 +56,18 @@ develop:
 install:
 	@echo "Installing application"
 	@echo "----------------------"
+	npm run build
+	npm run build-test
 	python3 setup.py -q install
 
 .PHONY: certs
-certs: 
+certs:
 	@echo "Creating certificates"
 	@echo "---------------------"
 	-pushd jupyterhub && sh ../scripts/generate_certificate.sh && popd
 
 .PHONY: db
-db: 
+db:
 	@echo "Creating database"
 	@echo "-----------------"
 	pushd jupyterhub; \
@@ -92,7 +94,7 @@ testimages:
 		docker pull simphonyproject/filetransfer:latest; \
 		docker pull simphonyproject/jupyter:latest; \
 	fi
-		
+
 
 .PHONY: test
 test: pythontest jstest
@@ -104,7 +106,7 @@ pythontest:
 	python -m tornado.testing discover -s remoteappmanager -t .
 
 .PHONY: jstest
-jstest: 
+jstest:
 	@echo "Running javascript testsuite"
 	@echo "----------------------------"
 	`npm bin`/jshint --config .jshintrc remoteappmanager/static/js/
