@@ -38,7 +38,7 @@ API reference
    remoteappmanager.jupyterhub.auth
    remoteappmanager.jupyterhub.spawners
    remoteappmanager.handlers.base_handler
-   remoteappmanager.handlers.home_handler
+   remoteappmanager.handlers.user_home_handler
    remoteappmanager.logging.logging_mixin
    remoteappmanager.webapi.application
    remoteappmanager.webapi.container
