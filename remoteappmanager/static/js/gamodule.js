@@ -17,7 +17,7 @@ function init() {
 class GaObserver {
     constructor() {
         this.ga = init();
-    };
+    }
 
     triggerApplicationStarting(name) {
         this.ga("send", "event", {
@@ -25,8 +25,8 @@ class GaObserver {
             eventAction: "start",
             eventLabel: name
         });
-    };
-};
+    }
+}
 
 module.exports = {
     init, // For testing purpose

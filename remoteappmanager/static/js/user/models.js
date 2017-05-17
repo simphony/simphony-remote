@@ -47,7 +47,7 @@ class ApplicationListModel {
         this.selectedIndex = null;
 
         this.loading = true;
-    };
+    }
 
     update() {
         // Requests an update of the object internal data.
@@ -97,7 +97,7 @@ class ApplicationListModel {
 
             this.loading = false;
         });
-    };
+    }
 
     updateIdx(index) {
         // Refetches and updates the entry at the given index.
@@ -110,7 +110,7 @@ class ApplicationListModel {
 
             this._updateStatus(app);
         });
-    };
+    }
 
     _updateConfigurables(app) {
         // Contains the submodels for the configurables.
@@ -129,7 +129,7 @@ class ApplicationListModel {
                 app.configurables.push(new ConfigurableCls());
             }
         });
-    };
+    }
 
     _updateStatus(app) {
         if (app.appData.container === undefined) {
@@ -137,7 +137,7 @@ class ApplicationListModel {
         } else {
             app.status = Status.RUNNING;
         }
-    };
+    }
 
     startApplication() {
         var selectedIndex = this.selectedIndex;
@@ -172,7 +172,7 @@ class ApplicationListModel {
         });
 
         return startPromise;
-    };
+    }
 
     stopApplication(index) {
         var appStopping = this.appList[index];
@@ -197,8 +197,8 @@ class ApplicationListModel {
         });
 
         return stopPromise;
-    };
-};
+    }
+}
 
 module.exports = {
     ApplicationListModel

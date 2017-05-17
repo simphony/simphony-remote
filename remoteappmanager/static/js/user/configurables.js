@@ -34,7 +34,7 @@ class ResolutionModel {
     constructor() {
         this.tag = resolutionTag;
         this.configDict = { resolution: 'Window' };
-    };
+    }
 
     asConfigDict() {
         var resolution = this.configDict.resolution;
@@ -45,8 +45,8 @@ class ResolutionModel {
         }
 
         return { resolution: resolution };
-    };
-};
+    }
+}
 
 var outputConfigurables = {};
 
