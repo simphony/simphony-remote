@@ -7,39 +7,38 @@ module.exports = {
     },
 
     template:
-        '<adminlte-box>' +
-        '  <div slot="header">Accounting for user {{ $route.params.id }} </div>' +
-        '  <div>' +
-        '    <div class="alert alert-danger" v-if="communicationError">' +
-        '      <strong>Error:</strong> {{communicationError}}' +
-        '    </div>' +
-        '    <data-table' +
-        '     :headers.once="table.headers"' +
-        '     :rows="table.rows"' +
-        '     :globalActions="table.globalActions"' +
-        '     :rowActions="table.rowActions">' +
-        '    </data-table>' +
-        '    <new-accounting-dialog ' +
-        '      v-if="newAccountingDialog.show"' +
-        '      :show="newAccountingDialog.show"' +
-        '      :userId="newAccountingDialog.userId"' +
-        '      @created="newAccountingCreated"' +
-        '      @closed="newAccountingDialog.show = false">' +
-        '    </new-accounting-dialog>' +
-        '    <confirm-dialog ' +
-        '       v-if="removeAccountingDialog.show"' +
-        '       title="Remove Accounting"' +
-        '       :okCallback="removeAccounting"' +
-        '       :closeCallback="closeRemoveAccountingDialog">' +
-        '        <div>Do you want to remove accounting ' +
-        '             {{ removeAccountingDialog.accountingToRemove }}?' +
-        '        </div>' +
-        '    </confirm-dialog>' +
-        '  </div>' +
-        '</adminlte-box>',
+        `<adminlte-box>
+          <div slot="header">Accounting for user {{ $route.params.id }} </div>
+          <div>
+            <div class="alert alert-danger" v-if="communicationError">
+              <strong>Error:</strong> {{communicationError}}
+            </div>
+            <data-table
+             :headers.once="table.headers"
+             :rows="table.rows"
+             :globalActions="table.globalActions"
+             :rowActions="table.rowActions">
+            </data-table>
+            <new-accounting-dialog
+              v-if="newAccountingDialog.show"
+              :show="newAccountingDialog.show"
+              :userId="newAccountingDialog.userId"
+              @created="newAccountingCreated"
+              @closed="newAccountingDialog.show = false">
+            </new-accounting-dialog>
+            <confirm-dialog
+               v-if="removeAccountingDialog.show"
+               title="Remove Accounting"
+               :okCallback="removeAccounting"
+               :closeCallback="closeRemoveAccountingDialog">
+                <div>Do you want to remove accounting
+                     {{ removeAccountingDialog.accountingToRemove }}?
+                </div>
+            </confirm-dialog>
+          </div>
+        </adminlte-box>`,
 
     data: function () {
-        var self = this;
         return {
             table: {
                 headers: [
@@ -48,7 +47,7 @@ module.exports = {
                 rows: [],
                 globalActions: [{
                     label: "Create New Entry",
-                    callback: function() { self.newAccountingDialog.show = true; }
+                    callback: () => { this.newAccountingDialog.show = true; }
                 }],
                 rowActions: [{
                     label: "Remove",
@@ -76,14 +75,13 @@ module.exports = {
 
     methods: {
         updateTable: function() {
-            var self = this;
             this.communicationError = null;
             resources.Accounting.items({filter: JSON.stringify({user_id: this.$route.params.id })})
-            .done(function (identifiers, items) {
-                self.table.rows = [];
-                identifiers.forEach(function(id) {
+            .done((identifiers, items) => {
+                this.table.rows = [];
+                identifiers.forEach((id) => {
                     var item = items[id];
-                    self.table.rows.push([
+                    this.table.rows.push([
                         id,
                         item.image_name,
                         item.allow_home,
@@ -93,8 +91,8 @@ module.exports = {
                     ]);
                 });
             })
-            .fail(function () {
-                self.communicationError = "The request could not be executed successfully";
+            .fail(() => {
+                this.communicationError = "The request could not be executed successfully";
             });
         },
 
@@ -114,15 +112,14 @@ module.exports = {
         },
 
         removeAccounting: function () {
-            var self = this;
             resources.Accounting.delete(this.removeAccountingDialog.accountingToRemove)
-            .done(function () {
-                self.closeRemoveAccountingDialog();
-                self.updateTable();
+            .done(() => {
+                this.closeRemoveAccountingDialog();
+                this.updateTable();
             })
-            .fail(function () {
-                self.closeRemoveAccountingDialog();
-                self.communicationError = "The request could not be executed successfully";
+            .fail(() => {
+                this.closeRemoveAccountingDialog();
+                this.communicationError = "The request could not be executed successfully";
             });
         }
     }

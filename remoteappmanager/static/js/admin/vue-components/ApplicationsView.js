@@ -7,44 +7,43 @@ module.exports = {
     },
 
     template:
-        '<adminlte-box title="Applications">' +
-        '  <div>' +
-        '    <div class="alert alert-danger" v-if="communicationError">' +
-        '      <strong>Error:</strong> {{communicationError}}' +
-        '    </div>' +
-        '    <data-table' +
-        '       :headers.once="table.headers"' +
-        '       :rows="table.rows"' +
-        '       :globalActions="table.globalActions"' +
-        '       :rowActions="table.rowActions">' +
-        '    </data-table>' +
-        '    <new-application-dialog ' +
-        '      v-if="newApplicationDialog.show"' +
-        '      :show="newApplicationDialog.show"' +
-        '      @created="newApplicationCreated"' +
-        '      @closed="newApplicationDialogClosed"></new-application-dialog>' +
-        '      ' +
-        '    <confirm-dialog ' +
-        '      v-if="removeApplicationDialog.show"' +
-        '      title="Remove Application"' +
-        '      :okCallback="removeApplication"' +
-        '      :closeCallback="closeRemoveApplicationDialog">' +
-        '      <div>Do you want to remove Application ' +
-        '           {{removeApplicationDialog.applicationToRemove.name}} ' +
-        '          ({{removeApplicationDialog.applicationToRemove.id}})</div>' +
-        '    </confirm-dialog>' +
-        '  </div>' +
-        '</adminlte-box>',
+        `<adminlte-box title="Applications">
+          <div>
+            <div class="alert alert-danger" v-if="communicationError">
+              <strong>Error:</strong> {{communicationError}}
+            </div>
+            <data-table
+               :headers.once="table.headers"
+               :rows="table.rows"
+               :globalActions="table.globalActions"
+               :rowActions="table.rowActions">
+            </data-table>
+            <new-application-dialog
+              v-if="newApplicationDialog.show"
+              :show="newApplicationDialog.show"
+              @created="newApplicationCreated"
+              @closed="newApplicationDialogClosed"></new-application-dialog>
+
+            <confirm-dialog
+              v-if="removeApplicationDialog.show"
+              title="Remove Application"
+              :okCallback="removeApplication"
+              :closeCallback="closeRemoveApplicationDialog">
+              <div>Do you want to remove Application
+                   {{removeApplicationDialog.applicationToRemove.name}}
+                  ({{removeApplicationDialog.applicationToRemove.id}})</div>
+            </confirm-dialog>
+          </div>
+        </adminlte-box>`,
 
     data: function () {
-        var self=this;
         return {
             table: {
                 headers: ["ID", "Image"],
                 rows: [],
                 globalActions: [{
                     label: "Create New Entry",
-                    callback: function() { self.newApplicationDialog.show = true; }
+                    callback: () => { this.newApplicationDialog.show = true; }
                 }],
                 rowActions: [{
                     label: "Remove",
@@ -74,21 +73,20 @@ module.exports = {
 
     methods: {
         updateTable: function() {
-            var self = this;
             this.communicationError = null;
             resources.Application.items()
-            .done(function (identifiers, items) {
-                self.table.rows = [];
-                identifiers.forEach(function(id) {
+            .done((identifiers, items) => {
+                this.table.rows = [];
+                identifiers.forEach((id) => {
                     var item = items[id];
-                    self.table.rows.push([
+                    this.table.rows.push([
                         id,
                         item.image_name
                     ]);
                 });
             })
-            .fail(function () {
-                self.communicationError = "The request could not be executed successfully";
+            .fail(() => {
+                this.communicationError = "The request could not be executed successfully";
             });
         },
 
@@ -110,14 +108,13 @@ module.exports = {
         },
 
         removeApplication: function () {
-            var self = this;
             resources.Application.delete(this.removeApplicationDialog.applicationToRemove.id)
-            .done(function () {
-                self.closeRemoveApplicationDialog();
-                self.updateTable();
+            .done(() => {
+                this.closeRemoveApplicationDialog();
+                this.updateTable();
             })
-            .fail(function () {
-                self.closeRemoveApplicationDialog();
+            .fail(() => {
+                this.closeRemoveApplicationDialog();
                 this.communicationError = "The request could not be executed successfully";
             });
         },

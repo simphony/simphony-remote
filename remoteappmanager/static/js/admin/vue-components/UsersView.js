@@ -7,39 +7,38 @@ module.exports = {
     },
 
     template:
-        '<adminlte-box title="Users">' +
-        '    <div class="alert alert-danger" v-if="communicationError">' +
-        '      <strong>Error:</strong> {{communicationError}}' +
-        '    </div>' +
-        '    <data-table' +
-        '     :headers.once="table.headers"' +
-        '     :rows="table.rows"' +
-        '     :globalActions="table.globalActions"' +
-        '     :rowActions="table.rowActions">' +
-        '    </data-table>' +
-        '    <new-user-dialog ' +
-        '      v-if="newUserDialog.show"' +
-        '      :show="newUserDialog.show"' +
-        '      @created="newUserCreated"' +
-        '      @closed="newUserDialog.show = false;"></new-user-dialog>' +
-        '    <confirm-dialog ' +
-        '      v-if="removeUserDialog.show"' +
-        '      :okCallback="removeUser"' +
-        '      :closeCallback="closeRemoveUserDialog">' +
-        '      <div>Do you want to remove User {{removeUserDialog.userToRemove.name}} ' +
-        '      ({{removeUserDialog.userToRemove.id}})</div>' +
-        '    </confirm-dialog>' +
-        '</adminlte-box>',
+        `<adminlte-box title="Users">
+            <div class="alert alert-danger" v-if="communicationError">
+              <strong>Error:</strong> {{communicationError}}
+            </div>
+            <data-table
+             :headers.once="table.headers"
+             :rows="table.rows"
+             :globalActions="table.globalActions"
+             :rowActions="table.rowActions">
+            </data-table>
+            <new-user-dialog
+              v-if="newUserDialog.show"
+              :show="newUserDialog.show"
+              @created="newUserCreated"
+              @closed="newUserDialog.show = false;"></new-user-dialog>
+            <confirm-dialog
+              v-if="removeUserDialog.show"
+              :okCallback="removeUser"
+              :closeCallback="closeRemoveUserDialog">
+              <div>Do you want to remove User {{removeUserDialog.userToRemove.name}}
+              ({{removeUserDialog.userToRemove.id}})</div>
+            </confirm-dialog>
+        </adminlte-box>`,
 
     data: function () {
-        var self = this;
         return {
             table: {
                 headers: ["ID", "Username"],
                 rows: [],
                 globalActions: [{
                     label: "Create New Entry",
-                    callback: function() { self.newUserDialog.show = true; }
+                    callback: () => { this.newUserDialog.show = true; }
                 }],
                 rowActions: [{
                     label: "Policies",
@@ -71,21 +70,20 @@ module.exports = {
 
     methods: {
         updateTable: function() {
-            var self = this;
             this.communicationError = null;
             resources.User.items()
-            .done(function (identifiers, items){
-                self.table.rows = [];
-                identifiers.forEach(function(id) {
+            .done((identifiers, items) => {
+                this.table.rows = [];
+                identifiers.forEach((id) => {
                     var item = items[id];
-                    self.table.rows.push([
+                    this.table.rows.push([
                         id,
                         item.name
                     ]);
                 });
             })
-            .fail(function () {
-                self.communicationError = "The request could not be executed successfully";
+            .fail(() => {
+                this.communicationError = "The request could not be executed successfully";
             });
         },
 
@@ -116,14 +114,13 @@ module.exports = {
         },
 
         removeUser: function () {
-            var self = this;
             resources.User.delete(this.removeUserDialog.userToRemove.id)
-            .done(function() {
-                self.closeRemoveUserDialog();
-                self.updateTable();
+            .done(() => {
+                this.closeRemoveUserDialog();
+                this.updateTable();
             })
-            .fail(function() {
-                self.closeRemoveUserDialog();
+            .fail(() => {
+                this.closeRemoveUserDialog();
             });
         }
     }
