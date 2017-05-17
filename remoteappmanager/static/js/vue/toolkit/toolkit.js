@@ -10,8 +10,8 @@ Vue.component("adminlte-box", AdminLTEBox);
 Vue.component("data-table", DataTable);
 
 module.exports = {
-    ConfirmDialog: ConfirmDialog,
-    AdminLTEBox: AdminLTEBox,
-    ModalDialog: ModalDialog,
-    DataTable: DataTable
+    ConfirmDialog,
+    AdminLTEBox,
+    ModalDialog,
+    DataTable
 };
