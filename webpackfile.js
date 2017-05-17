@@ -5,7 +5,7 @@ var js = path.resolve(__dirname, "remoteappmanager/static/js");
 module.exports = {
     entry: {
         admin: path.resolve(js, "admin/main.js"),
-        user: path.resolve(js, "home/controller.js")
+        user: path.resolve(js, "user/main.js")
     },
 
     output: {
@@ -22,14 +22,14 @@ module.exports = {
             "vue-router": path.resolve(components, "vue-router/dist/vue-router"),
             "vue-form": path.resolve(components, "vue-form/dist/vue-form"),
 
-            "admin-resources": path.resolve(js, "admin-resources"),
-            "home-resources": path.resolve(js, "home-resources"),
+            "admin-resources": path.resolve(js, "admin/admin-resources"),
+            "user-resources": path.resolve(js, "user/user-resources"),
             gamodule: path.resolve(js, "gamodule"),
             urlutils: path.resolve(js, "urlutils"),
             utils: path.resolve(js, "utils"),
 
             filters: path.resolve(js, "vue/filters"),
-            toolkit: path.resolve(js, "admin/vue-components/toolkit/toolkit"),
+            toolkit: path.resolve(js, "vue/toolkit/toolkit"),
         }
     },
 

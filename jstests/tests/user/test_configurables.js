@@ -1,6 +1,6 @@
-var configurables = require("home/configurables");
+var configurables = require("user/configurables");
 
-QUnit.module("home.configurables");
+QUnit.module("user.configurables");
 QUnit.test("instantiation", function (assert) {
     var resolutionConf = new configurables.resolution.model();
 
