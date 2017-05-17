@@ -22,7 +22,9 @@
   <![endif]-->
 
   <link rel="stylesheet" href="{{ static_url("css/remoteappmanager.css") }}" type="text/css"/>
-  <link rel="stylesheet" href="{{ static_url("bower_components/datatables.net-dt/css/jquery.dataTables.css") }}" type="text/css"/>
+
+  {% block stylesheet %}
+  {% endblock %}
 
   {% block script %}
     <script type="text/javascript">
