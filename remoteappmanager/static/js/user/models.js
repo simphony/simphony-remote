@@ -1,43 +1,44 @@
-var $ = require("jquery");
-var resources = require("user-resources");
-var configurables = require("./configurables");
+let $ = require("jquery");
+let resources = require("user-resources");
+let configurables = require("./configurables");
 
-var Status = {
-    RUNNING: "RUNNING",
-    STARTING: "STARTING",
-    STOPPING: "STOPPING",
-    STOPPED: "STOPPED"
+let Status = {
+  RUNNING: "RUNNING",
+  STARTING: "STARTING",
+  STOPPING: "STOPPING",
+  STOPPED: "STOPPED"
 };
 
-var availableApplicationsInfo = function () {
-    // Retrieve information from the various applications and
-    // connect the cascading callbacks.
-    // Returns a single promise. When resolved, the attached
-    // callbacks will be passed an array of the promises for the various
-    // retrieve operations, successful or not.
-    // This routine will go away when we provide the representation data
-    // inline with the items at tornado-webapi level.
+let availableApplicationsInfo = function () {
+  // Retrieve information from the various applications and
+  // connect the cascading callbacks.
+  // Returns a single promise. When resolved, the attached
+  // callbacks will be passed an array of the promises for the various
+  // retrieve operations, successful or not.
+  // This routine will go away when we provide the representation data
+  // inline with the items at tornado-webapi level.
 
-    var promise = $.Deferred();
+  let promise = $.Deferred();
 
-    resources.Application.items()
-        .done(function (identifiers, items) {
-            var result = [];
-            Object.keys(items).forEach(function(key) {
-                result.push(items[key]);
-            });
-            promise.resolve(result);
+  resources.Application.items()
+    .done((identifiers, items) => {
+      let result = [];
+      Object.keys(items).forEach((key) => {
+        result.push(items[key]);
+      });
+      promise.resolve(result);
 
-        })
-        .fail(function() {
-            promise.resolve([]);
-        });
+    })
+    .fail(() => {
+      promise.resolve([]);
+    });
 
-    return promise;
+  return promise;
 };
 
-var ApplicationListModel = function() {
-    // (constructor) Model for the application list.
+
+class ApplicationListModel {
+  constructor() {
     this.appList = [];
 
     // Selection index for when we click on one entry.
@@ -46,158 +47,159 @@ var ApplicationListModel = function() {
     this.selectedIndex = null;
 
     this.loading = true;
-};
+  }
 
-ApplicationListModel.prototype.update = function() {
+  update() {
     // Requests an update of the object internal data.
     // This method returns a jQuery Promise object.
     // When resolved, this.data will contain a list of the retrieved
     // data. Note that, in error conditions, this routine resolves
     // successfully in any case, and the data is set to empty list
     return $.when(
-        availableApplicationsInfo()
-    ).done(function (appData) {
-        // appData contains the data retrieved from the remote API
+      availableApplicationsInfo()
+    ).done((appData) => {
+      // appData contains the data retrieved from the remote API
 
-        var appList = [];
+      let appList = [];
 
-        // Sort application list by names
-        appData.sort(function(app1, app2) {
-            var app1Name = app1.image.ui_name? app1.image.ui_name: app1.image.name;
-            var app2Name = app2.image.ui_name? app2.image.ui_name: app2.image.name;
-            return app1Name < app2Name? -1: 1;
-        });
+      // Sort application list by names
+      appData.sort((app1, app2) => {
+        let app1Name = app1.image.ui_name? app1.image.ui_name: app1.image.name;
+        let app2Name = app2.image.ui_name? app2.image.ui_name: app2.image.name;
+        return app1Name < app2Name? -1: 1;
+      });
 
-        // Add the options for some image types
-        appData.forEach(function(applicationData) {
-            var app = {
-                appData: applicationData,
-                // Default values, will be overwritten
-                status: Status.STOPPED,
-                // If true the user will see the loading spinner (when starting the application)
-                delayed: true,
-                configurables: [],
-                isRunning: function() {return this.status === Status.RUNNING;},
-                isStopped: function() {return this.status === Status.STOPPED;},
-                isStarting: function() {return this.status === Status.STARTING;},
-                isStopping: function() {return this.status === Status.STOPPING;}
-            };
+      // Add the options for some image types
+      appData.forEach((applicationData) => {
+        let app = {
+          appData: applicationData,
+          // Default values, will be overwritten
+          status: Status.STOPPED,
+          // If true the user will see the loading spinner (when starting the application)
+          delayed: true,
+          configurables: [],
+          isRunning: function() {return this.status === Status.RUNNING;},
+          isStopped: function() {return this.status === Status.STOPPED;},
+          isStarting: function() {return this.status === Status.STARTING;},
+          isStopping: function() {return this.status === Status.STOPPING;}
+        };
 
-            this._updateConfigurables(app);
-            this._updateStatus(app);
+        this._updateConfigurables(app);
+        this._updateStatus(app);
 
-            app.delayed = !app.isRunning();
-            appList.push(app);
-        }.bind(this));
+        app.delayed = !app.isRunning();
+        appList.push(app);
+      });
 
-        this.appList = appList;
+      this.appList = appList;
 
-        if(appList.length) {this.selectedIndex = 0;}
+      if(appList.length) {this.selectedIndex = 0;}
 
-        this.loading = false;
-    }.bind(this));
-};
+      this.loading = false;
+    });
+  }
 
-ApplicationListModel.prototype.updateIdx = function(index) {
+  updateIdx(index) {
     // Refetches and updates the entry at the given index.
-    var app = this.appList[index];
-    var mapping_id = app.appData.mapping_id;
+    let app = this.appList[index];
+    let mapping_id = app.appData.mapping_id;
 
     return resources.Application.retrieve(mapping_id)
-    .done(function(newData) {
-        app.appData = newData;
+    .done((newData) => {
+      app.appData = newData;
 
-        this._updateStatus(app);
-    }.bind(this));
-};
+      this._updateStatus(app);
+    });
+  }
 
-ApplicationListModel.prototype._updateConfigurables = function(app) {
+  _updateConfigurables(app) {
     // Contains the submodels for the configurables.
     // It is a dictionary that maps a supported (by the image) configurable tag
     // to its client-side model.
     app.configurables = [];
 
     app.appData.image.configurables.forEach(function(tag) {
-        // If this returns null, the tag has not been recognized
-        // by the client. skip it and let the server deal with the
-        // missing data, either by using a default or throwing
-        // an error.
-        var ConfigurableCls = configurables[tag].model;
+      // If this returns null, the tag has not been recognized
+      // by the client. skip it and let the server deal with the
+      // missing data, either by using a default or throwing
+      // an error.
+      let ConfigurableCls = configurables[tag].model;
 
-        if (ConfigurableCls !== undefined) {
-            app.configurables.push(new ConfigurableCls());
-        }
+      if (ConfigurableCls !== undefined) {
+        app.configurables.push(new ConfigurableCls());
+      }
     });
-};
+  }
 
-ApplicationListModel.prototype._updateStatus = function(app) {
+  _updateStatus(app) {
     if (app.appData.container === undefined) {
-        app.status = Status.STOPPED;
+      app.status = Status.STOPPED;
     } else {
-        app.status = Status.RUNNING;
+      app.status = Status.RUNNING;
     }
-};
+  }
 
-ApplicationListModel.prototype.startApplication = function() {
-    var selectedIndex = this.selectedIndex;
-    var currentApp = this.appList[selectedIndex];
+  startApplication() {
+    let selectedIndex = this.selectedIndex;
+    let currentApp = this.appList[selectedIndex];
 
     currentApp.status = Status.STARTING;
     currentApp.delayed = true;
 
-    var configurablesData = {};
+    let configurablesData = {};
     currentApp.configurables.forEach(function(configurable) {
-        var tag = configurable.tag;
-        configurablesData[tag] = configurable.asConfigDict();
+      let tag = configurable.tag;
+      configurablesData[tag] = configurable.asConfigDict();
     });
 
-    var startPromise = $.Deferred();
+    let startPromise = $.Deferred();
 
     resources.Container.create({
-        mapping_id: currentApp.appData.mapping_id,
-        configurables: configurablesData
+      mapping_id: currentApp.appData.mapping_id,
+      configurables: configurablesData
     })
-    .done(function() {
-        this.updateIdx(selectedIndex)
-        .done(startPromise.resolve)
-        .fail(function(error) {
-            currentApp.status = Status.STOPPED;
-            startPromise.reject(error);
-        });
-    }.bind(this))
-    .fail(function(error) {
+    .done(() => {
+      this.updateIdx(selectedIndex)
+      .done(startPromise.resolve)
+      .fail((error) => {
         currentApp.status = Status.STOPPED;
         startPromise.reject(error);
+      });
+    })
+    .fail((error) => {
+      currentApp.status = Status.STOPPED;
+      startPromise.reject(error);
     });
 
     return startPromise;
-};
+  }
 
-ApplicationListModel.prototype.stopApplication = function(index) {
-    var appStopping = this.appList[index];
+  stopApplication(index) {
+    let appStopping = this.appList[index];
     appStopping.status = Status.STOPPING;
 
-    var url_id = appStopping.appData.container.url_id;
+    let url_id = appStopping.appData.container.url_id;
 
-    var stopPromise = $.Deferred();
+    let stopPromise = $.Deferred();
 
     resources.Container.delete(url_id)
-    .done(function() {
-        this.updateIdx(index)
-        .done(stopPromise.resolve)
-        .fail(function(error) {
-            appStopping.status = Status.STOPPED;
-            stopPromise.reject(error);
-        });
-    }.bind(this))
-    .fail(function(error) {
+    .done(() => {
+      this.updateIdx(index)
+      .done(stopPromise.resolve)
+      .fail(function(error) {
         appStopping.status = Status.STOPPED;
         stopPromise.reject(error);
+      });
+    })
+    .fail((error) => {
+      appStopping.status = Status.STOPPED;
+      stopPromise.reject(error);
     });
 
     return stopPromise;
-};
+  }
+}
 
 module.exports = {
-    ApplicationListModel: ApplicationListModel
+  ApplicationListModel
 };

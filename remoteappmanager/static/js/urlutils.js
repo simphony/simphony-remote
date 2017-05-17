@@ -5,46 +5,46 @@
 // Modifications Copyright (c) Juptyer Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-var pathJoin = function () {
-    // join a sequence of url components with '/'
-    var url = '', i = 0;
+let pathJoin = function () {
+  // join a sequence of url components with '/'
+  let url = '', i = 0;
 
-    for (i = 0; i < arguments.length; i += 1) {
-        if (arguments[i] === '') {
-            continue;
-        }
-        if (url.length > 0 && url[url.length-1] !== '/') {
-            url = url + '/' + arguments[i];
-        } else {
-            url = url + arguments[i];
-        }
+  for (i = 0; i < arguments.length; i += 1) {
+    if (arguments[i] === '') {
+      continue;
     }
-    url = url.replace(/\/\/+/, '/');
-    return url;
+    if (url.length > 0 && url[url.length-1] !== '/') {
+      url = url + '/' + arguments[i];
+    } else {
+      url = url + arguments[i];
+    }
+  }
+  url = url.replace(/\/\/+/, '/');
+  return url;
 };
 
-var parse = function (url) {
-    // an `a` element with an href allows attr-access to the parsed segments of a URL
-    // a = parse_url("http://localhost:8888/path/name#hash")
-    // a.protocol = "http:"
-    // a.host     = "localhost:8888"
-    // a.hostname = "localhost"
-    // a.port     = 8888
-    // a.pathname = "/path/name"
-    // a.hash     = "#hash"
-    var a = document.createElement("a");
-    a.href = url;
-    return a;
+let parse = function (url) {
+  // an `a` element with an href allows attr-access to the parsed segments of a URL
+  // a = parse_url("http://localhost:8888/path/name#hash")
+  // a.protocol = "http:"
+  // a.host   = "localhost:8888"
+  // a.hostname = "localhost"
+  // a.port   = 8888
+  // a.pathname = "/path/name"
+  // a.hash   = "#hash"
+  let a = document.createElement("a");
+  a.href = url;
+  return a;
 };
 
-var encodeUriComponents = function (uri) {
-    // encode just the components of a multi-segment uri,
-    // leaving '/' separators
-    return uri.split('/').map(encodeURIComponent).join('/');
+let encodeUriComponents = function (uri) {
+  // encode just the components of a multi-segment uri,
+  // leaving '/' separators
+  return uri.split('/').map(encodeURIComponent).join('/');
 };
 
 module.exports = {
-    pathJoin: pathJoin,
-    encodeUriComponents: encodeUriComponents,
-    parse: parse
+  pathJoin,
+  encodeUriComponents,
+  parse
 };

@@ -3,30 +3,32 @@
 // matching to prevent loading.
 
 function init() {
-    if (window.apidata.analytics !== undefined) {
-        window.ga('create', window.apidata.analytics.tracking_id, 'auto');
-    } else {
-        window.ga = function() {};
-    }
+  if (window.apidata.analytics !== undefined) {
+    window.ga('create', window.apidata.analytics.tracking_id, 'auto');
+  } else {
+    window.ga = function() {};
+  }
 
-    return function() {
-        window.ga.apply(this, arguments);
-    };
+  return function() {
+    window.ga.apply(this, arguments);
+  };
 }
 
-var GaObserver = function() {
+class GaObserver {
+  constructor() {
     this.ga = init();
-};
+  }
 
-GaObserver.prototype.triggerApplicationStarting = function(name) {
+  triggerApplicationStarting(name) {
     this.ga("send", "event", {
-        eventCategory: "Application",
-        eventAction: "start",
-        eventLabel: name
+      eventCategory: "Application",
+      eventAction: "start",
+      eventLabel: name
     });
-};
+  }
+}
 
 module.exports = {
-    init: init, // For testing purpose
-    GaObserver: GaObserver
+  init, // For testing purpose
+  GaObserver
 };
