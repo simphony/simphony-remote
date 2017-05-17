@@ -7,14 +7,14 @@ var resolutionComponent = Vue.component(resolutionTag + '-component', {
     props: ['configDict'],
 
     template:
-        '<div class="form-group">' +
-        '  <label>Resolution</label>' +
-        '  <select class="form-control" v-model="resolution">' +
-        '    <option v-for="resolutionOption in resolutionOptions">' +
-        '      {{resolutionOption}}' +
-        '    </option>' +
-        '  </select>' +
-        '</div>',
+        `<div class="form-group">
+          <label>Resolution</label>
+          <select class="form-control" v-model="resolution">
+            <option v-for="resolutionOption in resolutionOptions">
+              {{resolutionOption}}
+            </option>
+          </select>
+        </div>`,
 
     data: function() {
         return {
@@ -30,20 +30,22 @@ var resolutionComponent = Vue.component(resolutionTag + '-component', {
 });
 
 // Your configurable class must implement a tag and default configDict
-var ResolutionModel = function() {
-    this.tag = resolutionTag;
-    this.configDict = { resolution: 'Window' };
-};
+class ResolutionModel {
+    constructor() {
+        this.tag = resolutionTag;
+        this.configDict = { resolution: 'Window' };
+    };
 
-ResolutionModel.prototype.asConfigDict = function() {
-    var resolution = this.configDict.resolution;
+    asConfigDict() {
+        var resolution = this.configDict.resolution;
 
-    if (resolution === 'Window') {
-        var maxSize = utils.maxIframeSize();
-        resolution = maxSize[0] + 'x' + maxSize[1];
-    }
+        if (resolution === 'Window') {
+            var maxSize = utils.maxIframeSize();
+            resolution = maxSize[0] + 'x' + maxSize[1];
+        }
 
-    return { resolution: resolution };
+        return { resolution: resolution };
+    };
 };
 
 var outputConfigurables = {};
