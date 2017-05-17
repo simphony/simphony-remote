@@ -14,7 +14,7 @@ module.exports = {
     },
 
     resolve: {
-        extensions: ["*", ".js"],
+        extensions: ["*", ".js", ".vue"],
         alias: {
             lodash: path.resolve(components, "lodash/dist/lodash"),
             jquery: path.resolve(components, "admin-lte/plugins/jQuery/jquery-2.2.3.min"),
@@ -43,6 +43,12 @@ module.exports = {
                     options: {
                         presets: ['env']
                     }
+                }
+            },
+            {
+                test: /\.vue$/,
+                use: {
+                  loader: 'vue-loader'
                 }
             }
         ]
