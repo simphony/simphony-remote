@@ -10,20 +10,20 @@ let model = new models.ApplicationListModel();
 
 // Initialize views
 let appListView = new applicationListView.ApplicationListView({
-    el: '#applist',
-    data: function() { return { model: model }; }
+  el: '#applist',
+  data: function() { return { model: model }; }
 });
 
 let appView = new applicationView.ApplicationView({
-    el: '#appview',
-    data: function() { return { model: model }; }
+  el: '#appview',
+  data: function() { return { model: model }; }
 });
 
 // Create GA observer
 let gaObserver = new gamodule.GaObserver();
 
 appView.$on('startApplication', function(application) {
-    gaObserver.triggerApplicationStarting(application.appData.image.name);
+  gaObserver.triggerApplicationStarting(application.appData.image.name);
 });
 
 appListView.$on('entryClicked', function() { appView.focusIframe(); });

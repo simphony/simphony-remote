@@ -12,28 +12,28 @@ let AccountingView = require("./vue-components/AccountingView");
 // install router
 Vue.use(VueRouter);
 Vue.use(VueForm, {
-    inputClasses: {
-        valid: 'form-control-success',
-        invalid: 'form-control-danger'
-    }
+  inputClasses: {
+    valid: 'form-control-success',
+    invalid: 'form-control-danger'
+  }
 });
 
 Vue.filter("truncate", function(value) {
-    return _.truncate(value, {'length': 12 });
+  return _.truncate(value, {'length': 12 });
 });
 
 let router = new VueRouter({
-    routes: [
-        { path: '/', component: MainView },
-        { path: '/containers', component: ContainersView },
-        { path: '/users', component: UsersView },
-        { path: '/users/:id/accounting', component: AccountingView, name: "user_accounting" },
-        { path: '/applications', component: ApplicationsView }
-    ]
+  routes: [
+    { path: '/', component: MainView },
+    { path: '/containers', component: ContainersView },
+    { path: '/users', component: UsersView },
+    { path: '/users/:id/accounting', component: AccountingView, name: "user_accounting" },
+    { path: '/applications', component: ApplicationsView }
+  ]
 });
 
 let vm;
 vm = new Vue({
-    el: "#app",
-    router: router
+  el: "#app",
+  router: router
 });
