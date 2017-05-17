@@ -44,7 +44,7 @@ var encodeUriComponents = function (uri) {
 };
 
 module.exports = {
-    pathJoin: pathJoin,
-    encodeUriComponents: encodeUriComponents,
-    parse: parse
+    pathJoin,
+    encodeUriComponents,
+    parse
 };

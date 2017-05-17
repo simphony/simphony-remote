@@ -14,19 +14,21 @@ function init() {
     };
 }
 
-var GaObserver = function() {
-    this.ga = init();
-};
+class GaObserver {
+    constructor() {
+        this.ga = init();
+    };
 
-GaObserver.prototype.triggerApplicationStarting = function(name) {
-    this.ga("send", "event", {
-        eventCategory: "Application",
-        eventAction: "start",
-        eventLabel: name
-    });
+    triggerApplicationStarting(name) {
+        this.ga("send", "event", {
+            eventCategory: "Application",
+            eventAction: "start",
+            eventLabel: name
+        });
+    };
 };
 
 module.exports = {
-    init: init, // For testing purpose
-    GaObserver: GaObserver
+    init, // For testing purpose
+    GaObserver
 };

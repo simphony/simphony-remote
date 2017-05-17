@@ -41,7 +41,7 @@ var maxIframeSize = function () {
 };
 
 module.exports = {
-    all : all,
-    update : update,
-    maxIframeSize: maxIframeSize
+    all,
+    update,
+    maxIframeSize
 };
