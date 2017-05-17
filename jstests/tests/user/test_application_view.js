@@ -1,6 +1,6 @@
 var Vue = require("vuejs");
 var models = require("user/models");
-var applicationView = require("user/views/application_view");
+var ApplicationView = require("user/views/application_view");
 require("filters");
 
 QUnit.module("user.app_view");
@@ -8,7 +8,7 @@ QUnit.test("rendering form", function (assert) {
     var done = assert.async();
 
     var model = new models.ApplicationListModel();
-    var appView = new applicationView.ApplicationView({
+    var appView = new ApplicationView({
         data: function() { return { model: model }; }
     }).$mount();
 
@@ -41,7 +41,7 @@ QUnit.test("rendering iframe", function (assert) {
     var done = assert.async();
 
     var model = new models.ApplicationListModel();
-    var appView = new applicationView.ApplicationView({
+    var appView = new ApplicationView({
         data: function() { return { model: model }; }
     }).$mount();
 

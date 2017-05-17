@@ -1,7 +1,7 @@
 let gamodule = require("gamodule");
 let models = require("./models");
-let applicationListView = require("./views/application_list_view");
-let applicationView = require("./views/application_view");
+let ApplicationListView = require("./views/application_list_view");
+let ApplicationView = require("./views/application_view");
 require("filters");
 
 // This model keeps the retrieved content from the REST query locally.
@@ -9,12 +9,12 @@ require("filters");
 let model = new models.ApplicationListModel();
 
 // Initialize views
-let appListView = new applicationListView.ApplicationListView({
+let appListView = new ApplicationListView({
   el: '#applist',
   data: function() { return { model: model }; }
 });
 
-let appView = new applicationView.ApplicationView({
+let appView = new ApplicationView({
   el: '#appview',
   data: function() { return { model: model }; }
 });
