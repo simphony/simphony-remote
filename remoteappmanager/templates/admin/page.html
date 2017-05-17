@@ -1,159 +1,37 @@
-<!DOCTYPE html>
-<!--
-This is a starter template page. Use this page to start your new project from
-scratch. This page gets rid of all links and provides the needed markup only.
--->
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>{% block title %}RemoteApp Manager{% endblock %}</title>
-  <!-- Tell the browser to be responsive to screen width -->
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <!-- Bootstrap 3.3.6 -->
-  <link rel="stylesheet" href="{{ static_url("bower_components/admin-lte/bootstrap/css/bootstrap.min.css") }}">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="{{ static_url("bower_components/font-awesome/css/font-awesome.min.css") }}">
-  <!-- Ionicons -->
-  <link rel="stylesheet" href="{{ static_url("bower_components/ionicons/css/ionicons.min.css") }}">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="{{ static_url("bower_components/admin-lte/dist/css/AdminLTE.min.css") }}">
-  <link rel="stylesheet" href="{{ static_url("bower_components/admin-lte/dist/css/skins/skin-red.min.css")}}">
+{% extends "page.html" %}
 
-  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
-  <script src="{{ static_url("bower_components/html5shiv/dist/html5shiv.min.js") }}"></script>
-  <script src="{{ static_url("bower_components/respond/dest/respond.min.js") }}"></script>
-  <![endif]-->
+{% set skin = "skin-red" %}
 
-  <link rel="stylesheet" href="{{ static_url("css/remoteappmanager.css") }}" type="text/css"/>
+{% block stylesheet %}
   <link rel="stylesheet" href="{{ static_url("bower_components/datatables.net-dt/css/jquery.dataTables.css") }}" type="text/css"/>
+{% endblock %}
 
-  <script type="text/javascript">
-    // This will always be executed and create the basic ga function that
-    // does nothing
-    window.ga = function () {
-      (window.ga.q = window.ga.q || []).push(arguments);
-    };
-    window.ga.l = 1 * new Date();
-    window.GoogleAnalyticsObject = "ga";
-  </script>
-  {% if analytics %}
-    <script src='https://www.google-analytics.com/analytics.js' async type="text/javascript"></script>
-  {% endif %}
+{% block sidebar %}
+  <section class="sidebar">
+    <ul class="sidebar-menu" id="adminoptions">
+      <li class="header">ADMIN</li>
+      <router-link to="/" tag="li" exact-active-class="active"><a>Home</a></router-link>
+      <router-link to="/containers" tag="li" exact-active-class="active"><a>Containers</a></router-link>
+      <router-link to="/users" tag="li" active-class="active"><a>Users</a></router-link>
+      <router-link to="/applications" tag="li" exact-active-class="active"><a>Applications</a></router-link>
+    </ul>
+  </section>
+{% endblock %}
 
-  <script type="text/javascript">
-    window.apidata = {
-      base_url: "{{base_url}}",
-      prefix: "{{prefix}}",
-      {% if user %}
-        user: "{{user.name}}",
-      {% endif %}
-      {% if analytics %}
-        analytics: {
-          tracking_id: "{{ analytics.tracking_id }}"
-        },
-      {% endif %}
-    };
-  </script>
-</head>
-<body class="hold-transition skin-red sidebar-mini">
+{% block main %}
+  <section class="content">
+    <p>
+      <!-- use router-link component for navigation. -->
+      <!-- specify the link by passing the `to` prop. -->
+      <!-- <router-link> will be rendered as an `<a>` tag by default -->
+    </p>
+    <!-- route outlet -->
+    <!-- component matched by the route will render here -->
+    <router-view></router-view>
+  </section>
+{% endblock %}
 
-  <noscript>
-    <div id='noscript'>
-      Jupyter Hub requires JavaScript.<br>
-      Please enable it to proceed.
-    </div>
-  </noscript>
-
-  <div class="wrapper" id="app">
-
-    <!-- Main Header -->
-    <header class="main-header">
-
-      <a href="#" class="logo">
-        <!-- logo for regular state and mobile devices -->
-        <span class="logo-lg"><b>Simphony</b>Remote</span>
-      </a>
-
-      <!-- Header Navbar -->
-      <nav class="navbar navbar-static-top" role="navigation">
-        <!-- Navbar Right Menu -->
-        <div class="navbar-custom-menu">
-          <ul class="nav navbar-nav">
-            <!-- User Account Menu -->
-            <li class="dropdown user user-menu">
-              <!-- Menu Toggle Button -->
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <!-- The user image in the navbar-->
-                <img src="https://www.gravatar.com/avatar/{{ user.name | gravatar_id }}" class="user-image" alt="User Image">
-                <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                <span class="hidden-xs">{{ user.name }}</span>
-              </a>
-              <ul class="dropdown-menu">
-                <!-- The user image in the menu -->
-                <li class="user-header">
-                  <img src="https://www.gravatar.com/avatar/{{ user.name | gravatar_id }}" class="img-circle" alt="User Image">
-                  <p>
-                    {{ user.name }}
-                  </p>
-                </li>
-                <!-- Menu Body -->
-                <li class="user-body">
-                </li>
-                <!-- Menu Footer-->
-                <li class="user-footer">
-                  <div class="pull-right">
-                    {% block login_widget %}
-                      <a id="logout" href="{{ logout_url }}" class="btn btn-default btn-flat"><i class="fa fa-sign-out"> Sign out</i></a>
-                    {% endblock %}
-                  </div>
-                </li>
-              </ul>
-            </li>
-            <!-- Control Sidebar Toggle Button -->
-          </ul>
-        </div>
-      </nav>
-    </header>
-    <!-- Left side column. contains the logo and sidebar -->
-    <aside class="main-sidebar">
-      <section class="sidebar">
-        <ul class="sidebar-menu" id="adminoptions">
-          <li class="header">ADMIN</li>
-          <router-link to="/" tag="li" exact-active-class="active"><a>Home</a></router-link>
-          <router-link to="/containers" tag="li" exact-active-class="active"><a>Containers</a></router-link>
-          <router-link to="/users" tag="li" active-class="active"><a>Users</a></router-link>
-          <router-link to="/applications" tag="li" exact-active-class="active"><a>Applications</a></router-link>
-        </ul>
-      </section>
-    </aside>
-
-    <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
-      <!-- Main content -->
-      <section class="content">
-        <p>
-          <!-- use router-link component for navigation. -->
-          <!-- specify the link by passing the `to` prop. -->
-          <!-- <router-link> will be rendered as an `<a>` tag by default -->
-        </p>
-        <!-- route outlet -->
-        <!-- component matched by the route will render here -->
-        <router-view></router-view>
-      <!-- Your Page Content Here -->
-      </section>
-      <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
-  </div>
-
-  <script src="{{ static_url("bower_components/admin-lte/plugins/jQuery/jquery-2.2.3.min.js") }}"></script>
-  <script src="{{ static_url("bower_components/admin-lte/bootstrap/js/bootstrap.min.js") }}"></script>
-  <script src="{{ static_url("bower_components/admin-lte/dist/js/app.min.js") }}"></script>
-
-  <script src="{{ static_url("dist/admin.js") }}"></script>
-
-</body>
-</html>
+{% block script_init %}
+    {{  super() }}
+    <script src="{{ static_url("dist/admin.js") }}"></script>
+{% endblock %}
