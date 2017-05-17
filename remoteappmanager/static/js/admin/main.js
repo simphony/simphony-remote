@@ -1,13 +1,13 @@
-var _ = require("lodash");
-var Vue = require("vuejs");
-var VueRouter = require("vue-router");
-var VueForm = require("vue-form");
+let _ = require("lodash");
+let Vue = require("vuejs");
+let VueRouter = require("vue-router");
+let VueForm = require("vue-form");
 require("toolkit");
-var MainView = require("./vue-components/MainView");
-var ContainersView = require("./vue-components/ContainersView");
-var UsersView = require("./vue-components/UsersView");
-var ApplicationsView = require("./vue-components/ApplicationsView");
-var AccountingView = require("./vue-components/AccountingView");
+let MainView = require("./vue-components/MainView");
+let ContainersView = require("./vue-components/ContainersView");
+let UsersView = require("./vue-components/UsersView");
+let ApplicationsView = require("./vue-components/ApplicationsView");
+let AccountingView = require("./vue-components/AccountingView");
 
 // install router
 Vue.use(VueRouter);
@@ -22,7 +22,7 @@ Vue.filter("truncate", function(value) {
     return _.truncate(value, {'length': 12 });
 });
 
-var router = new VueRouter({
+let router = new VueRouter({
     routes: [
         { path: '/', component: MainView },
         { path: '/containers', component: ContainersView },
@@ -32,7 +32,7 @@ var router = new VueRouter({
     ]
 });
 
-var vm;
+let vm;
 vm = new Vue({
     el: "#app",
     router: router

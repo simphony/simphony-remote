@@ -5,9 +5,9 @@
 // Modifications Copyright (c) Juptyer Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-var pathJoin = function () {
+let pathJoin = function () {
     // join a sequence of url components with '/'
-    var url = '', i = 0;
+    let url = '', i = 0;
 
     for (i = 0; i < arguments.length; i += 1) {
         if (arguments[i] === '') {
@@ -23,7 +23,7 @@ var pathJoin = function () {
     return url;
 };
 
-var parse = function (url) {
+let parse = function (url) {
     // an `a` element with an href allows attr-access to the parsed segments of a URL
     // a = parse_url("http://localhost:8888/path/name#hash")
     // a.protocol = "http:"
@@ -32,12 +32,12 @@ var parse = function (url) {
     // a.port     = 8888
     // a.pathname = "/path/name"
     // a.hash     = "#hash"
-    var a = document.createElement("a");
+    let a = document.createElement("a");
     a.href = url;
     return a;
 };
 
-var encodeUriComponents = function (uri) {
+let encodeUriComponents = function (uri) {
     // encode just the components of a multi-segment uri,
     // leaving '/' separators
     return uri.split('/').map(encodeURIComponent).join('/');

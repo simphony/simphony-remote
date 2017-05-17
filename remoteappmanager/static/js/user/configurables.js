@@ -1,8 +1,8 @@
-var Vue = require("vuejs");
-var utils = require("utils");
+let Vue = require("vuejs");
+let utils = require("utils");
 
-var resolutionTag = 'resolution';
-var resolutionComponent = Vue.component(resolutionTag + '-component', {
+let resolutionTag = 'resolution';
+const resolutionComponent = Vue.component(resolutionTag + '-component', {
     // Your configurable must have a "configDict" property from the model
     props: ['configDict'],
 
@@ -37,10 +37,10 @@ class ResolutionModel {
     }
 
     asConfigDict() {
-        var resolution = this.configDict.resolution;
+        let resolution = this.configDict.resolution;
 
         if (resolution === 'Window') {
-            var maxSize = utils.maxIframeSize();
+            let maxSize = utils.maxIframeSize();
             resolution = maxSize[0] + 'x' + maxSize[1];
         }
 
@@ -48,7 +48,7 @@ class ResolutionModel {
     }
 }
 
-var outputConfigurables = {};
+let outputConfigurables = {};
 
 // Export all your configurable models here
 outputConfigurables[resolutionTag] = {

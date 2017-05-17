@@ -1,4 +1,4 @@
-var resources = require("admin-resources");
+let resources = require("admin-resources");
 
 module.exports = {
     template:
@@ -93,8 +93,8 @@ module.exports = {
         },
 
         createNewAccounting: function () {
-            var model = this.model;
-            var formstate = this.formstate;
+            let model = this.model;
+            let formstate = this.formstate;
 
             if (formstate.$invalid) {
                 return;
@@ -105,7 +105,7 @@ module.exports = {
                 return;
             }
 
-            var rep = {
+            let rep = {
                 user_id: this.userId,
                 image_name: this.model.image_name,
                 allow_home: this.model.allow_home,

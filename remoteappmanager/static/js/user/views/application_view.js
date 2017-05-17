@@ -1,9 +1,9 @@
-var Vue = require("vuejs");
-var urlUtils = require("urlutils");
-var utils = require("utils");
+let Vue = require("vuejs");
+let urlUtils = require("urlutils");
+let utils = require("utils");
 require("toolkit");
 
-var ApplicationView = Vue.extend({
+const ApplicationView = Vue.extend({
     template:
         `<!-- Application View -->
         <section id="appview"
@@ -98,12 +98,12 @@ var ApplicationView = Vue.extend({
             return this.currentApp.appData.image.policy;
         },
         appSource: function() {
-            var url = urlUtils.pathJoin(
+            let url = urlUtils.pathJoin(
                 window.apidata.base_url,
                 'containers',
                 this.currentApp.appData.container.url_id
             );
-            var output = this.currentApp.delayed ? url : url + '/';
+            let output = this.currentApp.delayed ? url : url + '/';
 
             this.currentApp.delayed = false;
 
@@ -113,8 +113,8 @@ var ApplicationView = Vue.extend({
 
     methods: {
         startApplication: function() {
-            var startingApp = this.currentApp;
-            var startingAppName = this.$options.filters.appName(startingApp.appData.image);
+            let startingApp = this.currentApp;
+            let startingAppName = this.$options.filters.appName(startingApp.appData.image);
             this.model.startApplication()
             .done(() => {
                 this.$emit('startApplication', startingApp);
@@ -133,7 +133,7 @@ var ApplicationView = Vue.extend({
             return utils.maxIframeSize();
         },
         focusIframe: function() {
-            var iframe = this.$el.querySelector('iframe');
+            let iframe = this.$el.querySelector('iframe');
             if(iframe !== null) {
                 iframe.focus();
             }

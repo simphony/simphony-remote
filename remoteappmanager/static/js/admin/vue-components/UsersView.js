@@ -1,5 +1,5 @@
-var resources = require("admin-resources");
-var NewUserDialog = require("./users/NewUserDialog");
+let resources = require("admin-resources");
+let NewUserDialog = require("./users/NewUserDialog");
 
 module.exports = {
     components: {
@@ -75,7 +75,7 @@ module.exports = {
             .done((identifiers, items) => {
                 this.table.rows = [];
                 identifiers.forEach((id) => {
-                    var item = items[id];
+                    let item = items[id];
                     this.table.rows.push([
                         id,
                         item.name

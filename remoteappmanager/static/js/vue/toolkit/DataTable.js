@@ -7,7 +7,7 @@ module.exports = {
             return typeof(value) === "boolean";
         },
         buttonClassFromType: function(value = "danger") {
-            var cls = {"btn": true};
+            let cls = {"btn": true};
             cls["btn-" + value] = true;
             return cls;
         }

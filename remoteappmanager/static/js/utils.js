@@ -5,9 +5,9 @@
 // Modifications Copyright (c) Juptyer Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-var $ = require("jquery");
+let $ = require("jquery");
 
-var all = function (promises) {
+let all = function (promises) {
     // A form of jQuery.when that handles an array of promises
     // and equalises the behavior regardless if there's one or more than
     // one elements.
@@ -26,7 +26,7 @@ var all = function (promises) {
     });
 };
 
-var update = function (d1, d2) {
+let update = function (d1, d2) {
     // Transfers the keys from d2 to d1. Returns d1
     $.map(d2, function (i, key) {
         d1[key] = d2[key];
@@ -34,9 +34,9 @@ var update = function (d1, d2) {
     return d1;
 };
 
-var maxIframeSize = function () {
+let maxIframeSize = function () {
     // Returns the current iframe viewport size
-    var box = document.querySelector(".content-wrapper").getBoundingClientRect();
+    let box = document.querySelector(".content-wrapper").getBoundingClientRect();
     return [box.width, box.height];
 };
 

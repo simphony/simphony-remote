@@ -1,7 +1,7 @@
-var Vue = require("vuejs");
+let Vue = require("vuejs");
 require("toolkit");
 
-var ApplicationListView = Vue.extend({
+const ApplicationListView = Vue.extend({
     template:
           `<section class="sidebar">
             <!-- Error dialog -->
@@ -74,7 +74,7 @@ var ApplicationListView = Vue.extend({
     computed: {
         visibleList: function() {
             return this.model.appList.filter((app) => {
-                var appName = this.$options.filters.appName(app.appData.image).toLowerCase();
+                let appName = this.$options.filters.appName(app.appData.image).toLowerCase();
                 return appName.indexOf(this.searchInput.toLowerCase()) !== -1;
             });
         }
@@ -82,7 +82,7 @@ var ApplicationListView = Vue.extend({
 
     methods: {
         stopApplication: function(index) {
-            var stoppingAppName = this.$options.filters.appName(
+            let stoppingAppName = this.$options.filters.appName(
                 this.model.appList[index].appData.image);
             this.model.stopApplication(index).fail((error) => {
                 this.stoppingError.code = error.code;

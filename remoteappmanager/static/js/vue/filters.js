@@ -1,5 +1,5 @@
-var Vue = require("vuejs");
-var urlUtils = require("urlutils");
+let Vue = require("vuejs");
+let urlUtils = require("urlutils");
 
 Vue.filter('iconSrc', function(icon_data) {
     return (

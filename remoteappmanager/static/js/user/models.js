@@ -1,28 +1,28 @@
-var $ = require("jquery");
-var resources = require("user-resources");
-var configurables = require("./configurables");
+let $ = require("jquery");
+let resources = require("user-resources");
+let configurables = require("./configurables");
 
-var Status = {
+let Status = {
     RUNNING: "RUNNING",
     STARTING: "STARTING",
     STOPPING: "STOPPING",
     STOPPED: "STOPPED"
 };
 
-var availableApplicationsInfo = function () {
-    // Retrieve information from the various applications and
+let availableApplicationsInfo = function () {
+    // Retrieve information from the letious applications and
     // connect the cascading callbacks.
     // Returns a single promise. When resolved, the attached
-    // callbacks will be passed an array of the promises for the various
+    // callbacks will be passed an array of the promises for the letious
     // retrieve operations, successful or not.
     // This routine will go away when we provide the representation data
     // inline with the items at tornado-webapi level.
 
-    var promise = $.Deferred();
+    let promise = $.Deferred();
 
     resources.Application.items()
         .done((identifiers, items) => {
-            var result = [];
+            let result = [];
             Object.keys(items).forEach((key) => {
                 result.push(items[key]);
             });
@@ -60,18 +60,18 @@ class ApplicationListModel {
         ).done((appData) => {
             // appData contains the data retrieved from the remote API
 
-            var appList = [];
+            let appList = [];
 
             // Sort application list by names
             appData.sort((app1, app2) => {
-                var app1Name = app1.image.ui_name? app1.image.ui_name: app1.image.name;
-                var app2Name = app2.image.ui_name? app2.image.ui_name: app2.image.name;
+                let app1Name = app1.image.ui_name? app1.image.ui_name: app1.image.name;
+                let app2Name = app2.image.ui_name? app2.image.ui_name: app2.image.name;
                 return app1Name < app2Name? -1: 1;
             });
 
             // Add the options for some image types
             appData.forEach((applicationData) => {
-                var app = {
+                let app = {
                     appData: applicationData,
                     // Default values, will be overwritten
                     status: Status.STOPPED,
@@ -101,8 +101,8 @@ class ApplicationListModel {
 
     updateIdx(index) {
         // Refetches and updates the entry at the given index.
-        var app = this.appList[index];
-        var mapping_id = app.appData.mapping_id;
+        let app = this.appList[index];
+        let mapping_id = app.appData.mapping_id;
 
         return resources.Application.retrieve(mapping_id)
         .done((newData) => {
@@ -123,7 +123,7 @@ class ApplicationListModel {
             // by the client. skip it and let the server deal with the
             // missing data, either by using a default or throwing
             // an error.
-            var ConfigurableCls = configurables[tag].model;
+            let ConfigurableCls = configurables[tag].model;
 
             if (ConfigurableCls !== undefined) {
                 app.configurables.push(new ConfigurableCls());
@@ -140,19 +140,19 @@ class ApplicationListModel {
     }
 
     startApplication() {
-        var selectedIndex = this.selectedIndex;
-        var currentApp = this.appList[selectedIndex];
+        let selectedIndex = this.selectedIndex;
+        let currentApp = this.appList[selectedIndex];
 
         currentApp.status = Status.STARTING;
         currentApp.delayed = true;
 
-        var configurablesData = {};
+        let configurablesData = {};
         currentApp.configurables.forEach(function(configurable) {
-            var tag = configurable.tag;
+            let tag = configurable.tag;
             configurablesData[tag] = configurable.asConfigDict();
         });
 
-        var startPromise = $.Deferred();
+        let startPromise = $.Deferred();
 
         resources.Container.create({
             mapping_id: currentApp.appData.mapping_id,
@@ -175,12 +175,12 @@ class ApplicationListModel {
     }
 
     stopApplication(index) {
-        var appStopping = this.appList[index];
+        let appStopping = this.appList[index];
         appStopping.status = Status.STOPPING;
 
-        var url_id = appStopping.appData.container.url_id;
+        let url_id = appStopping.appData.container.url_id;
 
-        var stopPromise = $.Deferred();
+        let stopPromise = $.Deferred();
 
         resources.Container.delete(url_id)
         .done(() => {

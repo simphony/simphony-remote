@@ -1,5 +1,5 @@
-var resources = require("admin-resources");
-var NewAccountingDialog = require("./accounting/NewAccountingDialog");
+let resources = require("admin-resources");
+let NewAccountingDialog = require("./accounting/NewAccountingDialog");
 
 module.exports = {
     components: {
@@ -80,7 +80,7 @@ module.exports = {
             .done((identifiers, items) => {
                 this.table.rows = [];
                 identifiers.forEach((id) => {
-                    var item = items[id];
+                    let item = items[id];
                     this.table.rows.push([
                         id,
                         item.image_name,

@@ -1,8 +1,8 @@
-var Vue = require("vuejs");
-var ConfirmDialog = require("./ConfirmDialog");
-var ModalDialog = require("./ModalDialog");
-var AdminLTEBox = require("./AdminLTEBox");
-var DataTable = require("./DataTable");
+let Vue = require("vuejs");
+let ConfirmDialog = require("./ConfirmDialog");
+let ModalDialog = require("./ModalDialog");
+let AdminLTEBox = require("./AdminLTEBox");
+let DataTable = require("./DataTable");
 
 Vue.component("confirm-dialog", ConfirmDialog);
 Vue.component("modal-dialog", ModalDialog);

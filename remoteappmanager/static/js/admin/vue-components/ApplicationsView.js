@@ -1,5 +1,5 @@
-var resources = require("admin-resources");
-var NewApplicationDialog = require("./applications/NewApplicationDialog");
+let resources = require("admin-resources");
+let NewApplicationDialog = require("./applications/NewApplicationDialog");
 
 module.exports = {
     components: {
@@ -78,7 +78,7 @@ module.exports = {
             .done((identifiers, items) => {
                 this.table.rows = [];
                 identifiers.forEach((id) => {
-                    var item = items[id];
+                    let item = items[id];
                     this.table.rows.push([
                         id,
                         item.image_name
