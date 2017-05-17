@@ -10,10 +10,10 @@ let Status = {
 };
 
 let availableApplicationsInfo = function () {
-    // Retrieve information from the letious applications and
+    // Retrieve information from the various applications and
     // connect the cascading callbacks.
     // Returns a single promise. When resolved, the attached
-    // callbacks will be passed an array of the promises for the letious
+    // callbacks will be passed an array of the promises for the various
     // retrieve operations, successful or not.
     // This routine will go away when we provide the representation data
     // inline with the items at tornado-webapi level.
