@@ -60,7 +60,7 @@ class NpmBuildCommand(install):
         import subprocess
         subprocess.check_call(['npm', 'run', 'build'])
         subprocess.check_call(['npm', 'run', 'build-test'])
-        install.run(self)
+        super().run()
 
 
 # main setup configuration class
