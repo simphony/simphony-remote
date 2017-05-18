@@ -1,6 +1,6 @@
 var path = require("path");
 var components = path.resolve(__dirname, "remoteappmanager/static/bower_components");
-var js = path.resolve(__dirname, "remoteappmanager/static/js");
+var js = path.resolve(__dirname, "frontend");
 
 module.exports = {
     entry: {
@@ -9,7 +9,7 @@ module.exports = {
     },
 
     output: {
-        path: path.resolve(__dirname, "remoteappmanager/static/dist"),
+        path: path.resolve(__dirname, "build/lib/remoteappmanager/static/dist"),
         filename: "[name].js"
     },
 

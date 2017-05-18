@@ -1,7 +1,7 @@
 var path = require("path");
 var jstests = path.resolve(__dirname, "jstests");
 var components = path.resolve(__dirname, "remoteappmanager/static/bower_components");
-var js = path.resolve(__dirname, "remoteappmanager/static/js");
+var js = path.resolve(__dirname, "frontend");
 
 module.exports = {
     entry: {
