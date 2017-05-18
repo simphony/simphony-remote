@@ -1,6 +1,6 @@
 var Vue = require("vuejs");
 var models = require("user/models");
-var ApplicationView = require("user/views/application_view");
+var ApplicationView = require("user/vue-components/ApplicationView");
 require("filters");
 
 QUnit.module("user.app_view");

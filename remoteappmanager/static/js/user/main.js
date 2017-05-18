@@ -1,7 +1,7 @@
 let gamodule = require("gamodule");
 let models = require("./models");
-let ApplicationListView = require("./views/application_list_view");
-let ApplicationView = require("./views/application_view");
+let ApplicationListView = require("./vue-components/ApplicationListView");
+let ApplicationView = require("./vue-components/ApplicationView");
 require("filters");
 
 // This model keeps the retrieved content from the REST query locally.
