@@ -145,3 +145,14 @@
     updated: function() { this.focusIframe(); }
   });
 </script>
+
+<style scoped>
+  .no-padding {
+    padding: 0px;
+  }
+
+  #application {
+    width: 100%;
+    height: 100%;
+  }
+</style>
