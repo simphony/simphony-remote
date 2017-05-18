@@ -77,3 +77,11 @@
     }
   };
 </script>
+
+<style scoped>
+  .required-field > label::after {
+    content: '*';
+    color: red;
+    margin-left: 0.25rem;
+  }
+</style>
