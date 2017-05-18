@@ -1,8 +1,8 @@
-var models = require("user/models");
+var ApplicationListModel = require("user/ApplicationListModel");
 
-QUnit.module("user.models");
+QUnit.module("user.ApplicationListModel");
 QUnit.test("instantiation", function (assert) {
-    var model = new models.ApplicationListModel();
+    var model = new ApplicationListModel();
 
     assert.equal(model.appList.length, 0);
     assert.equal(model.selectedIndex, null);

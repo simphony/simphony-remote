@@ -1,14 +1,14 @@
 var Vue = require("vuejs");
-var models = require("user/models");
-var applicationListView = require("user/views/application_list_view");
+var ApplicationListModel = require("user/ApplicationListModel");
+var ApplicationListView = require("user/vue-components/ApplicationListView");
 require("filters");
 
 QUnit.module("user.app_list_view");
 QUnit.test("rendering list", function (assert) {
     var done = assert.async();
 
-    var model = new models.ApplicationListModel();
-    var appListView = new applicationListView.ApplicationListView({
+    var model = new ApplicationListModel();
+    var appListView = new ApplicationListView({
         data: function() { return { model: model }; }
     }).$mount();
 
@@ -39,8 +39,8 @@ QUnit.test("rendering list", function (assert) {
 QUnit.test("rendering nothing in the list", function (assert) {
     var done = assert.async();
 
-    var model = new models.ApplicationListModel();
-    var appListView = new applicationListView.ApplicationListView({
+    var model = new ApplicationListModel();
+    var appListView = new ApplicationListView({
         data: function() { return { model: model }; }
     }).$mount();
 
@@ -67,8 +67,8 @@ QUnit.test("rendering nothing in the list", function (assert) {
 QUnit.test("search form", function (assert) {
     var done = assert.async();
 
-    var model = new models.ApplicationListModel();
-    var appListView = new applicationListView.ApplicationListView({
+    var model = new ApplicationListModel();
+    var appListView = new ApplicationListView({
         data: function() { return { model: model }; }
     }).$mount();
 

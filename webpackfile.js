@@ -14,7 +14,7 @@ module.exports = {
     },
 
     resolve: {
-        extensions: ["*", ".js"],
+        extensions: ["*", ".js", ".vue"],
         alias: {
             lodash: path.resolve(components, "lodash/dist/lodash"),
             jquery: path.resolve(components, "admin-lte/plugins/jQuery/jquery-2.2.3.min"),
@@ -39,10 +39,13 @@ module.exports = {
                 test: /\.js$/,
                 exclude: /(node_modules|bower_components)/,
                 use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['env']
-                    }
+                    loader: 'babel-loader'
+                }
+            },
+            {
+                test: /\.vue$/,
+                use: {
+                  loader: 'vue-loader'
                 }
             }
         ]
