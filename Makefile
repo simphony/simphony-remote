@@ -109,8 +109,8 @@ pythontest:
 jstest:
 	@echo "Running javascript testsuite"
 	@echo "----------------------------"
-	`npm bin`/jshint --config .jshintrc remoteappmanager/static/js/
-	`npm bin`/node-qunit-phantomjs jstests/tests.html
+	`npm bin`/jshint --config .jshintrc --exclude frontend/tests frontend
+	`npm bin`/node-qunit-phantomjs frontend/tests/tests.html
 
 .PHONY: jscoverage
 jscoverage:
