@@ -1,12 +1,12 @@
 let gamodule = require("gamodule");
-let models = require("./models");
+let ApplicationListModel = require("./ApplicationListModel");
 let ApplicationListView = require("./vue-components/ApplicationListView");
 let ApplicationView = require("./vue-components/ApplicationView");
 require("filters");
 
 // This model keeps the retrieved content from the REST query locally.
 // It is only synchronized at initial load.
-let model = new models.ApplicationListModel();
+let model = new ApplicationListModel();
 
 // Initialize views
 let appListView = new ApplicationListView({

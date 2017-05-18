@@ -1,6 +1,6 @@
 let $ = require("jquery");
 let resources = require("user-resources");
-let configurables = require("./configurables");
+let configurables = require("./configurables/configurables");
 
 let Status = {
   RUNNING: "RUNNING",
@@ -123,7 +123,7 @@ class ApplicationListModel {
       // by the client. skip it and let the server deal with the
       // missing data, either by using a default or throwing
       // an error.
-      let ConfigurableCls = configurables[tag].model;
+      let ConfigurableCls = configurables[tag];
 
       if (ConfigurableCls !== undefined) {
         app.configurables.push(new ConfigurableCls());
@@ -200,6 +200,4 @@ class ApplicationListModel {
   }
 }
 
-module.exports = {
-  ApplicationListModel
-};
+module.exports = ApplicationListModel;
