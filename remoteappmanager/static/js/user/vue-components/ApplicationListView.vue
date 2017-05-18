@@ -102,11 +102,7 @@
 </script>
 
 <style scoped>
-  #applistentries > li > a > div {
-    float: left;
-  }
-
-  #applistentries img.app-icon {
+  .app-icon {
     position: relative;
     width: 32px;
     height: 32px;
