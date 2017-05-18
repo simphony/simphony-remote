@@ -237,16 +237,13 @@
   li a .stop-button:hover {
     display: block;
   }
-</style>
 
-<style>
   .list-enter, .list-leave-to {
     opacity: 0;
     transform: translateX(-50px);
   }
   .list-enter-active, .list-leave-active {
-    transition: all 0.5s;
-    position: absolute;
+    transition: all .5s;
   }
   .list-move {
     transition: transform .5s;
