@@ -54,12 +54,14 @@ else:
         "docker-py==1.8",
         "tornadowebapi>=0.5.0"])
 
+
 class NpmBuildCommand(install):
     def run(self):
         import subprocess
         subprocess.check_call(['npm', 'run', 'build'])
         subprocess.check_call(['npm', 'run', 'build-test'])
         install.run(self)
+
 
 # main setup configuration class
 setup(
