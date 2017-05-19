@@ -9,7 +9,7 @@ module.exports = {
     },
 
     output: {
-        path: path.resolve(__dirname, "build/lib/remoteappmanager/static/dist"),
+        path: path.resolve(__dirname, "remoteappmanager/static/dist"),
         filename: "[name].js"
     },
 
