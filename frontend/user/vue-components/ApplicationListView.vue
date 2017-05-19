@@ -1,15 +1,5 @@
 <template>
   <section class="sidebar">
-  <!-- Error dialog -->
-    <confirm-dialog v-if="stoppingError.show"
-    :title="'Error when stopping ' + stoppingError.appName"
-    :okCallback="closeDialog">
-      <div class="alert alert-danger">
-        <strong>Code: {{stoppingError.code}}</strong>
-        <span>{{stoppingError.message}}</span>
-      </div>
-    </confirm-dialog>
-
     <!-- Search form -->
     <form action="#" class="sidebar-form">
       <input type="text" name="q" class="form-control" placeholder="Search..." v-model="searchInput">
@@ -46,12 +36,6 @@
           <img class="app-icon"
           :src="app.appData.image.icon_128 | iconSrc">
 
-          <button class="stop-button"
-          v-if="app.isRunning()"
-          @click="stopApplication(indexOf(app))"
-          :disabled="app.isStopping()">
-            <i class="fa fa-times"></i>
-          </button>
           <span>{{ app.appData.image | appName }}</span>
         </a>
       </li>
@@ -61,13 +45,11 @@
 
 <script>
   let Vue = require("vuejs");
-  require("toolkit");
 
   module.exports = Vue.extend({
     data: function() {
       return {
-        'searchInput': '',
-        stoppingError: { show: false, appName: '', code: '', message: '' }
+        'searchInput': ''
       };
     },
 
@@ -81,19 +63,6 @@
     },
 
     methods: {
-      stopApplication: function(index) {
-        let stoppingAppName = this.$options.filters.appName(
-          this.model.appList[index].appData.image);
-        this.model.stopApplication(index).fail((error) => {
-          this.stoppingError.code = error.code;
-          this.stoppingError.message = error.message;
-          this.stoppingError.appName = stoppingAppName;
-          this.stoppingError.show = true;
-        });
-      },
-      closeDialog: function() {
-        this.stoppingError.show = false;
-      },
       indexOf: function(app) {
         return this.model.appList.indexOf(app);
       }
@@ -210,30 +179,6 @@
   .truncate {
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-
-  .stop-button {
-    display: none;
-    position: absolute;
-    top: 10px;
-    left: 15px;
-    z-index: 100;
-    width: 32px;
-    height: 32px;
-    padding: 0px;
-    border: 1px solid rgba(0, 0, 0, 0.8);
-    background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 50%;
-    font-size: 18px;
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  /* When the mouse is on the img or the stop-button -> display stop-button */
-  li a img:hover + .stop-button {
-    display: block;
-  }
-  li a .stop-button:hover {
-    display: block;
   }
 
   .list-enter, .list-leave-to {
