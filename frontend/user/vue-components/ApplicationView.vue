@@ -16,7 +16,7 @@
     <!-- Start Form -->
     <div v-if="!currentApp.isRunning()" class="row">
       <div class="col-md-offset-2 col-md-8">
-        <div class="box box-primary">
+        <div class="box box-standard">
           <div class="box-header with-border">
             <h3 class="box-title">{{ currentApp.appData.image | appName }}</h3>
             <div class="box-tools pull-right"></div>

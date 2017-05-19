@@ -106,10 +106,8 @@
     position: relative;
     width: 32px;
     height: 32px;
-    border-radius: 50%;
+    border-radius: 20%;
     border-color: black;
-    border-width: 1px;
-    border-style: solid;
     margin-right: 5px;
     margin-top: -2px;
     background-color: white;
@@ -139,7 +137,7 @@
     height: 4px;
     border: 1px solid transparent;
     background-color: transparent;
-    border-radius: 50%;
+    border-radius: 20%;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 1.0);
   }
 
