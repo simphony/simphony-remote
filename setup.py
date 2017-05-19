@@ -1,6 +1,6 @@
 import os
 from setuptools import setup, find_packages
-from setuptools.command.install import install
+from setuptools.command.install import install as _install
 
 # Setup version
 VERSION = '1.2.0.dev0'
@@ -55,11 +55,10 @@ else:
         "tornadowebapi>=0.5.0"])
 
 
-class NpmBuildCommand(install):
+class install(_install):
     def run(self):
         import subprocess
         subprocess.check_call(['npm', 'run', 'build'])
-        subprocess.check_call(['npm', 'run', 'build-test'])
         super().run()
 
 
@@ -83,5 +82,5 @@ setup(
             "remoteapprest = remoteappmanager.cli.remoteapprest.__main__:main"
             ]
         },
-    cmdclass={'install': NpmBuildCommand}
+    cmdclass={'install': install}
     )
