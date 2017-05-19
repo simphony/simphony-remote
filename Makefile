@@ -56,6 +56,7 @@ develop:
 install:
 	@echo "Installing application"
 	@echo "----------------------"
+	npm run build-test
 	python3 setup.py -q install
 
 .PHONY: certs
