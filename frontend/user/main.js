@@ -20,7 +20,8 @@ let appView = new ApplicationView({
   data: function() { return { model: model }; }
 });
 
-let appLabel = new ApplicationLabel({
+var applabel;
+applabel = new ApplicationLabel({
   el: '#applabel',
   data: function() { return { model: model }; }
 });
