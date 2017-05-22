@@ -24,6 +24,7 @@
         </li>
         <li role="separator" class="divider"></li>
         <li
+        id="stop-button"
         :class="{ disabled: !currentApp.isRunning() }"
         @click="stopApplication()">
           <a href="#">
