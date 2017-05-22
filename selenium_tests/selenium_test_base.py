@@ -122,7 +122,7 @@ class SeleniumTestBase(unittest.TestCase):
         try:
             yield
         finally:
-            driver.find_element_by_css_selector(".dropdown-toggle").click()
+            driver.find_element_by_css_selector(".user-menu").click()
             driver.find_element_by_id("logout").click()
             self.wait_for(
                 lambda: "Sign in" == driver.find_element_by_css_selector(
@@ -145,8 +145,5 @@ class SeleniumTestBase(unittest.TestCase):
                 yield
             finally:
                 driver.find_element_by_id("application")
-                ActionChains(driver).move_to_element(
-                    driver.find_element_by_css_selector(
-                        "#applistentries .app-icon")
-                ).click(driver.find_element_by_css_selector(".stop-button")
-                        ).perform()
+                self.click_by_css_selector(".dropdown > a > img")
+                self.click_by_css_selector("#stop-button")

@@ -16,11 +16,10 @@ class TestContainerInteraction(SeleniumTestBase):
             self.click_by_css_selector(".start-button")
 
             driver.find_element_by_id("application")
-            ActionChains(driver).move_to_element(
-                driver.find_element_by_css_selector(
-                    "#applistentries .app-icon")
-                ).click(driver.find_element_by_css_selector(".stop-button")
-            ).perform()
+
+            self.click_by_css_selector(".dropdown > a > img")
+
+            self.click_by_css_selector("#stop-button")
 
     def test_focus(self):
         driver = self.driver
