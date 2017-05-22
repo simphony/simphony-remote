@@ -135,9 +135,10 @@
         return utils.maxIframeSize();
       },
       focusIframe: function() {
-        let iframe = this.$el.querySelector('iframe');
-        if(iframe !== null) {
-          iframe.focus();
+        // In case $el is not rendered, it's an empty comment '<!---->'
+        if(this.$el.nodeType === Node.ELEMENT_NODE &&
+           this.$el.querySelector('iframe') !== null) {
+          this.$el.querySelector('iframe').focus();
         }
       }
     },
