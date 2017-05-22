@@ -60,7 +60,6 @@
         let stoppingAppName = this.$options.filters.appName(
           this.currentApp.appData.image);
         this.model.stopApplication(this.model.selectedIndex).fail((error) => {
-          console.log('Fail')
           this.stoppingError.code = error.code;
           this.stoppingError.message = error.message;
           this.stoppingError.appName = stoppingAppName;
