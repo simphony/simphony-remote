@@ -135,9 +135,9 @@
         return utils.maxIframeSize();
       },
       focusIframe: function() {
-        let iframe = this.$el.querySelector('iframe');
-        if(iframe !== null) {
-          iframe.focus();
+        if(this.$el.querySelector !== undefined && // In case $el is not rendered
+           this.$el.querySelector('iframe') !== null) {
+          this.$el.querySelector('iframe').focus();
         }
       }
     },
