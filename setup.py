@@ -1,5 +1,6 @@
 import os
 from setuptools import setup, find_packages
+from setuptools.command.install import install as _install
 
 # Setup version
 VERSION = '1.2.0.dev0'
@@ -53,6 +54,14 @@ else:
         "docker-py==1.8",
         "tornadowebapi>=0.5.0"])
 
+
+class install(_install):
+    def run(self):
+        import subprocess
+        subprocess.check_call(['npm', 'run', 'build'])
+        super().run()
+
+
 # main setup configuration class
 setup(
     name='remoteappmanager',
@@ -72,5 +81,6 @@ setup(
             "remoteappdb = remoteappmanager.cli.remoteappdb.__main__:main",
             "remoteapprest = remoteappmanager.cli.remoteapprest.__main__:main"
             ]
-        }
+        },
+    cmdclass={'install': install}
     )
