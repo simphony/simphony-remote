@@ -63,7 +63,6 @@ var API = (function () {
 })();
 
 var RestError = function(code, message) {
-  console.log("Creating error "+code+" message: "+message);
   this.code = code;
   this.message = message;
 };
@@ -97,11 +96,6 @@ var create_handler = function(promise, data, textStatus, jqXHR) {
   if (status !== 201) {
     // Strange situation in which the call succeeded, but
     // not with a 201. Just do our best.
-    console.log(
-      "Create succeded but response with status " +
-      status +
-      " instead of 201."
-    );
     promise.reject(status, payload);
     return;
   }
@@ -113,7 +107,6 @@ var create_handler = function(promise, data, textStatus, jqXHR) {
     var arr = url.pathname.replace(/\/$/, "").split('/');
     id = arr[arr.length - 1];
   } catch (e) {
-    console.log("Response had invalid or absent Location header");
     promise.reject(status, payload);
     return;
   }
@@ -133,11 +126,6 @@ var create_singleton_handler = function(promise, data, textStatus, jqXHR) {
   if (status !== 201) {
     // Strange situation in which the call succeeded, but
     // not with a 201. Just do our best.
-    console.log(
-      "Create succeded but response with status " +
-      status +
-      " instead of 201."
-    );
     promise.reject(status, payload);
     return;
   }
@@ -146,7 +134,6 @@ var create_singleton_handler = function(promise, data, textStatus, jqXHR) {
   try {
     location = jqXHR.getResponseHeader('Location');
   } catch (e) {
-    console.log("Response had invalid or absent Location header");
     promise.reject(status, payload);
     return;
   }
@@ -166,11 +153,6 @@ var update_handler = function(promise, data, textStatus, jqXHR) {
   if (status !== 204) {
     // Strange situation in which the call succeeded, but
     // not with a 201. Just do our best.
-    console.log(
-      "Update succeded but response with status " +
-      status +
-      " instead of 204."
-    );
     promise.reject(status, payload);
     return;
   }
@@ -188,11 +170,6 @@ var delete_handler = function(promise, data, textStatus, jqXHR) {
   }
 
   if (status !== 204) {
-    console.log(
-      "Delete succeded but response with status " +
-      status +
-      " instead of 204."
-    );
     promise.reject(status, payload);
     return;
   }
@@ -210,19 +187,11 @@ var retrieve_handler = function(promise, data, textStatus, jqXHR) {
   }
 
   if (status !== 200) {
-    console.log(
-      "Retrieve succeded but response with status " +
-      status +
-      " instead of 200."
-    );
     promise.reject(status, payload);
     return;
   }
 
   if (payload === null) {
-    console.log(
-      "Retrieve succeded but empty or invalid payload"
-    );
     promise.reject(status, payload);
     return;
   }
@@ -255,8 +224,7 @@ var Resource = function(type) {
     API.request("PUT", urlUtils.pathJoin(type, id), body, query_args)
       .done(function(data, textStatus, jqXHR) {
         update_handler(promise, data, textStatus, jqXHR);
-        }
-      )
+      })
       .fail(function(jqXHR) {
         fail_handler(promise, jqXHR);
       });
@@ -309,19 +277,11 @@ var Resource = function(type) {
         }
 
         if (status !== 200) {
-          console.log(
-            "Items retrieve succeded but response with status " +
-            status +
-            " instead of 200."
-          );
           promise.reject(status, payload);
           return;
         }
 
         if (payload === null) {
-          console.log(
-            "Items Retrieve succeded but empty or invalid payload"
-          );
           promise.reject(status, payload);
           return;
         }
