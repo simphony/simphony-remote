@@ -108,7 +108,7 @@ pythontest:
 jstest:
 	@echo "Running javascript testsuite"
 	@echo "----------------------------"
-	./node_modules/.bin/eslint --ext .vue,.js --ignore-path .eslintignore frontend/
+	`npm bin`/eslint --ext .vue,.js --ignore-path .eslintignore frontend/
 	`npm bin`/node-qunit-phantomjs frontend/tests/tests.html
 
 .PHONY: jscoverage
