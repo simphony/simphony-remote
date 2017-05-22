@@ -4,7 +4,7 @@
     <confirm-dialog v-if="stoppingError.show"
     :title="'Error when stopping ' + stoppingError.appName"
     :okCallback="closeDialog">
-      <div class="alert alert-danger">
+      <div id="error-msg" class="alert alert-danger">
         <strong>Code: {{stoppingError.code}}</strong>
         <span>{{stoppingError.message}}</span>
       </div>
