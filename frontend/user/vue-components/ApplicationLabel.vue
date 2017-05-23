@@ -1,15 +1,5 @@
 <template>
   <ul v-if="currentApp !== null" class="nav navbar-nav">
-    <!-- Error dialog -->
-    <confirm-dialog v-if="stoppingError.show"
-    :title="'Error when stopping ' + stoppingError.appName"
-    :okCallback="closeDialog">
-      <div id="error-msg" class="alert alert-danger">
-        <strong>Code: {{stoppingError.code}}</strong>
-        <span>{{stoppingError.message}}</span>
-      </div>
-    </confirm-dialog>
-
     <li class="dropdown">
       <a href="#" class="dropdown-toggle cust-padding" data-toggle="dropdown" aria-expanded="false">
         <img class="app-icon"
@@ -43,12 +33,6 @@
   require('toolkit');
 
   module.exports = Vue.extend({
-    data: function() {
-      return {
-        stoppingError: { show: false, appName: '', code: '', message: '' }
-      };
-    },
-
     computed: {
       currentApp: function() {
         return this.model.appList[this.model.selectedIndex] || null;
@@ -60,15 +44,13 @@
         let stoppingAppName = this.$options.filters.appName(
           this.currentApp.appData.image);
         this.model.stopApplication(this.model.selectedIndex).fail((error) => {
-          this.stoppingError.code = error.code;
-          this.stoppingError.message = error.message;
-          this.stoppingError.appName = stoppingAppName;
-          this.stoppingError.show = true;
+          this.$emit('error', {
+            title: 'Error when stopping ' + stoppingAppName,
+            code: error.code,
+            message: error.message
+          });
         });
-      },
-      closeDialog: function() {
-        this.stoppingError.show = false;
-      },
+      }
     },
   });
 </script>

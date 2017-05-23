@@ -25,7 +25,7 @@ let appView = new ApplicationView({
   data: function() { return { model }; }
 });
 
-new ApplicationLabel({
+let applabel = new ApplicationLabel({
   el: '#applabel',
   data: function() { return { model: model }; }
 });
@@ -33,6 +33,7 @@ new ApplicationLabel({
 // Create GA observer
 let gaObserver = new gamodule.GaObserver();
 
+// Set events
 appView.$on('startApplication', function(application) {
   gaObserver.triggerApplicationStarting(application.appData.image.name);
 });
@@ -42,5 +43,9 @@ appView.$on('error', function(error) {
 });
 
 appListView.$on('entryClicked', function() { appView.focusIframe(); });
+
+applabel.$on('error', function(error) {
+  errorDialog.errorList.push(error);
+});
 
 model.update();
