@@ -58,7 +58,6 @@ QUnit.test("rendering iframe", function (assert) {
             model.selectedIndex = 1;
 
             Vue.nextTick(function() {
-            console.log(model.appList[1].ui_name)
                 assert.equal(
                     appView.$el.querySelector('.box-title').innerHTML,
                     model.appList[1].appData.image.ui_name
