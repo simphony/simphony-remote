@@ -1,5 +1,5 @@
 let gamodule = require("gamodule");
-let ErrorHandlerModel = require("ErrorHandlerModel");
+let errorReceiver = require("errorReceiver");
 let ApplicationListModel = require("./ApplicationListModel");
 let ApplicationListView = require("./vue-components/ApplicationListView");
 let ApplicationView = require("./vue-components/ApplicationView");
@@ -8,9 +8,6 @@ require("filters");
 // This model keeps the retrieved content from the REST query locally.
 // It is only synchronized at initial load.
 let model = new ApplicationListModel();
-
-// Create errorHandler
-let errorHandlerModel = new ErrorHandlerModel();
 
 // Initialize views
 let appListView = new ApplicationListView({
@@ -24,7 +21,7 @@ let appView = new ApplicationView({
   el: '#appview',
   data: function() { return {
     model,
-    errorHandlerModel
+    errorReceiver
   }; }
 });
 

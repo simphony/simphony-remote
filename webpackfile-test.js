@@ -28,6 +28,7 @@ module.exports = {
             utils: path.resolve(js, "utils"),
 
             filters: path.resolve(js, "vue/filters"),
+            errorReceiver: path.resolve(js, "vue/errorReceiver"),
             toolkit: path.resolve(js, "vue/toolkit/toolkit"),
             "toolkit-dir": path.resolve(js, "vue/toolkit"),
 

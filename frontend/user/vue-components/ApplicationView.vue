@@ -110,7 +110,7 @@
           startingError.title = "Error when starting " + startingAppName;
           startingError.code = error.code;
           startingError.message = error.message;
-          this.errorHandlerModel.errorList.push(startingError);
+          this.errorReceiver.push(startingError);
         });
       },
       getIframeSize: function() {
