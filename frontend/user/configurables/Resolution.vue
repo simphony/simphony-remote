@@ -1,7 +1,7 @@
 <template>
   <div class="form-group">
     <label>Resolution</label>
-    <select class="form-control" v-model="resolution">
+    <select class="form-control drop-down" v-model="resolution">
       <option v-for="resolutionOption in resolutionOptions">
         {{resolutionOption}}
       </option>
@@ -30,3 +30,10 @@
     }
   });
 </script>
+
+<style scoped>
+  .drop-down {
+    width: auto;
+    border-radius: 3px;
+  }
+</style>

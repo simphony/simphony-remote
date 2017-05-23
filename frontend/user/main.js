@@ -2,6 +2,7 @@ let gamodule = require("gamodule");
 let ApplicationListModel = require("./ApplicationListModel");
 let ApplicationListView = require("./vue-components/ApplicationListView");
 let ApplicationView = require("./vue-components/ApplicationView");
+let ApplicationLabel = require("./vue-components/ApplicationLabel");
 require("filters");
 
 // This model keeps the retrieved content from the REST query locally.
@@ -16,6 +17,11 @@ let appListView = new ApplicationListView({
 
 let appView = new ApplicationView({
   el: '#appview',
+  data: function() { return { model: model }; }
+});
+
+new ApplicationLabel({
+  el: '#applabel',
   data: function() { return { model: model }; }
 });
 

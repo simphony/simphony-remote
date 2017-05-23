@@ -13,7 +13,7 @@ class TestLoginLogout(SeleniumTestBase):
         driver.find_element_by_id("password_input").send_keys("test")
         driver.find_element_by_id("login_submit").click()
         driver.find_element_by_id("applistentries")
-        driver.find_element_by_css_selector(".dropdown-toggle").click()
+        driver.find_element_by_css_selector(".user-menu").click()
         driver.find_element_by_id("logout").click()
         self.wait_for(
             lambda: "Sign in" == driver.find_element_by_css_selector("div.auth-form-header").text
