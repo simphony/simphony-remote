@@ -31,7 +31,7 @@ QUnit.test("application name", function(assert) {
 
         done();
       });
-    })
+    });
   });
 });
 
@@ -69,7 +69,7 @@ QUnit.test("rendering stop button", function (assert) {
 
         done();
       });
-    })
+    });
   });
 });
 
@@ -82,7 +82,7 @@ QUnit.test("display stopping error", function(assert) {
   }).$mount();
 
   // Change model.stopApplication so that it returns an error
-  model.stopApplication = function(index) {
+  model.stopApplication = function() {
     var stopPromise = new $.Deferred();
     stopPromise.reject({ message: 'Oups', code: '456' });
     return stopPromise;
@@ -115,6 +115,6 @@ QUnit.test("display stopping error", function(assert) {
 
         done();
       });
-    })
+    });
   });
 });
