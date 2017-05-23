@@ -29,6 +29,7 @@ module.exports = {
             utils: path.resolve(js, "utils"),
 
             filters: path.resolve(js, "vue/filters"),
+            ErrorDialog: path.resolve(js, "vue/ErrorDialog"),
             toolkit: path.resolve(js, "vue/toolkit/toolkit"),
         }
     },
