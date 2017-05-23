@@ -3,16 +3,6 @@
   <section id="appview"
   v-if="currentApp !== null"
   :class="{ content: true, 'no-padding': currentApp.isRunning() }">
-    <!-- Error dialog -->
-    <confirm-dialog v-if="startingError.show"
-    :title="'Error when starting ' + startingError.appName"
-    :okCallback="closeDialog">
-      <div class="alert alert-danger">
-        <strong>Code: {{startingError.code}}</strong>
-        <span>{{startingError.message}}</span>
-      </div>
-    </confirm-dialog>
-
     <!-- Start Form -->
     <div v-if="!currentApp.isRunning()" class="row">
       <div class="col-md-offset-2 col-md-8">
@@ -86,12 +76,6 @@
   require("toolkit");
 
   module.exports = Vue.extend({
-    data: function() {
-      return {
-        startingError: { show: false, appName: '', code: '', message: '' }
-      };
-    },
-
     computed: {
       currentApp: function() {
         return this.model.appList[this.model.selectedIndex] || null;
@@ -122,14 +106,12 @@
           this.$emit('startApplication', startingApp);
         })
         .fail((error) => {
-          this.startingError.code = error.code;
-          this.startingError.message = error.message;
-          this.startingError.appName = startingAppName;
-          this.startingError.show = true;
+          var startingError = {};
+          startingError.title = "Error when starting " + startingAppName;
+          startingError.code = error.code;
+          startingError.message = error.message;
+          this.errorHandler.errorList.push(startingError);
         });
-      },
-      closeDialog: function() {
-        this.startingError.show = false;
       },
       getIframeSize: function() {
         return utils.maxIframeSize();
