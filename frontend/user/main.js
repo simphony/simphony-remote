@@ -1,5 +1,5 @@
 let gamodule = require("gamodule");
-let errorReceiver = require("errorReceiver");
+let ErrorDialog = require("ErrorDialog");
 let ApplicationListModel = require("./ApplicationListModel");
 let ApplicationListView = require("./vue-components/ApplicationListView");
 let ApplicationView = require("./vue-components/ApplicationView");
@@ -9,20 +9,17 @@ require("filters");
 // It is only synchronized at initial load.
 let model = new ApplicationListModel();
 
+let errorDialog = new ErrorDialog();
+
 // Initialize views
 let appListView = new ApplicationListView({
   el: '#applist',
-  data: function() { return {
-    model
-  }; }
+  data: function() { return { model }; }
 });
 
 let appView = new ApplicationView({
   el: '#appview',
-  data: function() { return {
-    model,
-    errorReceiver
-  }; }
+  data: function() { return { model }; }
 });
 
 // Create GA observer
@@ -30,6 +27,10 @@ let gaObserver = new gamodule.GaObserver();
 
 appView.$on('startApplication', function(application) {
   gaObserver.triggerApplicationStarting(application.appData.image.name);
+});
+
+appView.$on('error', function(error) {
+  errorDialog.errorList.push(error);
 });
 
 appListView.$on('entryClicked', function() { appView.focusIframe(); });
