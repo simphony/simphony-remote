@@ -106,11 +106,11 @@
           this.$emit('startApplication', startingApp);
         })
         .fail((error) => {
-          var startingError = {};
-          startingError.title = "Error when starting " + startingAppName;
-          startingError.code = error.code;
-          startingError.message = error.message;
-          this.errorReceiver.push(startingError);
+          this.errorReceiver.push({
+            title: "Error when starting " + startingAppName,
+            code: error.code,
+            message: error.message
+          });
         });
       },
       getIframeSize: function() {
