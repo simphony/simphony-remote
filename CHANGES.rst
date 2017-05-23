@@ -4,6 +4,16 @@ SimPhoNy Remote CHANGELOG
 What's new in SimPhoNy Remote 2.0.0
 -----------------------------------
 
+- Switch to Vue for both admin interface and user interface (#400, #402, #405, 
+  #407, #410, #411, #412, #413, #414, #420, #422, #423, #428, #431, #433, #434, 
+  #436, #437, #438, #440, #442, #443, #446, #447, #448, #450, #451, #456, #459,
+  #465, #467)
+- Fixed search behavior. Now only applications matching will be shown (#417, #427)
+- First application is now selected (#418)
+- Adapted backend for new Vue based interface:
+    - Usage of new tornado-webapi interface (#403)
+    - Added REST resource for statistics, needed by #395 (#406)
+    - Server side admin support for new Admin interface (#425)
 - Renamed some entities to more appropriate names (#419)
   - The term Accounting now refers exclusively to the relationship table
     connecting users, applications and policies.
@@ -14,7 +24,35 @@ What's new in SimPhoNy Remote 2.0.0
   - The above two break compatibility with the old configuration files.
     Old configuration files must be changed both in the options
     and the class they refer to.
+  - Added alembic file to support the migration (#445)
+- Removed CDN usage for full intranetwork compatibility.
+- Upgraded configurable-http-proxy to 2.0.1 (#394)
+- Added statistics in the main (Home) Admin panel. (#395)
+- Pinned against pre-release version of Jupyterhub due to deprecation and
+  incompatibility with authenticators (#396)
+- Extracted application name in the topbar (#462)
 
+- Fixes:
+    - Compatibility with some adblockers for google analytics (#379) 
+    - Added random token to container name to prevent conflict during stop of containers (#381)
+    - Documented behavior with uppercase-lowercase names with github authentication. (#386)
+    - Performs re-registration of container when the jupyterhub service is stopped, 
+      to regain access to containers (#387)
+    - Example jupyterhub configuration file allows now to work with no external interfaces (#409)
+
+- Refactor:
+    - Virtual docker has been cleaned up completely (#389)
+    - Container manager deprecated find methods have been removed in favor
+      of a different interface. (#391)
+    - Use webpack to include javascript code (#452, #458)
+    - Use of ES6 for the main development (#457)
+    - Changed frontend file layout (#454, #460)
+    - Removed underscore and moment from the javascript dependencies (#455)
+    - Replaced jshint with eslint (#463)
+
+- Other:
+    - Made tests less verbose with logging (#408)
+    - Reduced verbosity at build (#424)
 
 What's new in SimPhoNy Remote 1.1.0
 -----------------------------------
