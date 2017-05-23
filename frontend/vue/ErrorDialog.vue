@@ -4,9 +4,7 @@
   :okCallback="okCallback"
   :closeCallback="closeCallback">
     <div class="alert alert-danger">
-      <strong v-if="errorList[0].code !== undefined">
-        Code: {{errorList[0].code}}
-      </strong>
+      <strong v-if="errorList[0].code !== undefined">Code: {{errorList[0].code}}</strong>
       <span>{{errorList[0].message || 'unknown error'}}</span>
     </div>
   </confirm-dialog>
