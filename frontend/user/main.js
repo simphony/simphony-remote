@@ -1,5 +1,5 @@
 let gamodule = require("gamodule");
-let ErrorHandler = require("ErrorHandler");
+let ErrorHandlerModel = require("ErrorHandlerModel");
 let ApplicationListModel = require("./ApplicationListModel");
 let ApplicationListView = require("./vue-components/ApplicationListView");
 let ApplicationView = require("./vue-components/ApplicationView");
@@ -10,7 +10,7 @@ require("filters");
 let model = new ApplicationListModel();
 
 // Create errorHandler
-let errorHandler = new ErrorHandler();
+let errorHandlerModel = new ErrorHandlerModel();
 
 // Initialize views
 let appListView = new ApplicationListView({
@@ -24,7 +24,7 @@ let appView = new ApplicationView({
   el: '#appview',
   data: function() { return {
     model,
-    errorHandler
+    errorHandlerModel
   }; }
 });
 
