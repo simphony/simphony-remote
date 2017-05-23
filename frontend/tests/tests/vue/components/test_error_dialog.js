@@ -5,18 +5,15 @@ QUnit.module("ErrorDialog");
 QUnit.test("rendering errors one by one", function (assert) {
   var done = assert.async();
 
-  var errorReceiver = [];
-  var errorDialog = new ErrorDialog({
-    data: function() { return { errorList: errorReceiver }; }
-  }).$mount();
+  var errorDialog = new ErrorDialog().$mount();
 
   Vue.nextTick(function() {
     // Error dialog not rendered (No error to show)
     assert.notEqual(errorDialog.$el.nodeType, Node.ELEMENT_NODE);
 
-    errorReceiver.push({title: "Oups"});
-    errorReceiver.push({code: 502});
-    errorReceiver.push({title: "Oups", message: "Something happened..."});
+    errorDialog.errorList.push({title: "Oups"});
+    errorDialog.errorList.push({code: 502});
+    errorDialog.errorList.push({title: "Oups", message: "Something happened..."});
 
     Vue.nextTick(function() {
       assert.equal(
@@ -54,15 +51,12 @@ QUnit.test("rendering errors one by one", function (assert) {
 QUnit.test("cancel showing errors", function (assert) {
   var done = assert.async();
 
-  var errorReceiver = [];
-  var errorDialog = new ErrorDialog({
-    data: function() { return { errorList: errorReceiver }; }
-  }).$mount();
+  var errorDialog = new ErrorDialog().$mount();
 
   Vue.nextTick(function() {
-    errorReceiver.push({title: "Oups"});
-    errorReceiver.push({code: 502});
-    errorReceiver.push({title: "Oups", message: "Something happened..."});
+    errorDialog.errorList.push({title: "Oups"});
+    errorDialog.errorList.push({code: 502});
+    errorDialog.errorList.push({title: "Oups", message: "Something happened..."});
 
     Vue.nextTick(function() {
       assert.equal(

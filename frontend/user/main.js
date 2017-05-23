@@ -9,7 +9,9 @@ require("filters");
 // It is only synchronized at initial load.
 let model = new ApplicationListModel();
 
-let errorDialog = new ErrorDialog();
+let errorDialog = new ErrorDialog({
+  el: '#error-dialog-container'
+});
 
 // Initialize views
 let appListView = new ApplicationListView({

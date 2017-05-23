@@ -106,7 +106,7 @@
           this.$emit('startApplication', startingApp);
         })
         .fail((error) => {
-          this.errorReceiver.push({
+          this.$emit('error', {
             title: "Error when starting " + startingAppName,
             code: error.code,
             message: error.message

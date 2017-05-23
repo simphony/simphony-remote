@@ -15,6 +15,10 @@
   require("toolkit");
 
   module.exports = Vue.extend({
+    data: function() {
+      return { errorList: [] };
+    },
+
     methods: {
       okCallback: function() {
         // Display next error
