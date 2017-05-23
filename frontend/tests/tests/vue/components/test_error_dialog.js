@@ -51,7 +51,7 @@ QUnit.test("rendering errors one by one", function (assert) {
   });
 });
 
-QUnit.test("rendering errors one by one", function (assert) {
+QUnit.test("cancel showing errors", function (assert) {
   var done = assert.async();
 
   var errorReceiver = [];
