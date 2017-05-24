@@ -1,7 +1,6 @@
 var Vue = require("vuejs");
 var ApplicationListModel = require("user/ApplicationListModel");
 var ApplicationLabel = require("user/vue-components/ApplicationLabel");
-var $ = require("jquery");
 require("filters");
 
 QUnit.module("user.app_label");
@@ -31,7 +30,7 @@ QUnit.test("application name", function(assert) {
 
         done();
       });
-    })
+    });
   });
 });
 
@@ -69,6 +68,39 @@ QUnit.test("rendering stop button", function (assert) {
 
         done();
       });
-    })
+    });
+  });
+});
+
+QUnit.test("rendering share button", function (assert) {
+  var done = assert.async();
+
+  var model = new ApplicationListModel();
+  var appLabel = new ApplicationLabel({
+    data: function() { return { model: model }; }
+  }).$mount();
+
+  model.update().done(function() {
+    // Simulate application stopped
+    model.appList[0].status = 'STOPPED';
+
+    Vue.nextTick(function() {
+      // Test share button disabled
+      assert.ok(
+        appLabel.$el.querySelector('#share-button').classList.contains('disabled')
+      );
+
+      // Simulate application running
+      model.appList[0].status = 'RUNNING';
+
+      // Test share button disabled (Because clipboard save is not supported in test environment)
+      Vue.nextTick(function() {
+        assert.ok(
+          appLabel.$el.querySelector('#share-button').classList.contains('disabled')
+        );
+
+        done();
+      });
+    });
   });
 });
