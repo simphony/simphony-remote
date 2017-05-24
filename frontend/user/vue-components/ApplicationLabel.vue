@@ -13,6 +13,8 @@
           <a href="#">Application settings</a>
         </li>
         <li role="separator" class="divider"></li>
+
+        <!-- Stop button -->
         <li
         id="stop-button"
         :class="{ disabled: !currentApp.isRunning() }"
@@ -21,8 +23,20 @@
             <i class="fa fa-times text-danger"></i>
             Stop Application
           </a>
-          <!-- Put other settings here -->
         </li>
+
+        <!-- Share button -->
+        <li
+        id="share-button"
+        :class="{ disabled: !currentApp.isRunning() }"
+        :data-clipboard-text="getAppUrl()">
+          <a href="#">
+            <i class="fa fa-clipboard text-light-blue"></i>
+            Share (copy url to clipboard)
+          </a>
+        </li>
+
+        <!-- Put other settings here -->
       </ul>
     </li>
   </ul>
@@ -30,9 +44,14 @@
 
 <script>
   let Vue = require("vuejs");
+  let Clipboard = require('clipboard');
   require('toolkit');
 
   module.exports = Vue.extend({
+    mounted: function() {
+      new Clipboard('#share-button');
+    },
+
     computed: {
       currentApp: function() {
         return this.model.appList[this.model.selectedIndex] || null;
@@ -50,6 +69,17 @@
             message: error.message
           });
         });
+      },
+
+      getAppUrl: function() {
+        if(this.currentApp.isRunning()) {
+          let url = document.createElement('a');
+          url.href = window.location.href;
+          url.pathname = this.$options.filters.appUrl(this.currentApp);
+          url.hash = "";
+          return url.href;
+        }
+        return "";
       }
     },
   });
