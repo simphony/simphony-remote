@@ -46,21 +46,20 @@ QUnit.test("rendering iframe", function (assert) {
   }).$mount();
 
   model.update().done(function() {
-    // Simulate application running
-    model.appList[0].status = 'RUNNING';
-    model.appList[0].appData.container = {};
-    model.appList[0].appData.container.url_id = 'https://127.0.0.1:1234/';
+    // Switch to a running application
+    model.selectedIndex = 1;
 
     Vue.nextTick(function() {
       assert.equal(appView.$el.children[0].tagName, 'IFRAME');
+      assert.equal(appView.$el.children[0].getAttribute('src'), '/user/lambda/containers/654321/');
 
       // Render form again by selecting the other application which is stopped
-      model.selectedIndex = 1;
+      model.selectedIndex = 0;
 
       Vue.nextTick(function() {
         assert.equal(
           appView.$el.querySelector('.box-title').innerHTML,
-          model.appList[1].appData.image.ui_name
+          model.appList[0].appData.image.ui_name
         );
 
         done();
