@@ -29,7 +29,7 @@
         <li
         id="share-button"
         :class="{ disabled: !currentApp.isRunning() || !clipboardSupported }"
-        :data-clipboard-text="getAppUrl()">
+        :data-clipboard-text="sharedUrl">
           <a href="#">
             <i class="fa fa-clipboard text-light-blue"></i>
             Share (copy url to clipboard)
@@ -45,6 +45,7 @@
 <script>
   let Vue = require("vuejs");
   let Clipboard = require('clipboard');
+  let URL = require('url-parse');
   require('toolkit');
 
   module.exports = Vue.extend({
@@ -61,6 +62,14 @@
     computed: {
       currentApp: function() {
         return this.model.appList[this.model.selectedIndex] || null;
+      },
+      sharedUrl: function() {
+        if(this.currentApp.isRunning()) {
+          let url = new URL(window.location.origin);
+          url.set('pathname', this.$options.filters.appUrl(this.currentApp));
+          return url.href;
+        }
+        return "";
       }
     },
 
@@ -75,17 +84,6 @@
             message: error.message
           });
         });
-      },
-
-      getAppUrl: function() {
-        if(this.currentApp.isRunning()) {
-          let url = document.createElement('a');
-          url.href = window.location.href;
-          url.pathname = this.$options.filters.appUrl(this.currentApp);
-          url.hash = "";
-          return url.href;
-        }
-        return "";
       }
     },
   });
