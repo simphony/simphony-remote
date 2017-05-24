@@ -10,7 +10,7 @@
     :rowActions="table.rowActions">
     </data-table>
     <confirm-dialog
-    v-if="stopContainerDialog.show"
+    v-if="stopContainerDialog.visible"
     title="Stop container"
     :okCallback="stopContainer"
     :closeCallback="closeStopContainerDialog">
@@ -34,7 +34,7 @@
           }]
         },
         stopContainerDialog: {
-          show: false,
+          visible: false,
           containerToStop: null
         },
         communicationError: null
@@ -69,7 +69,7 @@
 
       stopAction: function(row) {
         this.stopContainerDialog.containerToStop = row[0];
-        this.stopContainerDialog.show = true;
+        this.stopContainerDialog.visible = true;
       },
 
       stopContainer: function () {
@@ -85,7 +85,7 @@
       },
 
       closeStopContainerDialog: function() {
-        this.stopContainerDialog.show = false;
+        this.stopContainerDialog.visible = false;
         this.stopContainerDialog.containerToStop = null;
       }
     }

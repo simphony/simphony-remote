@@ -13,15 +13,15 @@
       </data-table>
 
       <new-accounting-dialog
-      v-if="newAccountingDialog.show"
-      :show="newAccountingDialog.show"
+      v-if="newAccountingDialog.visible"
+      :show="newAccountingDialog.visible"
       :userId="newAccountingDialog.userId"
       @created="newAccountingCreated"
-      @closed="newAccountingDialog.show = false">
+      @closed="newAccountingDialog.visible = false">
       </new-accounting-dialog>
 
       <confirm-dialog
-      v-if="removeAccountingDialog.show"
+      v-if="removeAccountingDialog.visible"
       title="Remove Accounting"
       :okCallback="removeAccounting"
       :closeCallback="closeRemoveAccountingDialog">
@@ -51,7 +51,7 @@
           rows: [],
           globalActions: [{
             label: "Create New Entry",
-            callback: () => { this.newAccountingDialog.show = true; }
+            callback: () => { this.newAccountingDialog.visible = true; }
           }],
           rowActions: [{
             label: "Remove",
@@ -60,12 +60,12 @@
         },
 
         newAccountingDialog: {
-          show: false,
+          visible: false,
           userId: this.$route.params.id
         },
 
         removeAccountingDialog: {
-          show: false,
+          visible: false,
           accountingToRemove: null
         },
 
@@ -101,17 +101,17 @@
       },
 
       newAccountingCreated: function() {
-        this.newAccountingDialog.show = false;
+        this.newAccountingDialog.visible = false;
         this.updateTable();
       },
 
       removeAction: function(row) {
         this.removeAccountingDialog.accountingToRemove = row[0];
-        this.removeAccountingDialog.show = true;
+        this.removeAccountingDialog.visible = true;
       },
 
       closeRemoveAccountingDialog: function() {
-        this.removeAccountingDialog.show = false;
+        this.removeAccountingDialog.visible = false;
         this.removeAccountingDialog.accountingToRemove = null;
       },
 
