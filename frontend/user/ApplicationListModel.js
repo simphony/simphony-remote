@@ -139,15 +139,14 @@ class ApplicationListModel {
     }
   }
 
-  startApplication() {
-    let selectedIndex = this.selectedIndex;
-    let currentApp = this.appList[selectedIndex];
+  startApplication(index) {
+    let appStarting = this.appList[index];
 
-    currentApp.status = Status.STARTING;
-    currentApp.delayed = true;
+    appStarting.status = Status.STARTING;
+    appStarting.delayed = true;
 
     let configurablesData = {};
-    currentApp.configurables.forEach(function(configurable) {
+    appStarting.configurables.forEach(function(configurable) {
       let tag = configurable.tag;
       configurablesData[tag] = configurable.asConfigDict();
     });
@@ -155,19 +154,19 @@ class ApplicationListModel {
     let startPromise = $.Deferred();
 
     resources.Container.create({
-      mapping_id: currentApp.appData.mapping_id,
+      mapping_id: appStarting.appData.mapping_id,
       configurables: configurablesData
     })
     .done(() => {
-      this.updateIdx(selectedIndex)
+      this.updateIdx(index)
       .done(startPromise.resolve)
       .fail((error) => {
-        currentApp.status = Status.STOPPED;
+        appStarting.status = Status.STOPPED;
         startPromise.reject(error);
       });
     })
     .fail((error) => {
-      currentApp.status = Status.STOPPED;
+      appStarting.status = Status.STOPPED;
       startPromise.reject(error);
     });
 
