@@ -1,7 +1,6 @@
 var Vue = require("vuejs");
 var ApplicationListModel = require("user/ApplicationListModel");
 var ApplicationLabel = require("user/vue-components/ApplicationLabel");
-var $ = require("jquery");
 require("filters");
 
 QUnit.module("user.app_label");
@@ -31,7 +30,7 @@ QUnit.test("application name", function(assert) {
 
         done();
       });
-    })
+    });
   });
 });
 
@@ -69,6 +68,6 @@ QUnit.test("rendering stop button", function (assert) {
 
         done();
       });
-    })
+    });
   });
 });

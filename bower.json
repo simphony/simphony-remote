@@ -1,32 +1,32 @@
 {
-    "name": "simphony-remote-deps",
-    "version": "0.0.0",
-    "homepage": "https://github.com/simphony/simphony-remote",
-    "authors": [
-        "Stefano Borini <sborini@enthought.com>"
-    ],
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "test",
-        "tests"
-    ],
-    "dependencies": {
-        "bootstrap": "components/bootstrap#~3.3.7",
-        "font-awesome": "~4.5",
-        "ionicons": "~2.0.1",
-        "jquery": "components/jquery#~2.0",
-        "datatables.net": "~1.10.12",
-        "datatables.net-dt": "~1.10.12",
-        "admin-lte": "~2.3.11",
-        "html5shiv": "~3.7.3",
-        "respond": "~1.4.2",
-        "vue": "^2.2.6",
-        "vue-router": "^2.5.2",
-        "vue-form": "^4.0.0",
-        "lodash": "~4.17.4"
-    },
-    "devDependencies": {
-        "blanket": "^1.1.7"
-    }
+  "name": "simphony-remote-deps",
+  "version": "0.0.0",
+  "homepage": "https://github.com/simphony/simphony-remote",
+  "authors": [
+    "Stefano Borini <sborini@enthought.com>"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "components/bootstrap#~3.3.7",
+    "font-awesome": "~4.5",
+    "ionicons": "~2.0.1",
+    "jquery": "components/jquery#~2.0",
+    "datatables.net": "~1.10.12",
+    "datatables.net-dt": "~1.10.12",
+    "admin-lte": "~2.3.11",
+    "html5shiv": "~3.7.3",
+    "respond": "~1.4.2",
+    "vue": "^2.2.6",
+    "vue-router": "^2.5.2",
+    "vue-form": "^4.0.0",
+    "lodash": "~4.17.4"
+  },
+  "devDependencies": {
+    "blanket": "^1.1.7"
+  }
 }
