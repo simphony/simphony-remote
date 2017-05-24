@@ -26,7 +26,7 @@
   let resources = require("admin-resources");
 
   module.exports = {
-    props: ['show'],
+    props: ['visible'],
 
     data: function () {
       return {
@@ -73,7 +73,7 @@
     },
 
     watch: {
-      "show": function (value) {
+      "visible": function (value) {
         if (value) {
           this.reset();
         }

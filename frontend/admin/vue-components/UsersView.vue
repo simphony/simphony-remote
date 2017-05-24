@@ -10,12 +10,12 @@
     :rowActions="table.rowActions">
     </data-table>
     <new-user-dialog
-    v-if="newUserDialog.show"
-    :show="newUserDialog.show"
+    v-if="newUserDialog.visible"
+    :show="newUserDialog.visible"
     @created="newUserCreated"
-    @closed="newUserDialog.show = false;"></new-user-dialog>
+    @closed="newUserDialog.visible = false;"></new-user-dialog>
     <confirm-dialog
-    v-if="removeUserDialog.show"
+    v-if="removeUserDialog.visible"
     :okCallback="removeUser"
     :closeCallback="closeRemoveUserDialog">
       <div>Do you want to remove User {{removeUserDialog.userToRemove.name}}
@@ -40,7 +40,7 @@
           rows: [],
           globalActions: [{
             label: "Create New Entry",
-            callback: () => { this.newUserDialog.show = true; }
+            callback: () => { this.newUserDialog.visible = true; }
           }],
           rowActions: [{
             label: "Policies",
@@ -53,10 +53,10 @@
         },
         users: [],
         newUserDialog: {
-          show: false
+          visible: false
         },
         removeUserDialog: {
-          show: false,
+          visible: false,
           userToRemove: {
             id: null,
             name: ""
@@ -90,7 +90,7 @@
       },
 
       newUserCreated: function() {
-        this.newUserDialog.show = false;
+        this.newUserDialog.visible = false;
         this.updateTable();
       },
 
@@ -104,11 +104,11 @@
       removeAction: function(row) {
         this.removeUserDialog.userToRemove.id = row[0];
         this.removeUserDialog.userToRemove.name = row[1];
-        this.removeUserDialog.show = true;
+        this.removeUserDialog.visible = true;
       },
 
       closeRemoveUserDialog: function() {
-        this.removeUserDialog.show = false;
+        this.removeUserDialog.visible = false;
         this.removeUserDialog.userToRemove = {
           id: null,
           name: ""

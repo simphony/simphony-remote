@@ -12,13 +12,13 @@
       </data-table>
 
       <new-application-dialog
-      v-if="newApplicationDialog.show"
-      :show="newApplicationDialog.show"
+      v-if="newApplicationDialog.visible"
+      :visible="newApplicationDialog.visible"
       @created="newApplicationCreated"
       @closed="newApplicationDialogClosed"></new-application-dialog>
 
       <confirm-dialog
-      v-if="removeApplicationDialog.show"
+      v-if="removeApplicationDialog.visible"
       title="Remove Application"
       :okCallback="removeApplication"
       :closeCallback="closeRemoveApplicationDialog">
@@ -46,7 +46,7 @@
           rows: [],
           globalActions: [{
             label: "Create New Entry",
-            callback: () => { this.newApplicationDialog.show = true; }
+            callback: () => { this.newApplicationDialog.visible = true; }
           }],
           rowActions: [{
             label: "Remove",
@@ -55,11 +55,11 @@
         },
 
         newApplicationDialog: {
-          show: false
+          visible: false
         },
 
         removeApplicationDialog: {
-          show: false,
+          visible: false,
           applicationToRemove: {
             id: null,
             name: ""
@@ -94,12 +94,12 @@
       },
 
       newApplicationCreated: function() {
-        this.newApplicationDialog.show = false;
+        this.newApplicationDialog.visible = false;
         this.updateTable();
       },
 
       newApplicationDialogClosed: function() {
-        this.newApplicationDialog.show = false;
+        this.newApplicationDialog.visible = false;
       },
 
       removeAction: function(row) {
@@ -107,7 +107,7 @@
           id: row[0],
           name: row[1]
         };
-        this.removeApplicationDialog.show = true;
+        this.removeApplicationDialog.visible = true;
       },
 
       removeApplication: function () {
@@ -122,7 +122,7 @@
         });
       },
       closeRemoveApplicationDialog: function() {
-        this.removeApplicationDialog.show = false;
+        this.removeApplicationDialog.visible = false;
         this.removeApplicationDialog.applicationToRemove = {
           name: "",
           id: null
