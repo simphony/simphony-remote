@@ -28,7 +28,7 @@
         <!-- Share button -->
         <li
         id="share-button"
-        :class="{ disabled: !currentApp.isRunning() }"
+        :class="{ disabled: !currentApp.isRunning() || !clipboardSupported }"
         :data-clipboard-text="getAppUrl()">
           <a href="#">
             <i class="fa fa-clipboard text-light-blue"></i>
@@ -48,8 +48,14 @@
   require('toolkit');
 
   module.exports = Vue.extend({
+    data: function() {
+      return { clipboardSupported: Clipboard.isSupported() };
+    },
+
     mounted: function() {
-      new Clipboard('#share-button');
+      if(this.clipboardSupported) {
+        new Clipboard('#share-button');
+      }
     },
 
     computed: {
