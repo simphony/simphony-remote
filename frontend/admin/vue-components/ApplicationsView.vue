@@ -13,7 +13,7 @@
 
       <new-application-dialog
       v-if="newApplicationDialog.visible"
-      :show="newApplicationDialog.visible"
+      :visible="newApplicationDialog.visible"
       @created="newApplicationCreated"
       @closed="newApplicationDialogClosed"></new-application-dialog>
 

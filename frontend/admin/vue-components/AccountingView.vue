@@ -14,7 +14,7 @@
 
       <new-accounting-dialog
       v-if="newAccountingDialog.visible"
-      :show="newAccountingDialog.visible"
+      :visible="newAccountingDialog.visible"
       :userId="newAccountingDialog.userId"
       @created="newAccountingCreated"
       @closed="newAccountingDialog.visible = false">
