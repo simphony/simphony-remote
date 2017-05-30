@@ -28,7 +28,7 @@
         <!-- Share button -->
         <li
         id="share-button"
-        :class="{ disabled: !currentApp.isRunning() || !clipboardSupported }"
+        :class="{ disabled: !(currentApp.isRunning() && clipboardSupported) }"
         :data-clipboard-text="sharedUrl">
           <a href="#">
             <i class="fa fa-clipboard text-light-blue"></i>
