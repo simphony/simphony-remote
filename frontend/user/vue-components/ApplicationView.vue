@@ -71,6 +71,7 @@
 
 <script>
   let Vue = require("vuejs");
+  let urlUtils = require("urlutils");
   let utils = require("utils");
   require("toolkit");
 
@@ -83,7 +84,7 @@
         return this.currentApp.appData.image.policy;
       },
       appSource: function() {
-        let url = this.$options.filters.appUrl(this.currentApp);
+        let url = urlUtils.appUrl(this.currentApp);
 
         let output = this.currentApp.delayed ? url : url + '/';
         this.currentApp.delayed = false;

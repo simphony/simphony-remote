@@ -46,6 +46,7 @@
   let Vue = require("vuejs");
   let Clipboard = require('clipboard');
   let URL = require('url-parse');
+  let urlUtils = require('urlutils');
   require('toolkit');
 
   module.exports = Vue.extend({
@@ -66,7 +67,7 @@
       sharedUrl: function() {
         if(this.currentApp.isRunning()) {
           let url = new URL(window.location.origin);
-          url.set('pathname', this.$options.filters.appUrl(this.currentApp));
+          url.set('pathname', urlUtils.appUrl(this.currentApp));
           return url.href;
         }
         return "";

@@ -14,11 +14,3 @@ Vue.filter('iconSrc', function(icon_data) {
 Vue.filter('appName', function(image) {
   return image.ui_name? image.ui_name: image.name;
 });
-
-Vue.filter('appUrl', function(app) {
-  return urlUtils.pathJoin(
-    window.apidata.base_url,
-    'containers',
-    app.appData.container.url_id
-  );
-});
