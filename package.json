@@ -18,6 +18,7 @@
     "bower": "*",
     "clipboard": "^1.6.1",
     "configurable-http-proxy": "git://github.com/jupyterhub/configurable-http-proxy.git#2.0.1",
+    "devour-client": "^1.4.3",
     "url-parse": "^1.1.9"
   },
   "devDependencies": {

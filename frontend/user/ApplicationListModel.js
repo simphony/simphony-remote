@@ -1,39 +1,46 @@
-let $ = require("jquery");
-let resources = require("user-resources");
 let configurables = require("./configurables/configurables");
+let JsonApi = require("devour-client");
+let urlUtils = require("urlutils");
+
+const jsonApi = new JsonApi({
+  apiUrl: urlUtils.pathJoin(window.apidata.base_url, 'api', 'v2'),
+  trailingSlash: {resource: false, collection: true}
+});
+
+jsonApi.define('applications', {
+  image: {
+    jsonApi: 'hasOne',
+    type: 'image'
+  },
+  container: {
+    jsonApi: 'hasOne',
+    type: 'container'
+  }
+});
+jsonApi.define('image', {
+  name: '',
+  ui_name: '',
+  icon_128: '',
+  description: '',
+  policy: {
+    jsonApi: 'hasOne',
+    type: 'policy'
+  },
+  configurables: []
+});
+jsonApi.define('policy', {
+  allow_home: true,
+  volume_source: '',
+  volume_target: '',
+  volume_mode: ''
+});
+jsonApi.define('container', {});
 
 let Status = {
   RUNNING: "RUNNING",
   STARTING: "STARTING",
   STOPPING: "STOPPING",
   STOPPED: "STOPPED"
-};
-
-let availableApplicationsInfo = function () {
-  // Retrieve information from the various applications and
-  // connect the cascading callbacks.
-  // Returns a single promise. When resolved, the attached
-  // callbacks will be passed an array of the promises for the various
-  // retrieve operations, successful or not.
-  // This routine will go away when we provide the representation data
-  // inline with the items at tornado-webapi level.
-
-  let promise = $.Deferred();
-
-  resources.Application.items()
-    .done((identifiers, items) => {
-      let result = [];
-      Object.keys(items).forEach((key) => {
-        result.push(items[key]);
-      });
-      promise.resolve(result);
-
-    })
-    .fail(() => {
-      promise.resolve([]);
-    });
-
-  return promise;
 };
 
 
@@ -51,13 +58,10 @@ class ApplicationListModel {
 
   update() {
     // Requests an update of the object internal data.
-    // This method returns a jQuery Promise object.
     // When resolved, this.data will contain a list of the retrieved
     // data. Note that, in error conditions, this routine resolves
     // successfully in any case, and the data is set to empty list
-    return $.when(
-      availableApplicationsInfo()
-    ).done((appData) => {
+    return jsonApi.findAll('applications').then(appData => {
       // appData contains the data retrieved from the remote API
 
       let appList = [];
@@ -102,10 +106,10 @@ class ApplicationListModel {
   updateIdx(index) {
     // Refetches and updates the entry at the given index.
     let app = this.appList[index];
-    let mapping_id = app.appData.mapping_id;
+    let id = app.appData.id;
 
-    return resources.Application.retrieve(mapping_id)
-    .done((newData) => {
+    return jsonApi.find('application', id)
+    .then(newData => {
       app.appData = newData;
 
       this._updateStatus(app);
@@ -152,21 +156,21 @@ class ApplicationListModel {
       configurablesData[tag] = configurable.asConfigDict();
     });
 
-    let startPromise = $.Deferred();
+    let startPromise = new Promise(resolve => { resolve(); });
 
-    resources.Container.create({
-      mapping_id: currentApp.appData.mapping_id,
+    jsonApi.one('application', currentApp.appData.id).one('container').post({
+      id: currentApp.appData.id,
       configurables: configurablesData
     })
-    .done(() => {
+    .then(() => {
       this.updateIdx(selectedIndex)
-      .done(startPromise.resolve)
-      .fail((error) => {
+      .then(startPromise.resolve)
+      .catch(error => {
         currentApp.status = Status.STOPPED;
         startPromise.reject(error);
       });
     })
-    .fail((error) => {
+    .catch(error => {
       currentApp.status = Status.STOPPED;
       startPromise.reject(error);
     });
@@ -178,20 +182,18 @@ class ApplicationListModel {
     let appStopping = this.appList[index];
     appStopping.status = Status.STOPPING;
 
-    let url_id = appStopping.appData.container.url_id;
+    let stopPromise = new Promise(resolve => { resolve(); });
 
-    let stopPromise = $.Deferred();
-
-    resources.Container.delete(url_id)
-    .done(() => {
+    jsonApi.one('application', appStopping.appData.id).one('container').destroy()
+    .then(() => {
       this.updateIdx(index)
-      .done(stopPromise.resolve)
-      .fail(function(error) {
+      .then(stopPromise.resolve)
+      .catch(error => {
         appStopping.status = Status.STOPPED;
         stopPromise.reject(error);
       });
     })
-    .fail((error) => {
+    .catch(error => {
       appStopping.status = Status.STOPPED;
       stopPromise.reject(error);
     });
