@@ -81,7 +81,7 @@
         return this.model.appList[this.model.selectedIndex] || null;
       },
       appPolicy: function() {
-        return this.currentApp.appData.image.policy;
+        return this.currentApp.appData.policy;
       },
       appSource: function() {
         let url = urlUtils.pathJoin(
