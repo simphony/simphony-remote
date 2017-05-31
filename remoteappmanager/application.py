@@ -5,6 +5,7 @@ from remoteappmanager.handlers.api import (
     UserHomeHandler, RegisterContainerHandler)
 from remoteappmanager.utils import url_path_join, without_end_slash
 from remoteappmanager import webapi
+from remoteappmanager import jsonapi
 
 
 class Application(BaseApplication):
@@ -23,4 +24,10 @@ class Application(BaseApplication):
             (base_urlpath, UserHomeHandler),
             (base_urlpath.rstrip('/'), web.RedirectHandler, {
                 "url": base_urlpath}),
+        ]
+
+    def _jsonapi_handlers(self):
+        return [
+            ('/applications/', jsonapi.ApplicationList, 'application_list'),
+            ('/applications/(.*)/', jsonapi.ApplicationDetails, 'application_details')
         ]

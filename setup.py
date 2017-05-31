@@ -27,7 +27,7 @@ write_version_py()
 requirements = [
     "setuptools>=21.0",
     "traitlets>=4.1",
-    "tornado>=4.3",
+    "tornado>=4.5",
     "requests>=2.10.0",
     "escapism>=0.0.1",
     "jinja2>=2.8",

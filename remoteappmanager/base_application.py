@@ -1,5 +1,8 @@
 import importlib
 
+from remoteappmanager.utils import url_path_join
+from tornado_rest_jsonapi import Api
+
 from remoteappmanager.handlers.handler_authenticator import HubAuthenticator
 from traitlets import Instance, default
 from tornado import web
@@ -47,6 +50,9 @@ class BaseApplication(web.Application, LoggingMixin):
     #: The WebAPI registry for resources.
     registry = Instance(Registry)
 
+    #: The REST JSON-API registry
+    _jsonapi = Instance(Api)
+
     @property
     def command_line_config(self):
         return self._command_line_config
@@ -87,8 +93,9 @@ class BaseApplication(web.Application, LoggingMixin):
         self._jinja_init(settings)
 
         handlers = self._get_handlers()
-
         super().__init__(handlers, **settings)
+
+        self._jsonapi_init()
 
     # Initializers
     @default("container_manager")
@@ -145,6 +152,17 @@ class BaseApplication(web.Application, LoggingMixin):
             reg.register(resource_handler)
         return reg
 
+    @default("_jsonapi")
+    def _jsonapi_default(self):
+        base_urlpath = url_path_join(
+            self.command_line_config.base_urlpath,
+            "api/v2"
+        )
+
+        jsonapi = Api(self, base_urlpath=base_urlpath)
+        jsonapi.authenticator = HubAuthenticator
+        return jsonapi
+
     # Public
     def start(self):
         """Start the application and the ioloop"""
@@ -175,12 +193,21 @@ class BaseApplication(web.Application, LoggingMixin):
         Reimplement this in subclasses to export the specified endpoints"""
         return []
 
+    def _jsonapi_handlers(self):
+        """Return the JSONAPI handlers setup."""
+        return []
+
     def _get_handlers(self):
         """Returns the registered handlers"""
         base_urlpath = self.command_line_config.base_urlpath
         web_api = self.registry.api_handlers(base_urlpath)
         web_handlers = self._web_handlers()
         return web_api+web_handlers
+
+    def _jsonapi_init(self):
+        jsonapi = self._jsonapi_handlers()
+        for entry in jsonapi:
+            self._jsonapi.route(*entry)
 
     def _jinja_init(self, settings):
         """Initializes the jinja template system settings.
