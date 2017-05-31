@@ -54,7 +54,7 @@ class ContainerDetails(ResourceDetails):
 
 
 class ContainerModel:
-
+    pass
 
 
 
