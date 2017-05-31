@@ -51,8 +51,8 @@
           <div class="box-footer">
             <button class="btn btn-primary pull-right start-button"
             @click="startApplication()"
-            :disabled="currentApp.isStarting()">
-              Start
+            :disabled="currentApp.isStarting() || currentApp.isStopping()">
+              {{ {STOPPED: 'Start', STARTING: 'Starting', STOPPING: 'Stopping'}[currentApp.status] }}
             </button>
           </div>
         </div>
@@ -132,6 +132,10 @@
 <style scoped>
   .no-padding {
     padding: 0px;
+  }
+
+  .start-button {
+    min-width: 80px;
   }
 
   #application {
