@@ -41,8 +41,6 @@
 
     methods: {
       stopApplication: function() {
-        if(!this.currentApp.isRunning()) {return;}
-
         let stoppingAppName = this.$options.filters.appName(
           this.currentApp.appData.image);
         this.model.stopApplication(this.model.selectedIndex).fail((error) => {
@@ -60,6 +58,10 @@
 <style scoped>
   .cust-padding {
     padding: 9px;
+  }
+
+  .disabled {
+    pointer-events: none;
   }
 
   .app-icon {
