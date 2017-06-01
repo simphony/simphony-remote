@@ -4,7 +4,7 @@
       <button v-for="action in globalActions" class="btn btn-primary" @click="action.callback">{{action.label}}</button>
     </div>
     <div class="table-responsive">
-      <table class="table no-margin">
+      <table class="table table-hover no-margin">
         <thead>
           <tr>
             <th v-for="header in headers">{{header}}</th>

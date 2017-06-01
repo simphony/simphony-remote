@@ -1,6 +1,5 @@
 <template>
-  <adminlte-box>
-    <div slot="header">Accounting for user {{ $route.params.id }} </div>
+  <adminlte-box :title="'Accounting for user ' + $route.params.id">
     <div>
       <div class="alert alert-danger" v-if="communicationError">
         <strong>Error:</strong> {{communicationError}}
