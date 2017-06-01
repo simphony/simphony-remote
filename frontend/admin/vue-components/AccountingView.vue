@@ -1,34 +1,34 @@
 <template>
   <adminlte-box :title="'Accounting for user ' + $route.params.id">
-    <div>
-      <div class="alert alert-danger" v-if="communicationError">
-        <strong>Error:</strong> {{communicationError}}
-      </div>
-      <data-table
-      :headers.once="table.headers"
-      :rows="table.rows"
-      :globalActions="table.globalActions"
-      :rowActions="table.rowActions">
-      </data-table>
-
-      <new-accounting-dialog
-      v-if="newAccountingDialog.visible"
-      :visible="newAccountingDialog.visible"
-      :userId="newAccountingDialog.userId"
-      @created="newAccountingCreated"
-      @closed="newAccountingDialog.visible = false">
-      </new-accounting-dialog>
-
-      <confirm-dialog
-      v-if="removeAccountingDialog.visible"
-      title="Remove Accounting"
-      :okCallback="removeAccounting"
-      :closeCallback="closeRemoveAccountingDialog">
-        <div>Do you want to remove accounting
-          {{ removeAccountingDialog.accountingToRemove }}?
-        </div>
-      </confirm-dialog>
+    <div class="alert alert-danger" v-if="communicationError">
+      <strong>Error:</strong> {{communicationError}}
     </div>
+
+    <button slot="tools" class="btn btn-primary" @click="newAccountingDialog.visible = true">Create New Entry</button>
+
+    <data-table
+    :headers.once="table.headers"
+    :rows="table.rows"
+    :rowActions="table.rowActions">
+    </data-table>
+
+    <new-accounting-dialog
+    v-if="newAccountingDialog.visible"
+    :visible="newAccountingDialog.visible"
+    :userId="newAccountingDialog.userId"
+    @created="newAccountingCreated"
+    @closed="newAccountingDialog.visible = false">
+    </new-accounting-dialog>
+
+    <confirm-dialog
+    v-if="removeAccountingDialog.visible"
+    title="Remove Accounting"
+    :okCallback="removeAccounting"
+    :closeCallback="closeRemoveAccountingDialog">
+      <div>Do you want to remove accounting
+        {{ removeAccountingDialog.accountingToRemove }}?
+      </div>
+    </confirm-dialog>
   </adminlte-box>
 </template>
 
@@ -48,10 +48,6 @@
             "ID", "Image", "Workspace", "Vol. source", "Vol. target", "Readonly"
           ],
           rows: [],
-          globalActions: [{
-            label: "Create New Entry",
-            callback: () => { this.newAccountingDialog.visible = true; }
-          }],
           rowActions: [{
             label: "Remove",
             callback: this.removeAction

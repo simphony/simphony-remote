@@ -1,32 +1,32 @@
 <template>
   <adminlte-box title="Applications">
-    <div>
-      <div class="alert alert-danger" v-if="communicationError">
-        <strong>Error:</strong> {{communicationError}}
-      </div>
-      <data-table
-      :headers.once="table.headers"
-      :rows="table.rows"
-      :globalActions="table.globalActions"
-      :rowActions="table.rowActions">
-      </data-table>
-
-      <new-application-dialog
-      v-if="newApplicationDialog.visible"
-      :visible="newApplicationDialog.visible"
-      @created="newApplicationCreated"
-      @closed="newApplicationDialogClosed"></new-application-dialog>
-
-      <confirm-dialog
-      v-if="removeApplicationDialog.visible"
-      title="Remove Application"
-      :okCallback="removeApplication"
-      :closeCallback="closeRemoveApplicationDialog">
-        <div>Do you want to remove Application
-          {{removeApplicationDialog.applicationToRemove.name}}
-          ({{removeApplicationDialog.applicationToRemove.id}})</div>
-      </confirm-dialog>
+    <div class="alert alert-danger" v-if="communicationError">
+      <strong>Error:</strong> {{communicationError}}
     </div>
+
+    <button slot="tools" class="btn btn-primary" @click="newApplicationDialog.visible = true">Create New Entry</button>
+
+    <data-table
+    :headers.once="table.headers"
+    :rows="table.rows"
+    :rowActions="table.rowActions">
+    </data-table>
+
+    <new-application-dialog
+    v-if="newApplicationDialog.visible"
+    :visible="newApplicationDialog.visible"
+    @created="newApplicationCreated"
+    @closed="newApplicationDialogClosed"></new-application-dialog>
+
+    <confirm-dialog
+    v-if="removeApplicationDialog.visible"
+    title="Remove Application"
+    :okCallback="removeApplication"
+    :closeCallback="closeRemoveApplicationDialog">
+      <div>Do you want to remove Application
+        {{removeApplicationDialog.applicationToRemove.name}}
+        ({{removeApplicationDialog.applicationToRemove.id}})</div>
+    </confirm-dialog>
   </adminlte-box>
 </template>
 
@@ -44,10 +44,6 @@
         table: {
           headers: ["ID", "Image"],
           rows: [],
-          globalActions: [{
-            label: "Create New Entry",
-            callback: () => { this.newApplicationDialog.visible = true; }
-          }],
           rowActions: [{
             label: "Remove",
             callback: this.removeAction
