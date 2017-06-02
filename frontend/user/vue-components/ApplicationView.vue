@@ -99,6 +99,8 @@
 
     methods: {
       startApplication: function() {
+        if(!this.currentApp.isStopped()) {return;}
+
         let startingApp = this.currentApp;
         let startingAppName = this.$options.filters.appName(startingApp.appData.image);
         this.model.startApplication(this.model.selectedIndex)
