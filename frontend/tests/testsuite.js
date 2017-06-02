@@ -1,8 +1,3 @@
-window.apidata = {
-  base_url: "/user/lambda",
-  prefix: "/"
-};
-
 require("./tests/user/test_configurables.js");
 require("./tests/user/test_models.js");
 require("./tests/user/test_application_list_view.js");
