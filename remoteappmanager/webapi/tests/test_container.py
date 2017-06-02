@@ -25,8 +25,7 @@ class TestContainer(WebAPITestCase):
     def test_items(self):
         manager = self._app.container_manager
         manager.image = mock_coro_factory(Image())
-        manager.find_containers = mock_coro_factory(
-            [
+        manager.find_containers = mock_coro_factory([
                 DockerContainer(user="johndoe",
                                 mapping_id="whatever",
                                 url_id="12345",
@@ -48,12 +47,34 @@ class TestContainer(WebAPITestCase):
              'total': 2,
              'offset': 0,
              'items': {
-                '12345': {
-                    'image_name': 'image',
-                    'name': 'container',
-                    'mapping_id': 'whatever'
-                }
-            }})
+                 '12345': {
+                     'image_name': 'image',
+                     'name': 'container',
+                     'mapping_id': 'whatever'
+                 }
+             }})
+
+    def test_items_with_none_container(self):
+        manager = self._app.container_manager
+        manager.image = mock_coro_factory(Image())
+        manager.find_container = mock_coro_factory(None)
+
+        code, data = self.get("/user/johndoe/api/v1/containers/",
+                              httpstatus.OK)
+
+        # We get two because we have two mapping ids, hence the find_containers
+        # gets called once per each mapping id.
+        # This is a kind of unusual case, because we only get one item
+        # in the items list, due to the nature of the test.
+        self.assertEqual(
+            data,
+            {
+                'identifiers': [],
+                'total': 0,
+                'offset': 0,
+                'items': {}
+            }
+        )
 
     def test_create(self):
         with patch("remoteappmanager"
