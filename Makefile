@@ -20,9 +20,6 @@ dockerengine:
 deps:
 	@echo "Installing apt dependencies"
 	@echo "---------------------------"
-	nvm install node
-	which node
-	which npm
 	if [ `uname -s` != "Linux" ]; then \
 		echo "ERROR: Cannot run on non-Linux systems"; \
 		false; \
@@ -33,8 +30,12 @@ deps:
 	else \
 		plat_packages="docker.io python3-venv"; \
 	fi; \
-		curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash - ;\
-		sudo apt-get -qq install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages nodejs python3-pip
+		sudo apt-get -qq install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages python3-pip
+	# Install node and nvm, and workaround travis obsolete version.
+	curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash 
+	export NVM_DIR="$$HOME/.nvm" && [ -s "$$NVM_DIR/nvm.sh" ] && . "$$NVM_DIR/nvm.sh" && nvm install node && nvm use node
+	which node
+	which npm
 	npm install
 	`npm bin`/bower install
 
