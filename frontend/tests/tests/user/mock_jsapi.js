@@ -33,9 +33,6 @@ module.exports = {
             volume_mode: ""
           },
           configurables: []
-        },
-        container: {
-          url_id: "654321"
         }
       }
     },
