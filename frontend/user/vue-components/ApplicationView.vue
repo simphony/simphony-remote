@@ -51,8 +51,8 @@
           <div class="box-footer">
             <button class="btn btn-primary pull-right start-button"
             @click="startApplication()"
-            :disabled="currentApp.isStarting()">
-              Start
+            :disabled="currentApp.isStarting() || currentApp.isStopping()">
+              {{ {STOPPED: 'Start', STARTING: 'Starting', STOPPING: 'Stopping'}[currentApp.status] }}
             </button>
           </div>
         </div>
@@ -84,13 +84,9 @@
         return this.currentApp.appData.image.policy;
       },
       appSource: function() {
-        let url = urlUtils.pathJoin(
-          window.apidata.base_url,
-          'containers',
-          this.currentApp.appData.container.url_id
-        );
-        let output = this.currentApp.delayed ? url : url + '/';
+        let url = urlUtils.appUrl(this.currentApp);
 
+        let output = this.currentApp.delayed ? url : url + '/';
         this.currentApp.delayed = false;
 
         return output;
@@ -134,6 +130,10 @@
 <style scoped>
   .no-padding {
     padding: 0px;
+  }
+
+  .start-button {
+    min-width: 80px;
   }
 
   #application {

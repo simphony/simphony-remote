@@ -43,8 +43,17 @@ let encodeUriComponents = function (uri) {
   return uri.split('/').map(encodeURIComponent).join('/');
 };
 
+let appUrl = function(app) {
+  return pathJoin(
+    window.apidata.base_url,
+    'containers',
+    app.appData.container.url_id
+  );
+};
+
 module.exports = {
   pathJoin,
   encodeUriComponents,
-  parse
+  parse,
+  appUrl
 };
