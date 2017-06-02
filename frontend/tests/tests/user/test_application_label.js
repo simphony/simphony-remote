@@ -1,102 +1,89 @@
-var Vue = require("vuejs");
-var ApplicationListModel = require("user/ApplicationListModel");
-var ApplicationLabel = require("user/vue-components/ApplicationLabel");
+let Vue = require("vuejs");
+let ApplicationListModel = require("user/ApplicationListModel");
+let ApplicationLabel = require("user/vue-components/ApplicationLabel");
 require("filters");
 
-QUnit.module("user.app_label");
-QUnit.test("application name", function(assert) {
-  var done = assert.async();
+let model, appLabel;
 
-  var model = new ApplicationListModel();
-  var appLabel = new ApplicationLabel({
-    data: function() { return { model: model }; }
-  }).$mount();
+QUnit.module("user.app_label", {
+  beforeEach: function(assert) {
+    let done = assert.async();
 
-  model.update().done(function() {
-    Vue.nextTick(function() {
-      assert.equal(
-        appLabel.$el.querySelector('li > a > span').innerHTML,
-        model.appList[0].appData.image.ui_name
-      );
+    model = new ApplicationListModel();
+    appLabel = new ApplicationLabel({
+      data: function() { return { model: model }; }
+    }).$mount();
 
-      // Simulate changing currentApp
-      model.selectedIndex = 1;
-
-      Vue.nextTick(function() {
-        assert.equal(
-          appLabel.$el.querySelector('li > a > span').innerHTML,
-          model.appList[1].appData.image.ui_name
-        );
-
-        done();
-      });
+    model.update().done(function() {
+      Vue.nextTick(function() {done();});
     });
+  }
+});
+
+QUnit.test("application name", function(assert) {
+  let done = assert.async();
+
+  assert.equal(
+    appLabel.$el.querySelector('li > a > span').innerHTML,
+    model.appList[0].appData.image.ui_name
+  );
+
+  // Simulate changing currentApp
+  model.selectedIndex = 1;
+
+  Vue.nextTick(function() {
+    assert.equal(
+      appLabel.$el.querySelector('li > a > span').innerHTML,
+      model.appList[1].appData.image.ui_name
+    );
+
+    done();
   });
 });
 
 QUnit.test("rendering stop button", function (assert) {
-  var done = assert.async();
+  let done = assert.async();
 
-  var model = new ApplicationListModel();
-  var appLabel = new ApplicationLabel({
-    data: function() { return { model: model }; }
-  }).$mount();
+  assert.equal(
+    appLabel.$el.querySelector('li > a > span').innerHTML,
+    model.appList[0].appData.image.ui_name
+  );
 
-  model.update().done(function() {
-    // First application selected by default (stopped application)
-    Vue.nextTick(function() {
-      assert.equal(
-        appLabel.$el.querySelector('li > a > span').innerHTML,
-        model.appList[0].appData.image.ui_name
-      );
+  // Test stop button disabled
+  assert.ok(
+    appLabel.$el.querySelector('#stop-button').classList.contains('disabled')
+  );
 
-      // Test stop button disabled
-      assert.ok(
-        appLabel.$el.querySelector('#stop-button').classList.contains('disabled')
-      );
+  // Select running application
+  model.selectedIndex = 1;
 
-      // Select running application
-      model.selectedIndex = 1;
+  // Test stop button enabled
+  Vue.nextTick(function() {
+    assert.notOk(
+      appLabel.$el.querySelector('#stop-button').classList.contains('disabled')
+    );
 
-      // Test stop button enabled
-      Vue.nextTick(function() {
-        assert.notOk(
-          appLabel.$el.querySelector('#stop-button').classList.contains('disabled')
-        );
-
-        done();
-      });
-    });
+    done();
   });
 });
 
 QUnit.test("rendering share button", function (assert) {
-  var done = assert.async();
+  let done = assert.async();
 
-  var model = new ApplicationListModel();
-  var appLabel = new ApplicationLabel({
-    data: function() { return { model: model }; }
-  }).$mount();
+  // Test share button disabled
+  assert.ok(
+    appLabel.$el.querySelector('#share-button').classList.contains('disabled')
+  );
 
-  model.update().done(function() {
-    // First application selected by default (stopped application)
-    Vue.nextTick(function() {
-      // Test share button disabled
-      assert.ok(
-        appLabel.$el.querySelector('#share-button').classList.contains('disabled')
-      );
+  // Select running application
+  model.selectedIndex = 1;
 
-      // Select running application
-      model.selectedIndex = 1;
+  // Test share button disabled (Because clipboard save is not supported in test environment)
+  Vue.nextTick(function() {
+    assert.ok(
+      appLabel.$el.querySelector('#share-button').classList.contains('disabled')
+    );
 
-      // Test share button disabled (Because clipboard save is not supported in test environment)
-      Vue.nextTick(function() {
-        assert.ok(
-          appLabel.$el.querySelector('#share-button').classList.contains('disabled')
-        );
-
-        done();
-      });
-    });
+    done();
   });
 });
