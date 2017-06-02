@@ -4,11 +4,10 @@
       <strong>Error:</strong> {{communicationError}}
     </div>
 
-    <button slot="tools" class="btn btn-primary" @click="newApplicationDialog.visible = true">Create New Entry</button>
-
     <data-table
     :headers.once="table.headers"
     :rows="table.rows"
+    :globalActions="table.globalActions"
     :rowActions="table.rowActions">
     </data-table>
 
@@ -44,6 +43,10 @@
         table: {
           headers: ["ID", "Image"],
           rows: [],
+          globalActions: [{
+            label: "Create New Entry",
+            callback: () => {this.newApplicationDialog.visible = true;}
+          }],
           rowActions: [{
             label: "Remove",
             callback: this.removeAction

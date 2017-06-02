@@ -4,11 +4,10 @@
       <strong>Error:</strong> {{communicationError}}
     </div>
 
-    <button slot="tools" class="btn btn-primary" @click="newAccountingDialog.visible = true">Create New Entry</button>
-
     <data-table
     :headers.once="table.headers"
     :rows="table.rows"
+    :globalActions="table.globalActions"
     :rowActions="table.rowActions">
     </data-table>
 
@@ -48,6 +47,10 @@
             "ID", "Image", "Workspace", "Vol. source", "Vol. target", "Readonly"
           ],
           rows: [],
+          globalActions: [{
+            label: "Create New Entry",
+            callback: () => {this.newAccountingDialog.visible = true;}
+          }],
           rowActions: [{
             label: "Remove",
             callback: this.removeAction
