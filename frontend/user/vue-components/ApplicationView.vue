@@ -84,13 +84,9 @@
         return this.currentApp.appData.image.policy;
       },
       appSource: function() {
-        let url = urlUtils.pathJoin(
-          window.apidata.base_url,
-          'containers',
-          this.currentApp.appData.container.url_id
-        );
-        let output = this.currentApp.delayed ? url : url + '/';
+        let url = urlUtils.appUrl(this.currentApp);
 
+        let output = this.currentApp.delayed ? url : url + '/';
         this.currentApp.delayed = false;
 
         return output;
