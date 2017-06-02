@@ -20,6 +20,8 @@ dockerengine:
 deps:
 	@echo "Installing apt dependencies"
 	@echo "---------------------------"
+	which node
+	which npm
 	if [ `uname -s` != "Linux" ]; then \
 		echo "ERROR: Cannot run on non-Linux systems"; \
 		false; \
@@ -34,6 +36,8 @@ deps:
 		sudo apt-get -qq install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages nodejs python3-pip
 	node --version
 	npm --version
+	which node
+	which npm
 	npm install
 	`npm bin`/bower install
 
