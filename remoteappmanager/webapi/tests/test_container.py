@@ -62,10 +62,6 @@ class TestContainer(WebAPITestCase):
         code, data = self.get("/user/johndoe/api/v1/containers/",
                               httpstatus.OK)
 
-        # We get two because we have two mapping ids, hence the find_containers
-        # gets called once per each mapping id.
-        # This is a kind of unusual case, because we only get one item
-        # in the items list, due to the nature of the test.
         self.assertEqual(
             data,
             {
