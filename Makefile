@@ -30,7 +30,7 @@ deps:
 	else \
 		plat_packages="docker.io python3-venv"; \
 	fi; \
-		curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash - \
+		curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash - ;\
 		sudo apt-get -qq install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages nodejs python3-pip
 	node --version
 	npm --version
