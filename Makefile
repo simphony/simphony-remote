@@ -24,6 +24,7 @@ deps:
 		echo "ERROR: Cannot run on non-Linux systems"; \
 		false; \
 	fi
+	curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 	-sudo apt-get -qq update
 	if [ `lsb_release -rs` = "14.04" ]; then \
 		plat_packages="docker-engine python3.4-venv"; \
