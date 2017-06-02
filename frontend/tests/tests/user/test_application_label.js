@@ -43,9 +43,7 @@ QUnit.test("rendering stop button", function (assert) {
   }).$mount();
 
   model.update().done(function() {
-    // Simulate application stopped
-    model.appList[0].status = 'STOPPED';
-
+    // First application selected by default (stopped application)
     Vue.nextTick(function() {
       assert.equal(
         appLabel.$el.querySelector('li > a > span').innerHTML,
@@ -57,8 +55,8 @@ QUnit.test("rendering stop button", function (assert) {
         appLabel.$el.querySelector('#stop-button').classList.contains('disabled')
       );
 
-      // Simulate application running
-      model.appList[0].status = 'RUNNING';
+      // Select running application
+      model.selectedIndex = 1;
 
       // Test stop button enabled
       Vue.nextTick(function() {
@@ -81,17 +79,15 @@ QUnit.test("rendering share button", function (assert) {
   }).$mount();
 
   model.update().done(function() {
-    // Simulate application stopped
-    model.appList[0].status = 'STOPPED';
-
+    // First application selected by default (stopped application)
     Vue.nextTick(function() {
       // Test share button disabled
       assert.ok(
         appLabel.$el.querySelector('#share-button').classList.contains('disabled')
       );
 
-      // Simulate application running
-      model.appList[0].status = 'RUNNING';
+      // Select running application
+      model.selectedIndex = 1;
 
       // Test share button disabled (Because clipboard save is not supported in test environment)
       Vue.nextTick(function() {
