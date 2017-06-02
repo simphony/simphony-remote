@@ -11,6 +11,8 @@ addons:
 before_install:
     - firefox --version
     - make deps
+    - node --version
+    - npm --version
     - make pythondeps
     - python -c "import setuptools; print(setuptools.__version__)"
     - pip --version
