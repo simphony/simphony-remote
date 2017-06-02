@@ -1,16 +1,21 @@
-var Vue = require("vuejs");
-var ApplicationListModel = require("user/ApplicationListModel");
-var ApplicationListView = require("user/vue-components/ApplicationListView");
+let Vue = require("vuejs");
+let ApplicationListModel = require("user/ApplicationListModel");
+let ApplicationListView = require("user/vue-components/ApplicationListView");
 require("filters");
 
-QUnit.module("user.app_list_view");
-QUnit.test("rendering list", function (assert) {
-  var done = assert.async();
+let model, appListView;
 
-  var model = new ApplicationListModel();
-  var appListView = new ApplicationListView({
-    data: function() { return { model: model }; }
-  }).$mount();
+QUnit.module("user.app_list_view", {
+  beforeEach: function() {
+    model = new ApplicationListModel();
+    appListView = new ApplicationListView({
+      data: function() { return { model: model }; }
+    }).$mount();
+  }
+});
+
+QUnit.test("rendering list", function (assert) {
+  let done = assert.async();
 
   assert.ok(model.loading);
   assert.equal(
@@ -37,12 +42,7 @@ QUnit.test("rendering list", function (assert) {
 });
 
 QUnit.test("rendering nothing in the list", function (assert) {
-  var done = assert.async();
-
-  var model = new ApplicationListModel();
-  var appListView = new ApplicationListView({
-    data: function() { return { model: model }; }
-  }).$mount();
+  let done = assert.async();
 
   model.loading = false;
 
@@ -65,12 +65,7 @@ QUnit.test("rendering nothing in the list", function (assert) {
 });
 
 QUnit.test("search form", function (assert) {
-  var done = assert.async();
-
-  var model = new ApplicationListModel();
-  var appListView = new ApplicationListView({
-    data: function() { return { model: model }; }
-  }).$mount();
+  let done = assert.async();
 
   model.update().done(function() { Vue.nextTick(function() {
     assert.notEqual(appListView.visibleList.length, 0);
