@@ -1,3 +1,4 @@
+let $ = require("jquery");
 let Vue = require("vuejs");
 let ApplicationListModel = require("user/ApplicationListModel");
 let ApplicationLabel = require("user/vue-components/ApplicationLabel");
@@ -64,6 +65,40 @@ QUnit.test("rendering stop button", function (assert) {
     );
 
     done();
+  });
+});
+
+QUnit.test("stop method", function (assert) {
+  let done = assert.async();
+
+  let stopCalled = false;
+  // Mock model.stopApplication
+  model.stopApplication = function() {
+    let stopPromise = $.Deferred();
+    stopCalled = true;
+    return stopPromise.resolve();
+  };
+
+  // Select running application
+  model.selectedIndex = 1;
+
+  Vue.nextTick(function() {
+    // model.stopApplication should be called
+    appLabel.stopApplication().then(function() {
+      assert.ok(stopCalled);
+
+      // Select stopped application
+      model.selectedIndex = 0;
+      stopCalled = false;
+
+      Vue.nextTick(function() {
+        // model.stopApplication shouldn't be called
+        appLabel.stopApplication().then(function() {
+          assert.notOk(stopCalled);
+          done();
+        });
+      });
+    });
   });
 });
 
