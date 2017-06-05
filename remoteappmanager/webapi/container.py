@@ -163,6 +163,9 @@ class ContainerHandler(ResourceHandler):
                 user_name=self.current_user.name,
                 mapping_id=accounting.id)
 
+            if container is None:
+                continue
+
             rest_container = Container(identifier=container.url_id)
             rest_container.fill(container)
             running_containers.append(rest_container)
