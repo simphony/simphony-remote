@@ -3,6 +3,7 @@
     <div class="alert alert-danger" v-if="communicationError">
       <strong>Error:</strong> {{communicationError}}
     </div>
+
     <data-table
     :headers.once="table.headers"
     :rows="table.rows"
@@ -40,7 +41,7 @@
           rows: [],
           globalActions: [{
             label: "Create New Entry",
-            callback: () => { this.newUserDialog.visible = true; }
+            callback: () => {this.newUserDialog.visible = true;}
           }],
           rowActions: [{
             label: "Policies",

@@ -38,7 +38,7 @@
             <h4>Configuration</h4>
             <form class="configuration">
               <fieldset v-if="currentApp.configurables.length === 0">No configurable options for this image</fieldset>
-              <fieldset v-else :disabled="currentApp.isStarting()">
+              <fieldset v-else :disabled="!currentApp.isStopped()">
                 <component v-for="configurable in currentApp.configurables"
                 :key="configurable.tag"
                 :is="configurable.tag + '-component'"
@@ -51,7 +51,7 @@
           <div class="box-footer">
             <button class="btn btn-primary pull-right start-button"
             @click="startApplication()"
-            :disabled="currentApp.isStarting() || currentApp.isStopping()">
+            :disabled="!currentApp.isStopped()">
               {{ {STOPPED: 'Start', STARTING: 'Starting', STOPPING: 'Stopping'}[currentApp.status] }}
             </button>
           </div>
