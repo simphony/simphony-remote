@@ -13,6 +13,8 @@
           <a href="#">Application settings</a>
         </li>
         <li role="separator" class="divider"></li>
+
+        <!-- Stop button -->
         <li
         id="stop-button"
         :class="{ disabled: !currentApp.isRunning() }"
@@ -21,29 +23,65 @@
             <i class="fa fa-times text-danger"></i>
             Stop Application
           </a>
-          <!-- Put other settings here -->
         </li>
+
+        <!-- Share button -->
+        <li
+        id="share-button"
+        :class="{ disabled: !(currentApp.isRunning() && clipboardSupported) }"
+        :data-clipboard-text="sharedUrl">
+          <a href="#">
+            <i class="fa fa-clipboard text-light-blue"></i>
+            Share (copy url to clipboard)
+          </a>
+        </li>
+
+        <!-- Put other settings here -->
       </ul>
     </li>
   </ul>
 </template>
 
 <script>
+  let $ = require("jquery");
   let Vue = require("vuejs");
+  let Clipboard = require('clipboard');
+  let URL = require('url-parse');
+  let urlUtils = require('urlutils');
   require('toolkit');
 
   module.exports = Vue.extend({
+    data: function() {
+      return { clipboardSupported: Clipboard.isSupported() };
+    },
+
+    mounted: function() {
+      if(this.clipboardSupported) {
+        new Clipboard('#share-button');
+      }
+    },
+
     computed: {
       currentApp: function() {
         return this.model.appList[this.model.selectedIndex] || null;
+      },
+      sharedUrl: function() {
+        if(this.currentApp.isRunning()) {
+          let url = new URL(window.location.origin);
+          url.set('pathname', urlUtils.appUrl(this.currentApp));
+          return url.href;
+        }
+        return "";
       }
     },
 
     methods: {
       stopApplication: function() {
+        if(!this.currentApp.isRunning()) {return new $.Deferred().resolve();}
+
         let stoppingAppName = this.$options.filters.appName(
           this.currentApp.appData.image);
-        this.model.stopApplication(this.model.selectedIndex).fail((error) => {
+        return this.model.stopApplication(this.model.selectedIndex).fail((error) => {
           this.$emit('error', {
             title: 'Error when stopping ' + stoppingAppName,
             code: error.code,
@@ -58,6 +96,10 @@
 <style scoped>
   .cust-padding {
     padding: 9px;
+  }
+
+  .disabled {
+    pointer-events: none;
   }
 
   .app-icon {

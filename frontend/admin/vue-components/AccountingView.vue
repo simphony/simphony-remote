@@ -1,35 +1,33 @@
 <template>
-  <adminlte-box>
-    <div slot="header">Accounting for user {{ $route.params.id }} </div>
-    <div>
-      <div class="alert alert-danger" v-if="communicationError">
-        <strong>Error:</strong> {{communicationError}}
-      </div>
-      <data-table
-      :headers.once="table.headers"
-      :rows="table.rows"
-      :globalActions="table.globalActions"
-      :rowActions="table.rowActions">
-      </data-table>
-
-      <new-accounting-dialog
-      v-if="newAccountingDialog.show"
-      :show="newAccountingDialog.show"
-      :userId="newAccountingDialog.userId"
-      @created="newAccountingCreated"
-      @closed="newAccountingDialog.show = false">
-      </new-accounting-dialog>
-
-      <confirm-dialog
-      v-if="removeAccountingDialog.show"
-      title="Remove Accounting"
-      :okCallback="removeAccounting"
-      :closeCallback="closeRemoveAccountingDialog">
-        <div>Do you want to remove accounting
-          {{ removeAccountingDialog.accountingToRemove }}?
-        </div>
-      </confirm-dialog>
+  <adminlte-box :title="'Accounting for user ' + $route.params.id">
+    <div class="alert alert-danger" v-if="communicationError">
+      <strong>Error:</strong> {{communicationError}}
     </div>
+
+    <data-table
+    :headers.once="table.headers"
+    :rows="table.rows"
+    :globalActions="table.globalActions"
+    :rowActions="table.rowActions">
+    </data-table>
+
+    <new-accounting-dialog
+    v-if="newAccountingDialog.visible"
+    :visible="newAccountingDialog.visible"
+    :userId="newAccountingDialog.userId"
+    @created="newAccountingCreated"
+    @closed="newAccountingDialog.visible = false">
+    </new-accounting-dialog>
+
+    <confirm-dialog
+    v-if="removeAccountingDialog.visible"
+    title="Remove Accounting"
+    :okCallback="removeAccounting"
+    :closeCallback="closeRemoveAccountingDialog">
+      <div>Do you want to remove accounting
+        {{ removeAccountingDialog.accountingToRemove }}?
+      </div>
+    </confirm-dialog>
   </adminlte-box>
 </template>
 
@@ -51,7 +49,7 @@
           rows: [],
           globalActions: [{
             label: "Create New Entry",
-            callback: () => { this.newAccountingDialog.show = true; }
+            callback: () => {this.newAccountingDialog.visible = true;}
           }],
           rowActions: [{
             label: "Remove",
@@ -60,12 +58,12 @@
         },
 
         newAccountingDialog: {
-          show: false,
+          visible: false,
           userId: this.$route.params.id
         },
 
         removeAccountingDialog: {
-          show: false,
+          visible: false,
           accountingToRemove: null
         },
 
@@ -101,17 +99,17 @@
       },
 
       newAccountingCreated: function() {
-        this.newAccountingDialog.show = false;
+        this.newAccountingDialog.visible = false;
         this.updateTable();
       },
 
       removeAction: function(row) {
         this.removeAccountingDialog.accountingToRemove = row[0];
-        this.removeAccountingDialog.show = true;
+        this.removeAccountingDialog.visible = true;
       },
 
       closeRemoveAccountingDialog: function() {
-        this.removeAccountingDialog.show = false;
+        this.removeAccountingDialog.visible = false;
         this.removeAccountingDialog.accountingToRemove = null;
       },
 

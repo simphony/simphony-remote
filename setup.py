@@ -6,7 +6,6 @@ from setuptools.command.install import install as _install
 VERSION = '2.0.0'
 
 # Read description
-
 with open('README.rst', 'r') as readme:
     README_TEXT = readme.read()
 
@@ -57,8 +56,9 @@ else:
 
 class install(_install):
     def run(self):
-        import subprocess
-        subprocess.check_call(['npm', 'run', 'build'])
+        if not on_rtd:
+            import subprocess
+            subprocess.check_call(['npm', 'run', 'build'])
         super().run()
 
 

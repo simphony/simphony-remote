@@ -38,7 +38,7 @@
             <h4>Configuration</h4>
             <form class="configuration">
               <fieldset v-if="currentApp.configurables.length === 0">No configurable options for this image</fieldset>
-              <fieldset v-else :disabled="currentApp.isStarting()">
+              <fieldset v-else :disabled="!currentApp.isStopped()">
                 <component v-for="configurable in currentApp.configurables"
                 :key="configurable.tag"
                 :is="configurable.tag + '-component'"
@@ -51,8 +51,8 @@
           <div class="box-footer">
             <button class="btn btn-primary pull-right start-button"
             @click="startApplication()"
-            :disabled="currentApp.isStarting()">
-              Start
+            :disabled="!currentApp.isStopped()">
+              {{ {STOPPED: 'Start', STARTING: 'Starting', STOPPING: 'Stopping'}[currentApp.status] }}
             </button>
           </div>
         </div>
@@ -70,6 +70,7 @@
 </template>
 
 <script>
+  let $ = require("jquery");
   let Vue = require("vuejs");
   let urlUtils = require("urlutils");
   let utils = require("utils");
@@ -84,13 +85,9 @@
         return this.currentApp.appData.image.policy;
       },
       appSource: function() {
-        let url = urlUtils.pathJoin(
-          window.apidata.base_url,
-          'containers',
-          this.currentApp.appData.container.url_id
-        );
-        let output = this.currentApp.delayed ? url : url + '/';
+        let url = urlUtils.appUrl(this.currentApp);
 
+        let output = this.currentApp.delayed ? url : url + '/';
         this.currentApp.delayed = false;
 
         return output;
@@ -99,15 +96,17 @@
 
     methods: {
       startApplication: function() {
+        if(!this.currentApp.isStopped()) {return new $.Deferred().resolve();}
+
         let startingApp = this.currentApp;
         let startingAppName = this.$options.filters.appName(startingApp.appData.image);
-        this.model.startApplication()
+        return this.model.startApplication(this.model.selectedIndex)
         .done(() => {
           this.$emit('startApplication', startingApp);
         })
         .fail((error) => {
           this.$emit('error', {
-            title: "Error when starting " + startingAppName,
+            title: 'Error when starting ' + startingAppName,
             code: error.code,
             message: error.message
           });
@@ -132,6 +131,10 @@
 <style scoped>
   .no-padding {
     padding: 0px;
+  }
+
+  .start-button {
+    min-width: 80px;
   }
 
   #application {
