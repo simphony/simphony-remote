@@ -70,6 +70,7 @@
 </template>
 
 <script>
+  let $ = require("jquery");
   let Vue = require("vuejs");
   let urlUtils = require("urlutils");
   let utils = require("utils");
@@ -95,11 +96,11 @@
 
     methods: {
       startApplication: function() {
-        if(!this.currentApp.isStopped()) {return;}
+        if(!this.currentApp.isStopped()) {return new $.Deferred().resolve();}
 
         let startingApp = this.currentApp;
         let startingAppName = this.$options.filters.appName(startingApp.appData.image);
-        this.model.startApplication(this.model.selectedIndex)
+        return this.model.startApplication(this.model.selectedIndex)
         .done(() => {
           this.$emit('startApplication', startingApp);
         })
