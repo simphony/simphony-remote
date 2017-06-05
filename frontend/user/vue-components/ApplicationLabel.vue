@@ -43,6 +43,7 @@
 </template>
 
 <script>
+  let $ = require("jquery");
   let Vue = require("vuejs");
   let Clipboard = require('clipboard');
   let URL = require('url-parse');
@@ -76,9 +77,11 @@
 
     methods: {
       stopApplication: function() {
+        if(!this.currentApp.isRunning()) {return new $.Deferred().resolve();}
+
         let stoppingAppName = this.$options.filters.appName(
           this.currentApp.appData.image);
-        this.model.stopApplication(this.model.selectedIndex).fail((error) => {
+        return this.model.stopApplication(this.model.selectedIndex).fail((error) => {
           this.$emit('error', {
             title: 'Error when stopping ' + stoppingAppName,
             code: error.code,
@@ -93,6 +96,10 @@
 <style scoped>
   .cust-padding {
     padding: 9px;
+  }
+
+  .disabled {
+    pointer-events: none;
   }
 
   .app-icon {

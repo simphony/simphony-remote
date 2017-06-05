@@ -1,3 +1,4 @@
+let $ = require("jquery");
 let Vue = require("vuejs");
 let ApplicationListModel = require("user/ApplicationListModel");
 let ApplicationView = require("user/vue-components/ApplicationView");
@@ -153,6 +154,40 @@ QUnit.test("rendering start button", function (assert) {
       );
 
       done();
+    });
+  });
+});
+
+QUnit.test("start method", function (assert) {
+  let done = assert.async();
+
+  let startCalled = false;
+  // Mock model.startApplication
+  model.startApplication = function() {
+    let startPromise = $.Deferred();
+    startCalled = true;
+    return startPromise.resolve();
+  };
+
+  // Select stopped application
+  model.selectedIndex = 0;
+
+  Vue.nextTick(function() {
+    // model.startApplication should be called
+    appView.startApplication().then(function() {
+      assert.ok(startCalled);
+
+      // Select running application
+      model.selectedIndex = 1;
+      startCalled = false;
+
+      Vue.nextTick(function() {
+        // model.startApplication shouldn't be called
+        appView.startApplication().then(function() {
+          assert.notOk(startCalled);
+          done();
+        });
+      });
     });
   });
 });
