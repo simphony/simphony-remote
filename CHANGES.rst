@@ -46,7 +46,8 @@ What's new in SimPhoNy Remote 2.0.0
     - Using node 6 for the builds and prevent the use of node 4 from travis to 
       workaround disrupting ECONNRESET issues (#488)
     - Upgraded astor to master to fix python 3.5 incompatibility during 
-      documentation build (#494) 
+      documentation build (#494)
+    - Skip containers that are not found while checking container.items (#478)
 
 - Refactor:
     - Virtual docker has been cleaned up completely (#389)
