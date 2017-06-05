@@ -6,7 +6,6 @@ from setuptools.command.install import install as _install
 VERSION = '1.2.0.dev0'
 
 # Read description
-
 with open('README.rst', 'r') as readme:
     README_TEXT = readme.read()
 
