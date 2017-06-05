@@ -2,7 +2,10 @@
   <div class="row">
     <div class="col-md-12">
       <div class="box">
-        <div class="box-header with-border"><slot name="header">{{title}}</slot></div>
+        <div class="box-header with-border">
+          <h3 class="box-title">{{title}}</h3>
+          <div class="box-tools"><slot name="tools"></slot></div>
+        </div>
         <div class="box-body"><slot></slot></div>
       </div>
     </div>
