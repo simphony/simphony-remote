@@ -57,8 +57,9 @@ else:
 
 class install(_install):
     def run(self):
-        import subprocess
-        subprocess.check_call(['npm', 'run', 'build'])
+        if not on_rtd:
+            import subprocess
+            subprocess.check_call(['npm', 'run', 'build'])
         super().run()
 
 
