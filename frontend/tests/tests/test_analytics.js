@@ -1,10 +1,5 @@
 var gamodule = require("gamodule");
 
-window.apidata = {
-  base_url: "/",
-  prefix: "/"
-};
-
 QUnit.module("Google Analytics");
 QUnit.test("test without analytics", function (assert) {
   var result=[];
