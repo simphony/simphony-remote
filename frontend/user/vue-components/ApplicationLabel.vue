@@ -1,6 +1,6 @@
 <template>
   <ul v-if="currentApp !== null" class="nav navbar-nav">
-    <li class="dropdown">
+    <li class="dropdown notifications-menu">
       <a href="#" class="dropdown-toggle cust-padding" data-toggle="dropdown" aria-expanded="false">
         <img class="app-icon"
         :src="currentApp.appData.image.icon_128 | iconSrc">
@@ -8,35 +8,39 @@
         <span>{{ currentApp.appData.image | appName }}</span>
       </a>
 
-      <ul class="dropdown-menu" role="menu">
-        <li class="disabled">
-          <a href="#">Application settings</a>
-        </li>
-        <li role="separator" class="divider"></li>
+      <ul class="dropdown-menu">
+        <li class="header">Application settings</li>
 
-        <!-- Stop button -->
-        <li
-        id="stop-button"
-        :class="{ disabled: !currentApp.isRunning() }"
-        @click="stopApplication()">
-          <a href="#">
-            <i class="fa fa-times text-danger"></i>
-            Stop Application
-          </a>
-        </li>
+        <li>
+          <ul class="menu">
 
-        <!-- Share button -->
-        <li
-        id="share-button"
-        :class="{ disabled: !(currentApp.isRunning() && clipboardSupported) }"
-        :data-clipboard-text="sharedUrl">
-          <a href="#">
-            <i class="fa fa-clipboard text-light-blue"></i>
-            Share (copy url to clipboard)
-          </a>
-        </li>
+            <!-- Stop button -->
+            <li>
+              <a href="#"
+              class="btn btn-flat"
+              id="stop-button"
+              :class="{ disabled: !currentApp.isRunning() }"
+              @click="stopApplication()">
+                <i class="fa fa-times text-danger"></i>
+                Stop Application
+              </a>
+            </li>
 
-        <!-- Put other settings here -->
+            <!-- Share button -->
+            <li>
+              <a href="#"
+              class="btn btn-flat"
+              id="share-button"
+              :class="{ disabled: !(currentApp.isRunning() && clipboardSupported) }"
+              :data-clipboard-text="sharedUrl">
+                <i class="fa fa-clipboard text-light-blue"></i>
+                Share (copy url to clipboard)
+              </a>
+            </li>
+
+            <!-- Put other settings here -->
+          </ul>
+        </li>
       </ul>
     </li>
   </ul>
@@ -96,10 +100,6 @@
 <style scoped>
   .cust-padding {
     padding: 9px;
-  }
-
-  .disabled {
-    pointer-events: none;
   }
 
   .app-icon {
