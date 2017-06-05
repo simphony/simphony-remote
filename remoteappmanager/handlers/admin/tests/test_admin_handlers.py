@@ -44,22 +44,22 @@ class TestBaseAccess(utils.AsyncHTTPTestCase, LogTrapTestCase):
 
 class TestApplicationsHandler(TestBaseAccess):
     url = "/user/johndoe/#/applications/"
-    body_string = "datatable"
+    body_string = '<section class="content">'
 
 
 class TestUsersHandler(TestBaseAccess):
     url = "/user/johndoe/#/users/"
-    body_string = "datatable"
+    body_string = '<section class="content">'
 
 
 class TestContainersHandler(TestBaseAccess):
     url = "/user/johndoe/#/containers/"
-    body_string = "datatable"
+    body_string = '<section class="content">'
 
 
 class TestAccountingHandler(TestBaseAccess):
     url = "/user/johndoe/#/users/0/accounting/"
-    body_string = "datatable"
+    body_string = '<section class="content">'
 
     def test_unknown_id(self):
         self._app.db.unexistent_user_id = 123422
