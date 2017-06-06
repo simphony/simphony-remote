@@ -1,3 +1,4 @@
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var path = require("path");
 var components = path.resolve(__dirname, "remoteappmanager/static/bower_components");
 var js = path.resolve(__dirname, "frontend");
@@ -15,11 +16,12 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ["*", ".js", ".vue"],
+    extensions: ["*", ".js", ".vue", ".css"],
     alias: {
       lodash: path.resolve(components, "lodash/dist/lodash"),
       jquery: path.resolve(components, "admin-lte/plugins/jQuery/jquery-2.2.3.min"),
       bootstrap: path.resolve(components, "admin-lte/bootstrap/js/bootstrap.min"),
+      "bootstrap-css": path.resolve(components, "admin-lte/bootstrap/css/bootstrap.min"),
       "admin-lte": path.resolve(components, "admin-lte/dist/js/app.min"),
       vuejs: path.resolve(components, "vue/dist/vue"),
       "vue-router": path.resolve(components, "vue-router/dist/vue-router"),
@@ -51,7 +53,15 @@ module.exports = {
         use: {
           loader: 'vue-loader'
         }
+      },
+      {
+        test: /\.css$/,
+        loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader' })
       }
     ]
-  }
+  },
+
+  plugins: [
+    new ExtractTextPlugin("[name].css")
+  ]
 };
