@@ -17,9 +17,8 @@
             <!-- Stop button -->
             <li>
               <a href="#"
-              class="btn btn-flat"
               id="stop-button"
-              :class="{ disabled: !currentApp.isRunning() }"
+              :class="{ 'disabled-entry': !currentApp.isRunning() }"
               @click="stopApplication()">
                 <i class="fa fa-times text-danger"></i>
                 Stop Application
@@ -29,9 +28,8 @@
             <!-- Share button -->
             <li>
               <a href="#"
-              class="btn btn-flat"
               id="share-button"
-              :class="{ disabled: !(currentApp.isRunning() && clipboardSupported) }"
+              :class="{ 'disabled-entry': !(currentApp.isRunning() && clipboardSupported) }"
               :data-clipboard-text="sharedUrl">
                 <i class="fa fa-clipboard text-light-blue"></i>
                 Share (copy url to clipboard)
@@ -100,6 +98,11 @@
 <style scoped>
   .cust-padding {
     padding: 9px;
+  }
+
+  .disabled-entry {
+    pointer-events: none;
+    opacity: 0.4;
   }
 
   .app-icon {
