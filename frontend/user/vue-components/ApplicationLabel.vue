@@ -9,8 +9,6 @@
       </a>
 
       <ul class="dropdown-menu">
-        <li class="header">Application settings</li>
-
         <li>
           <ul class="menu">
 
