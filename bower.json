@@ -17,8 +17,6 @@
     "ionicons": "~2.0.1",
     "jquery": "components/jquery#~2.0",
     "admin-lte": "~2.3.11",
-    "html5shiv": "~3.7.3",
-    "respond": "~1.4.2",
     "vue": "^2.2.6",
     "vue-router": "^2.5.2",
     "vue-form": "^4.0.0",
