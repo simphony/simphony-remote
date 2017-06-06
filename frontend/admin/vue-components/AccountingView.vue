@@ -124,6 +124,12 @@
           this.communicationError = "The request could not be executed successfully";
         });
       }
+    },
+
+    watch: {
+      '$route.params.id': function() {
+        this.updateTable();
+      }
     }
   };
 </script>
