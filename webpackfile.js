@@ -21,10 +21,18 @@ module.exports = {
   resolve: {
     extensions: ["*", ".js", ".vue", ".css"],
     alias: {
+      // CSS
+      "bootstrap-css": path.resolve(components, "admin-lte/bootstrap/css/bootstrap.min"),
+      "font-awesome-css": path.resolve(components, "font-awesome/css/font-awesome.min"),
+      "ionicons-css": path.resolve(components, "ionicons/css/ionicons.min"),
+      "admin-lte-css": path.resolve(components, "admin-lte/dist/css/AdminLTE.min"),
+      "skin-black-css": path.resolve(components, "admin-lte/dist/css/skins/skin-black.min"),
+      "skin-red-css": path.resolve(components, "admin-lte/dist/css/skins/skin-red.min"),
+
+      // JS
       lodash: path.resolve(components, "lodash/dist/lodash"),
       jquery: path.resolve(components, "admin-lte/plugins/jQuery/jquery-2.2.3.min"),
       bootstrap: path.resolve(components, "admin-lte/bootstrap/js/bootstrap.min"),
-      "bootstrap-css": path.resolve(components, "admin-lte/bootstrap/css/bootstrap.min"),
       "admin-lte": path.resolve(components, "admin-lte/dist/js/app.min"),
       vuejs: path.resolve(components, "vue/dist/vue"),
       "vue-router": path.resolve(components, "vue-router/dist/vue-router"),
@@ -63,9 +71,9 @@ module.exports = {
         loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader' })
       },
       {
-        test: /\.(eot|svg|ttf|woff|woff2)$/,
+        test: /\.(eot|svg|ttf|woff|woff2|jpg)$/,
         // Output font files
-        loader: 'file-loader?name=fonts/[name].[ext]'
+        loader: 'file-loader?name=files/[name].[ext]'
       }
     ]
   },
