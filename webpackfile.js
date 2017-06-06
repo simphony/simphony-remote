@@ -5,7 +5,8 @@ var js = path.resolve(__dirname, "frontend");
 module.exports = {
   entry: {
     admin: path.resolve(js, "admin/main.js"),
-    user: path.resolve(js, "user/main.js")
+    user: path.resolve(js, "user/main.js"),
+    sharedDependencies: path.resolve(js, "sharedDependencies")
   },
 
   output: {
@@ -16,9 +17,11 @@ module.exports = {
   resolve: {
     extensions: ["*", ".js", ".vue"],
     alias: {
-      'external-dependencies': path.resolve(js, "externalDependencies"),
+      "external-dependencies": path.resolve(js, "externalDependencies"),
       lodash: path.resolve(components, "lodash/dist/lodash"),
       jquery: path.resolve(components, "admin-lte/plugins/jQuery/jquery-2.2.3.min"),
+      bootstrap: path.resolve(components, "admin-lte/bootstrap/js/bootstrap.min"),
+      "admin-lte": path.resolve(components, "admin-lte/dist/js/app.min"),
       vuejs: path.resolve(components, "vue/dist/vue"),
       "vue-router": path.resolve(components, "vue-router/dist/vue-router"),
       "vue-form": path.resolve(components, "vue-form/dist/vue-form"),
