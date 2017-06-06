@@ -1,3 +1,4 @@
+require("external-dependencies");
 let gamodule = require("gamodule");
 let ErrorDialog = require("ErrorDialog");
 let ApplicationListModel = require("./ApplicationListModel");
