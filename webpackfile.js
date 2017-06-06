@@ -4,17 +4,20 @@ var components = path.resolve(__dirname, "remoteappmanager/static/bower_componen
 var js = path.resolve(__dirname, "frontend");
 
 module.exports = {
+  // Input files for the bundles of JS/CSS
   entry: {
     admin: path.resolve(js, "admin/main.js"),
     user: path.resolve(js, "user/main.js"),
     sharedDependencies: path.resolve(js, "sharedDependencies")
   },
 
+  // Output bundle of JS
   output: {
     path: path.resolve(__dirname, "remoteappmanager/static/dist"),
     filename: "[name].js"
   },
 
+  // Aliases and file extensions supported
   resolve: {
     extensions: ["*", ".js", ".vue", ".css"],
     alias: {
@@ -39,6 +42,7 @@ module.exports = {
     }
   },
 
+  // Loaders for specific file extensions
   module: {
     rules: [
       {
@@ -57,10 +61,16 @@ module.exports = {
       {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader' })
+      },
+      {
+        test: /\.(eot|svg|ttf|woff|woff2)$/,
+        // Output font files
+        loader: 'file-loader?name=fonts/[name].[ext]'
       }
     ]
   },
 
+  // Output bundle of CSS
   plugins: [
     new ExtractTextPlugin("[name].css")
   ]
