@@ -17,7 +17,6 @@ module.exports = {
   resolve: {
     extensions: ["*", ".js", ".vue"],
     alias: {
-      "external-dependencies": path.resolve(js, "externalDependencies"),
       lodash: path.resolve(components, "lodash/dist/lodash"),
       jquery: path.resolve(components, "admin-lte/plugins/jQuery/jquery-2.2.3.min"),
       bootstrap: path.resolve(components, "admin-lte/bootstrap/js/bootstrap.min"),
