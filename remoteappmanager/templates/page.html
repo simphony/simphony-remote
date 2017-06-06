@@ -8,18 +8,7 @@
   <title>{% block title %}RemoteApp Manager{% endblock %}</title>
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-  <link rel="stylesheet" href="{{ static_url("bower_components/admin-lte/bootstrap/css/bootstrap.min.css") }}">
-  <link rel="stylesheet" href="{{ static_url("bower_components/font-awesome/css/font-awesome.min.css") }}">
-  <link rel="stylesheet" href="{{ static_url("bower_components/ionicons/css/ionicons.min.css") }}">
-  <link rel="stylesheet" href="{{ static_url("bower_components/admin-lte/dist/css/AdminLTE.min.css") }}">
-  <link rel="stylesheet" href="{{ static_url("bower_components/admin-lte/dist/css/skins/"+skin+".min.css")}}">
-
-  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
-  <script src="{{ static_url("bower_components/html5shiv/dist/html5shiv.min.js") }}"></script>
-  <script src="{{ static_url("bower_components/respond/dest/respond.min.js") }}"></script>
-  <![endif]-->
+  <link rel="stylesheet" href="{{ static_url("dist/sharedDependencies.css")}}">
 
   {% block stylesheet %}
   {% endblock %}
@@ -118,9 +107,7 @@
 
   <div id="error-dialog-container"></div>
 
-  <script src="{{ static_url("bower_components/admin-lte/plugins/jQuery/jquery-2.2.3.min.js") }}"></script>
-  <script src="{{ static_url("bower_components/admin-lte/bootstrap/js/bootstrap.min.js") }}"></script>
-  <script src="{{ static_url("bower_components/admin-lte/dist/js/app.min.js") }}"></script>
+  <script src="{{ static_url("dist/sharedDependencies.js") }}"></script>
 
   {% block script_init %}
     <script type="text/javascript">
