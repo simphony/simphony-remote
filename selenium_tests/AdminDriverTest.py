@@ -20,7 +20,7 @@ class AdminDriverTest(RemoteAppDriverTest):
         self.click_element_located(By.ID, "modal-cancel-btn")
         self.wait_until_modal_closed()
 
-    def click_user_policy(self, index=0):
+    def click_user_policies(self, index=0):
         self.click_element_located(By.ID, "row-{}-action-0".format(index))
 
     def click_remove_user(self, index=0):

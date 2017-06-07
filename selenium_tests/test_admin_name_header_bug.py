@@ -7,6 +7,6 @@ class TestAdminNameHeaderBug(AdminDriverTest):
         with self.logged_in():
             self.click_element_located(By.LINK_TEXT, "Users")
 
-            self.click_user_policy(0)
+            self.click_user_policies(0)
 
             self.wait_until_text_inside(By.CSS_SELECTOR, "span.hidden-xs", "admin")
