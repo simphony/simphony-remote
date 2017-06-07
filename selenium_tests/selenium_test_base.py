@@ -72,6 +72,15 @@ class SeleniumTestBase(unittest.TestCase):
     def select_application(self, index=0):
         self.click_element_located(By.ID, "application-entry-{}".format(index))
 
+    def open_application_settings(self):
+        self.click_element_located(By.ID, "application-settings")
+
+    def stop_selected_application(self):
+        self.click_element_located(By.ID, "stop-button")
+
+    def start_selected_application(self):
+        self.click_element_located(By.ID, "start-button")
+
     def close_alert_and_get_its_text(self):
         try:
             alert = self.driver.switch_to_alert()
@@ -158,5 +167,5 @@ class SeleniumTestBase(unittest.TestCase):
             finally:
                 self.select_application(index)
                 self.wait_until_element_present(By.ID, "application")
-                self.click_element_located(By.ID, "application-settings")
-                self.click_element_located(By.ID, "stop-button")
+                self.open_application_settings()
+                self.stop_selected_application()
