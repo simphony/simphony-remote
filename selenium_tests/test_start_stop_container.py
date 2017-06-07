@@ -9,12 +9,12 @@ class TestContainerInteraction(UserDriverTest):
             self.wait_until_application_list_loaded()
 
             self.select_application()
-            self.start_selected_application()
-            self.wait_until_selected_application_running()
+            self.start_application()
+            self.wait_until_application_running()
 
             self.open_application_settings()
-            self.stop_selected_application()
-            self.wait_until_selected_application_stopped()
+            self.stop_application()
+            self.wait_until_application_stopped()
 
     def test_focus(self):
         with self.running_container():
