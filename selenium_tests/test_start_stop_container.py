@@ -1,25 +1,21 @@
 # -*- coding: utf-8 -*-
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium_tests.selenium_test_base import SeleniumTestBase
+from selenium.webdriver.common.by import By
 
 
 class TestContainerInteraction(SeleniumTestBase):
     def test_start_stop_container(self):
         driver = self.driver
-        with self.login():
-            self.wait_for(lambda:
-                          driver.find_element_by_css_selector(
-                              "#loading-spinner").value_of_css_property(
-                              'display') == "none")
+        with self.logged_in():
+            self.wait_until_element_invisible(By.ID, "loading-spinner")
 
-            self.click_by_css_selector("#applistentries > li > a > img")
-            self.click_by_css_selector(".start-button")
+            self.click_element_located(By.CSS_SELECTOR, "#applistentries > li > a > img")
+            self.click_element_located(By.CLASS_NAME, "start-button")
 
-            driver.find_element_by_id("application")
-
-            self.click_by_css_selector(".dropdown > a > img")
-
-            self.click_by_css_selector("#stop-button")
+            self.wait_until_element_present(By.ID, "application")
+            self.click_element_located(By.CSS_SELECTOR, ".dropdown > a > img")
+            self.click_element_located(By.ID, "stop-button")
 
     def test_focus(self):
         driver = self.driver
@@ -33,6 +29,6 @@ class TestContainerInteraction(SeleniumTestBase):
 
             self.assertNotEqual(iframe, self.driver.switch_to.active_element)
 
-            self.click_by_css_selector("#applistentries > li > a > img")
+            self.click_element_located(By.CSS_SELECTOR, "#applistentries > li > a > img")
 
             self.assertEqual(iframe, self.driver.switch_to.active_element)

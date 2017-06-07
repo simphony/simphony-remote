@@ -3,6 +3,9 @@ import time
 import os
 import contextlib
 import sqlite3
+import selenium.webdriver.support.expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
@@ -23,6 +26,7 @@ class SeleniumTestBase(unittest.TestCase):
                                         capabilities=capabilities,
                                         timeout=60)
         self.driver.implicitly_wait(30)
+        self.wait = WebDriverWait(self.driver, 30)
         self.base_url = "https://127.0.0.1:8000/"
         self.verificationErrors = []
         self.accept_next_alert = True
@@ -38,19 +42,32 @@ class SeleniumTestBase(unittest.TestCase):
                     base_url=self.base_url))
             db.commit()
 
-    def is_element_present(self, how, what):
-        try:
-            self.driver.find_element(by=how, value=what)
-        except NoSuchElementException as e:
-            return False
-        return True
+    def wait_until_element_present(self, how, what):
+        return self.wait.until(EC.presence_of_element_located((how, what)))
 
-    def is_alert_present(self):
-        try:
-            self.driver.switch_to_alert()
-        except NoAlertPresentException as e:
-            return False
-        return True
+    def wait_until_alert_present(self):
+        return self.wait.until(EC.alert_is_present)
+
+    def wait_until_text_inside(self, how, what, text):
+        return self.wait.until(EC.text_to_be_present_in_element((how, what), text))
+
+    def wait_until_element_visible(self, how, what):
+        return self.wait.until(EC.visibility_of_element_located((how, what)))
+
+    def wait_until_element_invisible(self, how, what):
+        return self.wait.until(EC.invisibility_of_element_located((how, what)))
+
+    def wait_until_element_clickable(self, how, what):
+        return self.wait.until(EC.element_to_be_clickable((how, what)))
+
+    def click_element_located(self, how, what):
+        element = self.wait_until_element_clickable(how, what)
+        element.click()
+
+    def type_text_in_element_located(self, how, what, text):
+        element = self.wait_until_element_clickable(how, what)
+        element.clear()
+        element.send_keys(text)
 
     def close_alert_and_get_its_text(self):
         try:
@@ -74,12 +91,6 @@ class SeleniumTestBase(unittest.TestCase):
             time.sleep(1)
         else:
             self.fail("time out")
-
-    def click_by_css_selector(self, css_selector):
-        # Workaround for some unexpected behavior with clicking some elements.
-        self.driver.execute_script(
-            "arguments[0].click()",
-            self.driver.find_element_by_css_selector(css_selector))
 
     def click_button(self, button_text, number=0):
         """
@@ -108,42 +119,40 @@ class SeleniumTestBase(unittest.TestCase):
         self.driver.quit()
         self.assertEqual([], self.verificationErrors)
 
-    @contextlib.contextmanager
     def login(self, username="test"):
-        driver = self.driver
-        driver.get(self.base_url + "/hub/login")
+        self.driver.get(self.base_url + "/hub/login")
 
-        driver.find_element_by_id("username_input").clear()
-        driver.find_element_by_id("username_input").send_keys(username)
-        driver.find_element_by_id("password_input").clear()
-        driver.find_element_by_id("password_input").send_keys(username)
-        driver.find_element_by_id("login_submit").click()
+        self.type_text_in_element_located(By.ID, "username_input", username)
+        self.type_text_in_element_located(By.ID, "password_input", username)
+
+        self.click_element_located(By.ID, "login_submit")
+
+    def logout(self):
+        self.click_element_located(By.CLASS_NAME, "user-menu")
+        self.click_element_located(By.ID, "logout")
+        self.wait_until_text_inside(By.CSS_SELECTOR, "div.auth-form-header", "Sign in")
+
+    @contextlib.contextmanager
+    def logged_in(self, username="test"):
+        self.login(username)
 
         try:
             yield
         finally:
-            driver.find_element_by_css_selector(".user-menu").click()
-            driver.find_element_by_id("logout").click()
-            self.wait_for(
-                lambda: "Sign in" == driver.find_element_by_css_selector(
-                    "div.auth-form-header").text
-            )
+            self.logout()
 
     @contextlib.contextmanager
     def running_container(self):
-        with self.login():
+        with self.logged_in():
             driver = self.driver
-            self.wait_for(lambda:
-                          driver.find_element_by_css_selector(
-                              "#loading-spinner").value_of_css_property(
-                                  'display') == "none")
+            self.wait_until_element_invisible(By.ID, "loading-spinner")
 
-            self.click_by_css_selector("#applistentries > li > a > img")
-            self.click_by_css_selector(".start-button")
+            self.click_element_located(By.CSS_SELECTOR, "#applistentries > li > a > img")
+            self.click_element_located(By.CLASS_NAME, "start-button")
 
             try:
                 yield
             finally:
-                driver.find_element_by_id("application")
-                self.click_by_css_selector(".dropdown > a > img")
-                self.click_by_css_selector("#stop-button")
+                self.wait_until_element_present(By.ID, "application")
+                self.click_element_located(By.CSS_SELECTOR, ".dropdown > a > img")
+                self.click_element_located(By.ID, "stop-button")
