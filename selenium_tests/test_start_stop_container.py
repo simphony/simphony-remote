@@ -16,28 +16,6 @@ class TestContainerInteraction(SeleniumTestBase):
             self.stop_selected_application()
             self.wait_until_selected_application_stopped()
 
-    def test_start_stop_two_containers(self):
-        with self.logged_in():
-            self.wait_until_application_list_loaded()
-
-            self.select_application(0)
-            self.start_selected_application()
-            self.wait_until_selected_application_running()
-
-            self.select_application(1)
-            self.start_selected_application()
-            self.wait_until_selected_application_running()
-
-            self.select_application(0)
-            self.open_application_settings()
-            self.stop_selected_application()
-            self.wait_until_selected_application_stopped()
-
-            self.select_application(1)
-            self.open_application_settings()
-            self.stop_selected_application()
-            self.wait_until_selected_application_stopped()
-
     def test_focus(self):
         with self.running_container():
             iframe = self.wait_until_element_visible(By.TAG_NAME, "iframe")
