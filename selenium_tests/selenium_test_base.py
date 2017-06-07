@@ -90,16 +90,16 @@ class SeleniumTestBase(unittest.TestCase):
     def click_new_entry_button(self):
         self.click_element_located(By.ID, "global-action-0")
 
-    def submit_new_entry(self):
+    def click_submit_button(self):
         self.click_element_located(By.ID, "modal-submit-btn")
         self.wait_until_modal_closed()
 
-    def cancel_modal(self):
+    def click_cancel_button(self):
         self.click_element_located(By.ID, "modal-cancel-btn")
         self.wait_until_modal_closed()
 
     def wait_until_modal_closed(self):
-        self.wait.until_not(EC.alert_is_present())
+        return self.wait.until_not(EC.alert_is_present())
 
     def wait_for(self, check_func, timeout=30):
         for i in range(timeout):

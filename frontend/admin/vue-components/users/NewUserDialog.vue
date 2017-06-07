@@ -5,7 +5,7 @@
       <vue-form :state="formstate" v-model="formstate" @submit.prevent="createNewUser">
         <validate auto-label class="form-group required-field" :class="fieldClassName(formstate.name)">
           <label class="control-label">User Name</label>
-          <input type="text" name="name" class="form-control" required v-model.trim="model.name">
+          <input id="new-user-name" type="text" name="name" class="form-control" required v-model.trim="model.name">
           <field-messages name="name" show="$touched || $submitted">
             <span class="help-block" slot="required">User Name cannot be empty</span>
           </field-messages>
