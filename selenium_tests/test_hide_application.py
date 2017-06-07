@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 class TestHideApplication(SeleniumTestBase):
     def test_hide_application(self):
         with self.logged_in():
-            self.wait_until_element_invisible(By.ID, "loading-spinner")
+            self.wait_until_application_list_loaded()
 
             self.type_text_in_element_located(By.ID, "search-input", "foobarheho")
 

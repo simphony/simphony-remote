@@ -6,39 +6,37 @@ from selenium.webdriver.common.by import By
 class TestContainerInteraction(SeleniumTestBase):
     def test_start_stop_container(self):
         with self.logged_in():
-            self.wait_until_element_invisible(By.ID, "loading-spinner")
+            self.wait_until_application_list_loaded()
 
             self.select_application()
-
-            self.click_element_located(By.ID, "start-button")
-
-            self.wait_until_element_present(By.ID, "application")
+            self.start_selected_application()
+            self.wait_until_selected_application_running()
 
             self.open_application_settings()
             self.stop_selected_application()
-            self.wait_until_text_inside(By.ID, "start-button", "Start")
+            self.wait_until_selected_application_stopped()
 
     def test_start_stop_two_containers(self):
         with self.logged_in():
-            self.wait_until_element_invisible(By.ID, "loading-spinner")
+            self.wait_until_application_list_loaded()
 
             self.select_application(0)
             self.start_selected_application()
-            self.wait_until_element_present(By.ID, "application")
+            self.wait_until_selected_application_running()
 
             self.select_application(1)
             self.start_selected_application()
-            self.wait_until_element_present(By.ID, "application")
+            self.wait_until_selected_application_running()
 
             self.select_application(0)
             self.open_application_settings()
             self.stop_selected_application()
-            self.wait_until_text_inside(By.ID, "start-button", "Start")
+            self.wait_until_selected_application_stopped()
 
             self.select_application(1)
             self.open_application_settings()
             self.stop_selected_application()
-            self.wait_until_text_inside(By.ID, "start-button", "Start")
+            self.wait_until_selected_application_stopped()
 
     def test_focus(self):
         with self.running_container():
