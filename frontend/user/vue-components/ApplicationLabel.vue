@@ -1,6 +1,6 @@
 <template>
   <ul v-if="currentApp !== null" class="nav navbar-nav">
-    <li class="dropdown">
+    <li id="application-settings" class="dropdown">
       <a href="#" class="dropdown-toggle cust-padding" data-toggle="dropdown" aria-expanded="false">
         <img class="app-icon"
         :src="currentApp.appData.image.icon_128 | iconSrc">

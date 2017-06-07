@@ -69,6 +69,9 @@ class SeleniumTestBase(unittest.TestCase):
         element.clear()
         element.send_keys(text)
 
+    def select_application(self, index=0):
+        self.click_element_located(By.ID, "application-entry-{}".format(index))
+
     def close_alert_and_get_its_text(self):
         try:
             alert = self.driver.switch_to_alert()
@@ -128,7 +131,7 @@ class SeleniumTestBase(unittest.TestCase):
         self.click_element_located(By.ID, "login_submit")
 
     def logout(self):
-        self.click_element_located(By.CLASS_NAME, "user-menu")
+        self.click_element_located(By.ID, "user-menu")
         self.click_element_located(By.ID, "logout")
         self.wait_until_text_inside(By.CSS_SELECTOR, "div.auth-form-header", "Sign in")
 
@@ -142,17 +145,18 @@ class SeleniumTestBase(unittest.TestCase):
             self.logout()
 
     @contextlib.contextmanager
-    def running_container(self):
+    def running_container(self, index=0):
         with self.logged_in():
-            driver = self.driver
             self.wait_until_element_invisible(By.ID, "loading-spinner")
 
-            self.click_element_located(By.CSS_SELECTOR, "#applistentries > li > a > img")
-            self.click_element_located(By.CLASS_NAME, "start-button")
+            self.select_application(index)
+
+            self.click_element_located(By.ID, "start-button")
 
             try:
                 yield
             finally:
+                self.select_application(index)
                 self.wait_until_element_present(By.ID, "application")
-                self.click_element_located(By.CSS_SELECTOR, ".dropdown > a > img")
+                self.click_element_located(By.ID, "application-settings")
                 self.click_element_located(By.ID, "stop-button")
