@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from selenium_tests.selenium_test_base import SeleniumTestBase
+from selenium_tests.UserDriverTest import UserDriverTest
 from selenium.webdriver.common.by import By
 
 
-class TestContainerInteraction(SeleniumTestBase):
+class TestContainerInteraction(UserDriverTest):
     def test_start_stop_container(self):
         with self.logged_in():
             self.wait_until_application_list_loaded()

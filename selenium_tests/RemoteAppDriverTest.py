@@ -13,7 +13,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 import unittest
 
 
-class SeleniumTestBase(unittest.TestCase):
+class RemoteAppDriverTest(unittest.TestCase):
     def setUp(self):
         ff_binary = webdriver.firefox.firefox_binary.FirefoxBinary()
         ff_profile = webdriver.firefox.firefox_profile.FirefoxProfile()
@@ -66,78 +66,8 @@ class SeleniumTestBase(unittest.TestCase):
         element.clear()
         element.send_keys(text)
 
-    def select_application(self, index=0):
-        self.click_element_located(By.ID, "application-entry-{}".format(index))
-
-    def open_application_settings(self):
-        self.click_element_located(By.ID, "application-settings")
-
-    def stop_selected_application(self):
-        self.click_element_located(By.ID, "stop-button")
-
-    def start_selected_application(self):
-        self.click_element_located(By.ID, "start-button")
-
-    def wait_until_selected_application_running(self):
-        self.wait_until_element_present(By.ID, "application")
-
-    def wait_until_selected_application_stopped(self):
-        self.wait_until_text_inside(By.ID, "start-button", "Start")
-
-    def wait_until_application_list_loaded(self):
-        self.wait_until_element_invisible(By.ID, "loading-spinner")
-
-    def click_new_entry_button(self):
-        self.click_element_located(By.ID, "global-action-0")
-
-    def click_submit_button(self):
-        self.click_element_located(By.ID, "modal-submit-btn")
-        self.wait_until_modal_closed()
-
-    def click_cancel_button(self):
-        self.click_element_located(By.ID, "modal-cancel-btn")
-        self.wait_until_modal_closed()
-
     def wait_until_modal_closed(self):
         return self.wait.until_not(EC.alert_is_present())
-
-    def wait_for(self, check_func, timeout=30):
-        for i in range(timeout):
-            try:
-                if check_func():
-                    break
-            except:
-                pass
-            time.sleep(1)
-        else:
-            self.fail("time out")
-
-    def click_button(self, button_text, number=0):
-        """
-        Clicks a button with a given text.
-
-        Parameters
-        ----------
-        button_text: str
-            The text of the button
-        number: int
-            If multiple buttons with the same label are found, click
-            the number-th (zero based). If not specified, the first (0th)
-            button will be clicked.
-        """
-        self.wait_for(
-            lambda: len(self.get_buttons_by_text(button_text)) > number)
-
-        button = self.get_buttons_by_text(button_text)[number]
-        self.driver.execute_script("arguments[0].click()", button)
-
-    def get_buttons_by_text(self, text):
-        return [button for button in self.driver.find_elements_by_tag_name("button")
-                if button.text == text]
-
-    def tearDown(self):
-        self.driver.quit()
-        self.assertEqual([], self.verificationErrors)
 
     def login(self, username="test"):
         self.driver.get(self.base_url + "/hub/login")
@@ -152,29 +82,6 @@ class SeleniumTestBase(unittest.TestCase):
         self.click_element_located(By.ID, "logout")
         self.wait_until_text_inside(By.CSS_SELECTOR, "div.auth-form-header", "Sign in")
 
-    @contextlib.contextmanager
-    def logged_in(self, username="test"):
-        self.login(username)
-
-        try:
-            yield
-        finally:
-            self.logout()
-
-    @contextlib.contextmanager
-    def running_container(self, index=0):
-        with self.logged_in():
-            self.wait_until_application_list_loaded()
-
-            self.select_application(index)
-
-            self.start_selected_application()
-
-            try:
-                yield
-            finally:
-                self.select_application(index)
-                self.wait_until_selected_application_running()
-                self.open_application_settings()
-                self.stop_selected_application()
-                self.wait_until_selected_application_stopped()
+    def tearDown(self):
+        self.driver.quit()
+        self.assertEqual([], self.verificationErrors)
