@@ -1,5 +1,5 @@
-var Vue = require("vuejs");
-var ErrorDialog = require("vue/ErrorDialog");
+var Vue = require("vue");
+var ErrorDialog = require("ErrorDialog");
 
 QUnit.module("ErrorDialog");
 QUnit.test("rendering errors one by one", function (assert) {

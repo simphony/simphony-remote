@@ -1,5 +1,5 @@
 let _ = require("lodash");
-let Vue = require("vuejs");
+let Vue = require("vue");
 let VueRouter = require("vue-router");
 let VueForm = require("vue-form");
 require("toolkit");

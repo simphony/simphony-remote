@@ -1,6 +1,5 @@
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var path = require("path");
-var components = path.resolve(__dirname, "remoteappmanager/static/bower_components");
 var js = path.resolve(__dirname, "frontend");
 
 module.exports = {
@@ -22,21 +21,16 @@ module.exports = {
     extensions: ["*", ".js", ".vue", ".css"],
     alias: {
       // CSS
-      "bootstrap-css": path.resolve(components, "admin-lte/bootstrap/css/bootstrap.min"),
-      "font-awesome-css": path.resolve(components, "font-awesome/css/font-awesome.min"),
-      "ionicons-css": path.resolve(components, "ionicons/css/ionicons.min"),
-      "admin-lte-css": path.resolve(components, "admin-lte/dist/css/AdminLTE.min"),
-      "skin-black-css": path.resolve(components, "admin-lte/dist/css/skins/skin-black.min"),
-      "skin-red-css": path.resolve(components, "admin-lte/dist/css/skins/skin-red.min"),
+      "bootstrap-css": "admin-lte/bootstrap/css/bootstrap.min",
+      "font-awesome-css": "font-awesome/css/font-awesome.min",
+      "ionicons-css": "ionicons/dist/css/ionicons.min",
+      "admin-lte-css": "admin-lte/dist/css/AdminLTE.min",
+      "skin-black-css": "admin-lte/dist/css/skins/skin-black.min",
+      "skin-red-css": "admin-lte/dist/css/skins/skin-red.min",
 
       // JS
-      lodash: path.resolve(components, "lodash/dist/lodash"),
-      jquery: path.resolve(components, "admin-lte/plugins/jQuery/jquery-2.2.3.min"),
-      bootstrap: path.resolve(components, "admin-lte/bootstrap/js/bootstrap.min"),
-      "admin-lte": path.resolve(components, "admin-lte/dist/js/app.min"),
-      vuejs: path.resolve(components, "vue/dist/vue"),
-      "vue-router": path.resolve(components, "vue-router/dist/vue-router"),
-      "vue-form": path.resolve(components, "vue-form/dist/vue-form"),
+      vue: "vue/dist/vue",
+      "vue-router": "vue-router/dist/vue-router",
 
       "admin-resources": path.resolve(js, "admin/admin-resources"),
       "user-resources": path.resolve(js, "user/user-resources"),

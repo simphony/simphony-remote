@@ -1,6 +1,5 @@
 var path = require("path");
 var tests = path.resolve(__dirname, "frontend/tests");
-var components = path.resolve(__dirname, "remoteappmanager/static/bower_components");
 var js = path.resolve(__dirname, "frontend");
 
 module.exports = {
@@ -16,19 +15,16 @@ module.exports = {
   resolve: {
     extensions: ["*", ".js", ".vue"],
     alias: {
-      lodash: path.resolve(components, "lodash/dist/lodash"),
-      jquery: path.resolve(components, "admin-lte/plugins/jQuery/jquery-2.2.3.min"),
-      vuejs: path.resolve(components, "vue/dist/vue"),
-      "vue-router": path.resolve(components, "vue-router/dist/vue-router"),
-      "vue-form": path.resolve(components, "vue-form/dist/vue-form"),
+      vue: "vue/dist/vue",
+      "vue-router": "vue-router/dist/vue-router",
 
       "user-resources": path.resolve(tests, "tests/user/mock_jsapi"),
       gamodule: path.resolve(js, "gamodule"),
       urlutils: path.resolve(js, "urlutils"),
       utils: path.resolve(js, "utils"),
 
-      vue: path.resolve(js, "vue"),
       filters: path.resolve(js, "vue/filters"),
+      ErrorDialog: path.resolve(js, "vue/ErrorDialog"),
       toolkit: path.resolve(js, "vue/toolkit/toolkit"),
       "toolkit-dir": path.resolve(js, "vue/toolkit"),
 

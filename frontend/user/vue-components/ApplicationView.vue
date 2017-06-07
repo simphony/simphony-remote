@@ -71,7 +71,7 @@
 
 <script>
   let $ = require("jquery");
-  let Vue = require("vuejs");
+  let Vue = require("vue");
   let urlUtils = require("urlutils");
   let utils = require("utils");
   require("toolkit");

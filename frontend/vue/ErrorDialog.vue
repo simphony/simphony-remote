@@ -11,7 +11,7 @@
 </template>
 
 <script>
-  let Vue = require("vuejs");
+  let Vue = require("vue");
   require("toolkit");
 
   module.exports = Vue.extend({

@@ -1,4 +1,4 @@
-let Vue = require("vuejs");
+let Vue = require("vue");
 let ApplicationListModel = require("user/ApplicationListModel");
 let ApplicationListView = require("user/vue-components/ApplicationListView");
 require("filters");

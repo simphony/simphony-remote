@@ -1,4 +1,4 @@
-let Vue = require("vuejs");
+let Vue = require("vue");
 let ConfirmDialog = require("./ConfirmDialog");
 let ModalDialog = require("./ModalDialog");
 let AdminLTEBox = require("./AdminLTEBox");

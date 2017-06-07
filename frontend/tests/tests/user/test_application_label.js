@@ -1,5 +1,5 @@
 let $ = require("jquery");
-let Vue = require("vuejs");
+let Vue = require("vue");
 let ApplicationListModel = require("user/ApplicationListModel");
 let ApplicationLabel = require("user/vue-components/ApplicationLabel");
 require("filters");

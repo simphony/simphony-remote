@@ -35,7 +35,6 @@ deps:
 	node --version
 	npm --version
 	npm install
-	`npm bin`/bower install
 
 .PHONY: pythondeps
 pythondeps:
