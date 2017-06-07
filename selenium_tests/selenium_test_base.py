@@ -45,9 +45,6 @@ class SeleniumTestBase(unittest.TestCase):
     def wait_until_element_present(self, how, what):
         return self.wait.until(EC.presence_of_element_located((how, what)))
 
-    def wait_until_alert_present(self):
-        return self.wait.until(EC.alert_is_present)
-
     def wait_until_text_inside(self, how, what, text):
         return self.wait.until(EC.text_to_be_present_in_element((how, what), text))
 
@@ -90,17 +87,19 @@ class SeleniumTestBase(unittest.TestCase):
     def wait_until_application_list_loaded(self):
         self.wait_until_element_invisible(By.ID, "loading-spinner")
 
-    def close_alert_and_get_its_text(self):
-        try:
-            alert = self.driver.switch_to_alert()
-            alert_text = alert.text
-            if self.accept_next_alert:
-                alert.accept()
-            else:
-                alert.dismiss()
-            return alert_text
-        finally:
-            self.accept_next_alert = True
+    def click_new_entry_button(self):
+        self.click_element_located(By.ID, "global-action-0")
+
+    def submit_new_entry(self):
+        self.click_element_located(By.ID, "modal-submit-btn")
+        self.wait_until_modal_closed()
+
+    def cancel_modal(self):
+        self.click_element_located(By.ID, "modal-cancel-btn")
+        self.wait_until_modal_closed()
+
+    def wait_until_modal_closed(self):
+        self.wait.until_not(EC.alert_is_present())
 
     def wait_for(self, check_func, timeout=30):
         for i in range(timeout):

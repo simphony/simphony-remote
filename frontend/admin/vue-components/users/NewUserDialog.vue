@@ -11,8 +11,8 @@
           </field-messages>
         </validate>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" @click="close()">Cancel</button>
-          <button class="btn btn-primary" type="submit" :disabled="formstate.$invalid">Submit</button>
+          <button id="modal-cancel-btn" type="button" class="btn btn-default" @click="close()">Cancel</button>
+          <button id="modal-submit-btn" class="btn btn-primary" type="submit" :disabled="formstate.$invalid">Submit</button>
         </div>
       </vue-form>
     </div>

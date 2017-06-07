@@ -11,7 +11,6 @@
     :rowActions="table.rowActions">
     </data-table>
     <new-user-dialog
-    v-if="newUserDialog.visible"
     :show="newUserDialog.visible"
     @created="newUserCreated"
     @closed="newUserDialog.visible = false;"></new-user-dialog>
