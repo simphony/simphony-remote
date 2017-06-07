@@ -20,7 +20,8 @@
               <td v-else>{{value}}</td>
             </template>
             <td>
-              <button v-for="action in rowActions"
+              <button v-for="(action, action_index) in rowActions"
+              :id="'row-' + row_index + '-action-' + action_index"
               :class="buttonClassFromType(action.type)"
               style="margin-right: 10px"
               @click="action.callback(row)">{{action.label}}</button>
