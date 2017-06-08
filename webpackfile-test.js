@@ -15,6 +15,7 @@ module.exports = {
   resolve: {
     extensions: ["*", ".js", ".vue"],
     alias: {
+      jquery: "admin-lte/plugins/jQuery/jquery-2.2.3.min",
       vue: "vue/dist/vue",
       "vue-router": "vue-router/dist/vue-router",
 
