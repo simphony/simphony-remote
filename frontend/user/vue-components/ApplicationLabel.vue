@@ -30,7 +30,7 @@
               :class="{ 'disabled-entry': !(currentApp.isRunning() && clipboardSupported) }"
               :data-clipboard-text="sharedUrl">
                 <i class="fa fa-clipboard text-light-blue"></i>
-                Share (copy url to clipboard)
+                Share session
               </a>
             </li>
 
