@@ -7,6 +7,6 @@ class TestLoginLogout(RemoteAppDriverTest):
     def test_login_logout(self):
         self.login("test")
 
-        self.wait_until_element_visible(By.ID, "applistentries")
+        self.wait_until_visibility_of_element_located(By.ID, "applistentries")
 
         self.logout()

@@ -10,4 +10,4 @@ class TestHideApplication(UserDriverTest):
 
             self.type_text_in_element_located(By.ID, "search-input", "foobarheho")
 
-            self.wait_until_text_inside(By.ID, "applistentries", "")
+            self.wait_until_text_inside_element_located(By.ID, "applistentries", "")

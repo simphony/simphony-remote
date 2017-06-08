@@ -18,13 +18,13 @@ class UserDriverTest(RemoteAppDriverTest):
         self.click_first_element_located(By.ID, "start-button")
 
     def wait_until_application_running(self):
-        self.wait_until_element_present(By.ID, "application")
+        self.wait_until_presence_of_element_located(By.ID, "application")
 
     def wait_until_application_stopped(self):
-        self.wait_until_text_inside(By.ID, "start-button", "Start")
+        self.wait_until_text_inside_element_located(By.ID, "start-button", "Start")
 
     def wait_until_application_list_loaded(self):
-        self.wait_until_element_invisible(By.ID, "loading-spinner")
+        self.wait_until_invisibility_of_element_located(By.ID, "loading-spinner")
 
     @contextlib.contextmanager
     def logged_in(self, username="test"):

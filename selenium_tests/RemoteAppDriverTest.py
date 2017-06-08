@@ -42,23 +42,33 @@ class RemoteAppDriverTest(unittest.TestCase):
                     base_url=self.base_url))
             db.commit()
 
-    def wait_until_element_present(self, how, what):
+    def wait_until_presence_of_element_located(self, how, what):
         return self.wait.until(EC.presence_of_element_located((how, what)))
 
-    def wait_until_text_inside(self, how, what, text):
+    def wait_until_text_inside_element_located(self, how, what, text):
         return self.wait.until(EC.text_to_be_present_in_element((how, what), text))
 
-    def wait_until_element_visible(self, how, what):
+    def wait_until_visibility_of_element_located(self, how, what):
         return self.wait.until(EC.visibility_of_element_located((how, what)))
 
-    def wait_until_element_invisible(self, how, what):
+    def wait_until_visibility_of(self, element):
+        return self.wait.until(EC.visibility_of(element))
+
+    def wait_until_invisibility_of_element_located(self, how, what):
         return self.wait.until(EC.invisibility_of_element_located((how, what)))
 
-    def wait_until_element_clickable(self, how, what):
+    def wait_until_clickability_of_element_located(self, how, what):
         return self.wait.until(EC.element_to_be_clickable((how, what)))
 
+    def wait_until_clickability_of(self, element):
+        pass
+
     def click_first_element_located(self, how, what):
-        element = self.wait_until_element_clickable(how, what)
+        element = self.wait_until_clickability_of_element_located(how, what)
+        element.click()
+
+    def click_element(self, element):
+        self.wait_until_clickability_of(element)
         element.click()
 
     def click_first_button(self, name):
@@ -67,7 +77,7 @@ class RemoteAppDriverTest(unittest.TestCase):
         )
 
     def type_text_in_element_located(self, how, what, text):
-        element = self.wait_until_element_clickable(how, what)
+        element = self.wait_until_clickability_of_element_located(how, what)
         element.clear()
         element.send_keys(text)
 
@@ -85,7 +95,7 @@ class RemoteAppDriverTest(unittest.TestCase):
     def logout(self):
         self.click_first_element_located(By.ID, "user-menu")
         self.click_first_element_located(By.ID, "logout")
-        self.wait_until_text_inside(By.CSS_SELECTOR, "div.auth-form-header", "Sign in")
+        self.wait_until_text_inside_element_located(By.CSS_SELECTOR, "div.auth-form-header", "Sign in")
 
     def tearDown(self):
         self.driver.quit()

@@ -9,4 +9,4 @@ class TestAdminNameHeaderBug(AdminDriverTest):
 
             self.click_user_policies(0)
 
-            self.wait_until_text_inside(By.CSS_SELECTOR, "span.hidden-xs", "admin")
+            self.wait_until_text_inside_element_located(By.CSS_SELECTOR, "span.hidden-xs", "admin")

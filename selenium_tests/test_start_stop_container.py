@@ -18,7 +18,7 @@ class TestContainerInteraction(UserDriverTest):
 
     def test_focus(self):
         with self.running_container():
-            iframe = self.wait_until_element_visible(By.TAG_NAME, "iframe")
+            iframe = self.wait_until_visibility_of_element_located(By.TAG_NAME, "iframe")
             self.assertEqual(iframe, self.driver.switch_to.active_element)
 
             self.type_text_in_element_located(By.ID, "search-input", "")
