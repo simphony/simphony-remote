@@ -61,6 +61,11 @@ class RemoteAppDriverTest(unittest.TestCase):
         element = self.wait_until_element_clickable(how, what)
         element.click()
 
+    def click_first_button(self, name):
+        self.click_first_element_located(
+            By.XPATH, "//button[contains(text(),'{}')]".format(name)
+        )
+
     def type_text_in_element_located(self, how, what, text):
         element = self.wait_until_element_clickable(how, what)
         element.clear()
