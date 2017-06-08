@@ -5,14 +5,14 @@ from selenium.webdriver.common.by import By
 class TestCreateNewUser(AdminDriverTest):
     def test_cancel(self):
         with self.logged_in():
-            self.click_element_located(By.LINK_TEXT, "Users")
+            self.click_first_element_located(By.LINK_TEXT, "Users")
 
             self.click_new_entry_button()
             self.click_cancel_button()
 
     def test_create_and_remove_user(self):
         with self.logged_in():
-            self.click_element_located(By.LINK_TEXT, "Users")
+            self.click_first_element_located(By.LINK_TEXT, "Users")
 
             self.click_new_entry_button()
             self.type_text_in_element_located(By.CSS_SELECTOR, ".modal-body > form > div > input", "mrenou")

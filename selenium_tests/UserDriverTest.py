@@ -6,16 +6,16 @@ from selenium.webdriver.common.by import By
 
 class UserDriverTest(RemoteAppDriverTest):
     def select_application(self, index=0):
-        self.click_element_located(By.ID, "application-entry-{}".format(index))
+        self.click_first_element_located(By.ID, "application-entry-{}".format(index))
 
     def open_application_settings(self):
-        self.click_element_located(By.ID, "application-settings")
+        self.click_first_element_located(By.ID, "application-settings")
 
     def stop_application(self):
-        self.click_element_located(By.ID, "stop-button")
+        self.click_first_element_located(By.ID, "stop-button")
 
     def start_application(self):
-        self.click_element_located(By.ID, "start-button")
+        self.click_first_element_located(By.ID, "start-button")
 
     def wait_until_application_running(self):
         self.wait_until_element_present(By.ID, "application")

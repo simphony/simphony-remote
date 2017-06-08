@@ -57,7 +57,7 @@ class RemoteAppDriverTest(unittest.TestCase):
     def wait_until_element_clickable(self, how, what):
         return self.wait.until(EC.element_to_be_clickable((how, what)))
 
-    def click_element_located(self, how, what):
+    def click_first_element_located(self, how, what):
         element = self.wait_until_element_clickable(how, what)
         element.click()
 
@@ -75,11 +75,11 @@ class RemoteAppDriverTest(unittest.TestCase):
         self.type_text_in_element_located(By.ID, "username_input", username)
         self.type_text_in_element_located(By.ID, "password_input", username)
 
-        self.click_element_located(By.ID, "login_submit")
+        self.click_first_element_located(By.ID, "login_submit")
 
     def logout(self):
-        self.click_element_located(By.ID, "user-menu")
-        self.click_element_located(By.ID, "logout")
+        self.click_first_element_located(By.ID, "user-menu")
+        self.click_first_element_located(By.ID, "logout")
         self.wait_until_text_inside(By.CSS_SELECTOR, "div.auth-form-header", "Sign in")
 
     def tearDown(self):
