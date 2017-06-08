@@ -20,20 +20,13 @@ class AdminDriverTest(RemoteAppDriverTest):
         self.click_first_button("Cancel")
         self.wait_until_modal_closed()
 
-    def _get_table_element(self, name):
-        # Select row which contains somewhere the given name
-        return self.driver.find_element_by_xpath(
-            "//tr[td[text()='{}']]".format(name)
-        )
-
     def trigger_row_action(self, row, action_name):
-        # Select row
-        row = self._get_table_element(row)
-        # Get action button
-        action_btn = row.find_element_by_xpath(
-            "td/button[text()='{}']".format(action_name)
+        self.click_first_element_located(
+            By.XPATH,
+            "//tr[td[text()='{}']]/td/button[text()='{}']".format(
+                row, action_name
+            )
         )
-        self.click_element(action_btn)
 
     @contextlib.contextmanager
     def logged_in(self):
