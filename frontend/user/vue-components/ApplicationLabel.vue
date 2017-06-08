@@ -12,14 +12,14 @@
         <li>
           <ul class="menu">
 
-            <!-- Stop button -->
+            <!-- Quit button -->
             <li>
               <a href="#"
-              id="stop-button"
+              id="quit-button"
               :class="{ 'disabled-entry': !currentApp.isRunning() }"
               @click="stopApplication()">
                 <i class="fa fa-times text-danger"></i>
-                Stop Application
+                Quit
               </a>
             </li>
 

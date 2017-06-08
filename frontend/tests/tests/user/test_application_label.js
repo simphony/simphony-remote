@@ -42,7 +42,7 @@ QUnit.test("application name", function(assert) {
   });
 });
 
-QUnit.test("rendering stop button", function (assert) {
+QUnit.test("rendering quit button", function (assert) {
   let done = assert.async();
 
   assert.equal(
@@ -50,18 +50,18 @@ QUnit.test("rendering stop button", function (assert) {
     model.appList[0].appData.image.ui_name
   );
 
-  // Test stop button disabled
+  // Test quit button disabled
   assert.ok(
-    appLabel.$el.querySelector('#stop-button').classList.contains('disabled-entry')
+    appLabel.$el.querySelector('#quit-button').classList.contains('disabled-entry')
   );
 
   // Select running application
   model.selectedIndex = 1;
 
-  // Test stop button enabled
+  // Test quit button enabled
   Vue.nextTick(function() {
     assert.notOk(
-      appLabel.$el.querySelector('#stop-button').classList.contains('disabled-entry')
+      appLabel.$el.querySelector('#quit-button').classList.contains('disabled-entry')
     );
 
     done();
