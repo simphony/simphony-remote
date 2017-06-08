@@ -11,10 +11,7 @@
 </template>
 
 <script>
-  let Vue = require("vue");
-  require("toolkit");
-
-  module.exports = Vue.extend({
+  module.exports = {
     data: function() {
       return { errorList: [] };
     },
@@ -29,5 +26,5 @@
         this.errorList.splice(0, this.errorList.length);
       }
     }
-  });
+  };
 </script>

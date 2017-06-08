@@ -1,7 +1,7 @@
 let Vue = require("vue");
 let ApplicationListModel = require("user/ApplicationListModel");
 let ApplicationListView = require("user/vue-components/ApplicationListView");
-require("filters");
+require("toolkit");
 
 let model, appListView;
 

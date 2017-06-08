@@ -2,7 +2,7 @@ let $ = require("jquery");
 let Vue = require("vue");
 let ApplicationListModel = require("user/ApplicationListModel");
 let ApplicationView = require("user/vue-components/ApplicationView");
-require("filters");
+require("toolkit");
 
 let model, appView;
 
