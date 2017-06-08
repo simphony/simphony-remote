@@ -5,6 +5,10 @@ from selenium.webdriver.common.by import By
 
 
 class UserDriverTest(RemoteAppDriverTest):
+    def setUp(self):
+        RemoteAppDriverTest.setUp(self)
+        self.login("test")
+
     def select_application(self, index=0):
         self.click_first_element_located(By.ID, "application-entry-{}".format(index))
 
@@ -27,26 +31,21 @@ class UserDriverTest(RemoteAppDriverTest):
         self.wait_until_invisibility_of_element_located(By.ID, "loading-spinner")
 
     @contextlib.contextmanager
-    def logged_in(self, username="test"):
-        self.login(username)
+    def running_container(self, index=0):
+        self.wait_until_application_list_loaded()
+
+        self.select_application(index)
+        self.start_application()
+
         try:
             yield
         finally:
-            self.logout()
-
-    @contextlib.contextmanager
-    def running_container(self, index=0):
-        with self.logged_in():
-            self.wait_until_application_list_loaded()
-
             self.select_application(index)
-            self.start_application()
+            self.wait_until_application_running()
+            self.open_application_settings()
+            self.stop_application()
+            self.wait_until_application_stopped()
 
-            try:
-                yield
-            finally:
-                self.select_application(index)
-                self.wait_until_application_running()
-                self.open_application_settings()
-                self.stop_application()
-                self.wait_until_application_stopped()
+    def tearDown(self):
+        self.logout()
+        RemoteAppDriverTest.tearDown(self)

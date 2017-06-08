@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-import contextlib
 from selenium_tests.RemoteAppDriverTest import RemoteAppDriverTest
 from selenium.webdriver.common.by import By
 
 
 class AdminDriverTest(RemoteAppDriverTest):
+    def setUp(self):
+        RemoteAppDriverTest.setUp(self)
+        self.login("admin")
+
     def click_new_entry_button(self):
         self.click_first_button("Create New Entry")
 
@@ -28,10 +31,6 @@ class AdminDriverTest(RemoteAppDriverTest):
             )
         )
 
-    @contextlib.contextmanager
-    def logged_in(self):
-        self.login("admin")
-        try:
-            yield
-        finally:
-            self.logout()
+    def tearDown(self):
+        self.logout()
+        RemoteAppDriverTest.tearDown(self)

@@ -5,16 +5,15 @@ from selenium.webdriver.common.by import By
 
 class TestContainerInteraction(UserDriverTest):
     def test_start_stop_container(self):
-        with self.logged_in():
-            self.wait_until_application_list_loaded()
+        self.wait_until_application_list_loaded()
 
-            self.select_application()
-            self.start_application()
-            self.wait_until_application_running()
+        self.select_application()
+        self.start_application()
+        self.wait_until_application_running()
 
-            self.open_application_settings()
-            self.stop_application()
-            self.wait_until_application_stopped()
+        self.open_application_settings()
+        self.stop_application()
+        self.wait_until_application_stopped()
 
     def test_focus(self):
         with self.running_container():
