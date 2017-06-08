@@ -13,6 +13,19 @@ from selenium.webdriver.common.action_chains import ActionChains
 import unittest
 
 
+# Missing EC class
+class clickability_of(object):
+    def __init__(self, element):
+        self.element = element
+
+    def __call__(self, driver):
+        element = EC.visibility_of(self.element)(driver)
+        if element and element.is_enabled():
+            return element
+        else:
+            return false
+
+
 class RemoteAppDriverTest(unittest.TestCase):
     def setUp(self):
         ff_binary = webdriver.firefox.firefox_binary.FirefoxBinary()
@@ -61,7 +74,7 @@ class RemoteAppDriverTest(unittest.TestCase):
         return self.wait.until(EC.element_to_be_clickable((how, what)))
 
     def wait_until_clickability_of(self, element):
-        pass
+        return self.wait.until(clickability_of(element))
 
     def click_first_element_located(self, how, what):
         element = self.wait_until_clickability_of_element_located(how, what)
@@ -73,7 +86,7 @@ class RemoteAppDriverTest(unittest.TestCase):
 
     def click_first_button(self, name):
         self.click_first_element_located(
-            By.XPATH, "//button[contains(text(),'{}')]".format(name)
+            By.XPATH, "//button[text()='{}']".format(name)
         )
 
     def type_text_in_element_located(self, how, what, text):

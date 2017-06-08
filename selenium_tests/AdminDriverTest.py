@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 
 class AdminDriverTest(RemoteAppDriverTest):
     def click_new_entry_button(self):
-        self.click_first_element_located(By.ID, "global-action-0")
+        self.click_first_button("Create New Entry")
 
     def click_submit_button(self):
         self.click_first_button("Submit")
@@ -20,11 +20,20 @@ class AdminDriverTest(RemoteAppDriverTest):
         self.click_first_button("Cancel")
         self.wait_until_modal_closed()
 
-    def click_user_policies(self, index=0):
-        self.click_first_element_located(By.ID, "row-{}-action-0".format(index))
+    def _get_table_element(self, name):
+        # Select row which contains somewhere the given name
+        return self.driver.find_element_by_xpath(
+            "//tr[td[text()='{}']]".format(name)
+        )
 
-    def click_remove_user(self, index=0):
-        self.click_first_element_located(By.ID, "row-{}-action-1".format(index))
+    def trigger_row_action(self, row, action_name):
+        # Select row
+        row = self._get_table_element(row)
+        # Get action button
+        action_btn = row.find_element_by_xpath(
+            "td/button[text()='{}']".format(action_name)
+        )
+        self.click_element(action_btn)
 
     @contextlib.contextmanager
     def logged_in(self):

@@ -1,8 +1,7 @@
 <template>
   <div class="column-container">
     <div class="align-right">
-      <button v-for="(action, action_index) in globalActions"
-      :id="'global-action-' + action_index" class="btn btn-primary"
+      <button v-for="action in globalActions"
       @click="action.callback">{{action.label}}</button>
     </div>
     <div class="table-responsive">
@@ -20,8 +19,7 @@
               <td v-else>{{value}}</td>
             </template>
             <td>
-              <button v-for="(action, action_index) in rowActions"
-              :id="'row-' + row_index + '-action-' + action_index"
+              <button v-for="action in rowActions"
               :class="buttonClassFromType(action.type)"
               style="margin-right: 10px"
               @click="action.callback(row)">{{action.label}}</button>

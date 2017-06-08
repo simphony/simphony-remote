@@ -19,6 +19,6 @@ class TestCreateNewUser(AdminDriverTest):
             self.click_submit_button()
 
             # Click remove button
-            self.click_remove_user(1)
+            self.trigger_row_action("mrenou", "Remove")
 
             self.click_ok_button()
