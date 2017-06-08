@@ -17,7 +17,7 @@
               <a href="#"
               id="share-button"
               :class="{ 'disabled-entry': !currentApp.isRunning() }"
-              @click="shareModalVisible = true">
+              @click="shareDialogVisible = true">
                 <i class="fa fa-clipboard text-light-blue"></i>
                 Share session
               </a>
@@ -28,7 +28,7 @@
               <a href="#"
               id="quit-button"
               :class="{ 'disabled-entry': !currentApp.isRunning() }"
-              @click="stopApplication()">
+              @click="quitDialogVisible = true">
                 <i class="fa fa-times text-danger"></i>
                 Quit
               </a>
@@ -40,7 +40,7 @@
       </ul>
 
       <!-- Modal dialog for the share button -->
-      <modal-dialog v-if="shareModalVisible">
+      <modal-dialog v-if="shareDialogVisible">
         <div class="modal-header"><h4>Share Session</h4></div>
         <div class="modal-body">
           <div class="input-group">
@@ -53,9 +53,17 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" @click="shareModalVisible = false">Close</button>
+          <button type="button" class="btn btn-default" @click="shareDialogVisible = false">Close</button>
         </div>
       </modal-dialog>
+
+      <!-- Modal dialog for the quit button -->
+      <confirm-dialog
+      v-if="quitDialogVisible"
+      :okCallback="() => {quitDialogVisible = false; stopApplication();}"
+      :closeCallback="() => {quitDialogVisible = false;}">
+          <div>Are you sure you want to quit {{ currentApp.appData.image | appName }} ? (irreversible)</div>
+      </confirm-dialog>
     </li>
   </ul>
 </template>
@@ -70,7 +78,7 @@
 
   module.exports = Vue.extend({
     data: function() {
-      return { shareModalVisible: false };
+      return { shareDialogVisible: false, quitDialogVisible: false };
     },
 
     mounted: function() {
