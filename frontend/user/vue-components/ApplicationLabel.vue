@@ -12,17 +12,6 @@
         <li>
           <ul class="menu">
 
-            <!-- Quit button -->
-            <li>
-              <a href="#"
-              id="quit-button"
-              :class="{ 'disabled-entry': !currentApp.isRunning() }"
-              @click="stopApplication()">
-                <i class="fa fa-times text-danger"></i>
-                Quit
-              </a>
-            </li>
-
             <!-- Share button -->
             <li>
               <a href="#"
@@ -31,6 +20,17 @@
               :data-clipboard-text="sharedUrl">
                 <i class="fa fa-clipboard text-light-blue"></i>
                 Share session
+              </a>
+            </li>
+
+            <!-- Quit button -->
+            <li>
+              <a href="#"
+              id="quit-button"
+              :class="{ 'disabled-entry': !currentApp.isRunning() }"
+              @click="stopApplication()">
+                <i class="fa fa-times text-danger"></i>
+                Quit
               </a>
             </li>
 
