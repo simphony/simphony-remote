@@ -9,15 +9,15 @@ class AdminDriverTest(RemoteAppDriverTest):
         self.click_element_located(By.ID, "global-action-0")
 
     def click_submit_button(self):
-        self.click_element_located(By.ID, "modal-submit-btn")
+        self.click_element_located(By.XPATH, "//button[contains(text(),'Submit')]")
         self.wait_until_modal_closed()
 
     def click_ok_button(self):
-        self.click_element_located(By.ID, "modal-ok-btn")
+        self.click_element_located(By.XPATH, "//button[contains(text(),'Ok')]")
         self.wait_until_modal_closed()
 
     def click_cancel_button(self):
-        self.click_element_located(By.ID, "modal-cancel-btn")
+        self.click_element_located(By.XPATH, "//button[contains(text(),'Cancel')]")
         self.wait_until_modal_closed()
 
     def click_user_policies(self, index=0):

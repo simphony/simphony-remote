@@ -15,7 +15,7 @@ class TestCreateNewUser(AdminDriverTest):
             self.click_element_located(By.LINK_TEXT, "Users")
 
             self.click_new_entry_button()
-            self.type_text_in_element_located(By.ID, "new-user-name", "mrenou")
+            self.type_text_in_element_located(By.CSS_SELECTOR, ".modal-body > form > div > input", "mrenou")
             self.click_submit_button()
 
             # Click remove button

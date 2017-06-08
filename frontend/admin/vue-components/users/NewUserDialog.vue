@@ -5,14 +5,14 @@
       <vue-form :state="formstate" v-model="formstate" @submit.prevent="createNewUser">
         <validate auto-label class="form-group required-field" :class="fieldClassName(formstate.name)">
           <label class="control-label">User Name</label>
-          <input id="new-user-name" type="text" name="name" class="form-control" required v-model.trim="model.name">
+          <input type="text" name="name" class="form-control" required v-model.trim="model.name">
           <field-messages name="name" show="$touched || $submitted">
             <span class="help-block" slot="required">User Name cannot be empty</span>
           </field-messages>
         </validate>
         <div class="modal-footer">
-          <button id="modal-cancel-btn" type="button" class="btn btn-default" @click="close()">Cancel</button>
-          <button id="modal-submit-btn" class="btn btn-primary" type="submit" :disabled="formstate.$invalid">Submit</button>
+          <button type="button" class="btn btn-default" @click="close()">Cancel</button>
+          <button class="btn btn-primary" type="submit" :disabled="formstate.$invalid">Submit</button>
         </div>
       </vue-form>
     </div>
