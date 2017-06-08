@@ -1,8 +1,7 @@
 <template>
   <div class="column-container">
     <div class="align-right">
-      <button v-for="action in globalActions"
-      @click="action.callback">{{action.label}}</button>
+      <button v-for="action in globalActions" @click="action.callback">{{action.label}}</button>
     </div>
     <div class="table-responsive">
       <table class="table table-hover no-margin">

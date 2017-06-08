@@ -3,8 +3,8 @@
     <div class="modal-header"><slot name="header"><h4>{{ title }}</h4></slot></div>
     <div class="modal-body"><slot></slot></div>
     <div class="modal-footer text-right">
-      <button id="modal-cancel-btn" v-if="closeCallback !== undefined" type="button" class="btn btn-default" @click="closeCallback">Cancel</button>
-      <button id="modal-ok-btn" class="btn btn-primary primary" @click="okCallback">Ok</button>
+      <button v-if="closeCallback !== undefined" type="button" class="btn btn-default" @click="closeCallback">Cancel</button>
+      <button class="btn btn-primary primary" @click="okCallback">Ok</button>
     </div>
   </modal-dialog>
 </template>
