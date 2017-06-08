@@ -5,7 +5,11 @@
       <vue-form :state="formstate" v-model="formstate" @submit.prevent="createNewAccounting">
         <validate auto-label class="form-group required-field" :class="fieldClassName(formstate.image_name)">
           <label class="control-label">Image Name</label>
-          <input type="text" name="image_name" class="form-control" required v-model="model.image_name">
+          <select name="image_name" class="form-control" required v-model="model.image_name">
+            <option v-for="imageName in imageNames">
+              {{imageName}}
+            </option>
+          </select>
           <field-messages name="image_name" show="$dirty || $submitted">
             <span class="help-block" slot="required">Image Name cannot be empty</span>
           </field-messages>
@@ -74,8 +78,20 @@
           volume_target: '',
           volume_readonly: false,
           volume_source_target: []
-        }
+        },
+        imageNames: []
       };
+    },
+
+    mounted: function() {
+      resources.Application.items()
+      .done((identifiers, items) => {
+        this.imageNames = [];
+        identifiers.forEach((id) => {
+          let item = items[id];
+          this.imageNames.push(item.image_name);
+        });
+      });
     },
 
     methods: {
