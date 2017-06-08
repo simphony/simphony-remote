@@ -29,6 +29,8 @@ module.exports = {
       "skin-red-css": "admin-lte/dist/css/skins/skin-red.min",
 
       // JS
+      jquery: "admin-lte/plugins/jQuery/jquery-2.2.3.min",
+      bootstrap: "admin-lte/bootstrap/js/bootstrap.min",
       vue: "vue/dist/vue",
       "vue-router": "vue-router/dist/vue-router",
 

@@ -16,12 +16,10 @@
   },
   "dependencies": {
     "admin-lte": "~2.3.11",
-    "bootstrap": "~3.3.7",
     "clipboard": "~1.6.1",
     "configurable-http-proxy": "git://github.com/jupyterhub/configurable-http-proxy.git#2.0.1",
     "font-awesome": "~4.7.0",
     "ionicons": "~3.0.0",
-    "jquery": "~2.2.3",
     "lodash": "~4.17.4",
     "url-parse": "~1.1.9",
     "vue": "~2.3.3",
