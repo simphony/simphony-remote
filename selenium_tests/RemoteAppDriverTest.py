@@ -77,6 +77,18 @@ class RemoteAppDriverTest(unittest.TestCase):
     def wait_until_modal_closed(self):
         return self.wait.until_not(EC.alert_is_present())
 
+    def click_dialog_submit_button(self):
+        self.click_first_button("Submit")
+        self.wait_until_modal_closed()
+
+    def click_dialog_ok_button(self):
+        self.click_first_button("Ok")
+        self.wait_until_modal_closed()
+
+    def click_dialog_cancel_button(self):
+        self.click_first_button("Cancel")
+        self.wait_until_modal_closed()
+
     def login(self, username="test"):
         self.driver.get(self.base_url + "/hub/login")
 
