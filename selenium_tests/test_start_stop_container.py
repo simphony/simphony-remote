@@ -1,38 +1,29 @@
 # -*- coding: utf-8 -*-
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium_tests.selenium_test_base import SeleniumTestBase
+from selenium_tests.UserDriverTest import UserDriverTest
+from selenium.webdriver.common.by import By
 
 
-class TestContainerInteraction(SeleniumTestBase):
+class TestContainerInteraction(UserDriverTest):
     def test_start_stop_container(self):
-        driver = self.driver
-        with self.login():
-            self.wait_for(lambda:
-                          driver.find_element_by_css_selector(
-                              "#loading-spinner").value_of_css_property(
-                              'display') == "none")
+        self.wait_until_application_list_loaded()
 
-            self.click_by_css_selector("#applistentries > li > a > img")
-            self.click_by_css_selector(".start-button")
+        self.select_application()
+        self.start_application()
+        self.wait_until_application_running()
 
-            driver.find_element_by_id("application")
-
-            self.click_by_css_selector(".dropdown > a > img")
-
-            self.click_by_css_selector("#stop-button")
+        self.open_application_settings()
+        self.stop_application()
+        self.wait_until_application_stopped()
 
     def test_focus(self):
-        driver = self.driver
         with self.running_container():
-            iframe = driver.find_element_by_css_selector("iframe")
+            iframe = self.wait_until_visibility_of_element_located(By.TAG_NAME, "iframe")
             self.assertEqual(iframe, self.driver.switch_to.active_element)
 
-            search_box = driver.find_element_by_css_selector(
-                "input.form-control")
-            ActionChains(driver).move_to_element(search_box).click().perform()
+            self.type_text_in_element_located(By.ID, "search-input", "")
 
             self.assertNotEqual(iframe, self.driver.switch_to.active_element)
 
-            self.click_by_css_selector("#applistentries > li > a > img")
+            self.select_application()
 
             self.assertEqual(iframe, self.driver.switch_to.active_element)

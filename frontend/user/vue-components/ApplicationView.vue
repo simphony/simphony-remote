@@ -49,7 +49,7 @@
 
           <!-- Start Button -->
           <div class="box-footer">
-            <button class="btn btn-primary pull-right start-button"
+            <button id="start-button" class="btn btn-primary pull-right start-button"
             @click="startApplication()"
             :disabled="!currentApp.isStopped()">
               {{ {STOPPED: 'Start', STARTING: 'Starting', STOPPING: 'Stopping'}[currentApp.status] }}
@@ -71,7 +71,7 @@
 
 <script>
   let $ = require("jquery");
-  let Vue = require("vuejs");
+  let Vue = require("vue");
   let urlUtils = require("urlutils");
   let utils = require("utils");
   require("toolkit");

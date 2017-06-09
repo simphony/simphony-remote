@@ -1,8 +1,8 @@
 let $ = require("jquery");
-let Vue = require("vuejs");
+let Vue = require("vue");
 let ApplicationListModel = require("user/ApplicationListModel");
 let ApplicationLabel = require("user/vue-components/ApplicationLabel");
-require("filters");
+require("toolkit");
 
 let model, appLabel;
 
@@ -52,7 +52,7 @@ QUnit.test("rendering stop button", function (assert) {
 
   // Test stop button disabled
   assert.ok(
-    appLabel.$el.querySelector('#stop-button').classList.contains('disabled')
+    appLabel.$el.querySelector('#stop-button').classList.contains('disabled-entry')
   );
 
   // Select running application
@@ -61,7 +61,7 @@ QUnit.test("rendering stop button", function (assert) {
   // Test stop button enabled
   Vue.nextTick(function() {
     assert.notOk(
-      appLabel.$el.querySelector('#stop-button').classList.contains('disabled')
+      appLabel.$el.querySelector('#stop-button').classList.contains('disabled-entry')
     );
 
     done();
@@ -107,7 +107,7 @@ QUnit.test("rendering share button", function (assert) {
 
   // Test share button disabled
   assert.ok(
-    appLabel.$el.querySelector('#share-button').classList.contains('disabled')
+    appLabel.$el.querySelector('#share-button').classList.contains('disabled-entry')
   );
 
   // Select running application
@@ -116,7 +116,7 @@ QUnit.test("rendering share button", function (assert) {
   // Test share button disabled (Because clipboard save is not supported in test environment)
   Vue.nextTick(function() {
     assert.ok(
-      appLabel.$el.querySelector('#share-button').classList.contains('disabled')
+      appLabel.$el.querySelector('#share-button').classList.contains('disabled-entry')
     );
 
     done();

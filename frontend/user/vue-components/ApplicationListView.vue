@@ -2,7 +2,7 @@
   <section class="sidebar">
     <!-- Search form -->
     <form action="#" class="sidebar-form">
-      <input type="text" name="q" class="form-control" placeholder="Search..." v-model="searchInput">
+      <input id="search-input" type="text" name="q" class="form-control" placeholder="Search..." v-model="searchInput">
     </form>
 
     <!-- Sidebar Menu -->
@@ -28,6 +28,7 @@
     <transition-group name="list" tag="ul" id="applistentries" class="sidebar-menu">
       <li v-for="app in visibleList" v-bind:key="app"
       :class="{ active: indexOf(app) === model.selectedIndex }"
+      :id="'application-entry-' + indexOf(app)"
       @click="model.selectedIndex = indexOf(app); $emit('entryClicked');">
 
         <span :class="app.status.toLowerCase() + '-badge'"></span>
@@ -44,7 +45,7 @@
 </template>
 
 <script>
-  let Vue = require("vuejs");
+  let Vue = require("vue");
 
   module.exports = Vue.extend({
     data: function() {

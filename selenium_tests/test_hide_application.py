@@ -1,22 +1,12 @@
 # -*- coding: utf-8 -*-
-from selenium_tests.selenium_test_base import SeleniumTestBase
+from selenium_tests.UserDriverTest import UserDriverTest
 from selenium.webdriver.common.by import By
 
 
-class TestHideApplication(SeleniumTestBase):
+class TestHideApplication(UserDriverTest):
     def test_hide_application(self):
-        driver = self.driver
-        with self.login():
-            self.wait_for(lambda:
-                          driver.find_element_by_css_selector(
-                              "#loading-spinner").value_of_css_property(
-                              'display') == "none")
+        self.wait_until_application_list_loaded()
 
-            # Click on the search box
-            search_box = driver.find_element_by_name("q")
-            search_box.clear()
-            search_box.send_keys('foobarheho')
+        self.type_text_in_element_located(By.ID, "search-input", "foobarheho")
 
-            self.wait_for(lambda:
-                          not self.is_element_present(
-                              By.CSS_SELECTOR, '#applistentries > li'))
+        self.wait_until_text_inside_element_located(By.ID, "applistentries", "")

@@ -1,11 +1,11 @@
-var Vue = require("vuejs");
-var ErrorDialog = require("vue/ErrorDialog");
+var Vue = require("vue");
+var toolkit = require("toolkit");
 
 QUnit.module("ErrorDialog");
 QUnit.test("rendering errors one by one", function (assert) {
   var done = assert.async();
 
-  var errorDialog = new ErrorDialog().$mount();
+  var errorDialog = new Vue(toolkit.ErrorDialog).$mount();
 
   Vue.nextTick(function() {
     // Error dialog not rendered (No error to show)
@@ -51,7 +51,7 @@ QUnit.test("rendering errors one by one", function (assert) {
 QUnit.test("cancel showing errors", function (assert) {
   var done = assert.async();
 
-  var errorDialog = new ErrorDialog().$mount();
+  var errorDialog = new Vue(toolkit.ErrorDialog).$mount();
 
   Vue.nextTick(function() {
     errorDialog.errorList.push({title: "Oups"});
