@@ -8,6 +8,51 @@ class AdminDriverTest(RemoteAppDriverTest):
         RemoteAppDriverTest.setUp(self)
         self.login("admin")
 
+    def wait_until_visibility_of_row(self, row):
+        """ Wait until a specific row is visible
+        Parameters
+        ----------
+        row: String
+            A string which permit to locate the row, it can be:
+            - the index of the row ("2")
+            - a user name ("JohnDoe")
+            - an application name ("File Manager")
+            - a container id ("3514azd65a4z4dazd131")
+
+        Returns
+        -------
+        row_element: WebElement
+            The row that you specified
+
+        Example
+        -------
+        row_element = wait_until_visibility_of_row("JohnDoe")
+        """
+        return self.wait_until_presence_of_element_located(
+            By.XPATH,
+            "//tr[td[text()='{}']]".format(row)
+        )
+
+    def wait_until_invisibility_of_row(self, row):
+        """ Wait until a specific row is invisible
+        Parameters
+        ----------
+        row: String
+            A string which permit to locate the row, it can be:
+            - the index of the row ("2")
+            - a user name ("JohnDoe")
+            - an application name ("File Manager")
+            - a container id ("3514azd65a4z4dazd131")
+
+        Example
+        -------
+        row_element = wait_until_visibility_of_row("JohnDoe")
+        """
+        return self.wait_until_invisibility_of_element_located(
+            By.XPATH,
+            "//tr[td[text()='{}']]".format(row)
+        )
+
     def click_row_action_button(self, row, action_name):
         """ Click on an action button in the datatable for a specific row
         Parameters
