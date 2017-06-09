@@ -2,8 +2,8 @@ from selenium_tests.AdminDriverTest import AdminDriverTest
 from selenium.webdriver.common.by import By
 
 
-class TestCreateNewUser(AdminDriverTest):
-    def test_cancel(self):
+class TestUserAccounting(AdminDriverTest):
+    def test_create_new_entry_button(self):
         self.click_first_element_located(By.LINK_TEXT, "Users")
 
         self.click_first_button("Create New Entry")
@@ -20,3 +20,10 @@ class TestCreateNewUser(AdminDriverTest):
         self.click_row_action_button("mrenou", "Remove")
 
         self.click_modal_footer_button("Ok")
+
+    def test_admin_name_header_bug(self):
+        self.click_first_element_located(By.LINK_TEXT, "Users")
+
+        self.click_row_action_button("test", "Policies")
+
+        self.wait_until_text_inside_element_located(By.CSS_SELECTOR, "span.hidden-xs", "admin")
