@@ -46,9 +46,9 @@ class AdminDriverTest(RemoteAppDriverTest):
 
         Example
         -------
-        row_element = wait_until_visibility_of_row("JohnDoe")
+        wait_until_invisibility_of_row("JohnDoe")
         """
-        return self.wait_until_invisibility_of_element_located(
+        self.wait_until_invisibility_of_element_located(
             By.XPATH,
             "//tr[td[text()='{}']]".format(row)
         )
