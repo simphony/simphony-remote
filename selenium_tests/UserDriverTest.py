@@ -28,12 +28,13 @@ class UserDriverTest(RemoteAppDriverTest):
         """
         self.click_first_element_located(By.ID, "application-settings")
 
-    def stop_application(self):
-        """ Click on the stop button. It assumes that the application settings
-        menu is opened and that the application is running. This will stop the
+    def quit_application(self):
+        """ Click on the quit button. It assumes that the application settings
+        menu is opened and that the application is running. This will quit the
         currently selected application.
         """
-        self.click_first_element_located(By.ID, "stop-button")
+        self.click_first_element_located(By.ID, "quit-button")
+        self.click_modal_footer_button("Ok")
 
     def start_application(self):
         """ Click on the start button. It assumes that the currently selected
@@ -72,7 +73,7 @@ class UserDriverTest(RemoteAppDriverTest):
             self.select_application(index)
             self.wait_until_application_running()
             self.open_application_settings()
-            self.stop_application()
+            self.quit_application()
             self.wait_until_application_stopped()
 
     def tearDown(self):

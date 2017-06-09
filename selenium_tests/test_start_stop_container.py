@@ -12,7 +12,7 @@ class TestContainerInteraction(UserDriverTest):
         self.wait_until_application_running()
 
         self.open_application_settings()
-        self.stop_application()
+        self.quit_application()
         self.wait_until_application_stopped()
 
     def test_focus(self):
