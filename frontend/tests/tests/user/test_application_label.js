@@ -42,7 +42,7 @@ QUnit.test("application name", function(assert) {
   });
 });
 
-QUnit.test("rendering stop button", function (assert) {
+QUnit.test("rendering quit button", function (assert) {
   let done = assert.async();
 
   assert.equal(
@@ -50,18 +50,18 @@ QUnit.test("rendering stop button", function (assert) {
     model.appList[0].appData.image.ui_name
   );
 
-  // Test stop button disabled
+  // Test quit button disabled
   assert.ok(
-    appLabel.$el.querySelector('#stop-button').classList.contains('disabled-entry')
+    appLabel.$el.querySelector('#quit-button').classList.contains('disabled-entry')
   );
 
   // Select running application
   model.selectedIndex = 1;
 
-  // Test stop button enabled
+  // Test quit button enabled
   Vue.nextTick(function() {
     assert.notOk(
-      appLabel.$el.querySelector('#stop-button').classList.contains('disabled-entry')
+      appLabel.$el.querySelector('#quit-button').classList.contains('disabled-entry')
     );
 
     done();
@@ -113,9 +113,9 @@ QUnit.test("rendering share button", function (assert) {
   // Select running application
   model.selectedIndex = 1;
 
-  // Test share button disabled (Because clipboard save is not supported in test environment)
+  // Test share button enabled
   Vue.nextTick(function() {
-    assert.ok(
+    assert.notOk(
       appLabel.$el.querySelector('#share-button').classList.contains('disabled-entry')
     );
 

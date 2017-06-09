@@ -12,25 +12,25 @@
         <li>
           <ul class="menu">
 
-            <!-- Stop button -->
-            <li>
-              <a href="#"
-              id="stop-button"
-              :class="{ 'disabled-entry': !currentApp.isRunning() }"
-              @click="stopApplication()">
-                <i class="fa fa-times text-danger"></i>
-                Stop Application
-              </a>
-            </li>
-
             <!-- Share button -->
             <li>
               <a href="#"
               id="share-button"
-              :class="{ 'disabled-entry': !(currentApp.isRunning() && clipboardSupported) }"
-              :data-clipboard-text="sharedUrl">
+              :class="{ 'disabled-entry': !currentApp.isRunning() }"
+              @click="shareDialog.visible = true">
                 <i class="fa fa-clipboard text-light-blue"></i>
-                Share (copy url to clipboard)
+                Share session
+              </a>
+            </li>
+
+            <!-- Quit button -->
+            <li>
+              <a href="#"
+              id="quit-button"
+              :class="{ 'disabled-entry': !currentApp.isRunning() }"
+              @click="quitDialog.visible = true">
+                <i class="fa fa-times text-danger"></i>
+                Quit
               </a>
             </li>
 
@@ -38,6 +38,32 @@
           </ul>
         </li>
       </ul>
+
+      <!-- Modal dialog for the share button -->
+      <modal-dialog v-if="shareDialog.visible">
+        <div class="modal-header"><h4>Share Session</h4></div>
+        <div class="modal-body">
+          <div class="input-group">
+            <input id="shared-url" type="text" class="form-control" :value="sharedUrl + '/'"></input>
+            <span class="input-group-btn">
+              <button id="cp-clipboard-button" class="btn btn-primary" data-clipboard-target="#shared-url" data-toggle="tooltip" title="Copy to clipboard">
+                <i class="fa fa-clipboard"></i>
+              </button>
+            </span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" @click="shareDialog.visible = false">Close</button>
+        </div>
+      </modal-dialog>
+
+      <!-- Modal dialog for the quit button -->
+      <confirm-dialog
+      v-if="quitDialog.visible"
+      :okCallback="() => {quitDialog.visible = false; stopApplication();}"
+      :closeCallback="() => {quitDialog.visible = false;}">
+          <div>Are you sure you want to quit <b>{{ currentApp.appData.image | appName }}</b> ? (irreversible)</div>
+      </confirm-dialog>
     </li>
   </ul>
 </template>
@@ -52,13 +78,11 @@
 
   module.exports = Vue.extend({
     data: function() {
-      return { clipboardSupported: Clipboard.isSupported() };
+      return { shareDialog: {visible: false}, quitDialog: {visible: false} };
     },
 
     mounted: function() {
-      if(this.clipboardSupported) {
-        new Clipboard('#share-button');
-      }
+      new Clipboard('#cp-clipboard-button');
     },
 
     computed: {
