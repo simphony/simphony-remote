@@ -62,7 +62,7 @@
       v-if="quitDialogVisible"
       :okCallback="() => {quitDialogVisible = false; stopApplication();}"
       :closeCallback="() => {quitDialogVisible = false;}">
-          <div>Are you sure you want to quit {{ currentApp.appData.image | appName }} ? (irreversible)</div>
+          <div>Are you sure you want to quit <b>{{ currentApp.appData.image | appName }}</b> ? (irreversible)</div>
       </confirm-dialog>
     </li>
   </ul>
