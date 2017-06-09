@@ -113,9 +113,9 @@ QUnit.test("rendering share button", function (assert) {
   // Select running application
   model.selectedIndex = 1;
 
-  // Test share button disabled (Because clipboard save is not supported in test environment)
+  // Test share button enabled
   Vue.nextTick(function() {
-    assert.ok(
+    assert.notOk(
       appLabel.$el.querySelector('#share-button').classList.contains('disabled-entry')
     );
 
