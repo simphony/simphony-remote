@@ -20,9 +20,9 @@ class TestUserAccounting(AdminDriverTest):
         # Click remove button
         self.click_row_action_button("mrenou", "Remove")
 
-        self.wait_until_invisibility_of_row("mrenou")
-
         self.click_modal_footer_button("Ok")
+
+        self.wait_until_invisibility_of_row("mrenou")
 
     def test_admin_name_header_bug(self):
         self.click_first_element_located(By.LINK_TEXT, "Users")
