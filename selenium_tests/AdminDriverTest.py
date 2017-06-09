@@ -8,9 +8,6 @@ class AdminDriverTest(RemoteAppDriverTest):
         RemoteAppDriverTest.setUp(self)
         self.login("admin")
 
-    def click_new_entry_button(self):
-        self.click_first_button("Create New Entry")
-
     def trigger_row_action(self, row, action_name):
         self.click_first_element_located(
             By.XPATH,
