@@ -1,4 +1,4 @@
-var Vue = require("vuejs");
+var Vue = require("vue");
 
 var getRenderedText = function(Component, propsData) {
   var Ctor = Vue.extend(Component);

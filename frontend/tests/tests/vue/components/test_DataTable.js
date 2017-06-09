@@ -1,4 +1,4 @@
-var DataTable = require("toolkit-dir/DataTable");
+var DataTable = require("toolkit").DataTable;
 var helpers = require("helpers");
 
 QUnit.module("DataTable");

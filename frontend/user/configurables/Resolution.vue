@@ -10,7 +10,7 @@
 </template>
 
 <script>
-  let Vue = require('vuejs');
+  let Vue = require('vue');
 
   // Your component tag must have '-component' suffix
   module.exports = Vue.component('resolution-component', {
