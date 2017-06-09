@@ -11,15 +11,15 @@ class AdminDriverTest(RemoteAppDriverTest):
     def click_new_entry_button(self):
         self.click_first_button("Create New Entry")
 
-    def click_submit_button(self):
+    def click_dialog_submit_button(self):
         self.click_first_button("Submit")
         self.wait_until_modal_closed()
 
-    def click_ok_button(self):
+    def click_dialog_ok_button(self):
         self.click_first_button("Ok")
         self.wait_until_modal_closed()
 
-    def click_cancel_button(self):
+    def click_dialog_cancel_button(self):
         self.click_first_button("Cancel")
         self.wait_until_modal_closed()
 
