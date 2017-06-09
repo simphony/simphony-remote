@@ -1,4 +1,4 @@
-var ConfirmDialog = require("toolkit-dir/ConfirmDialog");
+var ConfirmDialog = require("toolkit").ConfirmDialog;
 var helpers = require("helpers");
 
 QUnit.module("ConfirmDialog");

@@ -44,7 +44,7 @@
 </template>
 
 <script>
-  let Vue = require("vuejs");
+  let Vue = require("vue");
 
   module.exports = Vue.extend({
     data: function() {

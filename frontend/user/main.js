@@ -1,18 +1,18 @@
 let gamodule = require("gamodule");
-let ErrorDialog = require("ErrorDialog");
+let Vue = require('vue');
 let ApplicationListModel = require("./ApplicationListModel");
 let ApplicationListView = require("./vue-components/ApplicationListView");
 let ApplicationView = require("./vue-components/ApplicationView");
 let ApplicationLabel = require("./vue-components/ApplicationLabel");
-require("filters");
+let toolkit = require("toolkit");
 
 // This model keeps the retrieved content from the REST query locally.
 // It is only synchronized at initial load.
 let model = new ApplicationListModel();
 
-let errorDialog = new ErrorDialog({
-  el: '#error-dialog-container'
-});
+let errorDialog = new Vue(toolkit.ErrorDialog).$mount(
+  '#error-dialog-container'
+);
 
 // Initialize views
 let appListView = new ApplicationListView({

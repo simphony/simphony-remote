@@ -44,7 +44,7 @@
 
 <script>
   let $ = require("jquery");
-  let Vue = require("vuejs");
+  let Vue = require("vue");
   let Clipboard = require('clipboard');
   let URL = require('url-parse');
   let urlUtils = require('urlutils');
