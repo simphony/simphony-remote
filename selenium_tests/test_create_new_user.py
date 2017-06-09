@@ -17,6 +17,6 @@ class TestCreateNewUser(AdminDriverTest):
         self.click_modal_footer_button("Submit")
 
         # Click remove button
-        self.trigger_row_action("mrenou", "Remove")
+        self.click_row_action_button("mrenou", "Remove")
 
         self.click_modal_footer_button("Ok")

@@ -8,7 +8,7 @@ class AdminDriverTest(RemoteAppDriverTest):
         RemoteAppDriverTest.setUp(self)
         self.login("admin")
 
-    def trigger_row_action(self, row, action_name):
+    def click_row_action_button(self, row, action_name):
         self.click_first_element_located(
             By.XPATH,
             "//tr[td[text()='{}']]/td/button[text()='{}']".format(
