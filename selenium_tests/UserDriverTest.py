@@ -63,10 +63,9 @@ class UserDriverTest(RemoteAppDriverTest):
         application is stopped at the end.
         """
         self.wait_until_application_list_loaded()
-
         self.select_application(index)
         self.start_application()
-
+        self.wait_until_application_running()
         try:
             yield
         finally:
