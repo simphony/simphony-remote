@@ -148,6 +148,25 @@ class RemoteAppDriverTest(unittest.TestCase):
         """
         return self.wait.until(EC.invisibility_of_element_located((how, what)))
 
+    def wait_until_invisibility_of(self, element):
+        """ Wait until an element is invisible, which means that it's not rendered or
+        the CSS display style is "none".
+        Parameters
+        ----------
+        element: WebElement
+            The web element which is supposed to be invisible
+
+        Returns:
+        --------
+        element:
+            The element
+
+        Example:
+        --------
+        wait_until_invisibility_of(my_button)
+        """
+        return self.wait.until_not(EC.visibility_of(element))
+
     def wait_until_clickability_of_element_located(self, how, what):
         """ Wait until an element is clickable, which means that it's visible,
         enabled and nothing is above this element.
