@@ -78,9 +78,9 @@
     methods: {
       updateTable: function() {
         this.communicationError = null;
-        this.table.rows = [];
         resources.Accounting.items({filter: JSON.stringify({user_id: this.$route.params.id })})
         .done((identifiers, items) => {
+          this.table.rows = [];
           identifiers.forEach((id) => {
             let item = items[id];
             this.table.rows.push([
@@ -128,6 +128,7 @@
 
     watch: {
       '$route.params.id': function() {
+        this.table.rows = [];
         this.updateTable();
       }
     }
