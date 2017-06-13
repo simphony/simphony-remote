@@ -111,13 +111,13 @@
 
   <script type="text/javascript">
     window.apidata = {
-      base_url: "{{base_url}}",
+      base_url: "{{ base_url }}",
       {% if user is not None %}
-        user: "{{user.name}}",
+        user: "{{ user.name }}",
       {% end %}
       {% if analytics is not None %}
         analytics: {
-          tracking_id: "{{ analytics.tracking_id }}"
+          tracking_id: "{{ analytics['tracking_id'] }}"
         },
       {% end %}
     }
