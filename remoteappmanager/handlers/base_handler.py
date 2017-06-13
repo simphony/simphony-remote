@@ -44,9 +44,12 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
         })
 
         args.update({
-            "gravatar_id": hashlib.md5(
-                str(self.current_user.name).strip().lower().encode(
-                    "utf-8")).hexdigest()
+            "gravatar_id": (
+                hashlib.md5(
+                    str(self.current_user.name).strip().lower().encode(
+                        "utf-8")).hexdigest()
+                if self.current_user is not None
+                else None)
         })
 
         super(BaseHandler, self).render(template_name, **args)
