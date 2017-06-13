@@ -1,17 +1,15 @@
-{% set skin = skin | default("skin-blue") %}
-
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>{% block title %}RemoteApp Manager{% endblock %}</title>
+  <title>{% block title %}RemoteApp Manager{% end %}</title>
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
   <link rel="stylesheet" href="{{ static_url("dist/sharedDependencies.css")}}">
 
   {% block stylesheet %}
-  {% endblock %}
+  {% end %}
 
   {% block script %}
     <script type="text/javascript">
@@ -23,13 +21,13 @@
       window.ga.l = 1 * new Date();
       window.GoogleAnalyticsObject = "ga";
     </script>
-    {% if analytics %}
-    <script src='https://www.google-analytics.com/analytics.js' async type="text/javascript"></script>
-    {% endif %}
-  {% endblock %}
+    {% if analytics is not None %}
+      <script src='https://www.google-analytics.com/analytics.js' async type="text/javascript"></script>
+    {% end %}
+  {% end %}
 </head>
 
-<body class="hold-transition {{ skin }} sidebar-mini">
+<body class="hold-transition {% block skin %}{% end %} sidebar-mini">
 
   <noscript>
     <div id='noscript'>
@@ -52,7 +50,7 @@
       <nav class="navbar navbar-static-top" role="navigation">
         <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
           {% block topbar %}
-          {% endblock %}
+          {% end %}
         </div>
 
         <!-- Navbar Right Menu -->
@@ -63,14 +61,14 @@
               <!-- Menu Toggle Button -->
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <!-- The user image in the navbar-->
-                <img src="https://www.gravatar.com/avatar/{{ user.name | gravatar_id }}" class="user-image" alt="User Image">
+                <img src="https://www.gravatar.com/avatar/{{ gravatar_id }}" class="user-image" alt="User Image">
                 <!-- hidden-xs hides the username on small devices so only the image appears. -->
                 <span class="hidden-xs">{{ user.name }}</span>
               </a>
               <ul class="dropdown-menu">
                 <!-- The user image in the menu -->
                 <li class="user-header">
-                  <img src="https://www.gravatar.com/avatar/{{ user.name | gravatar_id }}" class="img-circle" alt="User Image">
+                  <img src="https://www.gravatar.com/avatar/{{ gravatar_id }}" class="img-circle" alt="User Image">
                   <p>
                     {{ user.name }}
                   </p>
@@ -83,7 +81,7 @@
                   <div class="pull-right">
                     {% block login_widget %}
                     <a id="logout" href="{{ logout_url }}" class="btn btn-default btn-flat"><i class="fa fa-sign-out"> Sign out</i></a>
-                    {% endblock %}
+                    {% end %}
                   </div>
                 </li>
               </ul>
@@ -95,13 +93,13 @@
 
     <aside class="main-sidebar">
       {% block sidebar %}
-      {% endblock %}
+      {% end %}
     </aside>
 
     <div class="content-wrapper">
       <!-- Main content -->
       {% block main %}
-      {% endblock %}
+      {% end %}
     </div>
   </div>
 
@@ -109,22 +107,21 @@
 
   <script src="{{ static_url("dist/sharedDependencies.js") }}"></script>
 
+  <script type="text/javascript">
+    window.apidata = {
+      base_url: "{{base_url}}",
+      {% if user %}
+        user: "{{user.name}}",
+      {% end %}
+      {% if analytics is not None %}
+        analytics: {
+          tracking_id: "{{ analytics.tracking_id }}"
+        },
+      {% end %}
+    }
+  </script>
   {% block script_init %}
-    <script type="text/javascript">
-      window.apidata = {
-        base_url: "{{base_url}}",
-        prefix: "{{prefix}}",
-        {% if user %}
-          user: "{{user.name}}",
-        {% endif %}
-        {% if analytics %}
-          analytics: {
-            tracking_id: "{{ analytics.tracking_id }}"
-          },
-        {% endif %}
-      }
-    </script>
-  {% endblock %}
+  {% end %}
 
 </body>
 </html>

@@ -1,28 +1,23 @@
 {% extends "page.html" %}
 
 {% block login_widget %}
-{% endblock %}
+{% end %}
 
 {% block main %}
 
 <div class="error">
   {% block h1_error %}
-  <h1>
-    {{status_code}} : {{status_message}}
-  </h1>
-  {% endblock h1_error %}
+    <h1>
+      {{status_code}} : {{status_message}}
+    </h1>
+  {% end %}
   {% block error_detail %}
-  {% if message %}
-  <p>
-    {{message}}
-  </p>
-  {% endif %}
-  {% if message_html %}
-  <p>
-    {{message_html | safe}}
-  </p>
-  {% endif %}
-  {% endblock error_detail %}
+    {% if message %}
+      <p>
+        {{message}}
+      </p>
+    {% end %}
+  {% end %}
 </div>
 
-{% endblock %}
+{% end %}

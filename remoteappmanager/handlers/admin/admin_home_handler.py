@@ -9,4 +9,4 @@ class AdminHomeHandler(BaseHandler):
     @web.authenticated
     @gen.coroutine
     def get(self):
-        self.render('admin/page.html')
+        self.render('admin_page.html')
