@@ -79,6 +79,7 @@ class TestApplication(WebAPITestCase):
                         },
                         'name': 'boo',
                         'icon_128': '',
+                        'type': '',
                         'ui_name': 'foo_ui',
                         'description': '',
                         'configurables': []
@@ -94,6 +95,7 @@ class TestApplication(WebAPITestCase):
                             'volume_target': 'bar'
                         },
                         'name': 'boo',
+                        'type': '',
                         'icon_128': '',
                         'ui_name': 'foo_ui',
                         'description': '',
@@ -128,17 +130,18 @@ class TestApplication(WebAPITestCase):
                          {
                              'mapping_id': "one",
                              'image': {
-                              'configurables': [],
-                              'description': '',
-                              'icon_128': '',
-                              'name': 'boo',
-                              'policy': {
-                                    "allow_home": True,
-                                    "volume_mode": 'ro',
-                                    "volume_source": "foo",
-                                    "volume_target": "bar",
-                              },
-                              'ui_name': 'foo_ui'}})
+                                 'configurables': [],
+                                 'description': '',
+                                 'type': '',
+                                 'icon_128': '',
+                                 'name': 'boo',
+                                 'policy': {
+                                     "allow_home": True,
+                                     "volume_mode": 'ro',
+                                     "volume_source": "foo",
+                                     "volume_target": "bar",
+                                 },
+                                 'ui_name': 'foo_ui'}})
 
         self._app.container_manager.find_containers = \
             mock_coro_factory(return_value=[Container(
@@ -159,6 +162,7 @@ class TestApplication(WebAPITestCase):
                              'image': {
                                  'description': '',
                                  'icon_128': '',
+                                 'type': '',
                                  'name': 'boo',
                                  'ui_name': 'foo_ui',
                                  'policy': {
