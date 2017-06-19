@@ -26,6 +26,7 @@ class Image(ResourceFragment):
     ui_name = Unicode()
     icon_128 = Unicode()
     description = Unicode()
+    type = Unicode()
     policy = OneOf(Policy)
     configurables = List(Unicode)
 
@@ -71,11 +72,12 @@ class ApplicationHandler(ResourceHandler):
         resource.mapping_id = identifier
         resource.image = Image()
         resource.image.fill({
-                "name": image.name,
-                "ui_name": image.ui_name,
-                "icon_128": image.icon_128,
-                "description": image.description,
-                "configurables": [conf.tag for conf in image.configurables]
+            "name": image.name,
+            "ui_name": image.ui_name,
+            "icon_128": image.icon_128,
+            "description": image.description,
+            "type": image.type,
+            "configurables": [conf.tag for conf in image.configurables]
         })
         resource.image.policy = Policy()
         resource.image.policy.fill(policy)

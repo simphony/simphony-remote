@@ -16,7 +16,7 @@
             <li>
               <a href="#"
               id="share-button"
-              :class="{ 'disabled-entry': !currentApp.isRunning() }"
+              :class="{ 'disabled-entry': !currentApp.isRunning() || currentApp.appData.image.type == 'webapp' }"
               @click="shareDialog.visible = true">
                 <i class="fa fa-clipboard text-light-blue"></i>
                 Share session
