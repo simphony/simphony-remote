@@ -44,7 +44,7 @@
         <div class="modal-header"><h4>Share Session</h4></div>
         <div class="modal-body">
           <div class="input-group">
-            <input id="shared-url" type="text" class="form-control" :value="sharedUrl + '/'"></input>
+            <input id="shared-url" type="text" class="form-control" :value="sharedUrl + '/'">
             <span class="input-group-btn">
               <button id="cp-clipboard-button" class="btn btn-primary" data-clipboard-target="#shared-url" data-toggle="tooltip" title="Copy to clipboard">
                 <i class="fa fa-clipboard"></i>
