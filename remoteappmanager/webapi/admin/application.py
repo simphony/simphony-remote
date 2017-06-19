@@ -3,7 +3,7 @@ from tornado import gen
 from tornadowebapi import exceptions
 from tornadowebapi.resource import Resource
 from tornadowebapi.resource_handler import ResourceHandler
-from tornadowebapi.traitlets import Unicode
+from tornadowebapi.traitlets import Unicode, Bool
 
 from remoteappmanager.webapi.decorators import authenticated
 from remoteappmanager.db import exceptions as db_exceptions
@@ -11,6 +11,7 @@ from remoteappmanager.db import exceptions as db_exceptions
 
 class Application(Resource):
     image_name = Unicode(allow_empty=False, strip=True)
+    db_image = Bool(True)
 
 
 class ApplicationHandler(ResourceHandler):
@@ -57,12 +58,29 @@ class ApplicationHandler(ResourceHandler):
         items_response: ItemsResponse
             an object to be filled with the appropriate information
         """
+        docker_images = yield self.application.container_manager.images()
+        docker_images = [
+            image for image in docker_images
+            if image.type in ["webapp", "vncapp"]
+        ]
+
         db = self.application.db
         apps = db.list_applications()
+        app_names = [app.image for app in apps]
 
         items = []
         for app in apps:
             item = Application(identifier=str(app.id), image_name=app.image)
             items.append(item)
+
+        for image in docker_images:
+            image_name = image.name.split(":")[0]
+            if image_name not in app_names:
+                item = Application(
+                    identifier=image.docker_id,
+                    image_name=image_name,
+                    db_image=False
+                )
+                items.append(item)
 
         items_response.set(items)
