@@ -11,12 +11,6 @@
     :rowActions="table.rowActions">
     </data-table>
 
-    <new-application-dialog
-    v-if="newApplicationDialog.visible"
-    :visible="newApplicationDialog.visible"
-    @created="newApplicationCreated"
-    @closed="newApplicationDialogClosed"></new-application-dialog>
-
     <confirm-dialog
     v-if="removeApplicationDialog.visible"
     title="Remove Application"
@@ -31,25 +25,20 @@
 
 <script>
   let resources = require("admin-resources");
-  let NewApplicationDialog = require("./applications/NewApplicationDialog");
 
   module.exports = {
-    components: {
-      'new-application-dialog': NewApplicationDialog
-    },
-
     data: function () {
       return {
         table: {
           headers: ["ID", "Image"],
           rows: [],
-          globalActions: [{
-            label: "Create New Entry",
-            callback: () => {this.newApplicationDialog.visible = true;}
-          }],
           rowActions: [{
             label: "Remove",
             callback: this.removeAction
+          }, {
+            label: "Add",
+            type: "primary",
+            callback: this.addApplication
           }]
         },
 
@@ -82,7 +71,7 @@
           identifiers.forEach((id) => {
             let item = items[id];
             this.table.rows.push([
-              id,
+              item.db_image ? id: "-",
               item.image_name
             ]);
           });
@@ -90,15 +79,6 @@
         .fail(() => {
           this.communicationError = "The request could not be executed successfully";
         });
-      },
-
-      newApplicationCreated: function() {
-        this.newApplicationDialog.visible = false;
-        this.updateTable();
-      },
-
-      newApplicationDialogClosed: function() {
-        this.newApplicationDialog.visible = false;
       },
 
       removeAction: function(row) {
@@ -120,12 +100,23 @@
           this.communicationError = "The request could not be executed successfully";
         });
       },
+
       closeRemoveApplicationDialog: function() {
         this.removeApplicationDialog.visible = false;
         this.removeApplicationDialog.applicationToRemove = {
           name: "",
           id: null
         };
+      },
+
+      addApplication: function(row) {
+        resources.Application.create({image_name: row[1]})
+        .done(() => {
+          this.updateTable();
+        })
+        .fail(() => {
+          this.communicationError = "The request could not be executed successfully";
+        });
       }
     }
   };
