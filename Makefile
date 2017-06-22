@@ -26,7 +26,7 @@ deps:
 	fi
 	curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 	-sudo apt-get -qq update
-	sudo apt-get -qq install -o Dpkg::Options::="--force-confold" --force-yes -y docker.io python3-venv nodejs python3-pip
+	sudo apt-get -qq install -o Dpkg::Options::="--force-confold" --force-yes -y docker.io python3.4-venv nodejs python3-pip
 	node --version
 	npm --version
 	npm install
