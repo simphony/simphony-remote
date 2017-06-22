@@ -26,6 +26,7 @@ deps:
 	fi
 	curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 	-sudo apt-get -qq update
+	echo "deb https://apt.dockerproject.org/repo ubuntu-trusty main" > /etc/apt/sources.list.d/docker.list
 	if [ `lsb_release -rs` = "14.04" ]; then \
 		plat_packages="docker-engine python3.4-venv"; \
 	else \
