@@ -26,13 +26,7 @@ deps:
 	fi
 	curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 	-sudo apt-get -qq update
-	sudo echo "deb https://apt.dockerproject.org/repo trusty main" | sudo tee /etc/apt/sources.list.d/docker.list
-	if [ `lsb_release -rs` = "14.04" ]; then \
-		plat_packages="docker-engine python3.4-venv"; \
-	else \
-		plat_packages="docker.io python3-venv"; \
-	fi; \
-		sudo apt-get -qq install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages nodejs python3-pip
+	sudo apt-get -qq install -o Dpkg::Options::="--force-confold" --force-yes -y docker.io python3-venv nodejs python3-pip
 	node --version
 	npm --version
 	npm install
