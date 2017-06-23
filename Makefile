@@ -31,7 +31,7 @@ deps:
 		$(lsb_release -cs) \
 		stable"
 	-sudo apt-get -qq update
-	sudo apt-get install docker-ce=17.05.0~ce-0~ubuntu-$(lsb_release -cs)
+	sudo apt-get install docker-ce=17.03.0~ce-0~ubuntu-$(lsb_release -cs)
 	if [ `lsb_release -rs` = "14.04" ]; then \
 		plat_packages="linux-image-extra-$(uname -r) linux-image-extra-virtual python3.4-venv"; \
 	else \
