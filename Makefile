@@ -26,15 +26,14 @@ deps:
 	fi
 	curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-	version_name=(shell lsb_release -cs)
 	sudo add-apt-repository \
 		"deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-		$(version_name) \
+		`lsb_release -cs` \
 		stable"
 	-sudo apt-get -qq update
-	sudo apt-get install docker-ce=17.03.0~ce-0~ubuntu-$(lsb_release -cs)
+	sudo apt-get install docker-ce=17.03.0~ce-0~ubuntu-`lsb_release -cs`
 	if [ `lsb_release -rs` = "14.04" ]; then \
-		plat_packages="linux-image-extra-$(uname -r) linux-image-extra-virtual python3.4-venv"; \
+		plat_packages="linux-image-extra-`uname -r` linux-image-extra-virtual python3.4-venv"; \
 	else \
 		plat_packages="python3-venv"; \
 	fi; \
