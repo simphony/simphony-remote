@@ -26,9 +26,10 @@ deps:
 	fi
 	curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	version_name=(shell lsb_release -cs)
 	sudo add-apt-repository \
 		"deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-		$(lsb_release -cs) \
+		$(version_name) \
 		stable"
 	-sudo apt-get -qq update
 	sudo apt-get install docker-ce=17.03.0~ce-0~ubuntu-$(lsb_release -cs)
