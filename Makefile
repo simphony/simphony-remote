@@ -31,11 +31,11 @@ deps:
 		$(lsb_release -cs) \
 		stable"
 	-sudo apt-get -qq update
+	sudo apt-get install docker-ce=17.05.0~ce-0~ubuntu-$(lsb_release -cs)
 	if [ `lsb_release -rs` = "14.04" ]; then \
-		sudo apt-get install docker-ce=17.05.0~ce-0~ubuntu-$(lsb_release -cs)
 		plat_packages="linux-image-extra-$(uname -r) linux-image-extra-virtual python3.4-venv"; \
 	else \
-		plat_packages="docker.io python3-venv"; \
+		plat_packages="python3-venv"; \
 	fi; \
 		sudo apt-get -qq install -o Dpkg::Options::="--force-confold" --force-yes -y $$plat_packages nodejs python3-pip
 	docker --version
