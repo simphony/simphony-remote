@@ -1,16 +1,78 @@
-{% extends "page.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>{% block title %}RemoteApp Manager{% end %}</title>
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-{% block main %}
+  <link rel="stylesheet" href="{{ static_url("dist/sharedDependencies.css")}}">
 
-<div class="error">
-  <h1>
-    {{status_code}} : {{status_message}}
-  </h1>
-  {% if message %}
-    <p>
-      {{message}}
-    </p>
+  <script type="text/javascript">
+    // This will always be executed and create the basic ga function that
+    // does nothing
+    window.ga = function () {
+      (window.ga.q = window.ga.q || []).push(arguments);
+    };
+    window.ga.l = 1 * new Date();
+    window.GoogleAnalyticsObject = "ga";
+  </script>
+  {% if analytics is not None %}
+    <script src='https://www.google-analytics.com/analytics.js' async type="text/javascript"></script>
   {% end %}
-</div>
+</head>
 
-{% end %}
+<body class="fixed hold-transition skin-blue sidebar-mini">
+
+  <noscript>
+    <div id='noscript'>
+      Jupyter Hub requires JavaScript.<br>
+      Please enable it to proceed.
+    </div>
+  </noscript>
+
+  <div class="wrapper" id="app">
+
+    <!-- Main Header -->
+    <header class="main-header">
+      <a href="#" class="logo">
+        <!-- logo for regular state and mobile devices -->
+        <span class="logo-lg"><b>Simphony</b>Remote</span>
+      </a>
+    </header>
+
+    <aside class="main-sidebar">
+    </aside>
+
+    <div class="content-wrapper">
+      <!-- Main content -->
+      <div class="error">
+        <h1>
+          {{status_code}} : {{status_message}}
+        </h1>
+        {% if message %}
+          <p>
+            {{message}}
+          </p>
+        {% end %}
+      </div>
+    </div>
+  </div>
+
+  <div id="error-dialog-container"></div>
+
+  <script src="{{ static_url("dist/sharedDependencies.js") }}"></script>
+
+  <script type="text/javascript">
+    window.apidata = {
+      base_url: "{{ base_url }}",
+      {% if analytics is not None %}
+        analytics: {
+          tracking_id: "{{ analytics['tracking_id'] }}"
+        },
+      {% end %}
+    }
+  </script>
+
+</body>
+</html>
