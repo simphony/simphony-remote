@@ -7,7 +7,7 @@
           <label class="control-label">Image Name</label>
           <select name="image_name" class="form-control" required v-model="model.image_name">
             <option v-for="imageName in imageNames">
-              {{imageName}}
+              {{ imageName | truncate }}
             </option>
           </select>
           <field-messages name="image_name" show="$dirty || $submitted">
