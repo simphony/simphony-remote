@@ -14,7 +14,6 @@ deps:
 		echo "ERROR: Cannot run on non-Linux systems"; \
 		false; \
 	fi
-	sudo apt-get remove docker docker-engine
 	curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 	sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
