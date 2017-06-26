@@ -73,13 +73,13 @@
       },
 
       stopContainer: function () {
-        resources.Container.delete(this.stopContainerDialog.containerToStop)
+        let containerToStop = this.stopContainerDialog.containerToStop;
+        this.closeStopContainerDialog();
+        resources.Container.delete(containerToStop)
         .done(() => {
           this.updateTable();
-          this.closeStopContainerDialog();
         })
         .fail(() => {
-          this.closeStopContainerDialog();
           this.communicationError = "The request could not be executed successfully";
         });
       },
