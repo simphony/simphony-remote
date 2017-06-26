@@ -1,5 +1,6 @@
 from http.client import responses
 from urllib.parse import urljoin
+import hashlib
 
 from tornado import web, gen
 
@@ -36,12 +37,20 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
 
         args.update(kwargs)
 
-        if file_config.ga_tracking_id:
-            args.update({
-                "analytics": {
-                    "tracking_id": file_config.ga_tracking_id
-                }
-            })
+        args.update({
+            "analytics": {
+                "tracking_id": file_config.ga_tracking_id
+            } if file_config.ga_tracking_id else None
+        })
+
+        args.update({
+            "gravatar_id": (
+                hashlib.md5(
+                    str(self.current_user.name).strip().lower().encode(
+                        "utf-8")).hexdigest()
+                if self.current_user is not None
+                else None)
+        })
 
         super(BaseHandler, self).render(template_name, **args)
 

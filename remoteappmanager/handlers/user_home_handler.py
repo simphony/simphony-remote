@@ -9,4 +9,4 @@ class UserHomeHandler(BaseHandler):
     @web.authenticated
     @gen.coroutine
     def get(self):
-        self.render('user/page.html')
+        self.render('user_page.html')

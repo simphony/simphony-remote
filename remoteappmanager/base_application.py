@@ -4,14 +4,12 @@ from remoteappmanager.handlers.handler_authenticator import HubAuthenticator
 from traitlets import Instance, default
 from tornado import web
 import tornado.ioloop
-from jinja2 import Environment, FileSystemLoader
 
 from tornadowebapi.registry import Registry
 
 from remoteappmanager.db.interfaces import ABCDatabase
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.docker.container_manager import ContainerManager
-from remoteappmanager.jinja2_adapters import Jinja2LoaderAdapter, gravatar_id
 from remoteappmanager.user import User
 from remoteappmanager.traitlets import as_dict
 from remoteappmanager.services.hub import Hub
@@ -83,8 +81,6 @@ class BaseApplication(web.Application, LoggingMixin):
         settings.update(as_dict(file_config))
         settings["static_url_prefix"] = (
             self._command_line_config.base_urlpath + "static/")
-
-        self._jinja_init(settings)
 
         handlers = self._get_handlers()
 
@@ -181,17 +177,3 @@ class BaseApplication(web.Application, LoggingMixin):
         web_api = self.registry.api_handlers(base_urlpath)
         web_handlers = self._web_handlers()
         return web_api+web_handlers
-
-    def _jinja_init(self, settings):
-        """Initializes the jinja template system settings.
-        These will be passed as settings and will be accessible at
-        rendering."""
-        jinja_env = Environment(
-            loader=FileSystemLoader(
-                settings["template_path"]
-            ),
-            autoescape=True,
-        )
-
-        jinja_env.filters["gravatar_id"] = gravatar_id
-        settings["template_loader"] = Jinja2LoaderAdapter(jinja_env)

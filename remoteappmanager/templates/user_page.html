@@ -1,20 +1,19 @@
 {% extends "page.html" %}
 
-{% set skin = "skin-black" %}
+{% block skin %} skin-black {% end %}
 
 {% block topbar %}
   <div id="applabel"></div>
-{% endblock %}
+{% end %}
 
 {% block sidebar %}
   <div id="applist"></div>
-{% endblock %}
+{% end %}
 
 {% block main %}
   <div id="appview"></div>
-{% endblock %}
+{% end %}
 
 {% block script_init %}
-    {{  super() }}
     <script src="{{ static_url("dist/user.js") }}"></script>
-{% endblock %}
+{% end %}

@@ -21,7 +21,6 @@ API reference
    remoteappmanager.application
    remoteappmanager.command_line_config
    remoteappmanager.file_config
-   remoteappmanager.jinja2_adapters
    remoteappmanager.netutils
    remoteappmanager.traitlets
    remoteappmanager.user
@@ -46,4 +45,3 @@ API reference
    remoteappmanager.webapi.admin.container
    remoteappmanager.services.hub
    remoteappmanager.services.reverse_proxy
-

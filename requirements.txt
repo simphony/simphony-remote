@@ -6,7 +6,6 @@ requests==2.10.0
 # on ubuntu uses 1.23, so they don't like each other.
 docker-py==1.8
 escapism==0.0.1
-jinja2==2.8
 git+git://github.com/jupyterhub/jupyterhub.git@2d1a45f0190059ef436c2f97dc8d6e391eb2d139#egg=jupyterhub
 jupyter_client==4.3.0
 click==6.6
