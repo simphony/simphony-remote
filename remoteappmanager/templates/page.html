@@ -27,7 +27,7 @@
   {% end %}
 </head>
 
-<body class="hold-transition {% block skin %}skin-blue{% end %} sidebar-mini">
+<body class="fixed hold-transition {% block skin %}skin-blue{% end %} sidebar-mini">
 
   <noscript>
     <div id='noscript'>
@@ -94,8 +94,10 @@
     </header>
 
     <aside class="main-sidebar">
-      {% block sidebar %}
-      {% end %}
+      <div class="slimScrollDiv">
+        {% block sidebar %}
+        {% end %}
+      </div>
     </aside>
 
     <div class="content-wrapper">

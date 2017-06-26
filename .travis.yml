@@ -12,6 +12,7 @@ before_install:
     - firefox --version
     # Get rid of nvm and thus node installed by travis, which is the incorrect version
     - rm -rf ~/.nvm
+    - sudo apt-get remove docker docker-engine
     - make deps
     - make pythondeps
     - python -c "import setuptools; print(setuptools.__version__)"

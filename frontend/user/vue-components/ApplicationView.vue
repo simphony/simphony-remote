@@ -12,6 +12,9 @@
             <div class="box-tools pull-right"></div>
           </div>
           <div class="box-body">
+            <h4>Type</h4>
+            <span>{{ currentApp.appData.image.type == "webapp" ? "Web": "VNC" }} application</span>
+
             <h4>Description</h4>
             <span id="app-description">{{ currentApp.appData.image.description }}</span>
 

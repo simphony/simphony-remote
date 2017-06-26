@@ -10,5 +10,6 @@ require('skin-blue-css');
 
 // Load JS (Global jQuery so that it's accessible by bootstrap)
 window.jQuery = window.$ = require('jquery');
+require('admin-lte/plugins/slimScroll/jquery.slimscroll.min');
 require('bootstrap');
 require('admin-lte');

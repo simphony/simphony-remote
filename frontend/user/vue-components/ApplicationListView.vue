@@ -8,9 +8,7 @@
     <!-- Sidebar Menu -->
     <ul class="sidebar-menu">
       <li class="header">APPLICATIONS</li>
-    </ul>
 
-    <ul class="sidebar-menu">
       <li v-show="!model.loading && model.appList.length === 0" id="no-app-msg">
         <a href="#">No applications found</a>
       </li>
