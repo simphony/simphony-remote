@@ -15,7 +15,7 @@
           <tr v-for="(row, row_index) in rows">
             <template v-for="(value, col_index) in row">
               <td v-if="isBoolean(value)"><i class="fa fa-check" v-if="value"></i></td>
-              <td v-else>{{value}}</td>
+              <td v-else>{{ value | truncate }}</td>
             </template>
             <td>
               <button v-for="action in rowActions"
