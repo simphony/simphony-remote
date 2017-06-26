@@ -18,25 +18,21 @@ Deployment of the complete system in a single machine/VM.
 #. Make sure that you are obtaining a recent version of Docker, at least 1.12.
    Full instructions available at `the Docker website <https://docs.docker.com/engine/installation/linux/ubuntulinux/>`_.
    A Makefile rule is provided for convenience. **NOTE: this overwrites the docker.list file you might have setup in your
-   /etc/apt/sources.d/ directory**.  You might be prompted for the root password to execute this::
-     
-     make dockerengine
-
-#. Install dependencies. You might be prompted for the root password to execute this::
+   /etc/apt/sources.d/ directory**. You might be prompted for the root password to execute this::
 
      make deps
 
 #. Make sure your docker server is running, and your user is allowed to connect to
    the docker server (check accessibility of `/var/run/docker.sock`). You obtain this by
    running::
-   
+
      sudo service docker start
      sudo addgroup your_username docker
-    
+
    and logging out and in again. Check if your docker server is operative by running::
 
      docker info
-   
+
 #. Create and activate a virtual environment, then set the appropriate PATH for the node modules::
 
      make venv
@@ -44,7 +40,7 @@ Deployment of the complete system in a single machine/VM.
      export PATH=`node bin`:$PATH
 
 #. Install the python dependencies::
-    
+
      make pythondeps
 
 #. And install the package itself::
