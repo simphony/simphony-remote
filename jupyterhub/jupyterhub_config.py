@@ -10,7 +10,9 @@ c.JupyterHub.ssl_cert = 'test.crt'
 c.JupyterHub.hub_ip = public_ips()[0] if len(public_ips()) else '127.0.0.1'
 
 c.JupyterHub.logo_file = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'simphony_logo.png')
+    os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
+    'remoteappmanager/static/images/header_logo.png'
+)
 
 # Choose between system-user mode and virtual-user mode
 setting_mode = ('system_user', 'virtual_user')[1]
