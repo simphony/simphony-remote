@@ -19,10 +19,7 @@ Vue.use(VueForm, {
 });
 
 Vue.filter("truncate", function(value) {
-  if(typeof value === 'string') {
-    if(value.startsWith('simphonyproject/')) {
-      value = value.split('/')[1];
-    }
+  if(typeof value === 'string' && !value.startsWith('simphonyproject/')) {
     value = _.truncate(value, {'length': 24 });
   }
   return value;
