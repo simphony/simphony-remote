@@ -36,7 +36,7 @@ class TestUserAccounting(AdminDriverTest):
 
         self.click_row_action_button("test", "Policies")
 
-        self.wait_until_visibility_of_row("simphonic-mayavi")
+        self.wait_until_visibility_of_row("simphonyproject/simphonic-mayavi")
 
         self.driver.get(os.path.join(
             self.base_url,
@@ -44,4 +44,4 @@ class TestUserAccounting(AdminDriverTest):
         ))
 
         self.wait_until_presence_of_element_located(By.CSS_SELECTOR, "div.alert-danger")
-        self.wait_until_invisibility_of_row("simphonic-mayavi")
+        self.wait_until_invisibility_of_row("simphonyproject/simphonic-mayavi")
