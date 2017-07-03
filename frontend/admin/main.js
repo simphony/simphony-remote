@@ -19,10 +19,10 @@ Vue.use(VueForm, {
 });
 
 Vue.filter("truncate", function(value) {
-  if(typeof value === 'string' && !value.startsWith('simphonyproject/')) {
-    value = _.truncate(value, {'length': 24 });
+  if(typeof value === 'string' && value.startsWith('simphonyproject/')) {
+    return value;
   }
-  return value;
+  return _.truncate(value, {'length': 24 });
 });
 
 let router = new VueRouter({
