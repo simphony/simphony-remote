@@ -4,12 +4,45 @@ SimPhoNy Remote CHANGELOG
 What's new in SimPhoNy Remote 2.1.0
 -----------------------------------
 
+- Improve the quit and share application links:
+  - Improve the rendering aspect when those links are disabled (#506)
+  - Rename "Stop application" link to "Quit" (#519)
+  - Rename "Share (copy url)" link to "Share session" (#519)
+  - Move the share link above the quit link (#519)
+  - Those links now opens modal dialogs, a confirmation dialog for the quit link
+    and a dialog containing the application url and a share button for the share
+    link (#519)
+  - Disable the share link for web applications (#523)
+- Autofill available images in the new accounting dialog and let the admin
+  choose the new application using a combo-box instead of typing the application
+  name (#511)
+- Add rendering support for a big application list (#520)
+
+- Fixes:
+  - Changing the URL user id number in admin accounting panel now refresh the
+    table (#509)
+  - HTML input elements are not closed anymore (#524). They were not supposed to
+    be closed (see HTML documentation).
+  - Fix error when clicking twice on the stop button when stopping a container
+    from the admin interface (#527)
+
+- Refactor:
+  - Put all the Javascript and CSS dependencies in two bundles (#510)
+  - Clear the selenium tests code so that it is now easier to write new tests
+    (#515)
+  - Remove Bower from the dependencies and use only NPM for package management
+    (#517)
+  - Remove Jinja and use Tornado templates (#521)
+
+- Other:
+  - Fix TRAVIS build which was failing because of an update of the docker
+    version (#529)
 
 What's new in SimPhoNy Remote 2.0.0
 -----------------------------------
 
-- Switch to Vue for both admin interface and user interface (#400, #402, #405, 
-  #407, #410, #411, #412, #413, #414, #420, #422, #423, #428, #431, #433, #434, 
+- Switch to Vue for both admin interface and user interface (#400, #402, #405,
+  #407, #410, #411, #412, #413, #414, #420, #422, #423, #428, #431, #433, #434,
   #436, #437, #438, #440, #442, #443, #446, #447, #448, #450, #451, #456, #459,
   #465, #467, #468, #471, #472, #473, #480, #481, #482, #489, )
 - Added search. Now only applications matching will be shown (#417, #427)
@@ -38,18 +71,18 @@ What's new in SimPhoNy Remote 2.0.0
 - Extracted application name in the topbar (#462)
 
 - Fixes:
-    - Compatibility with some adblockers for google analytics (#379) 
-    - Added random token to container name to prevent conflict during stop 
+    - Compatibility with some adblockers for google analytics (#379)
+    - Added random token to container name to prevent conflict during stop
       of containers (#381)
-    - Documented behavior with uppercase-lowercase names with github 
+    - Documented behavior with uppercase-lowercase names with github
       authentication. (#386)
-    - Performs re-registration of container when the jupyterhub service is 
+    - Performs re-registration of container when the jupyterhub service is
       stopped, to regain access to containers (#387)
     - Example jupyterhub configuration file allows now to work with no external
       interfaces (#409)
-    - Using node 6 for the builds and prevent the use of node 4 from travis to 
+    - Using node 6 for the builds and prevent the use of node 4 from travis to
       workaround disrupting ECONNRESET issues (#488)
-    - Upgraded astor to master to fix python 3.5 incompatibility during 
+    - Upgraded astor to master to fix python 3.5 incompatibility during
       documentation build (#494)
     - Skip containers that are not found while checking container.items (#478)
 
@@ -70,22 +103,22 @@ What's new in SimPhoNy Remote 2.0.0
 What's new in SimPhoNy Remote 1.1.0
 -----------------------------------
 
-- Use container provenance information to prevent access to unrelated 
+- Use container provenance information to prevent access to unrelated
   containers or simphony-remote instances (#361)
 - Upgraded tornado WebAPI to 0.5.0 (#335, #365, #340)
 - Interface overhaul. Introduced Admin-LTE frontend (#346)
 - Upgraded against jupyterhub 0.8.0.dev0 (#355, #358)
-- Introduced "realms" to hold container provenance in case of shared docker 
+- Introduced "realms" to hold container provenance in case of shared docker
   server (#361)
 - Added dynamic whitelist for GitHub login (#351, #359, #364)
-- Fixes: 
+- Fixes:
     - forever stuck spinner in case of docker internal failure (#336)
-    - Documented unexpected behavior reported in #305: containers not visible 
+    - Documented unexpected behavior reported in #305: containers not visible
       if the per-user server is already running (#342)
     - Incorrect username in admin panel has been fixed (#353)
     - Removed selenium_test from deployment (#356)
     - Establish correct keyboard focus when canvas is made visible (#362)
-- Refactor: 
+- Refactor:
     - Extracted macro in jinja template to a separate file (#337)
     - Cleaned up javascript utils module into separate files (#339)
     - Use of table macro to reduce template duplication (#341)
@@ -115,7 +148,7 @@ Summary
 - Upgraded dependency to tornado WebAPI 0.4.0 (#328)
 - Cleanup of WebAPI testing (#324) JavaScript (#320), stale code (#319)
 - Moved JupyterHub support classes to specific subpackage (#298)
-- Introduced authenticated decorator for resources that does not 
+- Introduced authenticated decorator for resources that does not
   perform redirection like web.authenticated (#294)
 - Pinned requirements to specific versions (#289)
 - UI:
@@ -146,11 +179,11 @@ Summary
 - UI:
     - Added spinner during loading of applications. Added message in case of no applications available (#252)
     - beautification (#265)
-- CI: 
+- CI:
     - Removed Paraview image retrieval (#256)
     - Better Travis output using before_script to perform devdeps installation. (#267)
     - Added test coverage for JavaScript code with Blanket (#276)
-- Refactor: 
+- Refactor:
     - Major overhaul of JavaScript layer (#250)
     - Finalized porting of WebAPI to tornadowebapi (#254)
 - Fix:
@@ -164,24 +197,24 @@ What's new in SimPhoNy Remote 0.7.0
 Summary
 ~~~~~~~
 
-- Addressed issues for general support for Docker containers holding Web applications 
+- Addressed issues for general support for Docker containers holding Web applications
   (jupyter notebook, filemanager) available as simphony-remote-docker 0.3.0.
 - REST+ajax based retrieval of available applications (#209, #214)
 - Show application policy information in application list (#242)
-- Preparation for REST framework extraction: 
+- Preparation for REST framework extraction:
     - factored out authenticator code from the BaseHandler (#215)
     - soft deprecation of subpackage (#236)
 - Upgraded dependencies to jupyterhub 0.7.0.dev0 (#217), configurable-http-proxy (#219)
-  to fix forwarding bugs in jupyterhub. 
+  to fix forwarding bugs in jupyterhub.
 - Pinned request package dependency to 2.10.0 due to dockerpy constraints (#222)
 - Renamed Spawner to SystemUserSpawner (#205)
 - Added linting and testing infrastructure for javascript (#200)
 - Documentation fixes and refactorings:
-    - General fixes (#179, #198, #199, #202, #232, #233) 
-    - Use of autosummary for API extraction (#194, #234) 
+    - General fixes (#179, #198, #199, #202, #232, #233)
+    - Use of autosummary for API extraction (#194, #234)
     - Extracted traitlets documenter in a separate repository (#210)
 - Migrated tests under the appropriate paths in the package tree (#196)
-- Command remoteapprest prints out only essential (UI name) application information, 
+- Command remoteapprest prints out only essential (UI name) application information,
   instead of the whole content of the request. (#230)
 - Removed the need for sudo in configurable-http-proxy installation (#244). Installation is now local.
 - Support for Ubuntu 16.04 (#243)
@@ -290,7 +323,7 @@ Summary
   Additionally, a CLI utility to modify the content of the database has
   been provided (#8)
 - Added readthedocs documentation (#12)
-- Container URL now contains a base32 encoded unique identifier, 
+- Container URL now contains a base32 encoded unique identifier,
   instead of the docker container id. (#18)
 - Introduced authentication of the user for the application (#24)
 - Improved handling of failures in starting containers (#6, #14, #15)
@@ -301,7 +334,7 @@ What's new in SimPhoNy Remote 0.1.0
 Summary
 ~~~~~~~
 
-Initial release. 
+Initial release.
 
 - A jupyterhub application handling multiple docker containers per user (PAM authentication)
 - A specialized spawner to handle the correct initialization of the user app
