@@ -29,7 +29,7 @@ var API = (function () {
   // Object representing the interface to the Web API.
   // @param base_url : the url at which to find the web API endpoint.
   var self = {};
-  self.base_urlpath = "/user/admin/";
+  self.base_urlpath = window.apidata.base_url;
   self.default_options = {
     contentType: "application/json",
     cache: false,
