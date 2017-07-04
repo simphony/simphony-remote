@@ -14,8 +14,7 @@
         <tbody>
           <tr v-for="(row, row_index) in rows">
             <template v-for="(value, col_index) in row">
-              <td v-if="isBoolean(value)"><i class="fa fa-check" v-if="value"></i></td>
-              <td v-else>{{ columnFormatters[col_index] !== undefined ? columnFormatters[col_index](value) : value }}</td>
+              <td v-html="columnFormatters[col_index] !== undefined ? columnFormatters[col_index](value) : value"></td>
             </template>
             <td>
               <button v-for="action in rowActions"
@@ -40,9 +39,6 @@
       rowActions: { type: Array, default: () => {return [];} }
     },
     methods: {
-      isBoolean: function(value) {
-        return typeof(value) === "boolean";
-      },
       buttonClassFromType: function(value = "danger") {
         let cls = {"btn": true};
         cls["btn-" + value] = true;
