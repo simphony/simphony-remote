@@ -25,6 +25,8 @@ What's new in SimPhoNy Remote 2.1.0
     be closed (see HTML documentation).
   - Fix error when clicking twice on the stop button when stopping a container
     from the admin interface (#527)
+  - Fix issue included in 2.0.0 with hard-coded username for server requests
+    (#534)
 
 - Refactor:
   - Put all the Javascript and CSS dependencies in two bundles (#510)
