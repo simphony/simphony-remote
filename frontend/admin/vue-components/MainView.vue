@@ -1,39 +1,33 @@
 <template>
-  <div class="row">
-    <div class="col-md-12">
-      <div class="box">
-        <div class="box-header with-border">Statistics</div>
-        <div class="box-body">
-          <div class="alert alert-danger" v-if="communicationError">
-            <strong>Error:</strong> {{communicationError}}
-          </div>
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-4">Realm</div>
-              <div class="col-lg-4">{{ realm }}</div>
-            </div>
-            <div class="row">
-              <div class="col-lg-4">Total users</div>
-              <div class="col-lg-8">{{ num_total_users }}</div>
-            </div>
-            <div class="row">
-              <div class="col-lg-4">Number of applications</div>
-              <div class="col-lg-8">{{ num_applications }}</div>
-            </div>
-            <hr />
-            <div class="row">
-              <div class="col-lg-4">Active users</div>
-              <div class="col-lg-8">{{ num_active_users }}</div>
-            </div>
-            <div class="row">
-              <div class="col-lg-4">Running containers</div>
-              <div class="col-lg-8">{{ num_running_containers }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <adminlte-box title="Statistics">
+    <div class="alert alert-danger" v-if="communicationError">
+      <strong>Error:</strong> {{communicationError}}
     </div>
-  </div>
+    <table class="table table-bordered">
+      <tbody>
+        <tr>
+          <th>Realm</th>
+          <td>{{ realm }}</td>
+        </tr>
+        <tr>
+          <th>Total users</th>
+          <td>{{ num_total_users }}</td>
+        </tr>
+        <tr>
+          <th>Number of applications</th>
+          <td>{{ num_applications }}</td>
+        </tr>
+        <tr>
+          <th>Active users</th>
+          <td>{{ num_active_users }}</td>
+        </tr>
+        <tr>
+          <th>Running containers</th>
+          <td>{{ num_running_containers }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </adminlte-box>
 </template>
 
 <script>
