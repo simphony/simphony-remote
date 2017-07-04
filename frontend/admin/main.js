@@ -18,13 +18,6 @@ Vue.use(VueForm, {
   }
 });
 
-Vue.filter("truncate", function(value) {
-  if(typeof value === 'string' && value.startsWith('simphonyproject/')) {
-    return value;
-  }
-  return _.truncate(value, {'length': 24 });
-});
-
 let router = new VueRouter({
   routes: [
     { path: '/', component: MainView },

@@ -15,7 +15,7 @@
           <tr v-for="(row, row_index) in rows">
             <template v-for="(value, col_index) in row">
               <td v-if="isBoolean(value)"><i class="fa fa-check" v-if="value"></i></td>
-              <td v-else>{{ value | truncate }}</td>
+              <td v-else>{{ columnFormatters[col_index] !== undefined ? columnFormatters[col_index](value) : value }}</td>
             </template>
             <td>
               <button v-for="action in rowActions"
@@ -32,9 +32,13 @@
 
 <script>
   module.exports = {
-    props: [
-      "headers", "rows", "globalActions", "rowActions"
-    ],
+    props: {
+      headers: { type: Array, default: () => {return [];} },
+      columnFormatters: { type: Array, default: () => {return [];} },
+      rows: { type: Array, default: () => {return [];} },
+      globalActions: { type: Array, default: () => {return [];} },
+      rowActions: { type: Array, default: () => {return [];} }
+    },
     methods: {
       isBoolean: function(value) {
         return typeof(value) === "boolean";
