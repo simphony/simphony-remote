@@ -28,7 +28,7 @@
 <script>
   module.exports = {
     props: [
-      "headers", "rows", "globalActions", "rowActions"
+      "headers", "rows", "rowActions"
     ],
     methods: {
       isBoolean: function(value) {
@@ -42,14 +42,3 @@
     }
   };
 </script>
-
-<style scoped>
-  .column-container {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .align-right {
-    align-self: flex-end;
-  }
-</style>
