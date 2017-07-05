@@ -16,7 +16,7 @@
       <!-- Loading spinner -->
       <li v-show="model.loading" id="loading-spinner">
         <a href="#">
-          <i class="fa fa-spinner fa-spin"></i>
+          <i class="fa fa-refresh fa-spin"></i>
           <span>Loading</span>
         </a>
       </li>
