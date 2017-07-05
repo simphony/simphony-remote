@@ -20,6 +20,11 @@ What's new in SimPhoNy Remote 2.1.0
 - Add SimPhoNy logo to the login page (#528)
 - Improve the admin home view by using an AdminLTE table instead of a basic
   Bootstrap table (#537)
+- Display AdminLTE loading spinner when starting and stopping applications
+  (#539)
+- Add application logo to the start form on the user page (#541)
+- Report failure of unfound image when trying to grant access to unknown image
+  to a user (#542)
 
 - Fixes:
   - Changing the URL user id number in admin accounting panel now refresh the
