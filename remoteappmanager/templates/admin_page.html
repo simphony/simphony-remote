@@ -1,6 +1,6 @@
 {% extends "page.html" %}
 
-{% set skin = "skin-red" %}
+{% block skin %} skin-red {% end %}
 
 {% block sidebar %}
   <section class="sidebar">
@@ -12,7 +12,7 @@
       <router-link to="/applications" tag="li" exact-active-class="active"><a>Applications</a></router-link>
     </ul>
   </section>
-{% endblock %}
+{% end %}
 
 {% block main %}
   <section class="content">
@@ -25,9 +25,8 @@
     <!-- component matched by the route will render here -->
     <router-view></router-view>
   </section>
-{% endblock %}
+{% end %}
 
 {% block script_init %}
-    {{  super() }}
     <script src="{{ static_url("dist/admin.js") }}"></script>
-{% endblock %}
+{% end %}

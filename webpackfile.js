@@ -27,6 +27,7 @@ module.exports = {
       "admin-lte-css": "admin-lte/dist/css/AdminLTE.min",
       "skin-black-css": "admin-lte/dist/css/skins/skin-black.min",
       "skin-red-css": "admin-lte/dist/css/skins/skin-red.min",
+      "skin-blue-css": "admin-lte/dist/css/skins/skin-blue.min",
 
       // JS
       jquery: "admin-lte/plugins/jQuery/jquery-2.2.3.min",

@@ -17,7 +17,6 @@ let availableApplicationsInfo = function () {
   // retrieve operations, successful or not.
   // This routine will go away when we provide the representation data
   // inline with the items at tornado-webapi level.
-
   let promise = $.Deferred();
 
   resources.Application.items()

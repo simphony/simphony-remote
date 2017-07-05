@@ -6,6 +6,7 @@ require('ionicons-css');
 require('admin-lte-css');
 require('skin-black-css');
 require('skin-red-css');
+require('skin-blue-css');
 
 // Load JS (Global jQuery so that it's accessible by bootstrap)
 window.jQuery = window.$ = require('jquery');
