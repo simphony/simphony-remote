@@ -139,10 +139,6 @@
     padding: 0px;
   }
 
-  .start-button {
-    min-width: 80px;
-  }
-
   #application {
     width: 100%;
     height: 100%;
