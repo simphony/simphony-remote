@@ -54,9 +54,12 @@
           <div class="box-footer">
             <button id="start-button" class="btn btn-primary pull-right start-button"
             @click="startApplication()"
-            :disabled="!currentApp.isStopped()">
-              {{ {STOPPED: 'Start', STARTING: 'Starting', STOPPING: 'Stopping'}[currentApp.status] }}
-            </button>
+            :disabled="!currentApp.isStopped()"> Start </button>
+          </div>
+
+          <!-- Loading spinner -->
+          <div class="overlay" v-show="!currentApp.isStopped()">
+            <i class="fa fa-refresh fa-spin"></i>
           </div>
         </div>
       </div>
