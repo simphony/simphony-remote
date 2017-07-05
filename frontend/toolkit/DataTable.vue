@@ -34,9 +34,9 @@
 
   module.exports = {
     props: {
-      headers: { type: Array, default: () => {return [];} },
+      headers: { type: Array, required: true },
       columnFormatters: { type: Array, default: () => {return [];} },
-      rows: { type: Array, default: () => {return [];} },
+      rows: { type: Array, required: true },
       globalActions: { type: Array, default: () => {return [];} },
       rowActions: { type: Array, default: () => {return [];} }
     },
