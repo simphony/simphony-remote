@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 from setuptools.command.install import install as _install
 
 # Setup version
-VERSION = '2.0.0'
+VERSION = '2.0.1'
 
 # Read description
 with open('README.rst', 'r') as readme:
