@@ -37,7 +37,10 @@
   let NewAccountingDialog = require("./accounting/NewAccountingDialog");
 
   let checkIconFormatter = function(value) {
-    return '<i class="fa fa-check" v-if="' + value + '"></i>';
+    if(value) {
+      return '<i class="fa fa-check"></i>';
+    }
+    return '';
   };
 
   module.exports = {
