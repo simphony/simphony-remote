@@ -17,6 +17,9 @@ What's new in SimPhoNy Remote 2.1.0
   choose the new application using a combo-box instead of typing the application
   name (#511)
 - Add rendering support for a big application list (#520)
+- Add SimPhoNy logo to the login page (#528)
+- Improve the admin home view by using an AdminLTE table instead of a basic
+  Bootstrap table (#537)
 
 - Fixes:
   - Changing the URL user id number in admin accounting panel now refresh the
