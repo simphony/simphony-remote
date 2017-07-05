@@ -9,9 +9,9 @@
         <div class="box box-standard">
           <div class="box-header with-border">
             <h3 class="box-title">{{ currentApp.appData.image | appName }}</h3>
-            <div class="box-tools pull-right"></div>
           </div>
           <div class="box-body">
+            <img class="pull-right app-logo" :src="currentApp.appData.image.icon_128 | iconSrc"></img>
             <h4>Type</h4>
             <span>{{ currentApp.appData.image.type == "webapp" ? "Web": "VNC" }} application</span>
 
@@ -138,6 +138,10 @@
 
   .start-button {
     min-width: 80px;
+  }
+
+  .app-logo {
+    border-radius: 20%;
   }
 
   #application {

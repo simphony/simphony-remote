@@ -136,8 +136,12 @@
         .done(() => {
           this.$emit('created');
         })
-        .fail(() => {
-          this.communicationError = "The request could not be executed successfully";
+        .fail((error) => {
+          if(error.code == 404) {
+            this.communicationError = "The requested image is not available";
+          } else {
+            this.communicationError = "The request could not be executed successfully";
+          }
         });
       },
 
