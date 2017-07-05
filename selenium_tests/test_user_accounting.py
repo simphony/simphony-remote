@@ -7,13 +7,13 @@ class TestUserAccounting(AdminDriverTest):
     def test_create_new_entry_button(self):
         self.click_first_element_located(By.LINK_TEXT, "Users")
 
-        self.click_first_button("Create New Entry")
+        self.click_first_button("Create New User")
         self.click_modal_footer_button("Cancel")
 
     def test_create_and_remove_user(self):
         self.click_first_element_located(By.LINK_TEXT, "Users")
 
-        self.click_first_button("Create New Entry")
+        self.click_first_button("Create New User")
         self.type_text_in_element_located(By.CSS_SELECTOR, ".modal-body > form > div > input", "mrenou")
         self.click_modal_footer_button("Submit")
 
