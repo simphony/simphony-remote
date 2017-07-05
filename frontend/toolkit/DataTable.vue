@@ -14,7 +14,7 @@
         <tbody>
           <tr v-for="(row, row_index) in rows">
             <template v-for="(value, col_index) in row">
-              <td v-html="columnFormatters[col_index] !== undefined ? columnFormatters[col_index](value) : value"></td>
+              <td v-html="format(value, col_index)"></td>
             </template>
             <td>
               <button v-for="action in rowActions"
@@ -30,6 +30,8 @@
 </template>
 
 <script>
+  let _ = require('lodash');
+
   module.exports = {
     props: {
       headers: { type: Array, default: () => {return [];} },
@@ -43,6 +45,12 @@
         let cls = {"btn": true};
         cls["btn-" + value] = true;
         return cls;
+      },
+      format: function(value, col_index) {
+        if(_.isFunction(this.columnFormatters[col_index])) {
+          return this.columnFormatters[col_index](value);
+        }
+        return value;
       }
     }
   };
