@@ -1,4 +1,3 @@
-let _ = require("lodash");
 let Vue = require("vue");
 let VueRouter = require("vue-router");
 let VueForm = require("vue-form");
