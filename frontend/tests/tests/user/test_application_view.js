@@ -131,11 +131,6 @@ QUnit.test("rendering start button", function (assert) {
   model.appList[0].status = 'STARTING';
 
   Vue.nextTick(function() {
-    assert.equal(
-      appView.$el.querySelector('.start-button').innerHTML.trim(),
-      'Starting'
-    );
-
     assert.ok(
       appView.$el.querySelector('.start-button').disabled
     );
@@ -144,11 +139,6 @@ QUnit.test("rendering start button", function (assert) {
     model.appList[0].status = 'STOPPING';
 
     Vue.nextTick(function() {
-      assert.equal(
-        appView.$el.querySelector('.start-button').innerHTML.trim(),
-        'Stopping'
-      );
-
       assert.ok(
         appView.$el.querySelector('.start-button').disabled
       );
