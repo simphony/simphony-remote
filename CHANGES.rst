@@ -25,6 +25,8 @@ What's new in SimPhoNy Remote 2.1.0
 - Add application logo to the start form on the user page (#541)
 - Report failure of unfound image when trying to grant access to unknown image
   to a user (#542)
+- Use deployment version of Vue instead of development version (#543)
+- Add column formatters for the datatable component (#530)
 
 - Fixes:
   - Changing the URL user id number in admin accounting panel now refresh the
