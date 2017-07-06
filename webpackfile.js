@@ -32,7 +32,7 @@ module.exports = {
       // JS
       jquery: "admin-lte/plugins/jQuery/jquery-2.2.3.min",
       bootstrap: "admin-lte/bootstrap/js/bootstrap.min",
-      vue: "vue/dist/vue",
+      vue: "vue/dist/vue.min",
       "vue-router": "vue-router/dist/vue-router",
 
       "admin-resources": path.resolve(js, "admin/admin-resources"),
