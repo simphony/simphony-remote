@@ -1,5 +1,7 @@
 <template>
   <adminlte-box title="Users">
+    <button slot="tools" class="btn btn-primary" @click="newUserDialog.visible = true">Create New User</button>
+
     <div class="alert alert-danger" v-if="communicationError">
       <strong>Error:</strong> {{communicationError}}
     </div>
@@ -7,7 +9,6 @@
     <data-table
     :headers.once="table.headers"
     :rows="table.rows"
-    :globalActions="table.globalActions"
     :rowActions="table.rowActions">
     </data-table>
     <new-user-dialog
@@ -39,10 +40,6 @@
         table: {
           headers: ["ID", "Username"],
           rows: [],
-          globalActions: [{
-            label: "Create New Entry",
-            callback: () => {this.newUserDialog.visible = true;}
-          }],
           rowActions: [{
             label: "Policies",
             callback: this.showPolicyAction,

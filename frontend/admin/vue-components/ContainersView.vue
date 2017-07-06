@@ -6,7 +6,6 @@
     <data-table
     :headers.once="table.headers"
     :rows="table.rows"
-    :globalActions="table.globalActions"
     :rowActions="table.rowActions">
     </data-table>
     <confirm-dialog
