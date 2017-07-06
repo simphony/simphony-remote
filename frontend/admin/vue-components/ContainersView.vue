@@ -5,6 +5,7 @@
     </div>
     <data-table
     :headers.once="table.headers"
+    :columnFormatters.once="table.columnFormatters"
     :rows="table.rows"
     :globalActions="table.globalActions"
     :rowActions="table.rowActions">
@@ -21,12 +22,18 @@
 
 <script>
   let resources = require("admin-resources");
+  let _ = require("lodash");
+
+  let truncate = function(value) {
+    return _.truncate(value, {'length': 24});
+  };
 
   module.exports = {
     data: function () {
       return {
         table: {
           headers: ["URL ID", "User", "Image", "Docker ID", "Mapping ID"],
+          columnFormatters: [truncate, undefined, undefined, truncate, truncate],
           rows: [],
           rowActions: [{
             label: "Stop",

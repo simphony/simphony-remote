@@ -6,6 +6,7 @@
 
     <data-table
     :headers.once="table.headers"
+    :columnFormatters.once="table.columnFormatters"
     :rows="table.rows"
     :globalActions="table.globalActions"
     :rowActions="table.rowActions">
@@ -35,6 +36,13 @@
   let resources = require("admin-resources");
   let NewAccountingDialog = require("./accounting/NewAccountingDialog");
 
+  let checkIconFormatter = function(value) {
+    if(value) {
+      return '<i class="fa fa-check"></i>';
+    }
+    return '';
+  };
+
   module.exports = {
     components: {
       'new-accounting-dialog': NewAccountingDialog
@@ -46,6 +54,7 @@
           headers: [
             "ID", "Image", "Workspace", "Vol. source", "Vol. target", "Readonly"
           ],
+          columnFormatters: [undefined, undefined, checkIconFormatter, undefined, undefined, checkIconFormatter],
           rows: [],
           globalActions: [{
             label: "Create New Entry",

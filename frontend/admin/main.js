@@ -1,4 +1,3 @@
-let _ = require("lodash");
 let Vue = require("vue");
 let VueRouter = require("vue-router");
 let VueForm = require("vue-form");
@@ -16,10 +15,6 @@ Vue.use(VueForm, {
     valid: 'form-control-success',
     invalid: 'form-control-danger'
   }
-});
-
-Vue.filter("truncate", function(value) {
-  return _.truncate(value, {'length': 12 });
 });
 
 let router = new VueRouter({

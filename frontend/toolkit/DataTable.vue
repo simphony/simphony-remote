@@ -13,10 +13,9 @@
         </thead>
         <tbody>
           <tr v-for="(row, row_index) in rows">
-            <template v-for="(value, col_index) in row">
-              <td v-if="isBoolean(value)"><i class="fa fa-check" v-if="value"></i></td>
-              <td v-else>{{value}}</td>
-            </template>
+            <td
+            v-for="(value, col_index) in row"
+            v-html="format(value, col_index)"></td>
             <td>
               <button v-for="action in rowActions"
               :class="buttonClassFromType(action.type)"
@@ -31,18 +30,27 @@
 </template>
 
 <script>
+  let _ = require('lodash');
+
   module.exports = {
-    props: [
-      "headers", "rows", "globalActions", "rowActions"
-    ],
+    props: {
+      headers: { type: Array, required: true },
+      columnFormatters: { type: Array, default: () => {return [];} },
+      rows: { type: Array, required: true },
+      globalActions: { type: Array, default: () => {return [];} },
+      rowActions: { type: Array, default: () => {return [];} }
+    },
     methods: {
-      isBoolean: function(value) {
-        return typeof(value) === "boolean";
-      },
       buttonClassFromType: function(value = "danger") {
         let cls = {"btn": true};
         cls["btn-" + value] = true;
         return cls;
+      },
+      format: function(value, col_index) {
+        if(_.isFunction(this.columnFormatters[col_index])) {
+          return this.columnFormatters[col_index](value);
+        }
+        return value;
       }
     }
   };
