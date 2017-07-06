@@ -13,9 +13,9 @@
         </thead>
         <tbody>
           <tr v-for="(row, row_index) in rows">
-            <template v-for="(value, col_index) in row">
-              <td v-html="format(value, col_index)"></td>
-            </template>
+            <td
+            v-for="(value, col_index) in row"
+            v-html="format(value, col_index)"></td>
             <td>
               <button v-for="action in rowActions"
               :class="buttonClassFromType(action.type)"
