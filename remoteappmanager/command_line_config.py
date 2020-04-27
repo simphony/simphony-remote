@@ -60,11 +60,11 @@ class CommandLineConfig(HasTraits):
 
         if not self.command_line_options_inited:
             for trait_name, trait in self.traits().items():
-                    define(
-                        trait_name,
-                        default=trait.default_value,
-                        type=type(trait.default_value),
-                        help=trait.help)
+                define(
+                    trait_name,
+                    default=trait.default_value,
+                    type=type(trait.default_value),
+                    help=trait.help)
 
         self.__class__.command_line_options_inited = True
 
