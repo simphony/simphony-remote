@@ -1,7 +1,7 @@
 import os
 
 import time
-from tornado.testing import AsyncTestCase, gen_test, LogTrapTestCase
+from tornado.testing import AsyncTestCase, gen_test, ExpectLog
 
 from remoteappmanager.tests.temp_mixin import TempMixin
 from remoteappmanager.tests.utils import mock_coro_factory
@@ -13,7 +13,7 @@ from remoteappmanager.jupyterhub.auth import GitHubWhitelistAuthenticator
 
 class TestGithubWhiteListAuthenticator(TempMixin,
                                        AsyncTestCase,
-                                       LogTrapTestCase):
+                                       ExpectLog):
     def setUp(self):
         self.auth = GitHubWhitelistAuthenticator()
         self.auth.authenticate = mock_coro_factory(return_value="foo")

@@ -30,8 +30,7 @@ class ContainerHandler(ResourceHandler):
         mapping_id = resource.mapping_id
 
         webapp = self.application
-        account = self.current_user.account
-        accountings = webapp.db.get_accounting_for_user(account)
+        accountings = webapp.db.get_accounting_for_user(self.current_user)
         container_manager = webapp.container_manager
 
         choice = [(accounting.id,
@@ -147,7 +146,7 @@ class ContainerHandler(ResourceHandler):
         container_manager = self.application.container_manager
 
         accountings = self.application.db.get_accounting_for_user(
-            self.current_user.account)
+            self.current_user)
 
         running_containers = []
 
@@ -242,6 +241,8 @@ class ContainerHandler(ResourceHandler):
                                  home_path, user_name)
                 pass
 
+        if policy.app_license:
+            environment['APP_LICENSE'] = policy.app_license
         if None not in volume_spec:
             volume_source, volume_target, volume_mode = volume_spec
             volumes[volume_source] = {'bind': volume_target,

@@ -1,11 +1,11 @@
-from tornado.testing import LogTrapTestCase
+from tornado.testing import ExpectLog
 
 from remoteappmanager.tests import utils
 from remoteappmanager.tests.mocking import dummy
 from remoteappmanager.tests.temp_mixin import TempMixin
 
 
-class TestUserHomeHandler(TempMixin, utils.AsyncHTTPTestCase, LogTrapTestCase):
+class TestUserHomeHandler(TempMixin, utils.AsyncHTTPTestCase, ExpectLog):
     def get_app(self):
         app = dummy.create_application()
         app.hub.verify_token.return_value = {

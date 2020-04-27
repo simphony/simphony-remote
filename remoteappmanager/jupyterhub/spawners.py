@@ -44,10 +44,18 @@ class BaseSpawner(LocalProcessSpawner):
         for iarg, arg in enumerate(args):
             args[iarg] = arg.replace('--base-url=', '--base-urlpath=')
 
-        args.append("--proxy-api-url={}".format(self.proxy.api_server.url))
+        args.append("--proxy-api-url={}".format(
+            self.proxy.api_server.url))
+
+        args.append("--logout_url={}".format(
+            self.authenticator.logout_url(
+                self.hub.server.base_url)))
 
         if self.config_file_path:
             args.append("--config-file={}".format(self.config_file_path))
+
+        args.append("--login_service={}".format(
+            self.authenticator.login_service))
 
         return args
 

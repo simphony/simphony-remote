@@ -25,7 +25,7 @@ class BaseApplication(web.Application, LoggingMixin):
 
     #: The user currently obtained from the command line. It
     #: is well established at startup and passed to the request
-    #: handler _only_ when authencation is passed, otherwise Null
+    #: handler _only_ when authentication is passed, otherwise Null
     #: will be passed.
     user = Instance(User)
 
@@ -129,7 +129,8 @@ class BaseApplication(web.Application, LoggingMixin):
     def _user_default(self):
         """Initializes the user at the database level."""
         user_name = self.command_line_config.user
-        user = User(name=user_name)
+        login_service = self.command_line_config.login_service
+        user = User(name=user_name, login_service=login_service)
         user.account = self.db.get_user(user_name=user_name)
         return user
 
@@ -144,6 +145,9 @@ class BaseApplication(web.Application, LoggingMixin):
     # Public
     def start(self):
         """Start the application and the ioloop"""
+
+        self.log.info("Adding demo apps to User registry:")
+        self._add_demo_apps()
 
         self.log.info("Starting server with options:")
         for trait_name in self._command_line_config.trait_names():
@@ -161,6 +165,24 @@ class BaseApplication(web.Application, LoggingMixin):
         tornado.ioloop.IOLoop.current().start()
 
     # Private
+    def _add_demo_apps(self):
+        """Grant access to any demo applications provided for user"""
+
+        if not self.user.demo_applications:
+            return
+
+        # Add all demo applications already registered
+        for application in self.db.list_applications():
+            if application.image in self.user.demo_applications:
+                self.log.info(application.image)
+                self.db.grant_access(
+                    application.image,
+                    self.user.name,
+                    False,
+                    True,
+                    None
+                )
+
     def _webapi_resources(self):
         """Return a list of resources to be exported by the Web API.
         Reimplement this in subclasses to export specific resources"""

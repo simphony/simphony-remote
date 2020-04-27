@@ -128,7 +128,7 @@ class DummyDB(interfaces.ABCDatabase):
     def list_applications(self):  # pragma: no cover
         return self.applications.values()
 
-    def grant_access(self, app_name, user_name,
+    def grant_access(self, app_name, user_name, app_license,
                      allow_home, allow_view, volume):
         app = self._get_application_id_by_name(app_name)
         user = self._get_user_id_by_name(user_name)
@@ -143,7 +143,7 @@ class DummyDB(interfaces.ABCDatabase):
 
         return id
 
-    def revoke_access(self, app_name, user_name,
+    def revoke_access(self, app_name, user_name, app_license,
                       allow_home, allow_view, volume):
         pass
 

@@ -1,4 +1,4 @@
-from tornado.testing import LogTrapTestCase
+from tornado.testing import ExpectLog
 
 from remoteappmanager.tests import utils
 from remoteappmanager.tests.mocking import dummy
@@ -8,7 +8,7 @@ from remoteappmanager.tests.utils import mock_coro_factory
 
 class TestRegisterContainerHandler(TempMixin,
                                    utils.AsyncHTTPTestCase,
-                                   LogTrapTestCase):
+                                   ExpectLog):
     def get_app(self):
         app = dummy.create_application()
         app.hub.verify_token.return_value = {

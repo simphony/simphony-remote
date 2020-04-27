@@ -5,7 +5,7 @@ import subprocess
 import sys
 import time
 from unittest import mock
-from tornado.testing import LogTrapTestCase
+from tornado.testing import ExpectLog
 
 from tornado import testing
 from jupyterhub import orm
@@ -68,7 +68,7 @@ def new_spawner(spawner_class):
     return spawner_class(db=db, user=user, hub=hub)
 
 
-class TestSystemUserSpawner(TempMixin, testing.AsyncTestCase, LogTrapTestCase):
+class TestSystemUserSpawner(TempMixin, testing.AsyncTestCase, ExpectLog):
     def setUp(self):
         super().setUp()
         self.spawner = new_spawner(SystemUserSpawner)

@@ -21,7 +21,7 @@ class AuthHandler(web.RequestHandler):
         self.flush()
 
 
-class TestHub(utils.AsyncHTTPTestCase, testing.LogTrapTestCase):
+class TestHub(utils.AsyncHTTPTestCase, testing.ExpectLog):
     def get_app(self):
         self.handler = AuthHandler
         handlers = [

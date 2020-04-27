@@ -10,6 +10,9 @@ user.name (str)
 application.image (str)
     Image name of the application.
 
+policy.app_license (str)
+    String containing application license (if required)
+
 policy.allow_home (str)
     Is home directory mounted (1 - true, 0 - false).
 
@@ -76,6 +79,7 @@ class CSVUser(object):
 # Required headers of the CSV files
 _HEADERS = ('user.name',
             'application.image',
+            'policy.app_license'
             'policy.allow_home',
             'policy.allow_view',
             'policy.allow_common',
@@ -143,7 +147,8 @@ class CSVDatabase(ABCDatabase):
                         image=image
                     )
                 )
-
+                app_license = (record[indices['policy.app_license']] or
+                                 None)
                 allow_home = record[indices['policy.allow_home']] == '1'
                 allow_view = record[indices['policy.allow_view']] == '1'
                 allow_common = record[indices['policy.allow_common']] == '1'
@@ -155,13 +160,15 @@ class CSVDatabase(ABCDatabase):
                                None)
 
                 application_policy = self.application_policies.setdefault(
-                    (allow_home,
+                    (app_license,
+                     allow_home,
                      allow_view,
                      allow_common,
                      volume_source,
                      volume_target,
                      volume_mode),
                     CSVApplicationPolicy(
+                        app_license=app_license,
                         allow_home=allow_home,
                         allow_view=allow_view,
                         allow_common=allow_common,

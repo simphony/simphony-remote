@@ -1,8 +1,9 @@
 import contextlib
 import uuid
 import os
+from unittest import TestCase
 
-from tornado.testing import LogTrapTestCase
+from tornado.testing import ExpectLog
 
 from remoteappmanager.db import orm
 from remoteappmanager.db import exceptions
@@ -54,7 +55,7 @@ def fill_db(session):
         session.add_all(accountings)
 
 
-class TestOrm(TempMixin, LogTrapTestCase):
+class TestOrm(TempMixin, ExpectLog, TestCase):
     def setUp(self):
         super().setUp()
         self.sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
@@ -140,7 +141,7 @@ class TestOrm(TempMixin, LogTrapTestCase):
 
 
 class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
-                      LogTrapTestCase):
+                      ExpectLog, TestCase):
     def setUp(self):
         # Setup temporary directory
         super().setUp()

@@ -222,7 +222,7 @@ def list(ctx, no_decoration, show_apps):
         format = "simple"
         headers = ["ID", "Name"]
         if show_apps:
-            headers += ["App", "Home", "View", "Common", "Vol. Source",
+            headers += ["App", "License", "Home", "View", "Common", "Vol. Source",
                         "Vol. Target", "Vol. Mode"]
 
     session = ctx.obj.session
@@ -234,6 +234,7 @@ def list(ctx, no_decoration, show_apps):
             table.append(cur)
             if show_apps:
                 apps = [[entry.application.image,
+                         entry.application_policy.app_license,
                          entry.application_policy.allow_home,
                          entry.application_policy.allow_view,
                          entry.application_policy.allow_common,
@@ -243,7 +244,7 @@ def list(ctx, no_decoration, show_apps):
                         for entry in orm.accounting_for_user(session, user)]
 
                 if len(apps) == 0:
-                    apps = [['']*7]
+                    apps = [['']*8]
 
                 cur.extend(apps[0])
                 for app in apps[1:]:
@@ -340,6 +341,8 @@ def list(ctx, no_decoration):
 @app.command()
 @click.argument("image")
 @click.argument("user")
+@click.option("--app_license", type=click.STRING,
+              help="Application license (if required)")
 @click.option("--allow-home",
               is_flag=True,
               help="Enable mounting of home directory")
@@ -350,7 +353,7 @@ def list(ctx, no_decoration):
               help="Application data volume, format=SOURCE:TARGET:MODE, "
                    "where mode is 'ro' or 'rw'.")
 @click.pass_context
-def grant(ctx, image, user, allow_home, allow_view, volume):
+def grant(ctx, image, user, app_license, allow_home, allow_view, volume):
     """Grants access to application identified by IMAGE to a specific
     user USER and specified access policy."""
     allow_common = False
@@ -380,6 +383,7 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
                                      param_hint="user")
 
         orm_policy = session.query(orm.ApplicationPolicy).filter(
+            orm.ApplicationPolicy.app_license == app_license,
             orm.ApplicationPolicy.allow_home == allow_home,
             orm.ApplicationPolicy.allow_common == allow_common,
             orm.ApplicationPolicy.allow_view == allow_view,
@@ -389,6 +393,7 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
 
         if orm_policy is None:
             orm_policy = orm.ApplicationPolicy(
+                app_license=app_license,
                 allow_home=allow_home,
                 allow_common=allow_common,
                 allow_view=allow_view,
@@ -423,6 +428,8 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
               is_flag=True,
               help="revoke all grants for that specific user and application, "
                    "regardless of policy.")
+@click.option("--app_license", type=click.STRING,
+              help="Application license (if required)")
 @click.option("--allow-home",
               is_flag=True,
               help="Policy for mounting of home directory")
@@ -434,7 +441,7 @@ def grant(ctx, image, user, allow_home, allow_view, volume):
               help="Application data volume, format=SOURCE:TARGET:MODE, "
                    "where mode is 'ro' or 'rw'.")
 @click.pass_context
-def revoke(ctx, image, user, revoke_all, allow_home, allow_view, volume):
+def revoke(ctx, image, user, revoke_all, app_license, allow_home, allow_view, volume):
     """Revokes access to application identified by IMAGE to a specific
     user USER and specified parameters."""
     allow_common = False
@@ -463,6 +470,7 @@ def revoke(ctx, image, user, revoke_all, allow_home, allow_view, volume):
 
         else:
             orm_policy = session.query(orm.ApplicationPolicy).filter(
+                orm.ApplicationPolicy.app_license == app_license,
                 orm.ApplicationPolicy.allow_home == allow_home,
                 orm.ApplicationPolicy.allow_common == allow_common,
                 orm.ApplicationPolicy.allow_view == allow_view,

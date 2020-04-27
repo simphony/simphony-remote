@@ -17,7 +17,7 @@ class DummyDB:
 
 class TestApplication(TempMixin,
                       testing.AsyncTestCase,
-                      testing.LogTrapTestCase):
+                      testing.ExpectLog):
     def setUp(self):
         super().setUp()
 
