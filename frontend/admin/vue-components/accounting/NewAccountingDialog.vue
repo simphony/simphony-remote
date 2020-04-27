@@ -16,6 +16,11 @@
         </validate>
 
         <div class="form-group">
+            <label for="app_license">License</label>
+            <textarea class="form-control" name="app_license" placeholder="Enter license key here if required" v-model="model.app_license"></textarea>
+        </div>
+
+        <div class="form-group">
           <label>
             <input type="checkbox" id="allow_home" v-model="model.allow_home"/> Mount home as Workspace
           </label>
@@ -73,6 +78,7 @@
         communicationError: null,
         model: {
           image_name: '',
+          app_license: '',
           allow_home: false,
           volume_source: '',
           volume_target: '',
@@ -126,6 +132,7 @@
         let rep = {
           user_id: this.userId,
           image_name: this.model.image_name,
+          app_license: this.model.app_license,
           allow_home: this.model.allow_home,
           volume_source: this.model.volume_source,
           volume_target: this.model.volume_target,
