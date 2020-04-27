@@ -1,5 +1,4 @@
 from http.client import responses
-from urllib.parse import urljoin
 import hashlib
 
 from tornado import web, gen

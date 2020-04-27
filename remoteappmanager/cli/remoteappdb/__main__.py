@@ -91,7 +91,7 @@ def get_docker_client():
         # ConnectionError occurs, say, if the docker machine is not running
         # or if the shell is not in a docker VM (for Mac/Windows)
         print_error('docker client fails to connect.')
-        raise
+        raise exception
 
     return client
 
@@ -222,8 +222,8 @@ def list(ctx, no_decoration, show_apps):
         format = "simple"
         headers = ["ID", "Name"]
         if show_apps:
-            headers += ["App", "License", "Home", "View", "Common", "Vol. Source",
-                        "Vol. Target", "Vol. Mode"]
+            headers += ["App", "License", "Home", "View", "Common",
+                        "Vol. Source", "Vol. Target", "Vol. Mode"]
 
     session = ctx.obj.session
 
@@ -441,7 +441,9 @@ def grant(ctx, image, user, app_license, allow_home, allow_view, volume):
               help="Application data volume, format=SOURCE:TARGET:MODE, "
                    "where mode is 'ro' or 'rw'.")
 @click.pass_context
-def revoke(ctx, image, user, revoke_all, app_license, allow_home, allow_view, volume):
+def revoke(
+        ctx, image, user, revoke_all, app_license,
+        allow_home, allow_view, volume):
     """Revokes access to application identified by IMAGE to a specific
     user USER and specified parameters."""
     allow_common = False

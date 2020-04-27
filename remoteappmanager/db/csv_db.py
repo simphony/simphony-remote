@@ -147,8 +147,8 @@ class CSVDatabase(ABCDatabase):
                         image=image
                     )
                 )
-                app_license = (record[indices['policy.app_license']] or
-                                 None)
+                app_license = (
+                    record[indices['policy.app_license']] or None)
                 allow_home = record[indices['policy.allow_home']] == '1'
                 allow_view = record[indices['policy.allow_view']] == '1'
                 allow_common = record[indices['policy.allow_common']] == '1'

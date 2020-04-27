@@ -44,7 +44,8 @@ class CommandLineConfig(HasTraits):
     config_file = Unicode(help="The path of the configuration file")
 
     #: A reference to the authenticator class used for the user login
-    login_service = Unicode(help="The name of the JupyterHub Authenticator class")
+    login_service = Unicode(
+        help="The name of the JupyterHub Authenticator class")
 
     # Used to keep track if we already added the options
     # to the global config object. If that's the case, we skip the addition
@@ -58,12 +59,12 @@ class CommandLineConfig(HasTraits):
         """
 
         if not self.command_line_options_inited:
-            for traitlet_name, traitlet in self.traits().items():
+            for trait_name, trait in self.traits().items():
                     define(
-                        traitlet_name,
-                        default=traitlet.default_value,
-                        type=type(traitlet.default_value),
-                        help=traitlet.help)
+                        trait_name,
+                        default=trait.default_value,
+                        type=type(trait.default_value),
+                        help=trait.help)
 
         self.__class__.command_line_options_inited = True
 

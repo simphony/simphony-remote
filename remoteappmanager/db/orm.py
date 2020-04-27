@@ -409,9 +409,8 @@ class ORMDatabase(ABCDatabase):
     def revoke_access_by_id(self, mapping_id):
         with detached_session(self.db) as session, \
                 transaction(session):
-                session.query(Accounting).filter(
-                    Accounting.id == mapping_id
-                    ).delete()
+            session.query(Accounting).filter(
+                Accounting.id == mapping_id).delete()
 
 
 @contextlib.contextmanager
