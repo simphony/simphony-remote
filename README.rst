@@ -35,10 +35,6 @@ Basic instructions for a single-user deployment on a local (or virtual) machine 
 A more comprehensive deployment documentation, including use of a ``nginx`` reverse proxy and
 running as a service can be found `here <doc/source/deployment.rst>`_
 
-If you would like
-to test a deployment of S-R using Docker for CI purposes, then please use the following
-`instructions <ci/ci_instructions.rst>`_.
-
 Single Machine
 --------------
 
