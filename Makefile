@@ -182,7 +182,7 @@ test: pythontest jstest
 pythontest:
 	@echo "Running python testsuite"
 	@echo "------------------------"
-	python -m tornado.testing tornado.test.web_test -s remoteappmanager -t .
+	python -m tornado.testing discover -s remoteappmanager -t .
 
 .PHONY: jstest
 jstest:
