@@ -1,4 +1,19 @@
 SHELL=bash
+NODEJS_VERSION=6
+SIMPHONY_REMOTE=`pwd`
+CERT_TYPE='test'
+
+OS_DEPS = curl ca-certificates nginx
+
+UBUNTU_PKG = apt-get
+CENTOS_PKG = yum
+
+UBUNTU_DEPS = gnupg-agent apt-transport-https software-properties-common
+CENTOS_DEPS = openssl device-mapper-persistent-data lvm2 bzip2 gcc-c++ epel-release
+
+PYTHON3_DEPS = python3 python3-pip python3-venv
+DOCKER_DEPS = docker-ce docker-ce-cli containerd.io
+
 
 .PHONY: venv
 venv:
@@ -8,26 +23,96 @@ venv:
 
 .PHONY: deps
 deps:
-	@echo "Installing apt dependencies"
+	@echo "Installing dependencies"
 	@echo "---------------------------"
 	if [ `uname -s` != "Linux" ]; then \
 		echo "ERROR: Cannot run on non-Linux systems"; \
 		false; \
 	fi
-	curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+
+	if [ -f "/etc/lsb-release" ]; then \
+		$(MAKE) ubuntudeps; \
+	elif [ -f "/etc/centos-release" ]; then \
+		$(MAKE) centosdeps; \
+	else \
+		echo "ERROR: Installation requires either Ubuntu or CentOS systems"; \
+		false; \
+	fi
+
+osdeps:
+
+	# Install OS Dependencies
+	sudo $(PKG_MNGR) update -y
+	sudo $(PKG_MNGR) install -y $(OS_DEPS)
+
+	# Download and install NodeJS
+	curl -sL https://$(OS).nodesource.com/setup_${NODEJS_VERSION}.x | sudo -E bash -
+	sudo $(PKG_MNGR) install -y nodejs
+
+	# Install NPM if missing
+	$(MAKE) npmdeps PKG_MNGR=$(PKG_MNGR)
+
+ubuntudeps:
+
+	# Install Ubuntu Dependencies
+	sudo $(UBUNTU_PKG) install -qq -y $(UBUNTU_DEPS)
+
+	# Install generic OS dependencies
+	$(MAKE) osdeps PKG_MNGR=$(UBUNTU_PKG) OS=deb
+
+	# Download and install Docker
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 	sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
 	sudo add-apt-repository \
 		"deb [arch=amd64] https://download.docker.com/linux/ubuntu \
 		`lsb_release -cs` \
 		stable"
-	-sudo apt-get -qq update
-	sudo apt-get -qq install apt-transport-https ca-certificates software-properties-common
-	sudo apt-get -qq install -o Dpkg::Options::="--force-confold" --force-yes -y linux-image-extra-`uname -r` linux-image-extra-virtual python3.4-venv nodejs python3-pip
+	$(MAKE) dockerdeps PKG_MNGR=$(UBUNTU_PKG)
+
+	# Install Python 3
+	if [ `lsb_release -cs` == "xenial" ] || [ `lsb_release -cs` == "trusty" ]; then \
+		 sudo $(UBUNTU_PKG) install -o Dpkg::Options::="--force-confold" --force-yes -y linux-image-extra-virtual linux-image-extra-`uname -r` $(PYTHON3_DEPS); \
+	else sudo $(UBUNTU_PKG) install -o Dpkg::Options::="--force-confold" --force-yes -y $(PYTHON3_DEPS); \
+	fi
+
+	# Update if needed
+	sudo $(UBUNTU_PKG) update -y
+
+centosdeps:
+
+	# Install CentOS Dependencies
+	sudo $(CENTOS_PKG) install -y $(CENTOS_DEPS)
+
+	# Install generic OS dependencies
+	$(MAKE) osdeps PKG_MNGR=$(CENTOS_PKG) OS=rpm
+
+	# Download and install Docker
+	sudo yum-config-manager -y --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+	$(MAKE) dockerdeps PKG_MNGR=$(CENTOS_PKG)
+
+	# Install Python 3
+	sudo $(CENTOS_PKG) install -y $(PYTHON3_DEPS)
+
+	# Update if needed
+	sudo $(CENTOS_PKG) update -y
+
+dockerdeps:
+
+	if [[ `command -v docker` == '' ]]; then \
+		sudo $(PKG_MNGR) install -y $(DOCKER_DEPS); \
+	fi
+
 	docker --version
 	node --version
-	npm --version
+
+npmdeps:
+
+	if [[ `command -v npm` == '' ]]; then \
+		sudo $(PKG_MNGR) install -y npm; \
+	fi
+
 	npm install
+	npm --version
 
 .PHONY: pythondeps
 pythondeps:
@@ -58,7 +143,7 @@ install:
 certs:
 	@echo "Creating certificates"
 	@echo "---------------------"
-	-pushd jupyterhub && sh ../scripts/generate_certificate.sh && popd
+	bash scripts/generate_certificate.sh $(CERT_TYPE) $(SIMPHONY_REMOTE); \
 
 .PHONY: db
 db:
@@ -118,3 +203,5 @@ seleniumtest:
 .PHONY: docs
 docs:
 	sphinx-build -W doc/source doc/build/sphinx
+
+

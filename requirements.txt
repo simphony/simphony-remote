@@ -1,14 +1,16 @@
 setuptools==21.0
-tornado==4.3
+tornado==5.1.1
 # Fix to 2.10.0 due to docker-py needs (fails with 2.11.1)
 requests==2.10.0
 # We want 1.8 because 1.10 uses API version 1.24 and the docker server
 # on ubuntu uses 1.23, so they don't like each other.
 docker-py==1.8
 escapism==0.0.1
-git+git://github.com/jupyterhub/jupyterhub.git@2d1a45f0190059ef436c2f97dc8d6e391eb2d139#egg=jupyterhub
+# Pinned to 0.8.0.dev0 due to issues with spawners (fails with 0.8.0)
+git+http://github.com/jupyterhub/jupyterhub.git@2d1a45f0190059ef436c2f97dc8d6e391eb2d139#egg=jupyterhub
 jupyter_client==4.3.0
 click==6.6
 tabulate==0.7.5
-git+git://github.com/simphony/tornado-webapi.git@13d044331a1e86a03b18f6c1424cc9adf424ddac#egg=tornadowebapi
-oauthenticator==0.5.1
+git+http://github.com/simphony/tornado-webapi.git@8b6846faae23657a04cf97ca5229ce8ea083d000#egg=tornadowebapi
+# Pinned to 0.10.0 since 0.11.0 does not seem to be compatible with jupyterhub 0.7.x
+oauthenticator==0.10.0

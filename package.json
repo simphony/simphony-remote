@@ -6,7 +6,7 @@
   "license": "BSD",
   "repository": {
     "type": "git",
-    "url": "https://github.com/simphony-remote/simphony-remote.git"
+    "url": "https://github.com/simphony/simphony-remote.git"
   },
   "scripts": {
     "watch": "webpack --config webpackfile.js --watch",
@@ -17,11 +17,11 @@
   "dependencies": {
     "admin-lte": "~2.3.11",
     "clipboard": "~1.6.1",
-    "configurable-http-proxy": "git://github.com/jupyterhub/configurable-http-proxy.git#2.0.1",
+    "configurable-http-proxy": "~2.0.1",
     "font-awesome": "~4.7.0",
     "ionicons": "~3.0.0",
     "lodash": "~4.17.4",
-    "url-parse": "~1.1.9",
+    "url-parse": "^1.4.7",
     "vue": "~2.3.3",
     "vue-form": "~4.1.0",
     "vue-router": "~2.5.3"
