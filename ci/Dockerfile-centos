@@ -1,0 +1,29 @@
+FROM centos:7
+
+MAINTAINER SimPhoNy Team
+WORKDIR /simphony-remote
+COPY . /simphony-remote
+
+RUN yum update -y && \
+    yum install -y yum-utils && \
+    yum upgrade -y && \
+    yum install -y git sudo make
+
+RUN make deps
+
+ENV LC_ALL=en_GB.utf8
+ENV LANG=C.UTF-8
+
+ENV VIRTUAL_ENV /simphony-remote/venv
+RUN make venv
+ENV PATH $VIRTUAL_ENV/bin:$PATH
+
+RUN npm install bower
+RUN make pythondeps
+
+RUN make install
+RUN make certs
+RUN make db
+RUN mkdir /tmp/remoteapp
+
+EXPOSE 8000

@@ -9,6 +9,7 @@ for each user.
 
 .. include::
     developer/docker.rst
+    developer/ci_instructions.rst
 
 API reference
 -------------
