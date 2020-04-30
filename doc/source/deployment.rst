@@ -111,7 +111,6 @@ Setup docker containers
 To create new images, please follow the documentation hosted at Horizon 2020
 `Simphony <https://github.com/simphony/simphony-remote-docker>`_ project repository.
 
-.. _deploy_setup_db:
 
 Setup Database Accounting
 -------------------------
