@@ -1,5 +1,4 @@
 import os
-from tornado.testing import ExpectLog
 from unittest import mock, TestCase
 
 from click.testing import CliRunner
@@ -14,9 +13,9 @@ def create_docker_client():
     return VirtualDockerClient.with_containers()
 
 
-class TestRemoteAppDbCLI(TempMixin, ExpectLog, TestCase):
+class TestRemoteAppDbCLI(TempMixin, TestCase):
     def setUp(self):
-        super().setUp()
+        super(TestRemoteAppDbCLI, self).setUp()
         self.db = os.path.join(self.tempdir, "test.db")
         self._remoteappdb("init")
 
