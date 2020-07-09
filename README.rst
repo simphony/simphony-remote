@@ -190,3 +190,5 @@ within the docker container.
 
 Log out of SimphonyRemote (red 'admin' button in the top right) and log in using the username you specified for your
 new user and no password, you should now be able to start your application!
+
+# One line change
