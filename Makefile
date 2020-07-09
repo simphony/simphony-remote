@@ -108,6 +108,7 @@ dockerdeps:
 npmdeps:
 
 	if [[ `command -v npm` == '' ]]; then \
+		sudo $(PKG_MNGR) install -y node-gyp libssl1.0-dev; \
 		sudo $(PKG_MNGR) install -y npm; \
 	fi
 
