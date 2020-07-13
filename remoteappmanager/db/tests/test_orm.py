@@ -55,7 +55,7 @@ def fill_db(session):
         session.add_all(accountings)
 
 
-class TestOrm(TempMixin, ExpectLog, TestCase):
+class TestOrm(TempMixin, TestCase):
     def setUp(self):
         super().setUp()
         self.sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
@@ -141,7 +141,7 @@ class TestOrm(TempMixin, ExpectLog, TestCase):
 
 
 class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
-                      ExpectLog, TestCase):
+                      TestCase):
     def setUp(self):
         # Setup temporary directory
         super().setUp()
