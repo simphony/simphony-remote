@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ..user import User
+from remoteappmanager.user import User
 
 
 class TestUser(TestCase):
