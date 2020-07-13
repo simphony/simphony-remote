@@ -221,11 +221,11 @@ class CSVDatabase(ABCDatabase):
     def list_applications(self):
         return list(self.applications.values())
 
-    def grant_access(self, app_name, user_name,
+    def grant_access(self, app_name, user_name, app_license,
                      allow_home, allow_view, volume):
         raise UnsupportedOperation()
 
-    def revoke_access(self, app_name, user_name,
+    def revoke_access(self, app_name, user_name, app_license,
                       allow_home, allow_view, volume):
         raise UnsupportedOperation()
 

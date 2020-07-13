@@ -134,8 +134,9 @@ class DummyDB(interfaces.ABCDatabase):
         user = self._get_user_id_by_name(user_name)
 
         source, target, mode = volume.split(':')
-        policy = DummyDBApplicationPolicy(allow_home, allow_view, False,
-                                          source, target, mode)
+        policy = DummyDBApplicationPolicy(
+            app_license, allow_home, allow_view, False,
+            source, target, mode)
 
         self.policies[len(self.policies)] = policy
         id = str(uuid.uuid4().hex)

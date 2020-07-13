@@ -45,6 +45,7 @@ class TestAccounting(WebAPITestCase):
         self.post("/user/johndoe/api/v1/accounting/",
                   {"user_id": "0",
                    "image_name": "image_id1",
+                   "app_license": "",
                    "allow_home": True,
                    "volume_source": "/foo",
                    "volume_target": "/bar",
@@ -56,6 +57,7 @@ class TestAccounting(WebAPITestCase):
         self.post("/user/johndoe/api/v1/accounting/",
                   {"user_id": "0",
                    "image_name": "image_id1",
+                   "app_license": "",
                    "allow_home": True,
                    "volume_source": "/foo",
                    "volume_target": "/bar",
@@ -71,6 +73,7 @@ class TestAccounting(WebAPITestCase):
             self.post("/user/johndoe/api/v1/accounting/",
                       {"user_id": "0",
                        "image_name": "image_id1",
+                       "app_license": "",
                        "allow_home": True,
                        "volume_source": "/foo",
                        "volume_target": "/bar",
@@ -82,6 +85,7 @@ class TestAccounting(WebAPITestCase):
         self.post("/user/johndoe/api/v1/accounting/",
                   {"user_id": "234",
                    "image_name": "image_id1",
+                   "app_license": "",
                    "allow_home": True,
                    "volume_source": "/foo",
                    "volume_target": "/bar",
@@ -97,13 +101,14 @@ class TestAccounting(WebAPITestCase):
             self.post("/user/johndoe/api/v1/accounting/",
                       {"user_id": "0",
                        "image_name": "image_id1",
+                       "app_license": "",
                        "allow_home": True,
                        "volume_source": "",
                        "volume_target": "",
                        "volume_mode": ""
                        },
                       httpstatus.CREATED)
-            self.assertEqual(mock_grant_access.call_args[0][4], None)
+            self.assertEqual(mock_grant_access.call_args[0][5], None)
 
     def test_items(self):
         self.get("/user/johndoe/api/v1/accounting/", httpstatus.BAD_REQUEST)
