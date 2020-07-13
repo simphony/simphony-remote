@@ -3,8 +3,6 @@ import uuid
 import os
 from unittest import TestCase
 
-from tornado.testing import ExpectLog
-
 from remoteappmanager.db import orm
 from remoteappmanager.db import exceptions
 from remoteappmanager.db.orm import (Database, transaction, Accounting,
