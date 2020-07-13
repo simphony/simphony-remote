@@ -79,7 +79,7 @@ class CSVUser(object):
 # Required headers of the CSV files
 _HEADERS = ('user.name',
             'application.image',
-            'policy.app_license'
+            'policy.app_license',
             'policy.allow_home',
             'policy.allow_view',
             'policy.allow_common',

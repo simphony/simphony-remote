@@ -9,16 +9,17 @@ from remoteappmanager.tests.temp_mixin import TempMixin
 
 
 class GoodTable:
-    headers = ('user.name', 'application.image', 'policy.allow_home',
-               'policy.allow_view', 'policy.allow_common',
+    headers = ('user.name', 'application.image', 'policy.app_license',
+               'policy.allow_home', 'policy.allow_view',
+               'policy.allow_common',
                'policy.volume_source', 'policy.volume_target',
                'policy.volume_mode')
 
     #    name,     image, home, view, common, source, target, mode
     records = [
-        ('markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '1', '1', '0', '', '', ''),  # noqa
-        ('markdoe', 'simphonyproject/ubuntu-image:latest', '1', '1', '1', '/src', '/target', 'ro'),  # noqa
-        ('johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '0', '0', '0', '/src', '/target', 'ro')]  # noqa
+        ('markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '', '1', '1', '0', '', '', ''),  # noqa
+        ('markdoe', 'simphonyproject/ubuntu-image:latest', '', '1', '1', '1', '/src', '/target', 'ro'),  # noqa
+        ('johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '', '0', '0', '0', '/src', '/target', 'ro')]  # noqa
 
 
 class BadTableMissingHeaders:
@@ -37,7 +38,8 @@ class BadTableMissingHeaders:
 class GoodTableWithDifferentHeaders:
     # There is an extra column and the columns order are different
     # but that's okay
-    headers = ('policy.allow_view', 'policy.allow_common',
+    headers = ('policy.app_license', 'policy.allow_view',
+               'policy.allow_common',
                'policy.volume_source', 'policy.volume_target',
                'policy.volume_mode',
                'user.name', 'application.image', 'policy.allow_home',
@@ -45,9 +47,9 @@ class GoodTableWithDifferentHeaders:
 
     #  view, common, source, target, mode, name, image, home, extra
     records = [
-        ('1', '0', '', '', '', 'markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '1', 'anything'),  # noqa
-        ('1', '1', '/src', '/target', 'ro', 'markdoe', 'simphonyproject/ubuntu-image:latest', '1', 'extra'),  # noqa
-        ('0', '0', '/src', '/target', 'ro', 'johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '0', 'abc')]  # noqa
+        ('', '1', '0', '', '', '', 'markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '1', 'anything'),  # noqa
+        ('', '1', '1', '/src', '/target', 'ro', 'markdoe', 'simphonyproject/ubuntu-image:latest', '1', 'extra'),  # noqa
+        ('', '0', '0', '/src', '/target', 'ro', 'johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '0', 'abc')]  # noqa
 
 
 def write_csv_file(file_name, headers, records):

@@ -25,8 +25,11 @@ class ABCApplicationPolicy(metaclass=ABCMeta):
     """ Policy for an application
     """
 
-    def __init__(self, allow_home=False, allow_view=False, allow_common=False,
+    def __init__(self, app_license=None, allow_home=False, allow_view=False, allow_common=False,
                  volume_source=None, volume_target=None, volume_mode=None):
+
+        #: Application License (if specified)
+        self.app_license = app_license
 
         #: Is the home directory mounted
         self.allow_home = allow_home
