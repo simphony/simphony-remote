@@ -37,7 +37,7 @@ class RemoteAppDriverTest(unittest.TestCase):
         with contextlib.closing(sqlite3.connect(permissions_db_path)) as db:
             cur = db.cursor()
             cur.execute(
-                ("INSERT INTO moz_hosts VALUES (1, '{base_url}', "
+                ("INSERT INTO moz_perms VALUES (1, '{base_url}', "
                  "'popup', 1, 0, 0, 1474977124357)").format(
                     base_url=self.base_url))
             db.commit()

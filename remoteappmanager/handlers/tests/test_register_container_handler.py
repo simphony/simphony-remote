@@ -1,13 +1,12 @@
-from tornado.testing import ExpectLog
+from tornado.testing import ExpectLog, AsyncHTTPTestCase
 
-from remoteappmanager.tests import utils
 from remoteappmanager.tests.mocking import dummy
 from remoteappmanager.tests.temp_mixin import TempMixin
 from remoteappmanager.tests.utils import mock_coro_factory
 
 
 class TestRegisterContainerHandler(TempMixin,
-                                   utils.AsyncHTTPTestCase,
+                                   AsyncHTTPTestCase,
                                    ExpectLog):
     def get_app(self):
         app = dummy.create_application()

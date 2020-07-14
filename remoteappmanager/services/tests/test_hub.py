@@ -1,8 +1,7 @@
 from tornado import testing, web, gen
+from tornado.web import HTTPError
 
 from remoteappmanager.services.hub import Hub
-from tornado.web import HTTPError
-from remoteappmanager.tests import utils
 
 
 class AuthHandler(web.RequestHandler):
@@ -21,7 +20,7 @@ class AuthHandler(web.RequestHandler):
         self.flush()
 
 
-class TestHub(utils.AsyncHTTPTestCase, testing.ExpectLog):
+class TestHub(testing.AsyncHTTPTestCase, testing.ExpectLog):
     def get_app(self):
         self.handler = AuthHandler
         handlers = [

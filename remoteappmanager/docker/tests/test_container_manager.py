@@ -9,6 +9,7 @@ from remoteappmanager.docker.container_manager import ContainerManager, \
     OperationInProgress
 from remoteappmanager.docker.image import Image
 from remoteappmanager.tests import utils
+from remoteappmanager.tests.mocking.dummy import create_container_manager
 from remoteappmanager.tests.mocking.virtual.docker_client import (
     VirtualDockerClient)
 
@@ -16,9 +17,8 @@ from remoteappmanager.tests.mocking.virtual.docker_client import (
 class TestContainerManager(AsyncTestCase, ExpectLog):
     def setUp(self):
         super().setUp()
-        self.manager = ContainerManager(docker_config={}, realm="myrealm")
-        self.mock_docker_client = VirtualDockerClient.with_containers()
-        self.manager._docker_client._sync_client = self.mock_docker_client
+        self.manager = create_container_manager()
+        self.mock_docker_client = self.manager._docker_client._sync_client
 
     def test_instantiation(self):
         self.assertIsNotNone(self.manager._docker_client)

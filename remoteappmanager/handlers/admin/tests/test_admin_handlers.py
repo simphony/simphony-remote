@@ -1,9 +1,9 @@
-from tornado.testing import ExpectLog
-from remoteappmanager.tests import utils
+from tornado.testing import ExpectLog, AsyncHTTPTestCase
+
 from remoteappmanager.tests.mocking import dummy
 
 
-class TestBaseAccess(utils.AsyncHTTPTestCase, ExpectLog):
+class TestBaseAccess(AsyncHTTPTestCase, ExpectLog):
     #: which url to poke
     url = "/user/johndoe"
 

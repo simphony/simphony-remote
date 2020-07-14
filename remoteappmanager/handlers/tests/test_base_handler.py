@@ -1,12 +1,11 @@
-from tornado.testing import ExpectLog
+from tornado.testing import ExpectLog, AsyncHTTPTestCase
 from remoteappmanager.file_config import FileConfig
 
-from remoteappmanager.tests import utils
 from remoteappmanager.tests.mocking import dummy
 from remoteappmanager.tests.temp_mixin import TempMixin
 
 
-class TestBaseHandler(TempMixin, utils.AsyncHTTPTestCase, ExpectLog):
+class TestBaseHandler(TempMixin, AsyncHTTPTestCase, ExpectLog):
     def get_file_config(self):
         file_config = FileConfig()
         file_config.database_class = \
