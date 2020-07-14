@@ -1,7 +1,5 @@
 from tornado import escape
-from tornado.testing import ExpectLog
-
-from .utils import AsyncHTTPTestCase
+from tornado.testing import ExpectLog, AsyncHTTPTestCase
 
 
 class WebAPITestCase(AsyncHTTPTestCase, ExpectLog):
