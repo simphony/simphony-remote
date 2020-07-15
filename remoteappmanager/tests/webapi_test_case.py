@@ -1,8 +1,8 @@
 from tornado import escape
-from tornado.testing import ExpectLog, AsyncHTTPTestCase
+from tornado.testing import AsyncHTTPTestCase
 
 
-class WebAPITestCase(AsyncHTTPTestCase, ExpectLog):
+class WebAPITestCase(AsyncHTTPTestCase):
     """Base class for tests accessing the Web API,
     providing basic methods to issue web requests, get results, and compare
     against the expected HTTP code.

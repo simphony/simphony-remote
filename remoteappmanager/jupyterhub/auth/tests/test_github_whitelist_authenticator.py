@@ -1,7 +1,7 @@
 import os
 
 import time
-from tornado.testing import AsyncTestCase, gen_test, ExpectLog
+from tornado.testing import ExpectLog, AsyncTestCase, gen_test
 
 from remoteappmanager.tests.temp_mixin import TempMixin
 from remoteappmanager.tests.utils import mock_coro_factory
@@ -12,8 +12,7 @@ from remoteappmanager.jupyterhub.auth import GitHubWhitelistAuthenticator
 
 
 class TestGithubWhiteListAuthenticator(TempMixin,
-                                       AsyncTestCase,
-                                       ExpectLog):
+                                       AsyncTestCase):
     def setUp(self):
         self.auth = GitHubWhitelistAuthenticator()
         self.auth.authenticate = mock_coro_factory(return_value="foo")
@@ -35,13 +34,13 @@ class TestGithubWhiteListAuthenticator(TempMixin,
 
         auth = self.auth
         auth.whitelist_file = whitelist_path
-        response = yield auth.get_authenticated_user(Mock(),
-                                                     {"username": "foo"})
+        response = yield auth.get_authenticated_user(
+            Mock(), {"username": "foo"})
         self.assertEqual(response, "foo")
 
         # Check again to touch the code that does not trigger another load
-        response = yield auth.get_authenticated_user(Mock(),
-                                                     {"username": "foo"})
+        response = yield auth.get_authenticated_user(
+            Mock(), {"username": "foo"})
         self.assertEqual(response, "foo")
 
         # wait one second, so that we see a change in mtime.
@@ -51,8 +50,9 @@ class TestGithubWhiteListAuthenticator(TempMixin,
         with open(whitelist_path, "w") as f:
             f.write("bar\n")
 
-        response = yield auth.get_authenticated_user(Mock(),
-                                                     {"username": "foo"})
+        with ExpectLog('traitlets', "User 'foo' not in whitelist."):
+            response = yield auth.get_authenticated_user(
+                Mock(), {"username": "foo"})
         self.assertEqual(response, None)
 
     @gen_test
@@ -76,8 +76,9 @@ class TestGithubWhiteListAuthenticator(TempMixin,
         auth.whitelist_file = whitelist_path
 
         # Do the first triggering, so that we load the file content.
-        response = yield auth.get_authenticated_user(Mock(),
-                                                     {"username": "foo"})
+        with ExpectLog('traitlets', "User 'foo' not in whitelist."):
+            response = yield auth.get_authenticated_user(
+                Mock(), {"username": "foo"})
 
         self.assertEqual(response, None)
 
@@ -85,8 +86,9 @@ class TestGithubWhiteListAuthenticator(TempMixin,
         with patch("os.path.getmtime") as p:
             p.side_effect = Exception("BOOM!")
 
-            response = yield auth.get_authenticated_user(Mock(),
-                                                         {"username": "foo"})
+            with ExpectLog('traitlets', ""):
+                response = yield auth.get_authenticated_user(
+                    Mock(), {"username": "foo"})
             self.assertEqual(response, None)
 
     def test_dummy_setter(self):

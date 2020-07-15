@@ -1,11 +1,11 @@
-from tornado.testing import ExpectLog, AsyncHTTPTestCase
+from tornado.testing import AsyncHTTPTestCase, ExpectLog
 from remoteappmanager.file_config import FileConfig
 
 from remoteappmanager.tests.mocking import dummy
 from remoteappmanager.tests.temp_mixin import TempMixin
 
 
-class TestBaseHandler(TempMixin, AsyncHTTPTestCase, ExpectLog):
+class TestBaseHandler(TempMixin, AsyncHTTPTestCase):
     def get_file_config(self):
         file_config = FileConfig()
         file_config.database_class = \
@@ -32,11 +32,13 @@ class TestBaseHandlerInvalidAccounting(TestBaseHandler):
         return file_config
 
     def test_home_internal_error(self):
-        res = self.fetch("/user/johndoe/",
-                         headers={
-                             "Cookie": "jupyter-hub-token-johndoe=foo"
-                         }
-                         )
+        with ExpectLog('tornado.application', ''), \
+                ExpectLog('tornado.access', ''):
+            res = self.fetch("/user/johndoe/",
+                             headers={
+                                 "Cookie": "jupyter-hub-token-johndoe=foo"
+                             }
+                             )
 
         self.assertEqual(res.code, 500)
         self.assertIn('Internal Server Error', str(res.body))
@@ -50,11 +52,13 @@ class TestBaseHandlerDatabaseError(TestBaseHandler):
         return file_config
 
     def test_home_internal_error(self):
-        res = self.fetch("/user/johndoe/",
-                         headers={
-                             "Cookie": "jupyter-hub-token-johndoe=foo"
-                         }
-                         )
+        with ExpectLog('tornado.application', ''), \
+                ExpectLog('tornado.access', ''):
+            res = self.fetch("/user/johndoe/",
+                             headers={
+                                 "Cookie": "jupyter-hub-token-johndoe=foo"
+                             }
+                             )
 
         self.assertEqual(res.code, 500)
         self.assertIn('Internal Server Error', str(res.body))

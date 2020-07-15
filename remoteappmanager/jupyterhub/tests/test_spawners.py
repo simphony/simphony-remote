@@ -5,9 +5,8 @@ import subprocess
 import sys
 import time
 from unittest import mock
-from tornado.testing import ExpectLog
 
-from tornado import testing
+from tornado.testing import AsyncTestCase
 from jupyterhub import orm
 
 from remoteappmanager.jupyterhub.spawners import (
@@ -74,7 +73,7 @@ def new_spawner(spawner_class):
     return spawner_class(db=db, user=user, hub=hub, authenticator=authenticator)
 
 
-class TestSystemUserSpawner(TempMixin, testing.AsyncTestCase):
+class TestSystemUserSpawner(TempMixin, AsyncTestCase):
     def setUp(self):
         super().setUp()
         self.spawner = new_spawner(SystemUserSpawner)

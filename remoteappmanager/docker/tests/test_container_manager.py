@@ -1,7 +1,7 @@
 import os
 from unittest import mock
 
-from tornado.testing import AsyncTestCase, gen_test, ExpectLog
+from tornado.testing import AsyncTestCase, ExpectLog, gen_test
 
 from remoteappmanager.docker.container import Container
 from remoteappmanager.docker.docker_labels import SIMPHONY_NS_RUNINFO
@@ -14,7 +14,7 @@ from remoteappmanager.tests.mocking.virtual.docker_client import (
     VirtualDockerClient)
 
 
-class TestContainerManager(AsyncTestCase, ExpectLog):
+class TestContainerManager(AsyncTestCase):
     def setUp(self):
         super().setUp()
         self.manager = create_container_manager()
@@ -233,13 +233,14 @@ class TestContainerManager(AsyncTestCase, ExpectLog):
             good_path = os.path.abspath('.')
             volumes[good_path] = {'bind': '/target_vol3',
                                   'mode': 'ro'}
-
-            yield self.manager.start_container("johndoe",
-                                               "simphonyproject/simphony-mayavi:0.6.0",  # noqa
-                                               "5b34ce60d95742fa828cdced12b4c342",  # noqa
-                                               "/foo/bar",
-                                               volumes,
-                                               )
+            with ExpectLog('tornado.application', ''):
+                yield self.manager.start_container(
+                    "johndoe",
+                    "simphonyproject/simphony-mayavi:0.6.0",
+                    "5b34ce60d95742fa828cdced12b4c342",
+                    "/foo/bar",
+                    volumes,
+                )
 
             # Call args and keyword args that create_container receives
             args = docker_client.create_container.call_args
@@ -270,12 +271,15 @@ class TestContainerManager(AsyncTestCase, ExpectLog):
             self.assertFalse(self.mock_docker_client.remove_container.called)
 
             with self.assertRaisesRegex(Exception, 'Boom!'):
-                yield self.manager.start_container("johndoe",
-                                                   "simphonyproject/simphony-mayavi:0.6.0",  # noqa
-                                                   "5b34ce60d95742fa828cdced12b4c342",  # noqa
-                                                   "/users/johndoe/containers/4273750ddce3454283a5b1817526260b/",  # noqa
-                                                   None,
-                                                   None)
+                with ExpectLog('tornado.application', ''):
+                    yield self.manager.start_container(
+                        "johndoe",
+                        "simphonyproject/simphony-mayavi:0.6.0",
+                        "5b34ce60d95742fa828cdced12b4c342",
+                        "/users/johndoe/containers/4273750ddce3454283a5b1817526260b/",  # noqa
+                        None,
+                        None
+                    )
 
             self.assertTrue(docker_client.stop.called)
             self.assertTrue(docker_client.remove_container.called)
@@ -298,12 +302,15 @@ class TestContainerManager(AsyncTestCase, ExpectLog):
             self.manager._docker_client.port = mock.Mock(side_effect=raiser)
 
             with self.assertRaisesRegex(Exception, 'Boom!'):
-                yield self.manager.start_container("johndoe",
-                                                   "simphonyproject/simphony-mayavi:0.6.0",  # noqa
-                                                   "4273750ddce3454283a5b1817526260b",  # noqa
-                                                   "/users/johndoe/containers/3b83f81f2e4544e6aa1493b50202f8eb",  # noqa
-                                                   None,
-                                                   None)
+                with ExpectLog('tornado.application', ''):
+                    yield self.manager.start_container(
+                        "johndoe",
+                        "simphonyproject/simphony-mayavi:0.6.0",
+                        "4273750ddce3454283a5b1817526260b",
+                        "/users/johndoe/containers/3b83f81f2e4544e6aa1493b50202f8eb",  # noqa
+                        None,
+                        None
+                    )
 
             self.assertTrue(self.mock_docker_client.stop.called)
             self.assertTrue(self.mock_docker_client.remove_container.called)
@@ -351,7 +358,9 @@ class TestContainerManager(AsyncTestCase, ExpectLog):
         self.mock_docker_client.remove_container = mock.Mock()
         manager = ContainerManager(docker_config={},
                                    realm="anotherrealm")
-        yield manager.stop_and_remove_container("d2b56bffb5655cb7668b685b80116041a20ee8662ebfa5b5cb68cfc423d9dc30")  # noqa
+        with ExpectLog('tornado.application', ''):
+            yield manager.stop_and_remove_container(
+                "d2b56bffb5655cb7668b685b80116041a20ee8662ebfa5b5cb68cfc423d9dc30")  # noqa
 
         self.assertFalse(self.mock_docker_client.stop.called)
         self.assertFalse(self.mock_docker_client.remove_container.called)

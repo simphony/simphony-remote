@@ -1,9 +1,9 @@
-from tornado.testing import ExpectLog, AsyncHTTPTestCase
+from tornado.testing import AsyncHTTPTestCase, ExpectLog
 
 from remoteappmanager.tests.mocking import dummy
 
 
-class TestBaseAccess(AsyncHTTPTestCase, ExpectLog):
+class TestBaseAccess(AsyncHTTPTestCase):
     #: which url to poke
     url = "/user/johndoe"
 
@@ -31,11 +31,11 @@ class TestBaseAccess(AsyncHTTPTestCase, ExpectLog):
 
     def test_failed_auth(self):
         self._app.hub.verify_token.return_value = {}
-        res = self.fetch(self.url,
-                         headers={
-                             "Cookie": "jupyter-hub-token-username=foo"
-                         }
-                         )
+        with ExpectLog('tornado.access', ''):
+            res = self.fetch(
+                self.url,
+                headers={"Cookie": "jupyter-hub-token-username=foo"}
+            )
 
         self.assertGreaterEqual(res.code, 400)
         self.assertIn(self._app.file_config.login_url, res.effective_url)
@@ -63,9 +63,10 @@ class TestAccountingHandler(TestBaseAccess):
 
     def test_unknown_id(self):
         self._app.db.unexistent_user_id = 123422
-        res = self.fetch("/user/johndoe/users/123422/accounting/",
-                         headers={
-                             "Cookie": "jupyter-hub-token-johndoe=foo"
-                         })
+        with ExpectLog('tornado.access', ''):
+            res = self.fetch(
+                "/user/johndoe/users/123422/accounting/",
+                headers={"Cookie": "jupyter-hub-token-johndoe=foo"}
+            )
 
         self.assertEqual(res.code, 404)

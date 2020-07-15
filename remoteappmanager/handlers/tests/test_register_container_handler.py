@@ -6,8 +6,7 @@ from remoteappmanager.tests.utils import mock_coro_factory
 
 
 class TestRegisterContainerHandler(TempMixin,
-                                   AsyncHTTPTestCase,
-                                   ExpectLog):
+                                   AsyncHTTPTestCase):
     def get_app(self):
         app = dummy.create_application()
         app.hub.verify_token.return_value = {
@@ -18,11 +17,11 @@ class TestRegisterContainerHandler(TempMixin,
         return app
 
     def test_absent_url_id(self):
-        res = self.fetch("/user/johndoe/containers/99999/",
-                         headers={
-                             "Cookie": "jupyter-hub-token-johndoe=foo"
-                         }
-                         )
+        with ExpectLog('tornado.access', ''):
+            res = self.fetch(
+                "/user/johndoe/containers/99999/",
+                headers={"Cookie": "jupyter-hub-token-johndoe=foo"}
+            )
 
         self.assertEqual(res.code, 404)
 
@@ -54,11 +53,11 @@ class TestRegisterContainerHandler(TempMixin,
         self._app.reverse_proxy.register = mock_coro_factory(
             side_effect=Exception("BOOM"))
 
-        res = self.fetch("/user/johndoe/containers/",
-                         headers={
-                             "Cookie": "jupyter-hub-token-johndoe=foo"
-                         },
-                         follow_redirects=False
-                         )
+        with ExpectLog('tornado.access', ''):
+            res = self.fetch(
+                "/user/johndoe/containers/",
+                headers={"Cookie": "jupyter-hub-token-johndoe=foo"},
+                follow_redirects=False
+            )
 
         self.assertEqual(res.code, 404)
