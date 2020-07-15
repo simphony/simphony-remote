@@ -80,9 +80,9 @@ class TestContainer(WebAPITestCase):
                    new_callable=mock_coro_new_callable()):
 
             manager = self._app.container_manager
-            manager.start_container = mock_coro_factory(DockerContainer(
-                url_id="3456"
-            ))
+            manager.start_container = mock_coro_factory(
+                return_value=DockerContainer(url_id="3456")
+            )
             self.post(
                 "/user/johndoe/api/v1/containers/",
                 dict(

@@ -77,7 +77,7 @@ class DummyDB(interfaces.ABCDatabase):
                     application_policy=policy)
                 for id, (tbl_user, application, policy)
                 in self.accounting.items()
-                if tbl_user == user]
+                if tbl_user.name == user.name]
 
     def create_user(self, user_name):  # pragma: no cover
         if user_name in [u.name for u in self.list_users()]:
