@@ -70,7 +70,8 @@ def new_spawner(spawner_class):
         return_value='/logout_test')
     authenticator.login_service = 'TEST'
 
-    return spawner_class(db=db, user=user, hub=hub, authenticator=authenticator)
+    return spawner_class(
+        db=db, user=user, hub=hub, authenticator=authenticator)
 
 
 class TestSystemUserSpawner(TempMixin, AsyncTestCase):
