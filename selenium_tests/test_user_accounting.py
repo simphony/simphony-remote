@@ -16,6 +16,8 @@ class TestUserAccounting(AdminDriverTest):
         self.click_first_button("Create New Entry")
         self.type_text_in_element_located(By.CSS_SELECTOR, ".modal-body > form > div > input", "mrenou")
         self.click_modal_footer_button("Submit")
+        self.wait_until_invisibility_of_element_located(
+            By.CSS_SELECTOR, ".modal-fade-leave-to")
 
         # FIXME: This test is currently broken, since it will report that the
         #  "Remove" button is obstructed in the browser (although it is not in
