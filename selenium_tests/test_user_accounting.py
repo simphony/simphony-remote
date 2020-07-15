@@ -19,18 +19,12 @@ class TestUserAccounting(AdminDriverTest):
         self.wait_until_invisibility_of_element_located(
             By.CSS_SELECTOR, ".modal-fade-leave-to")
 
-        # FIXME: This test is currently broken, since it will report that the
-        #  "Remove" button is obstructed in the browser (although it is not in
-        #  the deployment). It seems to be a selenium issue, which may have been
-        #  previously suppressed by disallowing popups in the Firefox profile
-        #  permissions.sqlite file. However there is no obvious way to access
-        #  this file any more with later versions of Firefox (> 75.0)
         # Click remove button
-        # self.click_row_action_button("mrenou", "Remove")
-        #
-        # self.click_modal_footer_button("Ok")
-        #
-        # self.wait_until_invisibility_of_row("mrenou")
+        self.click_row_action_button("mrenou", "Remove")
+
+        self.click_modal_footer_button("Ok")
+
+        self.wait_until_invisibility_of_row("mrenou")
 
     def test_admin_name_header_bug(self):
         self.click_first_element_located(By.LINK_TEXT, "Users")
