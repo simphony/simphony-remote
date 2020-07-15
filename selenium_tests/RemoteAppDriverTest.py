@@ -17,6 +17,7 @@ class RemoteAppDriverTest(unittest.TestCase):
     def setUp(self):
         ff_binary = webdriver.firefox.firefox_binary.FirefoxBinary()
         ff_profile = webdriver.firefox.firefox_profile.FirefoxProfile()
+        ff_profile.set_preference("dom.webnotifications.enabled", False)
         ff_profile.assume_untrusted_cert_issuer = True
         ff_profile.accept_untrusted_certs = True
         capabilities = webdriver.DesiredCapabilities().FIREFOX
