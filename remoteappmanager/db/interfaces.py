@@ -30,9 +30,6 @@ class ABCApplicationPolicy(metaclass=ABCMeta):
                  volume_mode=None):
 
         #: Application License (if specified)
-        if app_license is None:
-            app_license = ''
-
         self.app_license = app_license
 
         #: Is the home directory mounted
