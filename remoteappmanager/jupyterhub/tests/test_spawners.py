@@ -74,7 +74,7 @@ def new_spawner(spawner_class):
     return spawner_class(db=db, user=user, hub=hub, authenticator=authenticator)
 
 
-class TestSystemUserSpawner(TempMixin, testing.AsyncTestCase, ExpectLog):
+class TestSystemUserSpawner(TempMixin, testing.AsyncTestCase):
     def setUp(self):
         super().setUp()
         self.spawner = new_spawner(SystemUserSpawner)
