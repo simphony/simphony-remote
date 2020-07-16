@@ -72,11 +72,11 @@ class Database(ABCDatabase):
                 Application(id=3, image="bar2")
                 ]
 
-    def grant_access(self, app_name, user_name,
+    def grant_access(self, app_name, user_name, app_license,
                      allow_home, allow_view, volume):
         raise exceptions.UnsupportedOperation()
 
-    def revoke_access(self, app_name, user_name,
+    def revoke_access(self, app_name, user_name, app_license,
                       allow_home, allow_view, volume):
         raise exceptions.UnsupportedOperation()
 

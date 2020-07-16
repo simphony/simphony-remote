@@ -52,7 +52,7 @@
       return {
         table: {
           headers: [
-            "ID", "Image", "Workspace", "Vol. source", "Vol. target", "Readonly"
+            "ID", "Image", "License", "Workspace", "Vol. source", "Vol. target", "Readonly"
           ],
           columnFormatters: [undefined, undefined, checkIconFormatter, undefined, undefined, checkIconFormatter],
           rows: [],
@@ -95,6 +95,7 @@
             this.table.rows.push([
               id,
               item.image_name,
+              item.app_license,
               item.allow_home,
               item.volume_source,
               item.volume_target,

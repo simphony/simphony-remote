@@ -1,0 +1,27 @@
+version: '3'
+services:
+  ubuntu:
+    image: ubuntu:18.04
+
+  centos:
+    image: centos:7
+
+  simphony-remote-ubuntu:
+    build:
+      context: .
+      dockerfile: ci/Dockerfile-ubuntu
+    image: simphony-remote-ubuntu
+    ports:
+      - "8000:8000"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  simphony-remote-centos:
+    build:
+      context: .
+      dockerfile: ci/Dockerfile-centos
+    image: simphony-remote-centos
+    ports:
+      - "8000:8000"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"

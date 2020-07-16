@@ -15,6 +15,7 @@ class Container(ResourceFragment):
 
 
 class Policy(ResourceFragment):
+    app_license = Unicode(allow_none=True)
     allow_home = Bool()
     volume_source = Unicode(allow_none=True)
     volume_target = Unicode(allow_none=True)
@@ -44,7 +45,7 @@ class ApplicationHandler(ResourceHandler):
     @authenticated
     def retrieve(self, resource, **kwargs):
         accs = self.application.db.get_accounting_for_user(
-            self.current_user.account
+            self.current_user
         )
         identifier = resource.identifier
 
@@ -94,7 +95,7 @@ class ApplicationHandler(ResourceHandler):
         """Retrieves a dictionary containing the image and the associated
         container, if active, as values."""
         accs = self.application.db.get_accounting_for_user(
-            self.current_user.account)
+            self.current_user)
 
         result = []
         for entry in accs:

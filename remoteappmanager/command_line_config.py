@@ -37,7 +37,15 @@ class CommandLineConfig(HasTraits):
     # The full URL where to access the reverse proxy API.
     proxy_api_url = Unicode(help="The url of the reverse proxy API")
 
+    # The full URL for logging out of JupyterHub (typically determined by an
+    # Authenticator class)
+    logout_url = Unicode(help="The logout url of the jupyterhub")
+
     config_file = Unicode(help="The path of the configuration file")
+
+    #: A reference to the authenticator class used for the user login
+    login_service = Unicode(
+        help="The name of the JupyterHub Authenticator class")
 
     # Used to keep track if we already added the options
     # to the global config object. If that's the case, we skip the addition
@@ -51,12 +59,12 @@ class CommandLineConfig(HasTraits):
         """
 
         if not self.command_line_options_inited:
-            for traitlet_name, traitlet in self.traits().items():
-                    define(
-                        traitlet_name,
-                        default=traitlet.default_value,
-                        type=type(traitlet.default_value),
-                        help=traitlet.help)
+            for trait_name, trait in self.traits().items():
+                define(
+                    trait_name,
+                    default=trait.default_value,
+                    type=type(trait.default_value),
+                    help=trait.help)
 
         self.__class__.command_line_options_inited = True
 

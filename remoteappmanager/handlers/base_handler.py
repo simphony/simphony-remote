@@ -1,5 +1,4 @@
 from http.client import responses
-from urllib.parse import urljoin
 import hashlib
 
 from tornado import web, gen
@@ -32,7 +31,7 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
         args = dict(
             user=self.current_user,
             base_url=command_line_config.base_urlpath,
-            logout_url=urljoin(command_line_config.hub_prefix, "logout")
+            logout_url=command_line_config.logout_url
         )
 
         args.update(kwargs)

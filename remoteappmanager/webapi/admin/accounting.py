@@ -15,6 +15,7 @@ from remoteappmanager.db import exceptions as db_exceptions
 class Accounting(Resource):
     user_id = Unicode(allow_empty=False, strip=True)
     image_name = Unicode(allow_empty=False, strip=True)
+    app_license = Unicode(allow_none=True)
     allow_home = Bool()
     volume_source = Unicode(allow_none=True)
     volume_target = Unicode(allow_none=True)
@@ -47,6 +48,7 @@ class AccountingHandler(ResourceHandler):
             id = db.grant_access(
                 resource.image_name,
                 acc_user.name,
+                resource.app_license,
                 resource.allow_home,
                 True,
                 volume,
@@ -91,6 +93,7 @@ class AccountingHandler(ResourceHandler):
                     identifier=str(acc.id),
                     user_id=str(acc_user.id),
                     image_name=acc.application.image,
+                    app_license=acc.application_policy.app_license,
                     allow_home=acc.application_policy.allow_home,
                     volume_source=acc.application_policy.volume_source,
                     volume_target=acc.application_policy.volume_target,

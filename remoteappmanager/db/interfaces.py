@@ -25,8 +25,12 @@ class ABCApplicationPolicy(metaclass=ABCMeta):
     """ Policy for an application
     """
 
-    def __init__(self, allow_home=False, allow_view=False, allow_common=False,
-                 volume_source=None, volume_target=None, volume_mode=None):
+    def __init__(self, app_license=None, allow_home=False, allow_view=False,
+                 allow_common=False, volume_source=None, volume_target=None,
+                 volume_mode=None):
+
+        #: Application License (if specified)
+        self.app_license = app_license
 
         #: Is the home directory mounted
         self.allow_home = allow_home
@@ -198,7 +202,7 @@ class ABCDatabase(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def grant_access(self, app_name, user_name,
+    def grant_access(self, app_name, user_name, app_license,
                      allow_home, allow_view, volume):
         """Grant access for user to application.
 
@@ -209,6 +213,9 @@ class ABCDatabase(metaclass=ABCMeta):
 
         user_name: str
             The name of the user
+
+        app_license: str
+            The license of a commercial application
 
         allow_home: bool
             If the home workspace should be mounted.
@@ -235,7 +242,7 @@ class ABCDatabase(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def revoke_access(self, app_name, user_name,
+    def revoke_access(self, app_name, user_name, app_license,
                       allow_home, allow_view, volume):
         """Revoke access for user to application.
 
@@ -246,6 +253,9 @@ class ABCDatabase(metaclass=ABCMeta):
 
         user_name: str
             The name of the user
+
+        app_license: str
+            The license of a commercial application
 
         allow_home: bool
             If the home workspace should be mounted.

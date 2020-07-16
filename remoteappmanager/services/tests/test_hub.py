@@ -1,8 +1,8 @@
-from tornado import testing, web, gen
+from tornado import web, gen
+from tornado.testing import gen_test, ExpectLog, AsyncHTTPTestCase
+from tornado.web import HTTPError
 
 from remoteappmanager.services.hub import Hub
-from tornado.web import HTTPError
-from remoteappmanager.tests import utils
 
 
 class AuthHandler(web.RequestHandler):
@@ -21,7 +21,7 @@ class AuthHandler(web.RequestHandler):
         self.flush()
 
 
-class TestHub(utils.AsyncHTTPTestCase, testing.LogTrapTestCase):
+class TestHub(AsyncHTTPTestCase):
     def get_app(self):
         self.handler = AuthHandler
         handlers = [
@@ -38,23 +38,31 @@ class TestHub(utils.AsyncHTTPTestCase, testing.LogTrapTestCase):
         self.assertEqual(hub.api_token, api_token)
 
     def test_invalid_init(self):
-        with self.assertRaises(ValueError):
-            Hub(endpoint_url="", api_token="dummy")
+        log_msg = "Invalid endpoint url to initialise the hub connection."
+        with ExpectLog('tornado.application', log_msg):
+            with self.assertRaises(ValueError):
+                Hub(endpoint_url="", api_token="dummy")
 
-        with self.assertRaises(ValueError):
-            Hub(endpoint_url="http://fake.url/", api_token="")
+        log_msg = "Invalid API Token to initialise the hub connection."
+        with ExpectLog('tornado.application', log_msg):
+            with self.assertRaises(ValueError):
+                Hub(endpoint_url="http://fake.url/", api_token="")
 
-    @testing.gen_test
+    @gen_test
     def test_requests(self):
         endpoint_url = self.get_url("/hub")
         api_token = "whatever"
         hub = Hub(endpoint_url=endpoint_url, api_token=api_token)
 
         self.handler.ret_status = 403
-        self.assertEqual((yield hub.verify_token("foo", "bar")), {})
+        with ExpectLog('tornado.access', ''):
+            self.assertEqual(
+                (yield hub.verify_token("foo", "bar")), {})
 
         self.handler.ret_status = 501
-        self.assertEqual((yield hub.verify_token("foo", "bar")), {})
+        with ExpectLog('tornado.access', ''):
+            self.assertEqual(
+                (yield hub.verify_token("foo", "bar")), {})
 
         self.handler.ret_status = 200
         res = yield hub.verify_token("foo", "bar")

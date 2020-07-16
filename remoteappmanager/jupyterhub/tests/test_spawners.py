@@ -5,9 +5,8 @@ import subprocess
 import sys
 import time
 from unittest import mock
-from tornado.testing import LogTrapTestCase
 
-from tornado import testing
+from tornado.testing import AsyncTestCase
 from jupyterhub import orm
 
 from remoteappmanager.jupyterhub.spawners import (
@@ -65,10 +64,17 @@ def new_spawner(spawner_class):
     # Mock hub
     hub = orm.Hub(server=generic_server)
 
-    return spawner_class(db=db, user=user, hub=hub)
+    # Mock authenticator
+    authenticator = mock.Mock()
+    authenticator.logout_url = mock.Mock(
+        return_value='/logout_test')
+    authenticator.login_service = 'TEST'
+
+    return spawner_class(
+        db=db, user=user, hub=hub, authenticator=authenticator)
 
 
-class TestSystemUserSpawner(TempMixin, testing.AsyncTestCase, LogTrapTestCase):
+class TestSystemUserSpawner(TempMixin, AsyncTestCase):
     def setUp(self):
         super().setUp()
         self.spawner = new_spawner(SystemUserSpawner)

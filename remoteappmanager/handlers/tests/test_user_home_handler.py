@@ -1,11 +1,10 @@
-from tornado.testing import LogTrapTestCase
+from tornado.testing import AsyncHTTPTestCase, ExpectLog
 
-from remoteappmanager.tests import utils
 from remoteappmanager.tests.mocking import dummy
 from remoteappmanager.tests.temp_mixin import TempMixin
 
 
-class TestUserHomeHandler(TempMixin, utils.AsyncHTTPTestCase, LogTrapTestCase):
+class TestUserHomeHandler(TempMixin, AsyncHTTPTestCase):
     def get_app(self):
         app = dummy.create_application()
         app.hub.verify_token.return_value = {
@@ -27,11 +26,12 @@ class TestUserHomeHandler(TempMixin, utils.AsyncHTTPTestCase, LogTrapTestCase):
 
     def test_failed_auth(self):
         self._app.hub.verify_token.return_value = {}
-        res = self.fetch("/user/johndoe/",
-                         headers={
-                             "Cookie": "jupyter-hub-token-johndoe=foo"
-                         }
-                         )
+        with ExpectLog('tornado.access', ''):
+            res = self.fetch("/user/johndoe/",
+                             headers={
+                                 "Cookie": "jupyter-hub-token-johndoe=foo"
+                             }
+                             )
 
         self.assertGreaterEqual(res.code, 400)
         self.assertIn(self._app.file_config.login_url, res.effective_url)

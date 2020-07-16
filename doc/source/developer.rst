@@ -7,8 +7,8 @@ RemoteAppManager
 The main tornado web application that manages the containers (docker applications)
 for each user.
 
-.. include::
-    developer/docker.rst
+.. include:: developer/docker.rst
+.. include:: developer/ci_instructions.rst
 
 API reference
 -------------

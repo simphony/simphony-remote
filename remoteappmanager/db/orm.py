@@ -54,6 +54,10 @@ class Application(IdMixin, Base):
 
 class ApplicationPolicy(IdMixin, Base):
     __tablename__ = "application_policy"
+
+    #: License, if required by the application
+    app_license = Column(Unicode, nullable=True)
+
     #: If the home directory should be mounted in the container
     allow_home = Column(Boolean)
 
@@ -303,7 +307,7 @@ class ORMDatabase(ABCDatabase):
 
         return applications
 
-    def grant_access(self, app_name, user_name,
+    def grant_access(self, app_name, user_name, app_license,
                      allow_home, allow_view, volume):
         allow_common = False
         source = target = mode = None
@@ -324,6 +328,7 @@ class ORMDatabase(ABCDatabase):
                     raise exceptions.NotFound()
 
                 orm_policy = session.query(ApplicationPolicy).filter(
+                    ApplicationPolicy.app_license == app_license,
                     ApplicationPolicy.allow_home == allow_home,
                     ApplicationPolicy.allow_common == allow_common,
                     ApplicationPolicy.allow_view == allow_view,
@@ -333,6 +338,7 @@ class ORMDatabase(ABCDatabase):
 
                 if orm_policy is None:
                     orm_policy = ApplicationPolicy(
+                        app_license=app_license,
                         allow_home=allow_home,
                         allow_common=allow_common,
                         allow_view=allow_view,
@@ -365,7 +371,7 @@ class ORMDatabase(ABCDatabase):
 
                 return id
 
-    def revoke_access(self, app_name, user_name,
+    def revoke_access(self, app_name, user_name, app_license,
                       allow_home, allow_view, volume):
         allow_common = False
         source = target = mode = None
@@ -384,6 +390,7 @@ class ORMDatabase(ABCDatabase):
                     User.name == user_name).one()
 
                 orm_policy = session.query(ApplicationPolicy).filter(
+                    ApplicationPolicy.app_license == app_license,
                     ApplicationPolicy.allow_home == allow_home,
                     ApplicationPolicy.allow_common == allow_common,
                     ApplicationPolicy.allow_view == allow_view,
@@ -402,9 +409,8 @@ class ORMDatabase(ABCDatabase):
     def revoke_access_by_id(self, mapping_id):
         with detached_session(self.db) as session, \
                 transaction(session):
-                session.query(Accounting).filter(
-                    Accounting.id == mapping_id
-                    ).delete()
+            session.query(Accounting).filter(
+                Accounting.id == mapping_id).delete()
 
 
 @contextlib.contextmanager
