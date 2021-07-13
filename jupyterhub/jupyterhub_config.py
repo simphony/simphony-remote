@@ -19,7 +19,7 @@ c.JupyterHub.logo_file = os.path.join(
 )
 
 # Choose between system-user mode and virtual-user mode
-setting_mode = ('system_user', 'virtual_user')[1]
+setting_mode = ('system_user', 'virtual_user', 'dummy_user')[1]
 
 if setting_mode == 'virtual_user':
     c.JupyterHub.spawner_class = ('remoteappmanager.jupyterhub.spawners.'
@@ -44,3 +44,10 @@ elif setting_mode == 'system_user':
     c.JupyterHub.spawner_class = ('remoteappmanager.jupyterhub.spawners.'
                                   'SystemUserSpawner')
     c.Authenticator.admin_users = {os.environ["USER"]}
+
+elif setting_mode == 'dummy_user':
+    # Make sure to run: `pip install dev-requirements.txt` first
+    c.JupyterHub.spawner_class = (
+        'simplespawner.SimpleLocalProcessSpawner')
+    c.JupyterHub.authenticator_class = (
+        'remoteappmanager.jupyterhub.auth.WorldAuthenticator')

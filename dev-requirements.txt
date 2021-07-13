@@ -1,3 +1,5 @@
 flake8
 coverage
 selenium==3.141.0
+notebook
+jupyterhub-simplespawner
