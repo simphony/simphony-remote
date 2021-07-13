@@ -9,6 +9,10 @@ c.JupyterHub.ssl_cert = 'test.crt'
 
 c.JupyterHub.hub_ip = public_ips()[0] if len(public_ips()) else '127.0.0.1'
 
+c.ConfigurableHTTPProxy.command = [
+    'configurable-http-proxy',
+    f'--default-target=http://{c.JupyterHub.hub_ip}:8081']
+
 c.JupyterHub.logo_file = os.path.join(
     os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
     'remoteappmanager/static/images/header_logo.png'
@@ -18,7 +22,7 @@ c.JupyterHub.logo_file = os.path.join(
 setting_mode = ('system_user', 'virtual_user')[1]
 
 if setting_mode == 'virtual_user':
-    c.JupyterHub.spawner_class = ('remoteappmanager.jupyterhub.spawners.' +
+    c.JupyterHub.spawner_class = ('remoteappmanager.jupyterhub.spawners.'
                                   'VirtualUserSpawner')
 
     # Parent directory in which temporary directory is created for
@@ -37,6 +41,6 @@ if setting_mode == 'virtual_user':
     c.Authenticator.admin_users = {"admin"}
 
 elif setting_mode == 'system_user':
-    c.JupyterHub.spawner_class = ('remoteappmanager.jupyterhub.spawners.' +
+    c.JupyterHub.spawner_class = ('remoteappmanager.jupyterhub.spawners.'
                                   'SystemUserSpawner')
     c.Authenticator.admin_users = {os.environ["USER"]}

@@ -2,11 +2,11 @@ import os
 import escapism
 import string
 
-from traitlets import Any, Unicode
+from traitlets import Any, Unicode, Instance
 from tornado import gen
 
 from jupyterhub.spawner import LocalProcessSpawner
-from jupyterhub import orm
+from jupyterhub.proxy import Proxy, ConfigurableHTTPProxy
 
 
 class BaseSpawner(LocalProcessSpawner):
@@ -14,9 +14,8 @@ class BaseSpawner(LocalProcessSpawner):
     the actual spawners
     """
 
-    #: The instance of the orm Proxy.
-    #: We use Any in agreement with base class practice.
-    proxy = Any()
+    #: The instance of the proxy.Proxy.
+    proxy = Instance(Proxy)
 
     #: The path of the configuration file for the cmd executable
     config_file_path = Unicode(config=True)
@@ -32,11 +31,7 @@ class BaseSpawner(LocalProcessSpawner):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        # We get the first one. Strangely enough, jupyterhub has a table
-        # containing potentially multiple proxies, but it's enforced to
-        # contain only one.
-        self.proxy = self.db.query(orm.Proxy).first()
+        self.proxy = ConfigurableHTTPProxy()
 
     def get_args(self):
         args = super().get_args()
@@ -44,12 +39,15 @@ class BaseSpawner(LocalProcessSpawner):
         for iarg, arg in enumerate(args):
             args[iarg] = arg.replace('--base-url=', '--base-urlpath=')
 
+        args.append("--cookie_name={}".format(
+            self.server.cookie_name))
+
         args.append("--proxy-api-url={}".format(
-            self.proxy.api_server.url))
+            self.proxy.api_url))
 
         args.append("--logout_url={}".format(
             self.authenticator.logout_url(
-                self.hub.server.base_url)))
+                self.hub.base_url)))
 
         if self.config_file_path:
             args.append("--config-file={}".format(self.config_file_path))
