@@ -135,6 +135,10 @@ class BaseApplication(web.Application, LoggingMixin):
         login_service = self.command_line_config.login_service
         user = User(name=user_name, login_service=login_service)
         user.account = self.db.get_user(user_name=user_name)
+
+        self.log.info("Adding demo apps to User registry:")
+        self._add_demo_apps(user)
+
         return user
 
     @default("registry")
@@ -150,8 +154,6 @@ class BaseApplication(web.Application, LoggingMixin):
         """Start the application and the ioloop"""
         self.log.info("Starting SimPhoNy-Remote using JupyterHub"
                       " server version %s", __version__)
-        self.log.info("Adding demo apps to User registry:")
-        self._add_demo_apps()
 
         self.log.info("Starting server with options:")
         for trait_name in self._command_line_config.trait_names():
@@ -196,19 +198,19 @@ class BaseApplication(web.Application, LoggingMixin):
         _check_version(hub_version, __version__, self.log)
 
     # Private
-    def _add_demo_apps(self):
+    def _add_demo_apps(self, user):
         """Grant access to any demo applications provided for user"""
 
-        if not self.user.demo_applications:
+        if user.demo_applications:
             return
 
         # Add all demo applications already registered
         for application in self.db.list_applications():
-            if application.image in self.user.demo_applications:
+            if application.image in user.demo_applications:
                 self.log.info(application.image)
                 self.db.grant_access(
                     application.image,
-                    self.user.name,
+                    user.name,
                     False,
                     True,
                     None

@@ -47,6 +47,7 @@ class TestApplication(WebAPITestCase):
         application_mock_2.image = "hello2"
 
         policy = Mock(
+            app_license='',
             allow_home=True,
             volume_source="foo",
             volume_target="bar",
@@ -72,6 +73,7 @@ class TestApplication(WebAPITestCase):
                 'two': {
                     'image': {
                         'policy': {
+                            'app_license': '',
                             'volume_mode': 'ro',
                             'volume_source': 'foo',
                             'allow_home': True,
@@ -89,6 +91,7 @@ class TestApplication(WebAPITestCase):
                 'one': {
                     'image': {
                         'policy': {
+                            'app_license': '',
                             'volume_mode': 'ro',
                             'volume_source': 'foo',
                             'allow_home': True,
@@ -136,6 +139,7 @@ class TestApplication(WebAPITestCase):
                                  'icon_128': '',
                                  'name': 'boo',
                                  'policy': {
+                                     'app_license': '',
                                      "allow_home": True,
                                      "volume_mode": 'ro',
                                      "volume_source": "foo",
@@ -166,6 +170,7 @@ class TestApplication(WebAPITestCase):
                                  'name': 'boo',
                                  'ui_name': 'foo_ui',
                                  'policy': {
+                                     'app_license': '',
                                      "allow_home": True,
                                      "volume_mode": 'ro',
                                      "volume_source": "foo",

@@ -5,6 +5,8 @@ from tornado.testing import AsyncHTTPTestCase, gen_test, ExpectLog
 from remoteappmanager.tests.utils import mock_coro_new_callable
 from remoteappmanager.netutils import wait_for_http_server_2xx
 
+FETCH_PATH = "remoteappmanager.netutils.AsyncHTTPClient.fetch"
+
 
 class ShortHandler(web.RequestHandler):
     error_count = 10
@@ -23,7 +25,7 @@ class LongHandler(ShortHandler):
     error_count = 100000
 
 
-class TestUtils(AsyncHTTPTestCase, ExpectLog):
+class TestUtils(AsyncHTTPTestCase):
     def get_app(self):
 
         app = web.Application(handlers=[('/short', ShortHandler),
@@ -32,23 +34,31 @@ class TestUtils(AsyncHTTPTestCase, ExpectLog):
 
     @gen_test
     def test_basic(self):
-        yield wait_for_http_server_2xx(self.get_url("/short"), timeout=2)
+        with ExpectLog('tornado.access', ''), \
+                ExpectLog('tornado.application', ''):
 
-        with self.assertRaises(TimeoutError):
-            yield wait_for_http_server_2xx(self.get_url("/long"), timeout=2)
+            yield wait_for_http_server_2xx(
+                self.get_url("/short"), timeout=2)
+
+            with self.assertRaises(TimeoutError):
+                yield wait_for_http_server_2xx(
+                    self.get_url("/long"), timeout=2)
 
     @gen_test
     def test_failures(self):
-        with mock.patch("remoteappmanager.netutils.AsyncHTTPClient.fetch",
-                        new_callable=mock_coro_new_callable(
-                            side_effect=OSError("boo"))), \
-                self.assertRaises(TimeoutError):
+        with ExpectLog('tornado.application', ''):
+            with mock.patch(FETCH_PATH,
+                            new_callable=mock_coro_new_callable(
+                                side_effect=OSError("boo"))), \
+                    self.assertRaises(TimeoutError):
 
-            yield wait_for_http_server_2xx(self.get_url("/short"), timeout=1)
+                yield wait_for_http_server_2xx(
+                    self.get_url("/short"), timeout=1)
 
-        with mock.patch("remoteappmanager.netutils.AsyncHTTPClient.fetch",
-                        new_callable=mock_coro_new_callable(
-                            side_effect=Exception("boo"))), \
-                self.assertRaises(TimeoutError):
+            with mock.patch(FETCH_PATH,
+                            new_callable=mock_coro_new_callable(
+                                side_effect=Exception("boo"))), \
+                    self.assertRaises(TimeoutError):
 
-            yield wait_for_http_server_2xx(self.get_url("/short"), timeout=1)
+                yield wait_for_http_server_2xx(
+                    self.get_url("/short"), timeout=1)

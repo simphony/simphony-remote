@@ -77,7 +77,7 @@ class DummyDB(interfaces.ABCDatabase):
                     application_policy=policy)
                 for id, (tbl_user, application, policy)
                 in self.accounting.items()
-                if tbl_user == user]
+                if tbl_user.name == user.name]
 
     def create_user(self, user_name):  # pragma: no cover
         if user_name in [u.name for u in self.list_users()]:
@@ -134,8 +134,9 @@ class DummyDB(interfaces.ABCDatabase):
         user = self._get_user_id_by_name(user_name)
 
         source, target, mode = volume.split(':')
-        policy = DummyDBApplicationPolicy(allow_home, allow_view, False,
-                                          source, target, mode)
+        policy = DummyDBApplicationPolicy(
+            app_license, allow_home, allow_view, False,
+            source, target, mode)
 
         self.policies[len(self.policies)] = policy
         id = str(uuid.uuid4().hex)

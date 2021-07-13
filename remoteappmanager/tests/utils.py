@@ -1,9 +1,6 @@
 import contextlib
 import sys
-import socket
 
-import tornado.netutil
-import tornado.testing
 from tornado import gen
 
 from remoteappmanager.command_line_config import CommandLineConfig
@@ -68,35 +65,6 @@ def invocation_argv():
     yield
 
     sys.argv[:] = saved_argv
-
-
-# Workaround for tornado bug #1573, already fixed in master, but not yet
-# available. Remove when upgrading tornado.
-def bind_unused_port(reuse_port=False):
-    """Binds a server socket to an available port on localhost.
-
-    Returns a tuple (socket, port).
-    """
-    sock = tornado.netutil.bind_sockets(None,
-                                        '127.0.0.1',
-                                        family=socket.AF_INET,
-                                        reuse_port=reuse_port)[0]
-    port = sock.getsockname()[1]
-    return sock, port
-
-
-class AsyncHTTPTestCase(tornado.testing.AsyncHTTPTestCase):
-    """Base class workaround for the above condition."""
-    def setUp(self):
-        self._bind_unused_port_orig = tornado.testing.bind_unused_port
-        tornado.testing.bind_unused_port = bind_unused_port
-
-        def cleanup():
-            tornado.testing.bind_unused_port = self._bind_unused_port_orig
-
-        self.addCleanup(cleanup)
-
-        super().setUp()
 
 
 def mock_coro_new_callable(return_value=None, side_effect=None):
