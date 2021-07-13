@@ -2,9 +2,11 @@ import importlib
 
 from remoteappmanager.handlers.handler_authenticator import HubAuthenticator
 from traitlets import Instance, default
-from tornado import web
+from tornado import web, gen
 import tornado.ioloop
 
+from jupyterhub._version import __version__, _check_version
+from tornado.httpclient import AsyncHTTPClient
 from tornadowebapi.registry import Registry
 
 from remoteappmanager.db.interfaces import ABCDatabase
@@ -80,7 +82,8 @@ class BaseApplication(web.Application, LoggingMixin):
         settings.update(as_dict(command_line_config))
         settings.update(as_dict(file_config))
         settings["static_url_prefix"] = (
-            self._command_line_config.base_urlpath + "static/")
+                self._command_line_config.base_urlpath + "static/")
+        settings['X-JupyterHub-Version'] = __version__
 
         handlers = self._get_handlers()
 
@@ -145,7 +148,8 @@ class BaseApplication(web.Application, LoggingMixin):
     # Public
     def start(self):
         """Start the application and the ioloop"""
-
+        self.log.info("Starting SimPhoNy-Remote using JupyterHub"
+                      " server version %s", __version__)
         self.log.info("Adding demo apps to User registry:")
         self._add_demo_apps()
 
@@ -162,7 +166,34 @@ class BaseApplication(web.Application, LoggingMixin):
 
         self.listen(self.command_line_config.port)
 
+        tornado.ioloop.IOLoop.current().run_sync(self.check_hub_version)
         tornado.ioloop.IOLoop.current().start()
+
+    @gen.coroutine
+    def check_hub_version(self):
+        """Test a connection to my Hub
+
+        - exit if I can't connect at all
+        - check version and warn on sufficient mismatch
+        """
+        client = AsyncHTTPClient()
+        RETRIES = 5
+        for i in range(1, RETRIES + 1):
+            try:
+                resp = yield client.fetch(
+                    self.command_line_config.hub_api_url)
+            except Exception:
+                self.log.exception(
+                    "Failed to connect to my Hub at %s (attempt %i/%i). Is it running?",
+                    self.command_line_config.hub_api_url, i, RETRIES)
+                yield gen.sleep(min(2 ** i, 16))
+            else:
+                break
+        else:
+            self.exit(1)
+
+        hub_version = resp.headers.get('X-JupyterHub-Version')
+        _check_version(hub_version, __version__, self.log)
 
     # Private
     def _add_demo_apps(self):
