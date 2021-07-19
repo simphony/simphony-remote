@@ -62,7 +62,7 @@ ubuntudeps:
 
 	# Download and install Docker
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-	sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+	sudo apt-key adv --keyserver hkps://sks.pod02.fleetstreetops.com --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
 	sudo add-apt-repository \
 		"deb [arch=amd64] https://download.docker.com/linux/ubuntu \
 		`lsb_release -cs` \
