@@ -180,7 +180,7 @@ class TestContainer(TestCase):
 
         docker_dict["Ports"] = [
              {
-                'IP': '0.0.0.0',
+                'IP': '::',
                 'PublicIP': 34567,
                 'PrivatePort': 22,
                 'Type': 'tcp'

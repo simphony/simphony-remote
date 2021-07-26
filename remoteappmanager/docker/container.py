@@ -136,7 +136,11 @@ class Container(HasTraits):
             # It's a client.containers() output, so we have different rules.
             ports = docker_dict.get('Ports') or []
             if len(ports) > 1:
-                raise ValueError("Container Ports had more than one element.")
+                if ports[0]["IP"] != "::":
+                    ports = [ports[0]]
+                else:
+                    raise ValueError("Container Ports had "
+                                     "more than one element.")
 
             if len(ports):
                 kwargs["ip"] = ports[0].get('IP') or kwargs["ip"]
