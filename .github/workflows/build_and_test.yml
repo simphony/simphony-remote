@@ -68,7 +68,7 @@ jobs:
           popd
           sleep 3
           . venv/bin/activate
-          coverage run -m tornado.testing discover
+          DISPLAY=:99 coverage run -m tornado.testing discover
           pip install codecov
           codecov
           bash <(curl -s https://codecov.io/bash)
