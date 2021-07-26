@@ -141,7 +141,7 @@ class TestContainer(TestCase):
                        }
 
         docker_dict["NetworkSettings"]["Ports"] = {
-            '8888/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '666'}],
+            '8888/tcp': [{'HostIp': '::', 'HostPort': '666'}],
             '8889/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '667'}]
         }
         with self.assertRaises(ValueError):
@@ -149,7 +149,7 @@ class TestContainer(TestCase):
 
         docker_dict["NetworkSettings"]["Ports"] = {
             '8888/tcp': [
-                {'HostIp': '0.0.0.0', 'HostPort': '32782'},
+                {'HostIp': '::', 'HostPort': '32782'},
                 {'HostIp': '0.0.0.0', 'HostPort': '32783'}
             ]
         }

@@ -118,8 +118,9 @@ class Container(HasTraits):
             if len(ports):
                 port_values = list(ports.values())[0]
                 if len(port_values) > 1:
-                    raise ValueError("Container Ports values had "
-                                     "more than one element.")
+                    if port_values[0].get("HostIp") == "::":
+                        raise ValueError("Container Ports values had "
+                                         "more than one element.")
 
                 if len(port_values):
                     kwargs["ip"] = port_values[0].get("HostIp") or kwargs["ip"]
