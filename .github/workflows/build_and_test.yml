@@ -63,6 +63,10 @@ jobs:
 
       - name: After Success
         run: |
+          pushd jupyterhub
+          `pwd`/start.sh &
+          popd
+          sleep 3
           . venv/bin/activate
           coverage run -m tornado.testing discover
           pip install codecov
