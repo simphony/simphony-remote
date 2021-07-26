@@ -17,7 +17,7 @@ jobs:
 
       - name: Install Firefox
         uses: browser-actions/setup-firefox@latest
-        with: 
+        with:
           firefox-version: "75.0"
 
       - name: Before Install
@@ -63,6 +63,7 @@ jobs:
 
       - name: After Success
         run: |
+          . venv/bin/activate
           coverage run -m tornado.testing discover
           pip install codecov
           codecov
