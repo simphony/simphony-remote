@@ -92,6 +92,13 @@ class Container(HasTraits):
         >>> containers = docker.Client().containers()
 
         >>> Container.from_docker_dict(containers[0])
+
+        Notes
+        -----
+        On GitHub Actions, the Ports key of the docker dict contains two
+        elements, with the first one having the proper HostIp and the other
+        having a '::' HostIp. We can safely assume the first one is the valid
+        one, and raise an exception in any other case.
         """
 
         is_inspect_container_output = ("Config" in docker_dict)
