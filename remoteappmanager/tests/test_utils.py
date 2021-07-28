@@ -1,10 +1,9 @@
 from unittest import TestCase
 
-from tornado.testing import ExpectLog
 from remoteappmanager import utils
 
 
-class TestUtils(ExpectLog, TestCase):
+class TestUtils(TestCase):
     def test_parse_volume_string(self):
         self.assertEqual(utils.parse_volume_string("/foo:/bar:ro"),
                          ("/foo", "/bar", "ro"))

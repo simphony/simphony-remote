@@ -17,6 +17,7 @@ class RemoteAppDriverTest(unittest.TestCase):
     def setUp(self):
         ff_binary = webdriver.firefox.firefox_binary.FirefoxBinary()
         ff_profile = webdriver.firefox.firefox_profile.FirefoxProfile()
+        ff_profile.set_preference("dom.webnotifications.enabled", False)
         ff_profile.assume_untrusted_cert_issuer = True
         ff_profile.accept_untrusted_certs = True
         capabilities = webdriver.DesiredCapabilities().FIREFOX
@@ -30,17 +31,6 @@ class RemoteAppDriverTest(unittest.TestCase):
         self.base_url = "https://127.0.0.1:8000/"
         self.verificationErrors = []
         self.accept_next_alert = True
-
-        permissions_db_path = os.path.join(ff_profile.profile_dir,
-                                           "permissions.sqlite")
-
-        with contextlib.closing(sqlite3.connect(permissions_db_path)) as db:
-            cur = db.cursor()
-            cur.execute(
-                ("INSERT INTO moz_perms VALUES (1, '{base_url}', "
-                 "'popup', 1, 0, 0, 1474977124357)").format(
-                    base_url=self.base_url))
-            db.commit()
 
     def wait_until_presence_of_element_located(self, how, what):
         """ Wait until a located element is present

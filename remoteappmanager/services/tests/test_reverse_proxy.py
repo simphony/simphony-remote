@@ -2,11 +2,13 @@ from unittest.mock import Mock
 
 from jupyterhub import orm
 from remoteappmanager.services.reverse_proxy import ReverseProxy
-from tornado import gen, testing
+from tornado import gen
+from tornado.testing import gen_test, AsyncTestCase, ExpectLog
 
 
-class TestReverseProxy(testing.AsyncTestCase, testing.ExpectLog):
-    @testing.gen_test
+class TestReverseProxy(AsyncTestCase):
+
+    @gen_test
     def test_reverse_proxy_operations(self):
         coroutine_out = None
 
@@ -32,8 +34,14 @@ class TestReverseProxy(testing.AsyncTestCase, testing.ExpectLog):
         self.assertEqual(coroutine_out["kwargs"]["method"], "DELETE")
 
     def test_incorrect_init(self):
-        with self.assertRaises(ValueError):
-            ReverseProxy(endpoint_url="http://fake/api", api_token="")
+        log_msg = ("invalid proxy API Token to initialise the "
+                   "reverse proxy connection.")
+        with ExpectLog('tornado.application', log_msg):
+            with self.assertRaises(ValueError):
+                ReverseProxy(endpoint_url="http://fake/api", api_token="")
 
-        with self.assertRaises(ValueError):
-            ReverseProxy(endpoint_url="", api_token="foo")
+        log_msg = ("invalid proxy endpoint url to initialise the "
+                   "reverse proxy connection.")
+        with ExpectLog('tornado.application', log_msg):
+            with self.assertRaises(ValueError):
+                ReverseProxy(endpoint_url="", api_token="foo")
