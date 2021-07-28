@@ -19,6 +19,7 @@ then
 
   echo "Generating self-signed certificates in $directory"
 
+  touch ~/.rnd
   openssl genrsa -out ${directory}/test.key 1024
   openssl req -new -key ${directory}/test.key -out ${directory}/test.csr -batch
   cp ${directory}/test.key ${directory}/test.key.org

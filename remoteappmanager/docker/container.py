@@ -92,6 +92,13 @@ class Container(HasTraits):
         >>> containers = docker.Client().containers()
 
         >>> Container.from_docker_dict(containers[0])
+
+        Notes
+        -----
+        On GitHub Actions, the Ports key of the docker dict contains two
+        elements, with the first one having the proper HostIp and the other
+        having a '::' HostIp. We can safely assume the first one is the valid
+        one, and raise an exception in any other case.
         """
 
         is_inspect_container_output = ("Config" in docker_dict)
@@ -118,8 +125,9 @@ class Container(HasTraits):
             if len(ports):
                 port_values = list(ports.values())[0]
                 if len(port_values) > 1:
-                    raise ValueError("Container Ports values had "
-                                     "more than one element.")
+                    if port_values[0].get("HostIp") == "::":
+                        raise ValueError("Container Ports values had "
+                                         "more than one element.")
 
                 if len(port_values):
                     kwargs["ip"] = port_values[0].get("HostIp") or kwargs["ip"]
@@ -136,7 +144,11 @@ class Container(HasTraits):
             # It's a client.containers() output, so we have different rules.
             ports = docker_dict.get('Ports') or []
             if len(ports) > 1:
-                raise ValueError("Container Ports had more than one element.")
+                if ports[0]["IP"] != "::":
+                    ports = [ports[0]]
+                else:
+                    raise ValueError("Container Ports had "
+                                     "more than one element.")
 
             if len(ports):
                 kwargs["ip"] = ports[0].get('IP') or kwargs["ip"]
