@@ -24,7 +24,7 @@ jobs:
 
       - name: Install make on Ubuntu
         if: ${{ matrix.container == 'ubuntu:18.04' }}
-        run: sudo apt-get install build-essential
+        run: apt-get install build-essential
 
       - name: Install requirements
         run: |
