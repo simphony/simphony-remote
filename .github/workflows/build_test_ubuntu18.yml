@@ -45,12 +45,16 @@ jobs:
           . venv/bin/activate
           flake8 .
 
+      - name: Build docs
+        run: |
+          . venv/bin/activate
+          make docs
+
       - name: Test
         run: |
           . venv/bin/activate
           make pythontest
           make jstest
-          make docs
           make testimages
           make testdb
           make certs
