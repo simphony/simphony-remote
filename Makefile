@@ -125,10 +125,16 @@ devdeps:
 	@echo "Installing test dependencies"
 	@echo "----------------------------"
 	pip3 -q install -r dev-requirements.txt -r doc-requirements.txt
-	sudo apt-get -qq install phantomjs
+	if [ -f "/etc/lsb-release" ]; then \
+		sudo apt-get -qq install phantomjs; \
+	elif [ -f "/etc/centos-release" ]; then \
+		curl -O https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2; \
+		tar xvjf phantomjs-2.1.1-linux-x86_64.tar.bz2 -C /usr/local/share; \
+		sudo ln -s /usr/local/share/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/local/bin; \
+	fi
 
 	# Install geckodriver (for selenium testing)
-	wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
+	curl -L -O https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
 	sudo sh -c 'tar -x geckodriver -zf geckodriver-v0.26.0-linux64.tar.gz -O > /usr/bin/geckodriver'
 	sudo chmod +x /usr/bin/geckodriver
 	rm geckodriver-v0.26.0-linux64.tar.gz
