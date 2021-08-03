@@ -9,20 +9,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build_test_ubuntu:
     runs-on: ubuntu-18.04
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install Firefox
-        uses: browser-actions/setup-firefox@latest
-        with:
-          firefox-version: "75.0"
-
-      - name: Before Install
+      - name: Install requirements
         run: |
-          firefox --version
           make deps
           make venv
           . venv/bin/activate
@@ -31,23 +25,36 @@ jobs:
           python -c "import setuptools; print(setuptools.__version__)"
           pip --version
 
-      - name: Install
+      - name: Install Firefox
+        uses: browser-actions/setup-firefox@latest
+        with:
+          firefox-version: "75.0"
+
+      - name: Install Simphony-Remote
         run: |
           . venv/bin/activate
           make install
 
-      - name: Before Test
+      - name: Install development requirements
         run: |
           . venv/bin/activate
           make devdeps
 
-      - name: Test
+      - name: Flake8 checks
         run: |
           . venv/bin/activate
           flake8 .
+
+      - name: Build docs
+        run: |
+          . venv/bin/activate
+          make docs
+
+      - name: Test
+        run: |
+          . venv/bin/activate
           make pythontest
           make jstest
-          make docs
           make testimages
           make testdb
           make certs
@@ -61,7 +68,7 @@ jobs:
           sleep 3
           DISPLAY=:99 python -m unittest discover -s selenium_tests -t . -v
 
-      - name: After Success
+      - name: Coverage
         run: |
           pushd jupyterhub
           `pwd`/start.sh &
