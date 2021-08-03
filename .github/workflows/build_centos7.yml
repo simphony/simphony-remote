@@ -10,6 +10,8 @@ on:
 
 jobs:
   build_centos:
+    # GitHub Actions does not currently support CentOS as an official platform, so in order to
+    # test on this OS we need to run it as a container based on the Ubuntu environment
     runs-on: ubuntu-latest
 
     strategy:
@@ -55,3 +57,10 @@ jobs:
         run: |
           . venv/bin/activate
           make devdeps
+
+      - name: Test python backend
+        run: |
+          . venv/bin/activate
+          export LC_ALL=en_US.UTF-8
+          export LANG=en_US.UTF-8
+          make pythontest
