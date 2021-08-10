@@ -52,6 +52,12 @@
           </label>
         </div>
 
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="allow_srdata" v-model="model.allow_srdata"/> Allow providing a startup file
+          </label>
+        </div>
+
         <p v-if="crossValidationError" class="text-danger">Both Volume Source and Target must be defined</p>
         <div class="modal-footer">
           <div class="alert alert-danger" v-if="communicationError">
@@ -83,7 +89,8 @@
           volume_source: '',
           volume_target: '',
           volume_readonly: false,
-          volume_source_target: []
+          volume_source_target: [],
+          allow_srdata: false
         },
         imageNames: []
       };
@@ -136,7 +143,8 @@
           allow_home: this.model.allow_home,
           volume_source: this.model.volume_source,
           volume_target: this.model.volume_target,
-          volume_mode: (model.volume_readonly ? "ro" : "rw")
+          volume_mode: (model.volume_readonly ? "ro" : "rw"),
+          allow_srdata: this.model.allow_srdata
         };
 
         resources.Accounting.create(rep)

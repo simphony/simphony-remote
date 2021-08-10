@@ -353,4 +353,19 @@ class VirtualDockerClient(object):
                     SIMPHONY_NS.description: 'A vanilla Ubuntu installation',  # noqa
                 },
                 exposed_ports=["8888/tcp"]
-            )]
+            ),
+            _Image(
+                id="sha256:df5f5184104426b65967e016ff2ac0bfcd44ad7899ca3bbcf8e44e4461491a9e",  # noqa
+                name="simphonyproject/simphony-paraview",
+                labels={
+                    SIMPHONY_NS.description: 'Ubuntu machine with ParaView preinstalled',  # noqa
+                    SIMPHONY_NS.ui_name: 'ParaView',
+                    SIMPHONY_NS.type: 'vncapp',
+                    SIMPHONY_NS_ENV['x11-width']: '',
+                    SIMPHONY_NS_ENV['x11-height']: '',
+                    SIMPHONY_NS_ENV['x11-depth']: '',
+                    SIMPHONY_NS_ENV['srdata']: '',
+                },
+                exposed_ports=["8888/tcp"]
+            )
+        ]

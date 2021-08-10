@@ -203,7 +203,7 @@ class ABCDatabase(metaclass=ABCMeta):
 
     @abstractmethod
     def grant_access(self, app_name, user_name, app_license,
-                     allow_home, allow_view, volume):
+                     allow_home, allow_view, volume, allow_srdata):
         """Grant access for user to application.
 
         Parameters
@@ -228,6 +228,9 @@ class ABCDatabase(metaclass=ABCMeta):
             mode being "ro" or "rw".
             (e.g. "/host/path:/container/path:ro").
 
+        allow_srdata : bool
+            If the user can provide a file for the container to load at startup
+
         Raises
         ------
         exception.NotFound:
@@ -243,7 +246,7 @@ class ABCDatabase(metaclass=ABCMeta):
 
     @abstractmethod
     def revoke_access(self, app_name, user_name, app_license,
-                      allow_home, allow_view, volume):
+                      allow_home, allow_view, volume, allow_srdata):
         """Revoke access for user to application.
 
         Parameters
@@ -267,6 +270,9 @@ class ABCDatabase(metaclass=ABCMeta):
             A volume to mount in the format source_path:target_path:mode
             mode being "ro" or "rw".
             (e.g. "/host/path:/container/path:ro").
+
+        allow_srdata : bool
+            If the user can provide a file for the container to load at startup
 
         Raises
         ------

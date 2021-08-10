@@ -67,14 +67,17 @@ class ApplicationPolicy(IdMixin, Base):
     #: If the container should be accessible by other people
     allow_view = Column(Boolean)
 
-    # Which volume to mount
+    #: Which volume to mount
     volume_source = Column(Unicode, nullable=True)
 
-    # Where to mount it in the container
+    #: Where to mount it in the container
     volume_target = Column(Unicode, nullable=True)
 
-    # In which mode
+    #: In which mode
     volume_mode = Column(Enum("ro", "rw"), nullable=True)
+
+    #: If the user can open a file at startup
+    allow_srdata = Column(Boolean)
 
 
 class Accounting(Base):
@@ -308,7 +311,7 @@ class ORMDatabase(ABCDatabase):
         return applications
 
     def grant_access(self, app_name, user_name, app_license,
-                     allow_home, allow_view, volume):
+                     allow_home, allow_view, volume, allow_srdata):
         allow_common = False
         source = target = mode = None
 
@@ -334,7 +337,9 @@ class ORMDatabase(ABCDatabase):
                     ApplicationPolicy.allow_view == allow_view,
                     ApplicationPolicy.volume_source == source,
                     ApplicationPolicy.volume_target == target,
-                    ApplicationPolicy.volume_mode == mode).one_or_none()
+                    ApplicationPolicy.volume_mode == mode,
+                    ApplicationPolicy.allow_srdata == allow_srdata
+                ).one_or_none()
 
                 if orm_policy is None:
                     orm_policy = ApplicationPolicy(
@@ -345,6 +350,7 @@ class ORMDatabase(ABCDatabase):
                         volume_source=source,
                         volume_target=target,
                         volume_mode=mode,
+                        allow_srdata=allow_srdata,
                     )
                     session.add(orm_policy)
 
@@ -372,7 +378,7 @@ class ORMDatabase(ABCDatabase):
                 return id
 
     def revoke_access(self, app_name, user_name, app_license,
-                      allow_home, allow_view, volume):
+                      allow_home, allow_view, volume, allow_srdata):
         allow_common = False
         source = target = mode = None
 
@@ -396,7 +402,8 @@ class ORMDatabase(ABCDatabase):
                     ApplicationPolicy.allow_view == allow_view,
                     ApplicationPolicy.volume_source == source,
                     ApplicationPolicy.volume_target == target,
-                    ApplicationPolicy.volume_mode == mode).one()
+                    ApplicationPolicy.volume_mode == mode,
+                    ApplicationPolicy.allow_srdata == allow_srdata).one()
             except NoResultFound:
                 raise exceptions.NotFound()
 

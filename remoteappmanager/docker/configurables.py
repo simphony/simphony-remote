@@ -106,6 +106,35 @@ class Resolution(Configurable):
         }
 
 
+class ParaviewData(Configurable):
+    """ Support opening a specific file when ParaView starts up. """
+
+    tag = "srdata"
+
+    @classmethod
+    def supported_by(cls, image):
+        return "SRDATA" in image.env
+
+    @classmethod
+    def config_dict_to_env(cls, config_dict):
+        """ The config dict must contain the "srdata" key, e.g.:
+
+        {"srdata": "/home/user/can.ex2"}
+        """
+        if config_dict is None or len(config_dict) == 0:
+            return cls.default_env()
+
+        data = config_dict["srdata"]
+        if not isinstance(data, str):
+            raise ValueError("invalid file path")
+
+        return {"SRDATA": data}
+
+    @classmethod
+    def default_env(cls):
+        return {"SRDATA": ""}
+
+
 def for_image(image):
     """Returns the configurables that are available for a specific
     image.
@@ -122,7 +151,7 @@ def for_image(image):
 
     """
     # We lack automatic registration. Add here new configurables
-    available = [Resolution]
+    available = [Resolution, ParaviewData]
 
     return [conf_class
             for conf_class in available
