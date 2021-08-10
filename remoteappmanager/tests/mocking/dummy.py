@@ -129,13 +129,13 @@ class DummyDB(interfaces.ABCDatabase):
         return self.applications.values()
 
     def grant_access(self, app_name, user_name, app_license,
-                     allow_home, allow_view, volume):
+                     allow_home, allow_view, volume, allow_srdata):
         app = self._get_application_id_by_name(app_name)
         user = self._get_user_id_by_name(user_name)
 
         source, target, mode = volume.split(':')
         policy = DummyDBApplicationPolicy(
-            app_license, allow_home, allow_view, False,
+            app_license, allow_home, allow_view, False, allow_srdata,
             source, target, mode)
 
         self.policies[len(self.policies)] = policy
@@ -145,7 +145,7 @@ class DummyDB(interfaces.ABCDatabase):
         return id
 
     def revoke_access(self, app_name, user_name, app_license,
-                      allow_home, allow_view, volume):
+                      allow_home, allow_view, volume, allow_srdata):
         pass
 
     def revoke_access_by_id(self, mapping_id):
