@@ -85,7 +85,8 @@ _HEADERS = ('user.name',
             'policy.allow_common',
             'policy.volume_source',
             'policy.volume_target',
-            'policy.volume_mode')
+            'policy.volume_mode',
+            'policy.allow_srdata')
 
 
 @mergedocs(ABCDatabase)
@@ -158,6 +159,7 @@ class CSVDatabase(ABCDatabase):
                                  None)
                 volume_mode = (record[indices['policy.volume_mode']] or
                                None)
+                allow_srdata = record[indices['policy.allow_srdata']] == '1'
 
                 application_policy = self.application_policies.setdefault(
                     (app_license,
@@ -166,7 +168,8 @@ class CSVDatabase(ABCDatabase):
                      allow_common,
                      volume_source,
                      volume_target,
-                     volume_mode),
+                     volume_mode,
+                     allow_srdata),
                     CSVApplicationPolicy(
                         app_license=app_license,
                         allow_home=allow_home,
@@ -174,7 +177,8 @@ class CSVDatabase(ABCDatabase):
                         allow_common=allow_common,
                         volume_source=volume_source,
                         volume_target=volume_target,
-                        volume_mode=volume_mode))
+                        volume_mode=volume_mode,
+                        allow_srdata=allow_srdata))
 
                 # Save the configuration
                 # Note that we don't filter existing duplicate entry
@@ -222,11 +226,11 @@ class CSVDatabase(ABCDatabase):
         return list(self.applications.values())
 
     def grant_access(self, app_name, user_name, app_license,
-                     allow_home, allow_view, volume):
+                     allow_home, allow_view, volume, allow_srdata):
         raise UnsupportedOperation()
 
     def revoke_access(self, app_name, user_name, app_license,
-                      allow_home, allow_view, volume):
+                      allow_home, allow_view, volume, allow_srdata):
         raise UnsupportedOperation()
 
     def revoke_access_by_id(self, mapping_id):

@@ -85,14 +85,16 @@ class TestCSVDatabase(TempMixin, ABCTestDatabaseInterface,
                                       allow_common=False,
                                       volume_source=None,
                                       volume_target=None,
-                                      volume_mode=None)),
+                                      volume_mode=None,
+                                      allow_srdata=False)),
                 (CSVApplication(id=1, image='simphonyproject/ubuntu-image:latest'),  # noqa
                  CSVApplicationPolicy(allow_home=True,
                                       allow_view=True,
                                       allow_common=True,
                                       volume_source='/src',
                                       volume_target='/target',
-                                      volume_mode='ro'))
+                                      volume_mode='ro',
+                                      allow_srdata=False))
                 ),
             'johndoe': (
                 (CSVApplication(id=0, image='simphonyproject/simphony-mayavi:0.6.0'),  # noqa
@@ -101,7 +103,8 @@ class TestCSVDatabase(TempMixin, ABCTestDatabaseInterface,
                                       allow_common=False,
                                       volume_source='/src',
                                       volume_target='/target',
-                                      volume_mode='ro')),
+                                      volume_mode='ro',
+                                      allow_srdata=False)),
                 )}
         return mappings[user.name]
 

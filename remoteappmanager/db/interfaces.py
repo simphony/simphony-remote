@@ -27,7 +27,7 @@ class ABCApplicationPolicy(metaclass=ABCMeta):
 
     def __init__(self, app_license=None, allow_home=False, allow_view=False,
                  allow_common=False, volume_source=None, volume_target=None,
-                 volume_mode=None):
+                 volume_mode=None, allow_srdata=False):
 
         #: Application License (if specified)
         self.app_license = app_license
@@ -49,6 +49,9 @@ class ABCApplicationPolicy(metaclass=ABCMeta):
 
         #: Mode for read-write access (ro = Read-only. rw = Read-write)
         self.volume_mode = volume_mode
+
+        #: Allow user to provide a file for the container to load at startup
+        self.allow_srdata = allow_srdata
 
     def __repr__(self):
         args = _inspect.getargs(
