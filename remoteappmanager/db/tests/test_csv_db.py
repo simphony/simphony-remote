@@ -13,26 +13,26 @@ class GoodTable:
                'policy.allow_home', 'policy.allow_view',
                'policy.allow_common',
                'policy.volume_source', 'policy.volume_target',
-               'policy.volume_mode')
+               'policy.volume_mode', 'policy.allow_srdata')
 
-    #    name,     image, home, view, common, source, target, mode
+    #    name,     image, home, view, common, source, target, mode, srdata
     records = [
-        ('markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '', '1', '1', '0', '', '', ''),  # noqa
-        ('markdoe', 'simphonyproject/ubuntu-image:latest', '', '1', '1', '1', '/src', '/target', 'ro'),  # noqa
-        ('johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '', '0', '0', '0', '/src', '/target', 'ro')]  # noqa
+        ('markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '', '1', '1', '0', '', '', '', '0'),  # noqa
+        ('markdoe', 'simphonyproject/ubuntu-image:latest', '', '1', '1', '1', '/src', '/target', 'ro', '0'),  # noqa
+        ('johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '', '0', '0', '0', '/src', '/target', 'ro', '0')]  # noqa
 
 
 class BadTableMissingHeaders:
     # policy.volume_source and policy.volume_target are missing
     headers = ('user.name', 'application.image', 'policy.allow_home',
                'policy.allow_view', 'policy.allow_common',
-               'policy.volume_mode')
+               'policy.volume_mode', 'policy.allow_srdata')
 
     #    name,     image, home, view, common, mode
     records = [
-        ('markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '1', '1', '0', ''),  # noqa
-        ('markdoe', 'simphonyproject/ubuntu-image:latest', '1', '1', '1', 'ro'),  # noqa
-        ('johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '0', '0', '0', 'ro')]  # noqa
+        ('markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '1', '1', '0', '', '0'),  # noqa
+        ('markdoe', 'simphonyproject/ubuntu-image:latest', '1', '1', '1', 'ro', '0'),  # noqa
+        ('johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '0', '0', '0', 'ro', '0')]  # noqa
 
 
 class GoodTableWithDifferentHeaders:
@@ -43,13 +43,13 @@ class GoodTableWithDifferentHeaders:
                'policy.volume_source', 'policy.volume_target',
                'policy.volume_mode',
                'user.name', 'application.image', 'policy.allow_home',
-               'extra_column')
+               'policy.allow_srdata', 'extra_column')
 
     #  view, common, source, target, mode, name, image, home, extra
     records = [
         ('', '1', '0', '', '', '', 'markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '1', 'anything'),  # noqa
-        ('', '1', '1', '/src', '/target', 'ro', 'markdoe', 'simphonyproject/ubuntu-image:latest', '1', 'extra'),  # noqa
-        ('', '0', '0', '/src', '/target', 'ro', 'johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '0', 'abc')]  # noqa
+        ('', '1', '1', '/src', '/target', 'ro', '0', 'markdoe', 'simphonyproject/ubuntu-image:latest', '1', '0', 'extra'),  # noqa
+        ('', '0', '0', '/src', '/target', 'ro', 'johndoe', 'simphonyproject/simphony-mayavi:0.6.0', '0', '0', 'abc')]  # noqa
 
 
 def write_csv_file(file_name, headers, records):
