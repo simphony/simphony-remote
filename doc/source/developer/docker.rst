@@ -11,7 +11,7 @@ Labels are defined with the prefix namespace::
 
     eu.simphony-project.docker
 
-The following labels are currently defined. 
+The following labels are currently defined.
 Their definition can be found in ``remoteappmanager.docker.docker_labels``
 
     - ``ui_name``: the UI visible name of the image
@@ -21,12 +21,12 @@ Their definition can be found in ``remoteappmanager.docker.docker_labels``
       the original base image (vncapp or webapp)
     - ``env``: subnamespace for accepted environment variables. See below.
 
-The env is a subnamespace defining the environment variables the image internals 
+The env is a subnamespace defining the environment variables the image internals
 can understand.  This does not mean that they are the only ones that will be
-passed to the image. 
+passed to the image.
 
-The naming strategy works around the `docker label restrictions 
-<https://docs.docker.com/engine/userguide/labels-custom-metadata/#/label-keys-namespaces>`_ 
+The naming strategy works around the `docker label restrictions
+<https://docs.docker.com/engine/userguide/labels-custom-metadata/#/label-keys-namespaces>`_
 of having `kebab case <http://c2.com/cgi/wiki?KebabCase>`_ vs envvars that are
 traditionally MACRO_CASE. Additionally, it allows new variables to be added
 by layers without having to know the variables understood by the base layer.
@@ -39,7 +39,7 @@ and dashes converted to underscores. For example:
 the value of the label is currently unused, and should be left empty.
 
 If your application uses variables with a different convention, or uses double underscores,
-you will have to define an auxilliary variable and transfer the value in the image 
+you will have to define an auxilliary variable and transfer the value in the image
 startup scripts.
 
 Currently reserved env keys:
@@ -47,15 +47,17 @@ Currently reserved env keys:
     - ``x11-width``: for the VNC images, the X11 width
     - ``x11-height``: for the VNC images, the X11 height
     - ``x11-depth``: for the VNC images, the X11 depth (currently unused, fixed at 16)
+    - ``srdata``: for the Simphony-ParaView image, this variable can be set to a file that
+      will be loaded by ParaView at startup
 
 Container Labels
 ''''''''''''''''
 
 When a container is started, the following labels will be added:
 
-    - ``url_id``: unique identifier that ends up in the URL when the 
+    - ``url_id``: unique identifier that ends up in the URL when the
       user is redirected
-    - ``mapping_id``: a unique key identifying the combination of image 
+    - ``mapping_id``: a unique key identifying the combination of image
       and policy used to start the container.
     - ``user``: the user that started the container
 
