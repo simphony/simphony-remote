@@ -73,11 +73,11 @@ class Database(ABCDatabase):
                 ]
 
     def grant_access(self, app_name, user_name, app_license,
-                     allow_home, allow_view, volume, allow_srdata):
+                     allow_home, allow_view, volume, allow_startup_data):
         raise exceptions.UnsupportedOperation()
 
     def revoke_access(self, app_name, user_name, app_license,
-                      allow_home, allow_view, volume, allow_srdata):
+                      allow_home, allow_view, volume, allow_startup_data):
         raise exceptions.UnsupportedOperation()
 
     def revoke_access_by_id(self, mapping_id):

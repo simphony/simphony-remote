@@ -42,7 +42,7 @@
             <form class="configuration">
               <fieldset v-if="currentApp.configurables.length === 0">No configurable options for this image</fieldset>
               <fieldset v-else :disabled="!currentApp.isStopped()">
-                <fieldset v-if="appPolicy.allow_srdata">
+                <fieldset v-if="appPolicy.allow_startup_data">
                   <component v-for="configurable in currentApp.configurables"
                   :key="configurable.tag"
                   :is="configurable.tag + '-component'"

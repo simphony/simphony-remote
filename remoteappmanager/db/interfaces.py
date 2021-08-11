@@ -27,7 +27,7 @@ class ABCApplicationPolicy(metaclass=ABCMeta):
 
     def __init__(self, app_license=None, allow_home=False, allow_view=False,
                  allow_common=False, volume_source=None, volume_target=None,
-                 volume_mode=None, allow_srdata=False):
+                 volume_mode=None, allow_startup_data=False):
 
         #: Application License (if specified)
         self.app_license = app_license
@@ -51,7 +51,7 @@ class ABCApplicationPolicy(metaclass=ABCMeta):
         self.volume_mode = volume_mode
 
         #: Allow user to provide a file for the container to load at startup
-        self.allow_srdata = allow_srdata
+        self.allow_startup_data = allow_startup_data
 
     def __repr__(self):
         args = _inspect.getargs(
@@ -206,7 +206,7 @@ class ABCDatabase(metaclass=ABCMeta):
 
     @abstractmethod
     def grant_access(self, app_name, user_name, app_license,
-                     allow_home, allow_view, volume, allow_srdata):
+                     allow_home, allow_view, volume, allow_startup_data):
         """Grant access for user to application.
 
         Parameters
@@ -231,7 +231,7 @@ class ABCDatabase(metaclass=ABCMeta):
             mode being "ro" or "rw".
             (e.g. "/host/path:/container/path:ro").
 
-        allow_srdata : bool
+        allow_startup_data : bool
             If the user can provide a file for the container to load at startup
 
         Raises
@@ -249,7 +249,7 @@ class ABCDatabase(metaclass=ABCMeta):
 
     @abstractmethod
     def revoke_access(self, app_name, user_name, app_license,
-                      allow_home, allow_view, volume, allow_srdata):
+                      allow_home, allow_view, volume, allow_startup_data):
         """Revoke access for user to application.
 
         Parameters
@@ -274,7 +274,7 @@ class ABCDatabase(metaclass=ABCMeta):
             mode being "ro" or "rw".
             (e.g. "/host/path:/container/path:ro").
 
-        allow_srdata : bool
+        allow_startup_data : bool
             If the user can provide a file for the container to load at startup
 
         Raises

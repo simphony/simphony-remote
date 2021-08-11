@@ -20,7 +20,7 @@ class Accounting(Resource):
     volume_source = Unicode(allow_none=True)
     volume_target = Unicode(allow_none=True)
     volume_mode = Unicode(allow_none=True)
-    allow_srdata = Bool()
+    allow_startup_data = Bool()
 
     @classmethod
     def collection_name(cls):
@@ -53,7 +53,7 @@ class AccountingHandler(ResourceHandler):
                 resource.allow_home,
                 True,
                 volume,
-                resource.allow_srdata,
+                resource.allow_startup_data,
                 )
         except db_exceptions.NotFound:
             raise exceptions.NotFound()
@@ -100,7 +100,7 @@ class AccountingHandler(ResourceHandler):
                     volume_source=acc.application_policy.volume_source,
                     volume_target=acc.application_policy.volume_target,
                     volume_mode=acc.application_policy.volume_mode,
-                    allow_srdata=acc.application_policy.allow_srdata,
+                    allow_startup_data=acc.application_policy.allow_startup_data,  # noqa
                 )
                 response.append(entry)
             item_response.set(response)

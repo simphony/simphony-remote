@@ -54,7 +54,7 @@
 
         <div class="form-group">
           <label>
-            <input type="checkbox" id="allow_srdata" v-model="model.allow_srdata"/> Allow providing a startup file
+            <input type="checkbox" id="allow_startup_data" v-model="model.allow_startup_data"/> Allow providing a startup file
           </label>
         </div>
 
@@ -90,7 +90,7 @@
           volume_target: '',
           volume_readonly: false,
           volume_source_target: [],
-          allow_srdata: false
+          allow_startup_data: false
         },
         imageNames: []
       };
@@ -144,7 +144,7 @@
           volume_source: this.model.volume_source,
           volume_target: this.model.volume_target,
           volume_mode: (model.volume_readonly ? "ro" : "rw"),
-          allow_srdata: this.model.allow_srdata
+          allow_startup_data: this.model.allow_startup_data
         };
 
         resources.Accounting.create(rep)

@@ -77,7 +77,7 @@ class ApplicationPolicy(IdMixin, Base):
     volume_mode = Column(Enum("ro", "rw"), nullable=True)
 
     #: If the user can open a file at startup
-    allow_srdata = Column(Boolean)
+    allow_startup_data = Column(Boolean)
 
 
 class Accounting(Base):
@@ -311,7 +311,7 @@ class ORMDatabase(ABCDatabase):
         return applications
 
     def grant_access(self, app_name, user_name, app_license,
-                     allow_home, allow_view, volume, allow_srdata):
+                     allow_home, allow_view, volume, allow_startup_data):
         allow_common = False
         source = target = mode = None
 
@@ -338,7 +338,7 @@ class ORMDatabase(ABCDatabase):
                     ApplicationPolicy.volume_source == source,
                     ApplicationPolicy.volume_target == target,
                     ApplicationPolicy.volume_mode == mode,
-                    ApplicationPolicy.allow_srdata == allow_srdata
+                    ApplicationPolicy.allow_startup_data == allow_startup_data
                 ).one_or_none()
 
                 if orm_policy is None:
@@ -350,7 +350,7 @@ class ORMDatabase(ABCDatabase):
                         volume_source=source,
                         volume_target=target,
                         volume_mode=mode,
-                        allow_srdata=allow_srdata,
+                        allow_startup_data=allow_startup_data,
                     )
                     session.add(orm_policy)
 
@@ -378,7 +378,7 @@ class ORMDatabase(ABCDatabase):
                 return id
 
     def revoke_access(self, app_name, user_name, app_license,
-                      allow_home, allow_view, volume, allow_srdata):
+                      allow_home, allow_view, volume, allow_startup_data):
         allow_common = False
         source = target = mode = None
 
@@ -403,7 +403,8 @@ class ORMDatabase(ABCDatabase):
                     ApplicationPolicy.volume_source == source,
                     ApplicationPolicy.volume_target == target,
                     ApplicationPolicy.volume_mode == mode,
-                    ApplicationPolicy.allow_srdata == allow_srdata).one()
+                    ApplicationPolicy.allow_startup_data == allow_startup_data
+                ).one()
             except NoResultFound:
                 raise exceptions.NotFound()
 

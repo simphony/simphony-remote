@@ -100,7 +100,7 @@
               item.volume_source,
               item.volume_target,
               item.volume_mode === "ro",
-              item.allow_srdata
+              item.allow_startup_data
             ]);
           });
         })

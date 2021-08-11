@@ -349,7 +349,7 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         self.assertEqual(acc[0].application_policy.volume_source, "/foo")
         self.assertEqual(acc[0].application_policy.volume_target, "/bar")
         self.assertEqual(acc[0].application_policy.volume_mode, "ro")
-        self.assertEqual(acc[0].application_policy.allow_srdata, False)
+        self.assertEqual(acc[0].application_policy.allow_startup_data, False)
 
         # Do it twice to check idempotency
         id2 = database.grant_access(
@@ -386,7 +386,7 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         self.assertEqual(acc[0].application_policy.volume_source, None)
         self.assertEqual(acc[0].application_policy.volume_target, None)
         self.assertEqual(acc[0].application_policy.volume_mode, None)
-        self.assertEqual(acc[0].application_policy.allow_srdata, False)
+        self.assertEqual(acc[0].application_policy.allow_startup_data, False)
 
         database.revoke_access(
             "simphonyremote/amazing", "ciccio", 'some_key',
@@ -416,7 +416,7 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         # Id not present, should do nothing
         database.revoke_access_by_id(3441)
 
-    def test_allow_srdata(self):
+    def test_allow_startup_data(self):
         database = self.create_database()
 
         database.create_user("ciccio")
@@ -438,7 +438,7 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         self.assertEqual(acc[0].application_policy.volume_source, "/foo")
         self.assertEqual(acc[0].application_policy.volume_target, "/bar")
         self.assertEqual(acc[0].application_policy.volume_mode, "ro")
-        self.assertEqual(acc[0].application_policy.allow_srdata, True)
+        self.assertEqual(acc[0].application_policy.allow_startup_data, True)
 
     def test_unsupported_ops(self):
         """Override to silence the base class assumption that most of

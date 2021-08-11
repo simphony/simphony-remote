@@ -13,9 +13,9 @@ class GoodTable:
                'policy.allow_home', 'policy.allow_view',
                'policy.allow_common',
                'policy.volume_source', 'policy.volume_target',
-               'policy.volume_mode', 'policy.allow_srdata')
+               'policy.volume_mode', 'policy.allow_startup_data')
 
-    #    name,     image, home, view, common, source, target, mode, srdata
+    #    name,    image, home, view, common, source, target, mode, startup_data
     records = [
         ('markdoe', 'simphonyproject/simphony-mayavi:0.6.0', '', '1', '1', '0', '', '', '', '0'),  # noqa
         ('markdoe', 'simphonyproject/ubuntu-image:latest', '', '1', '1', '1', '/src', '/target', 'ro', '0'),  # noqa
@@ -26,7 +26,7 @@ class BadTableMissingHeaders:
     # policy.volume_source and policy.volume_target are missing
     headers = ('user.name', 'application.image', 'policy.allow_home',
                'policy.allow_view', 'policy.allow_common',
-               'policy.volume_mode', 'policy.allow_srdata')
+               'policy.volume_mode', 'policy.allow_startup_data')
 
     #    name,     image, home, view, common, mode
     records = [
@@ -43,7 +43,7 @@ class GoodTableWithDifferentHeaders:
                'policy.volume_source', 'policy.volume_target',
                'policy.volume_mode',
                'user.name', 'application.image', 'policy.allow_home',
-               'policy.allow_srdata', 'extra_column')
+               'policy.allow_startup_data', 'extra_column')
 
     #  view, common, source, target, mode, name, image, home, extra
     records = [
@@ -86,7 +86,7 @@ class TestCSVDatabase(TempMixin, ABCTestDatabaseInterface,
                                       volume_source=None,
                                       volume_target=None,
                                       volume_mode=None,
-                                      allow_srdata=False)),
+                                      allow_startup_data=False)),
                 (CSVApplication(id=1, image='simphonyproject/ubuntu-image:latest'),  # noqa
                  CSVApplicationPolicy(allow_home=True,
                                       allow_view=True,
@@ -94,7 +94,7 @@ class TestCSVDatabase(TempMixin, ABCTestDatabaseInterface,
                                       volume_source='/src',
                                       volume_target='/target',
                                       volume_mode='ro',
-                                      allow_srdata=False))
+                                      allow_startup_data=False))
                 ),
             'johndoe': (
                 (CSVApplication(id=0, image='simphonyproject/simphony-mayavi:0.6.0'),  # noqa
@@ -104,7 +104,7 @@ class TestCSVDatabase(TempMixin, ABCTestDatabaseInterface,
                                       volume_source='/src',
                                       volume_target='/target',
                                       volume_mode='ro',
-                                      allow_srdata=False)),
+                                      allow_startup_data=False)),
                 )}
         return mappings[user.name]
 

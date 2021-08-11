@@ -1,6 +1,6 @@
 import unittest
 from remoteappmanager.docker.configurables import (
-    ParaviewData, Resolution, for_image,
+    Resolution, StartupData, for_image,
 )
 from remoteappmanager.docker.image import Image
 from remoteappmanager.tests.mocking.virtual.docker_client import (
@@ -27,15 +27,15 @@ class TestConfigurables(unittest.TestCase):
         self.assertFalse(Resolution.supported_by(self.image_2))
         self.assertTrue(Resolution.supported_by(self.image_3))
 
-    def test_srdata(self):
-        self.assertFalse(ParaviewData.supported_by(self.image_1))
-        self.assertFalse(ParaviewData.supported_by(self.image_2))
-        self.assertTrue(ParaviewData.supported_by(self.image_3))
+    def test_startup_data(self):
+        self.assertFalse(StartupData.supported_by(self.image_1))
+        self.assertFalse(StartupData.supported_by(self.image_2))
+        self.assertTrue(StartupData.supported_by(self.image_3))
 
     def test_for_image(self):
         self.assertEqual(for_image(self.image_1), [Resolution])
         self.assertEqual(for_image(self.image_2), [])
-        self.assertEqual(for_image(self.image_3), [Resolution, ParaviewData])
+        self.assertEqual(for_image(self.image_3), [Resolution, StartupData])
 
     def test_config_dict_to_env_resolution(self):
         self.assertEqual(
@@ -65,17 +65,17 @@ class TestConfigurables(unittest.TestCase):
         with self.assertRaises(ValueError):
             Resolution.config_dict_to_env({"resolution": "0x1024"})
 
-    def test_config_dict_to_env_srdata(self):
+    def test_config_dict_to_env_startup_data(self):
         self.assertEqual(
-            ParaviewData.config_dict_to_env({"srdata": "/home/test/can.ex2"}),
+            StartupData.config_dict_to_env({"srdata": "/home/test/can.ex2"}),
             {"SRDATA": "/home/test/can.ex2"}
 
         )
 
-        default = ParaviewData.default_env()
+        default = StartupData.default_env()
         self.assertEqual(default, {"SRDATA": ""})
-        self.assertEqual(ParaviewData.config_dict_to_env(None), default)
-        self.assertEqual(ParaviewData.config_dict_to_env({}), default)
+        self.assertEqual(StartupData.config_dict_to_env(None), default)
+        self.assertEqual(StartupData.config_dict_to_env({}), default)
 
         with self.assertRaises(ValueError):
-            ParaviewData.config_dict_to_env({"srdata": 123})
+            StartupData.config_dict_to_env({"srdata": 123})

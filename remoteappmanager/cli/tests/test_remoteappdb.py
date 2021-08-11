@@ -103,7 +103,7 @@ class TestRemoteAppDbCLI(TempMixin, TestCase):
         self._remoteappdb("app grant myapp user "
                           "--allow-view "
                           "--volume=frobniz:froble:ro "
-                          "--allow-srdata")
+                          "--allow-startup-data")
         _, out = self._remoteappdb("user list --show-apps")
         self.assertIn("myapp", out)
         self.assertIn("frobniz", out)

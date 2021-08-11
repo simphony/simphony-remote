@@ -50,7 +50,7 @@ class TestAccounting(WebAPITestCase):
                    "volume_source": "/foo",
                    "volume_target": "/bar",
                    "volume_mode": "ro",
-                   "allow_srdata": False,
+                   "allow_startup_data": False,
                    },
                   httpstatus.CREATED)
 
@@ -63,7 +63,7 @@ class TestAccounting(WebAPITestCase):
                    "volume_source": "/foo",
                    "volume_target": "/bar",
                    "volume_mode": "ro",
-                   "allow_srdata": False,
+                   "allow_startup_data": False,
                    },
                   httpstatus.CREATED)
 
@@ -80,7 +80,7 @@ class TestAccounting(WebAPITestCase):
                        "volume_source": "/foo",
                        "volume_target": "/bar",
                        "volume_mode": "ro",
-                       "allow_srdata": False,
+                       "allow_startup_data": False,
                        },
                       httpstatus.INTERNAL_SERVER_ERROR)
 
@@ -93,7 +93,7 @@ class TestAccounting(WebAPITestCase):
                    "volume_source": "/foo",
                    "volume_target": "/bar",
                    "volume_mode": "ro",
-                   "allow_srdata": False,
+                   "allow_startup_data": False,
                    },
                   httpstatus.BAD_REQUEST)
 
@@ -110,7 +110,7 @@ class TestAccounting(WebAPITestCase):
                        "volume_source": "",
                        "volume_target": "",
                        "volume_mode": "",
-                       "allow_srdata": False,
+                       "allow_startup_data": False,
                        },
                       httpstatus.CREATED)
             self.assertEqual(mock_grant_access.call_args[0][5], None)

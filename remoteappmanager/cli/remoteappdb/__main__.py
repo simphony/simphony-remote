@@ -223,7 +223,8 @@ def list(ctx, no_decoration, show_apps):
         headers = ["ID", "Name"]
         if show_apps:
             headers += ["App", "License", "Home", "View", "Common",
-                        "Vol. Source", "Vol. Target", "Vol. Mode", 'SR Data']
+                        "Vol. Source", "Vol. Target", "Vol. Mode",
+                        "Allow Startup Data"]
 
     session = ctx.obj.session
 
@@ -241,7 +242,7 @@ def list(ctx, no_decoration, show_apps):
                          entry.application_policy.volume_source,
                          entry.application_policy.volume_target,
                          entry.application_policy.volume_mode,
-                         entry.application_policy.allow_srdata]
+                         entry.application_policy.allow_startup_data]
                         for entry in orm.accounting_for_user(session, user)]
 
                 if len(apps) == 0:
@@ -353,13 +354,13 @@ def list(ctx, no_decoration):
 @click.option("--volume", type=click.STRING,
               help="Application data volume, format=SOURCE:TARGET:MODE, "
                    "where mode is 'ro' or 'rw'.")
-@click.option("--allow-srdata",
+@click.option("--allow-startup-data",
               is_flag=True,
               help="Allow user to provide a file for the container to load"
                    "at startup.")
 @click.pass_context
 def grant(ctx, image, user, app_license, allow_home, allow_view, volume,
-          allow_srdata):
+          allow_startup_data):
     """Grants access to application identified by IMAGE to a specific
     user USER and specified access policy."""
     allow_common = False
@@ -396,7 +397,8 @@ def grant(ctx, image, user, app_license, allow_home, allow_view, volume,
             orm.ApplicationPolicy.volume_source == source,
             orm.ApplicationPolicy.volume_target == target,
             orm.ApplicationPolicy.volume_mode == mode,
-            orm.ApplicationPolicy.allow_srdata == allow_srdata).one_or_none()
+            orm.ApplicationPolicy.allow_startup_data == allow_startup_data
+        ).one_or_none()
 
         if orm_policy is None:
             orm_policy = orm.ApplicationPolicy(
@@ -407,7 +409,7 @@ def grant(ctx, image, user, app_license, allow_home, allow_view, volume,
                 volume_source=source,
                 volume_target=target,
                 volume_mode=mode,
-                allow_srdata=allow_srdata,
+                allow_startup_data=allow_startup_data,
             )
             session.add(orm_policy)
 
@@ -448,14 +450,14 @@ def grant(ctx, image, user, app_license, allow_home, allow_view, volume,
 @click.option("--volume", type=click.STRING,
               help="Application data volume, format=SOURCE:TARGET:MODE, "
                    "where mode is 'ro' or 'rw'.")
-@click.option("--allow-srdata",
+@click.option("--allow-startup-data",
               is_flag=True,
               help="Allow user to provide a file for the container to load"
                    "at startup.")
 @click.pass_context
 def revoke(
         ctx, image, user, revoke_all, app_license,
-        allow_home, allow_view, volume, allow_srdata):
+        allow_home, allow_view, volume, allow_startup_data):
     """Revokes access to application identified by IMAGE to a specific
     user USER and specified parameters."""
     allow_common = False
@@ -491,7 +493,8 @@ def revoke(
                 orm.ApplicationPolicy.volume_source == source,
                 orm.ApplicationPolicy.volume_target == target,
                 orm.ApplicationPolicy.volume_mode == mode,
-                orm.ApplicationPolicy.allow_srdata == allow_srdata).one()
+                orm.ApplicationPolicy.allow_startup_data == allow_startup_data
+            ).one()
 
             session.query(orm.Accounting).filter(
                 orm.Accounting.application == orm_app,
