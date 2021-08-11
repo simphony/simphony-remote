@@ -107,7 +107,7 @@ class Resolution(Configurable):
 
 
 class StartupData(Configurable):
-    """ Support opening a specific file when ParaView starts up. """
+    """ Support opening a specific file when an application starts up. """
 
     tag = "srdata"
 
