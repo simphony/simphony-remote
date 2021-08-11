@@ -102,12 +102,14 @@ class TestRemoteAppDbCLI(TempMixin, TestCase):
         self._remoteappdb("app grant myapp user")
         self._remoteappdb("app grant myapp user "
                           "--allow-view "
-                          "--volume=frobniz:froble:ro")
+                          "--volume=frobniz:froble:ro "
+                          "--allow-startup-data")
         _, out = self._remoteappdb("user list --show-apps")
         self.assertIn("myapp", out)
         self.assertIn("frobniz", out)
         self.assertIn("froble", out)
-        self.assertIn(" ro\n", out)
+        self.assertIn(" ro", out)
+        self.assertIn("1\n", out)
 
     def test_app_revoke(self):
         self._remoteappdb("app create myapp --no-verify")

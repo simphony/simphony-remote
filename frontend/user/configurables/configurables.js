@@ -1,6 +1,7 @@
 let utils = require("utils");
 
 require("./Resolution");
+require("./StartupData");
 
 
 // Your configurable class must implement a tag and default configDict
@@ -22,9 +23,23 @@ class ResolutionModel {
   }
 }
 
+class StartupDataModel {
+  constructor() {
+    this.tag = "startupdata";
+    this.configDict = { startupdata: '' };
+  }
+
+  asConfigDict() {
+    let startupdata = this.configDict.startupdata;
+
+    return { startupdata: startupdata };
+  }
+}
+
 let outputConfigurables = {};
 
 // Export all your configurable models here respecting the tag (here resolution)
 outputConfigurables.resolution = ResolutionModel;
+outputConfigurables.startupdata = StartupDataModel;
 
 module.exports = outputConfigurables;

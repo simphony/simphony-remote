@@ -324,19 +324,19 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         with self.assertRaises(exceptions.NotFound):
             database.grant_access(
                 "simphonyremote/amazing", "ciccio", '',
-                True, False, "/foo:/bar:ro")
+                True, False, "/foo:/bar:ro", False)
         database.create_user("ciccio")
 
         with self.assertRaises(exceptions.NotFound):
             database.grant_access(
                 "simphonyremote/amazing", "ciccio", '',
-                True, False, "/foo:/bar:ro")
+                True, False, "/foo:/bar:ro", False)
 
         database.create_application("simphonyremote/amazing")
 
         id = database.grant_access(
             "simphonyremote/amazing", "ciccio", 'some_key',
-            True, False, "/foo:/bar:ro")
+            True, False, "/foo:/bar:ro", False)
         self.assertIsNotNone(id)
 
         user = database.get_user(user_name="ciccio")
@@ -349,23 +349,24 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         self.assertEqual(acc[0].application_policy.volume_source, "/foo")
         self.assertEqual(acc[0].application_policy.volume_target, "/bar")
         self.assertEqual(acc[0].application_policy.volume_mode, "ro")
+        self.assertEqual(acc[0].application_policy.allow_startup_data, False)
 
         # Do it twice to check idempotency
         id2 = database.grant_access(
             "simphonyremote/amazing", "ciccio", 'some_key',
-            True, False, "/foo:/bar:ro")
+            True, False, "/foo:/bar:ro", False)
         self.assertEqual(id, id2)
 
         database.revoke_access(
             "simphonyremote/amazing", "ciccio", 'some_key',
-            True, False, "/foo:/bar:ro")
+            True, False, "/foo:/bar:ro", False)
 
         self.assertEqual(len(database.get_accounting_for_user(user)), 0)
 
         with self.assertRaises(exceptions.NotFound):
             database.revoke_access(
                 "simphonyremote/amazing", "hello", 'some_key',
-                True, False, "/foo:/bar:ro")
+                True, False, "/foo:/bar:ro", False)
 
     def test_grant_revoke_access_volume(self):
         database = self.create_database()
@@ -374,7 +375,7 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         database.create_application("simphonyremote/amazing")
         database.grant_access(
             "simphonyremote/amazing", "ciccio", 'some_key',
-            True, False, None)
+            True, False, None, False)
 
         user = database.get_user(user_name="ciccio")
         acc = database.get_accounting_for_user(user)
@@ -385,10 +386,11 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         self.assertEqual(acc[0].application_policy.volume_source, None)
         self.assertEqual(acc[0].application_policy.volume_target, None)
         self.assertEqual(acc[0].application_policy.volume_mode, None)
+        self.assertEqual(acc[0].application_policy.allow_startup_data, False)
 
         database.revoke_access(
             "simphonyremote/amazing", "ciccio", 'some_key',
-            True, False, None)
+            True, False, None, False)
 
         self.assertEqual(len(database.get_accounting_for_user(user)), 0)
 
@@ -399,7 +401,7 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
         database.create_application("simphonyremote/amazing")
         id = database.grant_access(
             "simphonyremote/amazing", "ciccio", 'some_key',
-            True, False, None)
+            True, False, None, False)
 
         user = database.get_user(user_name="ciccio")
         apps = database.get_accounting_for_user(user)
@@ -413,6 +415,30 @@ class TestOrmDatabase(TempMixin, ABCTestDatabaseInterface,
 
         # Id not present, should do nothing
         database.revoke_access_by_id(3441)
+
+    def test_allow_startup_data(self):
+        database = self.create_database()
+
+        database.create_user("ciccio")
+        database.create_application("simphonyremote/amazing")
+        id = database.grant_access(
+            "simphonyremote/amazing", "ciccio", "some_key",
+            True, False, "/foo:/bar:ro", True
+        )
+
+        self.assertIsNotNone(id)
+
+        user = database.get_user(user_name="ciccio")
+        acc = database.get_accounting_for_user(user)
+        self.assertEqual(acc[0].id, id)
+        self.assertEqual(acc[0].application.image, "simphonyremote/amazing")
+        self.assertEqual(acc[0].application_policy.app_license, 'some_key')
+        self.assertEqual(acc[0].application_policy.allow_home, True)
+        self.assertEqual(acc[0].application_policy.allow_view, False)
+        self.assertEqual(acc[0].application_policy.volume_source, "/foo")
+        self.assertEqual(acc[0].application_policy.volume_target, "/bar")
+        self.assertEqual(acc[0].application_policy.volume_mode, "ro")
+        self.assertEqual(acc[0].application_policy.allow_startup_data, True)
 
     def test_unsupported_ops(self):
         """Override to silence the base class assumption that most of

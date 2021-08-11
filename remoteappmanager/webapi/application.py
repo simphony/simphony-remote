@@ -20,6 +20,7 @@ class Policy(ResourceFragment):
     volume_source = Unicode(allow_none=True)
     volume_target = Unicode(allow_none=True)
     volume_mode = Unicode(allow_none=True)
+    allow_startup_data = Bool()
 
 
 class Image(ResourceFragment):
