@@ -47,7 +47,7 @@ Currently reserved env keys:
     - ``x11-width``: for the VNC images, the X11 width
     - ``x11-height``: for the VNC images, the X11 height
     - ``x11-depth``: for the VNC images, the X11 depth (currently unused, fixed at 16)
-    - ``srdata``: this variable can be set to a file that will be loaded by an application
+    - ``startupdata``: this variable can be set to a file that will be loaded by an application
       upon startup
 
 Container Labels
