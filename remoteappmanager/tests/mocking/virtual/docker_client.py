@@ -364,7 +364,7 @@ class VirtualDockerClient(object):
                     SIMPHONY_NS_ENV['x11-width']: '',
                     SIMPHONY_NS_ENV['x11-height']: '',
                     SIMPHONY_NS_ENV['x11-depth']: '',
-                    SIMPHONY_NS_ENV['srdata']: '',
+                    SIMPHONY_NS_ENV['startupdata']: '',
                 },
                 exposed_ports=["8888/tcp"]
             )
