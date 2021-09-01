@@ -109,7 +109,7 @@ class Resolution(Configurable):
 class StartupData(Configurable):
     """ Support opening a specific file when an application starts up. """
 
-    tag = "srdata"
+    tag = "startupdata"
 
     @classmethod
     def supported_by(cls, image):
@@ -119,9 +119,9 @@ class StartupData(Configurable):
     def config_dict_to_env(cls, config_dict):
         """ The config dict must contain the tag key, e.g.:
 
-        cls.tag = "srdata"
+        cls.tag = "startupdata"
 
-        {"srdata": "/home/user/can.ex2"}
+        {"startupdata": "/home/user/can.ex2"}
         """
         if config_dict is None or len(config_dict) == 0:
             return cls.default_env()

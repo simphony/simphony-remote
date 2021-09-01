@@ -67,15 +67,16 @@ class TestConfigurables(unittest.TestCase):
 
     def test_config_dict_to_env_startup_data(self):
         self.assertEqual(
-            StartupData.config_dict_to_env({"srdata": "/home/test/can.ex2"}),
-            {"SRDATA": "/home/test/can.ex2"}
+            StartupData.config_dict_to_env(
+                {"startupdata": "/home/test/can.ex2"}),
+            {"STARTUPDATA": "/home/test/can.ex2"}
 
         )
 
         default = StartupData.default_env()
-        self.assertEqual(default, {"SRDATA": ""})
+        self.assertEqual(default, {"STARTUPDATA": ""})
         self.assertEqual(StartupData.config_dict_to_env(None), default)
         self.assertEqual(StartupData.config_dict_to_env({}), default)
 
         with self.assertRaises(ValueError):
-            StartupData.config_dict_to_env({"srdata": 123})
+            StartupData.config_dict_to_env({"startupdata": 123})

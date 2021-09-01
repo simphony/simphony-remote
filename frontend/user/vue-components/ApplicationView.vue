@@ -49,7 +49,7 @@
                   :configDict.sync="configurable.configDict"></component>
                 </fieldset>
                 <fieldset v-else>
-                  <component v-for="configurable in currentApp.configurables" v-if="configurable.tag !== 'srdata'"
+                  <component v-for="configurable in currentApp.configurables" v-if="configurable.tag !== 'startupdata'"
                   :key="configurable.tag"
                   :is="configurable.tag + '-component'"
                   :configDict.sync="configurable.configDict"></component>
