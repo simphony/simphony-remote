@@ -137,9 +137,12 @@ def available(ctx):
 
 @app.command()
 @click.argument("identifier")
+@click.option("--startupdata", default=None)
 @click.pass_context
-def start(ctx, identifier):
+def start(ctx, identifier, startupdata):
     """Starts a container for application identified by IDENTIFIER.
+    If ``startupdata`` is provided, the container will open the given file at
+    startup.
     If a container is already running, restarts it."""
     cred = ctx.obj.credentials
     url, username, cookies = cred.url, cred.username, cred.cookies
@@ -147,9 +150,12 @@ def start(ctx, identifier):
     request_url = urljoin(url,
                           "/user/{}/api/v1/containers/".format(username))
 
-    payload = json.dumps(dict(
-        mapping_id=identifier
-    ))
+    payload_dict = dict(mapping_id=identifier)
+    if startupdata is not None:
+        payload_dict.update(
+            configurables=dict(startupdata=dict(startupdata=startupdata)))
+
+    payload = json.dumps(payload_dict)
 
     response = requests.post(request_url, payload, cookies=cookies,
                              verify=False)

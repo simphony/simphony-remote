@@ -141,6 +141,18 @@ class TestRemoteAppREST(TempMixin, unittest.TestCase):
             self.assertEqual(mock_post.call_args[0][1],
                              json.dumps({"mapping_id": "1"}))
 
+            self._remoteapprest("app start 1 --startupdata=/test")
+            self.assertEqual(mock_post.call_args[0][0],
+                             "/user/bar/api/v1/containers/")
+            self.assertEqual(
+                mock_post.call_args[0][1],
+                json.dumps(
+                    {"mapping_id": "1",
+                     "configurables": {
+                         "startupdata": {"startupdata": "/test"}
+                     }}
+                ))
+
     def test_app_stop(self):
         with mock.patch('requests.delete') as mock_delete, \
                 mock.patch("remoteappmanager.cli.remoteapprest.__main__."
