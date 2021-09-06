@@ -130,10 +130,20 @@ class TestRemoteAppREST(TempMixin, unittest.TestCase):
 
     def test_app_start(self):
         with mock.patch('requests.post') as mock_post, \
+                mock.patch("requests.get") as mock_get, \
                 mock.patch("remoteappmanager.cli.remoteapprest.__main__."
                            "Credentials.from_file") as mock_from_file:
 
             mock_from_file.return_value = self.get_mock_credentials()
+
+            response = [mock.Mock()]
+            response[0].content = json.dumps(
+                {'items': {'1': {"image": {
+                    "policy": {"allow_startup_data": True}
+                }}}}
+            ).encode("utf-8")
+
+            mock_get.side_effect = response
 
             self._remoteapprest("app start 1")
             self.assertEqual(mock_post.call_args[0][0],
@@ -152,6 +162,64 @@ class TestRemoteAppREST(TempMixin, unittest.TestCase):
                          "startupdata": {"startupdata": "/test"}
                      }}
                 ))
+
+    def test_app_start_allow_startup_data(self):
+        with mock.patch("requests.get") as mock_get, \
+                mock.patch("remoteappmanager.cli.remoteapprest.__main__."
+                           "Credentials.from_file") as mock_from_file:
+
+            mock_from_file.return_value = self.get_mock_credentials()
+
+            # allow_startup_data is False, so this will fail
+
+            response = [mock.Mock()]
+            response[0].content = json.dumps(
+                {'items': {'1': {"image": {
+                    "policy": {"allow_startup_data": False}
+                }}}}
+            ).encode("utf-8")
+
+            mock_get.side_effect = response
+
+            argstring = "app start 1 --startupdata=/test"
+            runner = CliRunner()
+            result = runner.invoke(remoteapprest.cli,
+                                   argstring.split(),
+                                   catch_exceptions=True)
+
+            self.assertEqual(result.exit_code, 1)
+            self.assertIn("The 'allow_startup_data' policy is False for the "
+                          "current user",
+                          result.output)
+
+            # Removing the --startupdata option should work just fine
+
+            argstring = "app start 1"
+            runner = CliRunner()
+            result = runner.invoke(remoteapprest.cli,
+                                   argstring.split(),
+                                   catch_exceptions=True)
+
+            self.assertEqual(result.exit_code, -1)
+
+            # Same if the allow_startup_data policy is set to True
+
+            response = [mock.Mock()]
+            response[0].content = json.dumps(
+                {'items': {'1': {"image": {
+                    "policy": {"allow_startup_data": True}
+                }}}}
+            ).encode("utf-8")
+
+            mock_get.side_effect = response
+
+            argstring = "app start 1 --startupdata=/test"
+            runner = CliRunner()
+            result = runner.invoke(remoteapprest.cli,
+                                   argstring.split(),
+                                   catch_exceptions=True)
+
+            self.assertEqual(result.exit_code, -1)
 
     def test_app_stop(self):
         with mock.patch('requests.delete') as mock_delete, \
