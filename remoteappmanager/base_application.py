@@ -136,6 +136,8 @@ class BaseApplication(web.Application, LoggingMixin):
             self.log.info(
                 "Creating new User account for {}:".format(user.name))
             self.db.create_user(user.name)
+        else:
+            self.log.info("User account found for {}:".format(user.name))
 
         self.log.info("Adding demo apps to User registry:")
         self._add_demo_apps(user)
