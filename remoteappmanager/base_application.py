@@ -182,7 +182,8 @@ class BaseApplication(web.Application, LoggingMixin):
                     '',
                     False,
                     True,
-                    None
+                    None,
+                    True
                 )
 
     def _webapi_resources(self):
