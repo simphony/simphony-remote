@@ -168,17 +168,18 @@ class BaseApplication(web.Application, LoggingMixin):
     # Private
     def _add_demo_apps(self, user):
         """Grant access to any demo applications provided for user"""
-
-        if user.demo_applications:
+        if not user.demo_applications:
+            self.log.debug("No demo applications available")
             return
 
         # Add all demo applications already registered
         for application in self.db.list_applications():
             if application.image in user.demo_applications:
-                self.log.info(application.image)
+                self.log.debug(f"Avaliable image: {application.image}")
                 self.db.grant_access(
                     application.image,
                     user.name,
+                    '',
                     False,
                     True,
                     None
