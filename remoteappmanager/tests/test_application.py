@@ -50,7 +50,7 @@ class TestApplication(TempMixin,
         self.assertIsNotNone(app.container_manager)
         self.assertIsNotNone(app.hub)
         self.assertEqual(app.user.name, "johndoe")
-        self.assertNotNone(app.user.account)
+        self.assertIsNotNone(app.user.account)
 
     def test_error_default_value_with_unimportable_accounting(self):
         self.file_config.database_class = "not.importable.Class"

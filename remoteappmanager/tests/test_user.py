@@ -12,6 +12,6 @@ class TestUser(TestCase):
 
     def test_init(self):
         self.assertEqual('test-user', self.user.name)
-        self.assertNone(self.user.account)
+        self.assertIsNone(self.user.account)
         self.assertEqual('Basic', self.user.login_service)
         self.assertListEqual(['some-image'], self.user.demo_applications)
