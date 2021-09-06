@@ -153,9 +153,9 @@ def start(ctx, identifier, startupdata):
     payload_dict = dict(mapping_id=identifier)
     if startupdata is not None:
         # First make sure that the allow_startup_data policy is True
-        request_url = urljoin(url,
-                              "/user/{}/api/v1/applications/".format(username))
-        response = requests.get(request_url, cookies=cookies, verify=False)
+        check_url = urljoin(url,
+                            "/user/{}/api/v1/applications/".format(username))
+        response = requests.get(check_url, cookies=cookies, verify=False)
         apps_data = json.loads(response.content.decode("utf-8"))
         app_data = apps_data["items"][identifier]
         allow_startup_data = app_data["image"]["policy"]["allow_startup_data"]

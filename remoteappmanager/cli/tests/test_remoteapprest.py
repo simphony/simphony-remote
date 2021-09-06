@@ -130,10 +130,20 @@ class TestRemoteAppREST(TempMixin, unittest.TestCase):
 
     def test_app_start(self):
         with mock.patch('requests.post') as mock_post, \
+                mock.patch("requests.get") as mock_get, \
                 mock.patch("remoteappmanager.cli.remoteapprest.__main__."
                            "Credentials.from_file") as mock_from_file:
 
             mock_from_file.return_value = self.get_mock_credentials()
+
+            response = [mock.Mock()]
+            response[0].content = json.dumps(
+                {'items': {'1': {"image": {
+                    "policy": {"allow_startup_data": True}
+                }}}}
+            ).encode("utf-8")
+
+            mock_get.side_effect = response
 
             self._remoteapprest("app start 1")
             self.assertEqual(mock_post.call_args[0][0],
