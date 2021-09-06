@@ -132,6 +132,10 @@ class BaseApplication(web.Application, LoggingMixin):
         login_service = self.command_line_config.login_service
         user = User(name=user_name, login_service=login_service)
         user.account = self.db.get_user(user_name=user_name)
+        if user.account is None:
+            self.log.info(
+                "Creating new User account for {}:".format(user.name))
+            self.db.create_user(user.name)
 
         self.log.info("Adding demo apps to User registry:")
         self._add_demo_apps(user)
