@@ -351,7 +351,9 @@ class ContainerManager(LoggingMixin):
 
         container_url_id = image_name.split("/")[-1]
         container_urlpath = without_end_slash(
-            url_path_join(base_urlpath, "containers", container_url_id))
+            url_path_join(base_urlpath,
+                          "containers",
+                          container_url_id))
         container_name = _generate_container_name(self.realm,
                                                   user_name,
                                                   mapping_id)
@@ -405,20 +407,35 @@ class ContainerManager(LoggingMixin):
         try:
             ip, port = yield from self._get_ip_and_port(container_id)
         except Exception as e:
-            self.log.exception("Could not retrieve ip/port information "
-                               "for container {}".format(container_id))
+            self.log.exception(
+                "Could not retrieve ip/port information "
+                "for container {}".format(container_id))
             yield self.stop_and_remove_container(container_id)
             raise e
 
         extended_id = f"{container_url_id}_{port}"
 
-        container = Container(docker_id=container_id, name=container_name, image_name=image_name,
-            image_id=image_id, mapping_id=mapping_id, ip=ip, port=port, url_id=extended_id,
-            urlpath=container_urlpath, )
+        container = Container(
+            docker_id=container_id,
+            name=container_name,
+            image_name=image_name,
+            image_id=image_id,
+            mapping_id=mapping_id,
+            ip=ip,
+            port=port,
+            url_id=extended_id,
+            urlpath=container_urlpath,
+        )
 
-        self.log.info(("Started container '{}' (id: {}). "
-                       "Exported port reachable at {}:{}").format(container_name, container_id, ip,
-            port))
+        self.log.info(
+            ("Started container '{}' (id: {}). "
+             "Exported port reachable at {}:{}").format(
+                container_name,
+                container_id,
+                ip,
+                port
+            )
+        )
 
         return container
 
