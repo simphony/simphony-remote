@@ -1,4 +1,4 @@
-from traitlets import HasTraits, Unicode, Any
+from traitlets import HasTraits, Unicode, Any, List
 
 
 class User(HasTraits):
@@ -14,8 +14,6 @@ class User(HasTraits):
     #: Reference to the authenticator method used for user login
     login_service = Unicode()
 
-    @property
-    def demo_applications(self):
-        """Can be implemented to provide any default applications
-        granted by the user"""
-        return []
+    #: Provide names of any default applications granted to the user
+    #: This can be set in the JupyterHub configuration file
+    demo_applications = List().tag(config=True)
