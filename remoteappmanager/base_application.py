@@ -131,13 +131,12 @@ class BaseApplication(web.Application, LoggingMixin):
         user_name = self.command_line_config.user
         login_service = self.command_line_config.login_service
         user = User(name=user_name, login_service=login_service)
-        user.account = self.db.get_user(user_name=user_name)
-        if user.account is None:
+        while self.db.get_user(user_name=user.name) is None:
             self.log.info(
                 "Creating new User account for {}:".format(user.name))
             self.db.create_user(user.name)
-        else:
-            self.log.info("User account found for {}:".format(user.name))
+        user.account = self.db.get_user(user_name=user.name)
+        self.log.info("User account loaded for {}:".format(user.name))
 
         self.log.info("Adding demo apps to User registry:")
         self._add_demo_apps(user)
