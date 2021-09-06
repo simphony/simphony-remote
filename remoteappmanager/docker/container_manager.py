@@ -416,15 +416,9 @@ class ContainerManager(LoggingMixin):
             image_id=image_id, mapping_id=mapping_id, ip=ip, port=port, url_id=extended_id,
             urlpath=container_urlpath, )
 
-        self.log.info(
-            ("Started container '{}' (id: {}). "
-             "Exported port reachable at {}:{}").format(
-                container_name,
-                container_id,
-                ip,
-                port
-            )
-        )
+        self.log.info(("Started container '{}' (id: {}). "
+                       "Exported port reachable at {}:{}").format(container_name, container_id, ip,
+            port))
 
         return container
 
