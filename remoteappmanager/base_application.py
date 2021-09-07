@@ -131,8 +131,20 @@ class BaseApplication(web.Application, LoggingMixin):
         user_name = self.command_line_config.user
         login_service = self.command_line_config.login_service
         user = User(name=user_name, login_service=login_service)
-        user.account = self.db.get_user(user_name=user_name)
 
+        # Handle User accounting
+        if self.db.get_user(user_name=user.name) is None:
+            self.log.info(
+                "User account not found for {}:".format(user.name))
+            if self.file_config.auto_user_creation:
+                self.log.info(
+                    "Creating new User account for {}:".format(user.name))
+                self.db.create_user(user.name)
+        else:
+            self.log.info("User account found for {}:".format(user.name))
+        user.account = self.db.get_user(user_name=user.name)
+
+        # Add any demo apps to registry
         self.log.info("Adding demo apps to User registry:")
         self._add_demo_apps(user)
 
@@ -168,20 +180,26 @@ class BaseApplication(web.Application, LoggingMixin):
     # Private
     def _add_demo_apps(self, user):
         """Grant access to any demo applications provided for user"""
+        if user.account is None:
+            self.log.debug("No user account available")
+            return
 
-        if user.demo_applications:
+        if not self.file_config.demo_applications:
+            self.log.debug("No demo applications available")
             return
 
         # Add all demo applications already registered
         for application in self.db.list_applications():
-            if application.image in user.demo_applications:
-                self.log.info(application.image)
+            if application.image in self.file_config.demo_applications:
+                self.log.debug(f"Available image: {application.image}")
                 self.db.grant_access(
                     application.image,
                     user.name,
+                    '',
                     False,
                     True,
-                    None
+                    None,
+                    True
                 )
 
     def _webapi_resources(self):

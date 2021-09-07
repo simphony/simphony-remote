@@ -13,9 +13,3 @@ class User(HasTraits):
 
     #: Reference to the authenticator method used for user login
     login_service = Unicode()
-
-    @property
-    def demo_applications(self):
-        """Can be implemented to provide any default applications
-        granted by the user"""
-        return []

@@ -2,7 +2,7 @@ import os
 
 import tornado.options
 from docker import tls
-from traitlets import HasTraits, Int, Unicode, Bool, Dict
+from traitlets import HasTraits, List, Int, Unicode, Bool, Dict
 
 from remoteappmanager import paths
 from remoteappmanager.traitlets import set_traits_from_dict
@@ -70,6 +70,13 @@ class FileConfig(HasTraits):
     ga_tracking_id = Unicode(
         help="The google analytics tracking id"
     )
+
+    #: Provide names of any default applications granted to users
+    demo_applications = List()
+
+    #: Whether or not to automatically create user accounts upon starting
+    #: up the application if they do not already exist in the database
+    auto_user_creation = Bool(False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
