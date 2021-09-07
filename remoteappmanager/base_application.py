@@ -191,7 +191,7 @@ class BaseApplication(web.Application, LoggingMixin):
         # Add all demo applications already registered
         for application in self.db.list_applications():
             if application.image in self.file_config.demo_applications:
-                self.log.debug(f"Avaliable image: {application.image}")
+                self.log.debug(f"Available image: {application.image}")
                 self.db.grant_access(
                     application.image,
                     user.name,
