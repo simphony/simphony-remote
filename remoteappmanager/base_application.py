@@ -138,7 +138,8 @@ class BaseApplication(web.Application, LoggingMixin):
 
         # Handle User accounting
         if self.db.get_user(user_name=user.name) is None:
-            self.log.warning("User account not found for {}:".format(user.name))
+            self.log.warning(
+                "User account not found for {}:".format(user.name))
             if self.auto_user_creation:
                 self.log.info(
                     "Creating new User account for {}:".format(user.name))
