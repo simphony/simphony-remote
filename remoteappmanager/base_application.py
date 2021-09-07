@@ -1,7 +1,7 @@
 import importlib
 
 from remoteappmanager.handlers.handler_authenticator import HubAuthenticator
-from traitlets import Bool, Instance, default
+from traitlets import Instance, default
 from tornado import web
 import tornado.ioloop
 
@@ -44,10 +44,6 @@ class BaseApplication(web.Application, LoggingMixin):
 
     #: The WebAPI registry for resources.
     registry = Instance(Registry)
-
-    #: Whether or not to automatically create user accounts upon starting
-    #: up the application if they do not already exist in the database
-    auto_user_creation = Bool(False, config=True)
 
     @property
     def command_line_config(self):
@@ -138,9 +134,9 @@ class BaseApplication(web.Application, LoggingMixin):
 
         # Handle User accounting
         if self.db.get_user(user_name=user.name) is None:
-            self.log.warning(
+            self.log.info(
                 "User account not found for {}:".format(user.name))
-            if self.auto_user_creation:
+            if self.file_config.auto_user_creation:
                 self.log.info(
                     "Creating new User account for {}:".format(user.name))
                 self.db.create_user(user.name)
@@ -184,13 +180,17 @@ class BaseApplication(web.Application, LoggingMixin):
     # Private
     def _add_demo_apps(self, user):
         """Grant access to any demo applications provided for user"""
-        if not user.demo_applications:
+        if user.account is None:
+            self.log.debug("No user account available")
+            return
+
+        if not self.file_config.demo_applications:
             self.log.debug("No demo applications available")
             return
 
         # Add all demo applications already registered
         for application in self.db.list_applications():
-            if application.image in user.demo_applications:
+            if application.image in self.file_config.demo_applications:
                 self.log.debug(f"Avaliable image: {application.image}")
                 self.db.grant_access(
                     application.image,

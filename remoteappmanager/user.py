@@ -13,7 +13,3 @@ class User(HasTraits):
 
     #: Reference to the authenticator method used for user login
     login_service = Unicode()
-
-    #: Provide names of any default applications granted to the user
-    #: This can be set in the JupyterHub configuration file
-    demo_applications = List().tag(config=True)
