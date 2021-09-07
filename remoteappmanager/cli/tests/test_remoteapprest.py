@@ -144,12 +144,20 @@ class TestRemoteAppREST(TempMixin, unittest.TestCase):
             ).encode("utf-8")
 
             mock_get.side_effect = response
+            mock_post.return_value.status_code = 201
+            mock_post.return_value.headers = {
+                "Location": "http://127.0.0.1:8000"
+                            "/user/bar/api/v1/containers/test_49165"
+            }
 
-            self._remoteapprest("app start 1")
+            _, output = self._remoteapprest("app start 1")
             self.assertEqual(mock_post.call_args[0][0],
                              "/user/bar/api/v1/containers/")
             self.assertEqual(mock_post.call_args[0][1],
                              json.dumps({"mapping_id": "1"}))
+            self.assertEqual(
+                output.strip(),
+                "http://127.0.0.1:49165/user/bar/containers/test")
 
             self._remoteapprest("app start 1 --startupdata=/test")
             self.assertEqual(mock_post.call_args[0][0],
@@ -162,9 +170,13 @@ class TestRemoteAppREST(TempMixin, unittest.TestCase):
                          "startupdata": {"startupdata": "/test"}
                      }}
                 ))
+            self.assertEqual(
+                output.strip(),
+                "http://127.0.0.1:49165/user/bar/containers/test")
 
     def test_app_start_allow_startup_data(self):
-        with mock.patch("requests.get") as mock_get, \
+        with mock.patch('requests.post') as mock_post, \
+                mock.patch("requests.get") as mock_get, \
                 mock.patch("remoteappmanager.cli.remoteapprest.__main__."
                            "Credentials.from_file") as mock_from_file:
 
@@ -180,6 +192,10 @@ class TestRemoteAppREST(TempMixin, unittest.TestCase):
             ).encode("utf-8")
 
             mock_get.side_effect = response
+            mock_post.return_value.status_code = 201
+            mock_post.return_value.headers = {
+                "Location": "http://127.0.0.1:8000"
+                            "/user/bar/api/v1/containers/test_49165"}
 
             argstring = "app start 1 --startupdata=/test"
             runner = CliRunner()
@@ -200,7 +216,10 @@ class TestRemoteAppREST(TempMixin, unittest.TestCase):
                                    argstring.split(),
                                    catch_exceptions=True)
 
-            self.assertEqual(result.exit_code, -1)
+            self.assertEqual(result.exit_code, 0)
+            self.assertEqual(
+                result.output.strip(),
+                "http://127.0.0.1:49165/user/bar/containers/test")
 
             # Same if the allow_startup_data policy is set to True
 
@@ -219,7 +238,10 @@ class TestRemoteAppREST(TempMixin, unittest.TestCase):
                                    argstring.split(),
                                    catch_exceptions=True)
 
-            self.assertEqual(result.exit_code, -1)
+            self.assertEqual(result.exit_code, 0)
+            self.assertEqual(
+                result.output.strip(),
+                "http://127.0.0.1:49165/user/bar/containers/test")
 
     def test_app_stop(self):
         with mock.patch('requests.delete') as mock_delete, \

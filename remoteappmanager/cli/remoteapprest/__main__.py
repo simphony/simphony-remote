@@ -4,7 +4,7 @@ import os
 import requests
 import requests.utils
 import json
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit
 
 import click
 
@@ -173,6 +173,11 @@ def start(ctx, identifier, startupdata):
                              verify=False)
     if response.status_code == 201:
         location = response.headers["Location"]
+        parsed = urlsplit(location)
+        path, port = parsed.path.split("_")
+        port = port.rstrip("/")
+        path = "".join(path.split("/api/v1"))
+        location = f"{parsed.scheme}://{parsed.hostname}:{port}{path}"
         print(location)
 
 
