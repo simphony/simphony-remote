@@ -1,4 +1,4 @@
-from traitlets import HasTraits, Unicode, Any, List
+from traitlets import HasTraits, Unicode, Any
 
 
 class User(HasTraits):
