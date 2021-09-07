@@ -349,7 +349,7 @@ class ContainerManager(LoggingMixin):
             '\n'.join('{0} -> {1}'.format(source, target['bind'])
                       for source, target in filtered_volumes.items()))
 
-        container_url_id = image_name.split("/")[-1]
+        container_url_id = _generate_container_url_id(image_name)
         container_urlpath = without_end_slash(
             url_path_join(base_urlpath,
                           "containers",
@@ -693,8 +693,22 @@ def _generate_container_name(realm, user_name, mapping_id):
                                 )
 
 
-def _generate_container_url_id():
-    """Generates a unique string to identify the container through a url"""
+def _generate_container_url_id(image_name=None):
+    """ If a complete image name is provided, parses and returns the image
+    name, otherwise generates a unique string to identify the container.
+
+    Parameters
+    ----------
+    image_name : str, default None
+        The image name, in the format simphony-remote/simphony-application.
+
+    Returns
+    -------
+    str
+        The container identifier.
+    """
+    if image_name:
+        return image_name.split("/")[-1]
     return uuid.uuid4().hex
 
 
