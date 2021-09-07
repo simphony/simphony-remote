@@ -50,6 +50,38 @@ class TestApplication(TempMixin,
         self.assertIsNotNone(app.container_manager)
         self.assertIsNotNone(app.hub)
         self.assertEqual(app.user.name, "johndoe")
+        self.assertEqual(app.user.login_service, "")
+        self.assertIsNone(app.user.account)
+
+    def test_initialization_with_sqlite_db_and_auto_user_creation(self):
+        # Initialise database
+        sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
+        utils.init_sqlite_db(sqlite_file_path)
+
+        self.file_config.database_class = (
+            "remoteappmanager.db.orm.ORMDatabase")
+        self.file_config.database_kwargs = {
+            "url": "sqlite:///"+sqlite_file_path}
+
+        # Mimic assigning Application state in JupyterHub configuration
+        # file
+        Application.auto_user_creation = True
+
+        app = Application(self.command_line_config,
+                          self.file_config,
+                          self.environment_config)
+
+        self.assertIsNotNone(app.command_line_config)
+        self.assertIsNotNone(app.file_config)
+        self.assertIsNotNone(app.environment_config)
+
+        self.assertIsNotNone(app.db)
+        self.assertIsNotNone(app.user)
+        self.assertIsNotNone(app.reverse_proxy)
+        self.assertIsNotNone(app.container_manager)
+        self.assertIsNotNone(app.hub)
+        self.assertEqual(app.user.name, "johndoe")
+        self.assertEqual(app.user.login_service, "")
         self.assertIsNotNone(app.user.account)
 
     def test_error_default_value_with_unimportable_accounting(self):

@@ -1,7 +1,7 @@
 import importlib
 
 from remoteappmanager.handlers.handler_authenticator import HubAuthenticator
-from traitlets import Instance, default
+from traitlets import Bool, Instance, default
 from tornado import web
 import tornado.ioloop
 
@@ -44,6 +44,10 @@ class BaseApplication(web.Application, LoggingMixin):
 
     #: The WebAPI registry for resources.
     registry = Instance(Registry)
+
+    #: Whether or not to automatically create user accounts upon starting
+    #: up the application if they do not already exist in the database
+    auto_user_creation = Bool(False, config=True)
 
     @property
     def command_line_config(self):
@@ -131,13 +135,19 @@ class BaseApplication(web.Application, LoggingMixin):
         user_name = self.command_line_config.user
         login_service = self.command_line_config.login_service
         user = User(name=user_name, login_service=login_service)
-        while self.db.get_user(user_name=user.name) is None:
-            self.log.info(
-                "Creating new User account for {}:".format(user.name))
-            self.db.create_user(user.name)
-        user.account = self.db.get_user(user_name=user.name)
-        self.log.info("User account loaded for {}:".format(user.name))
 
+        # Handle User accounting
+        if self.db.get_user(user_name=user.name) is None:
+            self.log.warning("User account not found for {}:".format(user.name))
+            if self.auto_user_creation:
+                self.log.info(
+                    "Creating new User account for {}:".format(user.name))
+                self.db.create_user(user.name)
+        else:
+            self.log.info("User account found for {}:".format(user.name))
+        user.account = self.db.get_user(user_name=user.name)
+
+        # Add any demo apps to registry
         self.log.info("Adding demo apps to User registry:")
         self._add_demo_apps(user)
 
