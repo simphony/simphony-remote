@@ -53,6 +53,8 @@ If you would like to test a deployment of S-R using Docker for CI purposes, then
 #. Make sure that you have a recent version of Docker. This guide has been tested on version 19.03.5 (build 633a0ea838).
    :code:`make deps` will install the latest version if you do not already have a version of docker available.
    Full instructions available at `the Docker website <https://docs.docker.com/engine/installation/linux/ubuntulinux/>`_.
+   Docker installed using Ubuntu's Snap package manager might not work as expected; see
+   https://github.com/simphony/simphony-remote/issues/572 for details.
    A Makefile rule is provided for convenience.
    **NOTE: this overwrites the docker.list file you might have setup in your /etc/apt/sources.d/ directory**.
    You might be prompted for the root password to execute this::
