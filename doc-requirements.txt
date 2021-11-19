@@ -1,3 +1,6 @@
 sphinx==1.4.4
+# docutils version 0.18 is known to cause issues with Sphinx
+# See https://github.com/sphinx-doc/sphinx/issues/9727
+docutils<0.18
 astor==0.8.1
 git+https://github.com/simphony/traitlet-documenter.git@v0.1.0#egg=traitlet_documenter
