@@ -1,4 +1,4 @@
-sphinx==1.4.4
+sphinx
 # docutils version 0.18 is known to cause issues with Sphinx
 # See https://github.com/sphinx-doc/sphinx/issues/9727
 docutils<0.18
