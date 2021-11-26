@@ -455,7 +455,7 @@ with open(HELP_FILE_PATH, 'w') as fh:
 del _config
 
 
-autodoc_member_order = 'source'
+autodoc_member_order = 'bysource'
 autoclass_content = 'both'
 autodoc_default_flags = [
     'show-inheritance', 'members', 'undoc-members']
