@@ -61,13 +61,12 @@ import posixpath
 from types import ModuleType
 
 from six import text_type
-from docutils.parsers.rst import directives
+from docutils.parsers.rst import Directive, directives
 from docutils.statemachine import ViewList
 from docutils import nodes
 
 import sphinx
 from sphinx import addnodes
-from sphinx.util.compat import Directive
 from sphinx.pycode import ModuleAnalyzer, PycodeError
 from sphinx.ext.autodoc import Options
 
@@ -555,7 +554,7 @@ def process_generate_options(app):
 
     from .generate import generate_autosummary_docs
 
-    ext = app.config.source_suffix[0]
+    ext = list(app.config.source_suffix)[0]
     genfiles = [genfile + (not genfile.endswith(ext) and ext or '')
                 for genfile in genfiles]
 
