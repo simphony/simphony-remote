@@ -565,8 +565,7 @@ def process_generate_options(app):
                 for genfile in genfiles]
 
     generate_autosummary_docs(genfiles, builder=app.builder,
-                              warn=app.warn, info=app.info, suffix=ext,
-                              base_path=app.srcdir)
+                              suffix=ext, base_path=app.srcdir)
 
 
 def setup(app):
