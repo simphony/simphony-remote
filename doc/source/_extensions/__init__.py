@@ -558,13 +558,6 @@ def process_generate_options(app):
     from .generate import generate_autosummary_docs
 
     # Add documenters to AutoDirective registry
-    app.add_autodocumenter(ModuleDocumenter)
-    app.add_autodocumenter(ClassDocumenter)
-    app.add_autodocumenter(ExceptionDocumenter)
-    app.add_autodocumenter(DataDocumenter)
-    app.add_autodocumenter(FunctionDocumenter)
-    app.add_autodocumenter(MethodDocumenter)
-    app.add_autodocumenter(AttributeDocumenter)
     app.add_autodocumenter(InstanceAttributeDocumenter)
 
     ext = list(app.config.source_suffix)[0]
