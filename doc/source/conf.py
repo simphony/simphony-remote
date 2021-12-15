@@ -44,10 +44,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'autodoc_traits',
-    # patched autosummary for issue
-    # https://github.com/sphinx-doc/sphinx/issues/1061
-    '_extensions'
-    #'sphinx.ext.autosummary'
+    'sphinx.ext.autosummary',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
