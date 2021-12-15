@@ -68,10 +68,7 @@ from docutils import nodes
 import sphinx
 from sphinx import addnodes
 from sphinx.pycode import ModuleAnalyzer, PycodeError
-from sphinx.ext.autodoc import Options, \
-    ModuleDocumenter, ClassDocumenter, ExceptionDocumenter, DataDocumenter, \
-    FunctionDocumenter, MethodDocumenter, AttributeDocumenter, \
-    InstanceAttributeDocumenter
+from sphinx.ext.autodoc import Options, InstanceAttributeDocumenter
 
 
 # -- autosummary_toc node ------------------------------------------------------
