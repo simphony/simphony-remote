@@ -1,0 +1,20 @@
+# Readthedocs configuration file
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
+# Readthedocs configuration file version
+version: 2
+
+# Additional document formats to produce
+formats: all
+
+build:
+  os: ubuntu-18.04
+  tools:
+    python: "3.7"
+
+sphinx:
+   configuration: docs/source/conf.py
+
+python:
+   install:
+   - requirements: doc-requirements.txt
