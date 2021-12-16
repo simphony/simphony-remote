@@ -59,9 +59,7 @@ class install(_install):
         if not on_rtd:
             import subprocess
             subprocess.check_call(['npm', 'run', 'build'])
-        # Workaround for setuptools ignoring `install_requires` when
-        # `cmdclass` is overridden. See https://stackoverflow.com/q/21915469
-        super().do_egg_install()
+        super().run()
 
 
 # main setup configuration class
