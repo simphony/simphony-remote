@@ -25,7 +25,7 @@ modelling environment for nanomaterials and systems by design".
 Documentation
 =============
 
-A quick setup guide is given below; please see the `documentation <doc/source/index.rst>`_ for more
+A quick setup guide is given below; please see the :doc:`documentation </index>` for more
 detailed information.
 
 Deployment (Quick Start)
@@ -33,13 +33,13 @@ Deployment (Quick Start)
 
 Basic instructions for a single-user deployment on a local (or virtual) machine are provided below.
 A more comprehensive deployment documentation, including use of a ``nginx`` reverse proxy and
-running as a service can be found `here <doc/source/deployment.rst>`_
+running as a service can be found :doc:`here </deployment>`
 
 Single Machine
 --------------
 
 If you would like to test a deployment of S-R using Docker for CI purposes, then please use the following
-`instructions <doc/source/developer/ci_instructions.rst>`_.
+:doc:`instructions </developer/ci_instructions>`.
 
 .. note::
 
@@ -118,7 +118,7 @@ Start JupyterHub
      cd ./jupyterhub
 
 #. Verify that ``jupyterhub_config.py`` is correct for your deployment
-   machine setup (see `configuration <doc/source/configuration>`_ for more details).
+   machine setup (see :doc:`configuration </configuration>` for more details).
    Some example configuration files are provided in the
    ``example_configurations/`` directory.
 
@@ -172,7 +172,7 @@ Default sqlite database
 
    **remoteappmanager** by default uses a sqlite database *remoteappmanager.db* in
    the current work directory.  The **remoteappdb** command-line tool is provided
-   for setting up the database.  Please refer to the `utilities <doc/source/utilities.rst>`_
+   for setting up the database.  Please refer to the :doc:`utilities </utilities>`
    section for details on the use of this program.
 
 
