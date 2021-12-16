@@ -2,7 +2,7 @@ Simphony-remote
 ===============
 
 .. image:: https://readthedocs.org/projects/simphony-remote/badge/?version=latest
-   :target: http://simphony-remote.readthedocs.io/en/latest/?badge=latest
+   :target: https://simphony-remote.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
 The Simphony-remote is web service that allows users to start and work with simphony enabled environments remotely.
