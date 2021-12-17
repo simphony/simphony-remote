@@ -6,10 +6,11 @@ on:
     # Run this action twice a month just before midnight UTC
     # "*" is a special character in YAML, so we have to quote this string
     - cron:  '59 23 7,22 1-12 *'
+  workflow_dispatch:
 
 jobs:
   trigger_readthedocs_build:
     runs-on: ubuntu-18.04
 
     steps:
-      - run: echo 1
+      - run: curl -X POST -d "token=${{ secrets.RTD_WEBHOOK_TOKEN }}" "${{ secrets.RTD_WEBHOOK_URL }}"
