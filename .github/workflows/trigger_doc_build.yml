@@ -2,9 +2,9 @@ name: Trigger documentation build on Readthedocs
 
 on:
   schedule:
-    # Run this action twice a month just before midnight UTC
+    # Run this action once a month just before midnight UTC
     # "*" is a special character in YAML, so we have to quote this string
-    - cron:  '45 11 17 1-12 *'
+    - cron:  '59 23 1 1-12 *'
   workflow_dispatch:
 
 jobs:
