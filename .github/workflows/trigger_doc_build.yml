@@ -1,5 +1,13 @@
 name: Trigger documentation build on Readthedocs
 
+# on:
+#   schedule:
+#     # Run this action twice a month just before midnight UTC
+#     # "*" is a special character in YAML, so we have to quote this string
+#     - cron:  '59 23 7,22 1-12 *'
+#   workflow_dispatch:
+
+# Try the workaround documented here: https://github.community/t/new-action-isnt-showing/128287/4
 on:
   schedule:
     # Run this action twice a month just before midnight UTC
