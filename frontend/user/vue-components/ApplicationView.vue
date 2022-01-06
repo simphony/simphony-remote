@@ -42,10 +42,18 @@
             <form class="configuration">
               <fieldset v-if="currentApp.configurables.length === 0">No configurable options for this image</fieldset>
               <fieldset v-else :disabled="!currentApp.isStopped()">
-                <component v-for="configurable in currentApp.configurables"
-                :key="configurable.tag"
-                :is="configurable.tag + '-component'"
-                :configDict.sync="configurable.configDict"></component>
+                <fieldset v-if="appPolicy.allow_startup_data">
+                  <component v-for="configurable in currentApp.configurables"
+                  :key="configurable.tag"
+                  :is="configurable.tag + '-component'"
+                  :configDict.sync="configurable.configDict"></component>
+                </fieldset>
+                <fieldset v-else>
+                  <component v-for="configurable in currentApp.configurables" v-if="configurable.tag !== 'startupdata'"
+                  :key="configurable.tag"
+                  :is="configurable.tag + '-component'"
+                  :configDict.sync="configurable.configDict"></component>
+                </fieldset>
               </fieldset>
             </form>
           </div>

@@ -4,7 +4,7 @@ import os
 import requests
 import requests.utils
 import json
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit
 
 import click
 
@@ -137,9 +137,12 @@ def available(ctx):
 
 @app.command()
 @click.argument("identifier")
+@click.option("--startupdata", default=None)
 @click.pass_context
-def start(ctx, identifier):
+def start(ctx, identifier, startupdata):
     """Starts a container for application identified by IDENTIFIER.
+    If ``startupdata`` is provided, the container will open the given file at
+    startup.
     If a container is already running, restarts it."""
     cred = ctx.obj.credentials
     url, username, cookies = cred.url, cred.username, cred.cookies
@@ -147,14 +150,34 @@ def start(ctx, identifier):
     request_url = urljoin(url,
                           "/user/{}/api/v1/containers/".format(username))
 
-    payload = json.dumps(dict(
-        mapping_id=identifier
-    ))
+    payload_dict = dict(mapping_id=identifier)
+    if startupdata is not None:
+        # First make sure that the allow_startup_data policy is True
+        check_url = urljoin(url,
+                            "/user/{}/api/v1/applications/".format(username))
+        response = requests.get(check_url, cookies=cookies, verify=False)
+        apps_data = json.loads(response.content.decode("utf-8"))
+        app_data = apps_data["items"][identifier]
+        allow_startup_data = app_data["image"]["policy"]["allow_startup_data"]
+        if allow_startup_data:
+            payload_dict.update(
+                configurables=dict(startupdata=dict(startupdata=startupdata)))
+        else:
+            raise click.ClickException(
+                "The 'allow_startup_data' policy is False for the current "
+                "user.\nExiting.")
+
+    payload = json.dumps(payload_dict)
 
     response = requests.post(request_url, payload, cookies=cookies,
                              verify=False)
     if response.status_code == 201:
         location = response.headers["Location"]
+        parsed = urlsplit(location)
+        path, port = parsed.path.split("_")
+        port = port.rstrip("/")
+        path = "".join(path.split("/api/v1"))
+        location = f"{parsed.scheme}://{parsed.hostname}:{port}{path}"
         print(location)
 
 

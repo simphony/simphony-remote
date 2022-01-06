@@ -106,6 +106,37 @@ class Resolution(Configurable):
         }
 
 
+class StartupData(Configurable):
+    """ Support opening a specific file when an application starts up. """
+
+    tag = "startupdata"
+
+    @classmethod
+    def supported_by(cls, image):
+        return cls.tag.upper() in image.env
+
+    @classmethod
+    def config_dict_to_env(cls, config_dict):
+        """ The config dict must contain the tag key, e.g.:
+
+        cls.tag = "startupdata"
+
+        {"startupdata": "/home/user/can.ex2"}
+        """
+        if config_dict is None or len(config_dict) == 0:
+            return cls.default_env()
+
+        data = config_dict[cls.tag]
+        if not isinstance(data, str):
+            raise ValueError("invalid file path")
+
+        return {cls.tag.upper(): data}
+
+    @classmethod
+    def default_env(cls):
+        return {cls.tag.upper(): ""}
+
+
 def for_image(image):
     """Returns the configurables that are available for a specific
     image.
@@ -122,7 +153,7 @@ def for_image(image):
 
     """
     # We lack automatic registration. Add here new configurables
-    available = [Resolution]
+    available = [Resolution, StartupData]
 
     return [conf_class
             for conf_class in available

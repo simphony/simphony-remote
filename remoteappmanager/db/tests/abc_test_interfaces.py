@@ -145,7 +145,7 @@ class ABCTestDatabaseInterface(metaclass=ABCMeta):
 
         for method in [db.grant_access, db.revoke_access]:
             with self.assertRaises(exceptions.UnsupportedOperation):
-                method("bonkers", "uuu", 'key', True, False, "/a:/b:ro")
+                method("bonkers", "uuu", 'key', True, False, "/a:/b:ro", False)
 
         with self.assertRaises(exceptions.UnsupportedOperation):
             db.revoke_access_by_id(12345)

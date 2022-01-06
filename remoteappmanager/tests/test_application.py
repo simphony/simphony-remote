@@ -50,7 +50,8 @@ class TestApplication(TempMixin,
         self.assertIsNotNone(app.container_manager)
         self.assertIsNotNone(app.hub)
         self.assertEqual(app.user.name, "johndoe")
-        self.assertEqual(app.user.account, None)
+        self.assertEqual(app.user.login_service, "")
+        self.assertIsNone(app.user.account)
 
     def test_error_default_value_with_unimportable_accounting(self):
         self.file_config.database_class = "not.importable.Class"
@@ -92,6 +93,34 @@ class TestApplication(TempMixin,
         self.assertIsNotNone(app.user)
         self.assertEqual(app.user.name, "johndoe")
         self.assertIsInstance(app.user.account, test_csv_db.CSVUser)
+
+    def test_initialization_with_demo_applications(self):
+        # Initialise database
+        sqlite_file_path = os.path.join(self.tempdir, "sqlite.db")
+        utils.init_sqlite_db(sqlite_file_path)
+
+        # Add demo app to database using remoteappmanager API
+        from remoteappmanager.db.orm import ORMDatabase
+        test_db = ORMDatabase("sqlite:///"+sqlite_file_path)
+        test_db.create_application('my-demo-app')
+        del test_db
+
+        self.file_config.database_class = (
+            "remoteappmanager.db.orm.ORMDatabase")
+        self.file_config.database_kwargs = {
+            "url": "sqlite:///"+sqlite_file_path}
+        self.file_config.demo_applications = ['my-demo-app']
+        self.file_config.auto_user_creation = True
+
+        app = Application(self.command_line_config,
+                          self.file_config,
+                          self.environment_config)
+
+        self.assertEqual(app.user.name, "johndoe")
+        self.assertIsNotNone(app.user.account)
+
+        user_apps = app.db.get_accounting_for_user(app.user.account)
+        self.assertEqual('my-demo-app', user_apps[0].application.image)
 
     def test_start(self):
         with patch(

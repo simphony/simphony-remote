@@ -43,11 +43,8 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
-    'traitlet_documenter',
-    # patched autosummary for issue
-    # https://github.com/sphinx-doc/sphinx/issues/1061
-    '_extensions'
-    #'sphinx.ext.autosummary'
+    'autodoc_traits',
+    'sphinx.ext.autosummary',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -455,7 +452,7 @@ with open(HELP_FILE_PATH, 'w') as fh:
 del _config
 
 
-autodoc_member_order = 'source'
+autodoc_member_order = 'bysource'
 autoclass_content = 'both'
 autodoc_default_flags = [
     'show-inheritance', 'members', 'undoc-members']

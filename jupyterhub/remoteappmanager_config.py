@@ -63,7 +63,12 @@
 # database_class = "remoteappmanager.db.orm.ORMDatabase"
 # database_kwargs = {
 #     "url": "sqlite:///"+os.path.abspath('./remoteappmanager.db')}
-
+#
+# # User accounting
+#
+# auto_user_creation = True
+# demo_applications = ['my-demo-app']
+#
 # # ----------------
 # # Google Analytics
 # # ----------------

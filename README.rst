@@ -2,7 +2,7 @@ Simphony-remote
 ===============
 
 .. image:: https://readthedocs.org/projects/simphony-remote/badge/?version=latest
-   :target: http://simphony-remote.readthedocs.io/en/latest/?badge=latest
+   :target: https://simphony-remote.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
 The Simphony-remote is web service that allows users to start and work with simphony enabled environments remotely.
@@ -25,7 +25,7 @@ modelling environment for nanomaterials and systems by design".
 Documentation
 =============
 
-A quick setup guide is given below; please see the `documentation <doc/source/index.rst>`_ for more
+A quick setup guide is given below; please see the :doc:`documentation </index>` for more
 detailed information.
 
 Deployment (Quick Start)
@@ -33,13 +33,13 @@ Deployment (Quick Start)
 
 Basic instructions for a single-user deployment on a local (or virtual) machine are provided below.
 A more comprehensive deployment documentation, including use of a ``nginx`` reverse proxy and
-running as a service can be found `here <doc/source/deployment.rst>`_
+running as a service can be found :doc:`here </deployment>`
 
 Single Machine
 --------------
 
 If you would like to test a deployment of S-R using Docker for CI purposes, then please use the following
-`instructions <doc/source/developer/ci_instructions.rst>`_.
+:doc:`instructions </developer/ci_instructions>`.
 
 .. note::
 
@@ -52,7 +52,10 @@ If you would like to test a deployment of S-R using Docker for CI purposes, then
 
 #. Make sure that you have a recent version of Docker. This guide has been tested on version 19.03.5 (build 633a0ea838).
    :code:`make deps` will install the latest version if you do not already have a version of docker available.
-   Full instructions available at `the Docker website <https://docs.docker.com/engine/installation/linux/ubuntulinux/>`_.
+   Full instructions available at the Docker website `for Ubuntu <https://docs.docker.com/engine/install/ubuntu/>`_
+   and `for CentOS <https://docs.docker.com/engine/install/centos/>`_ operating systems.
+   Docker installed using Ubuntu's Snap package manager might not work as expected; see
+   https://github.com/simphony/simphony-remote/issues/572 for details.
    A Makefile rule is provided for convenience.
    **NOTE: this overwrites the docker.list file you might have setup in your /etc/apt/sources.d/ directory**.
    You might be prompted for the root password to execute this::
@@ -115,7 +118,7 @@ Start JupyterHub
      cd ./jupyterhub
 
 #. Verify that ``jupyterhub_config.py`` is correct for your deployment
-   machine setup (see `configuration <doc/source/configuration>`_ for more details).
+   machine setup (see :doc:`configuration </configuration>` for more details).
    Some example configuration files are provided in the
    ``example_configurations/`` directory.
 
@@ -169,7 +172,7 @@ Default sqlite database
 
    **remoteappmanager** by default uses a sqlite database *remoteappmanager.db* in
    the current work directory.  The **remoteappdb** command-line tool is provided
-   for setting up the database.  Please refer to the `utilities <doc/source/utilities.rst>`_
+   for setting up the database.  Please refer to the :doc:`utilities </utilities>`
    section for details on the use of this program.
 
 

@@ -1,0 +1,69 @@
+name: CentOS CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '59 23 7,22 1-12 *'
+
+  workflow_dispatch:
+
+jobs:
+  build_centos:
+    # GitHub Actions does not currently support CentOS as an official platform, so in order to
+    # test on this OS we need to run it as a container based on the Ubuntu environment
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        container: ["centos:7"]
+
+    container:
+      image: ${{ matrix.container }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install make and sudo
+        run: |
+          yum update -y
+          yum install -y sudo
+          yum groupinstall -y "Development Tools"
+          yum install -y  gtk3 libXext libXrender libXtst libX11 libXau libXcursor libXdmcp libXfixes libXi libXmu libXp libXpm libXt
+
+      - name: Install requirements
+        run: |
+          make deps
+          make venv
+          . venv/bin/activate
+          export PATH=`npm bin`:$PATH
+          make pythondeps
+          python -c "import setuptools; print(setuptools.__version__)"
+          pip --version
+
+      - name: Install Firefox
+        run: |
+          cd /usr/local
+          curl -O http://ftp.mozilla.org/pub/firefox/releases/75.0/linux-x86_64/en-US/firefox-75.0.tar.bz2
+          tar xvjf firefox-75.0.tar.bz2
+          sudo ln -s /usr/local/firefox/firefox /usr/bin/firefox
+
+      - name: Install Simphony-Remote
+        run: |
+          . venv/bin/activate
+          make install
+
+      - name: Install development requirements
+        run: |
+          . venv/bin/activate
+          make devdeps
+
+      - name: Test python backend
+        run: |
+          . venv/bin/activate
+          export LC_ALL=en_US.UTF-8
+          export LANG=en_US.UTF-8
+          make pythontest

@@ -52,6 +52,7 @@ class TestApplication(WebAPITestCase):
             volume_source="foo",
             volume_target="bar",
             volume_mode="ro",
+            allow_startup_data=False,
         )
 
         app.db.get_accounting_for_user = Mock(return_value=[
@@ -77,7 +78,8 @@ class TestApplication(WebAPITestCase):
                             'volume_mode': 'ro',
                             'volume_source': 'foo',
                             'allow_home': True,
-                            'volume_target': 'bar'
+                            'volume_target': 'bar',
+                            'allow_startup_data': False
                         },
                         'name': 'boo',
                         'icon_128': '',
@@ -95,7 +97,8 @@ class TestApplication(WebAPITestCase):
                             'volume_mode': 'ro',
                             'volume_source': 'foo',
                             'allow_home': True,
-                            'volume_target': 'bar'
+                            'volume_target': 'bar',
+                            'allow_startup_data': False
                         },
                         'name': 'boo',
                         'type': '',
@@ -144,6 +147,7 @@ class TestApplication(WebAPITestCase):
                                      "volume_mode": 'ro',
                                      "volume_source": "foo",
                                      "volume_target": "bar",
+                                     "allow_startup_data": False,
                                  },
                                  'ui_name': 'foo_ui'}})
 
@@ -175,6 +179,7 @@ class TestApplication(WebAPITestCase):
                                      "volume_mode": 'ro',
                                      "volume_source": "foo",
                                      "volume_target": "bar",
+                                     "allow_startup_data": False,
                                  },
                                  'configurables': [],
                              }
