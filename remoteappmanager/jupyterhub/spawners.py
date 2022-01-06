@@ -2,10 +2,11 @@ import os
 import escapism
 import string
 
-from traitlets import Unicode
+from traitlets import Unicode, default
 from tornado import gen
 
 from jupyterhub.spawner import LocalProcessSpawner
+from jupyterhub import orm
 
 
 class BaseSpawner(LocalProcessSpawner):
@@ -26,11 +27,14 @@ class BaseSpawner(LocalProcessSpawner):
     #: (along with ConfigurableHTTPProxy.auth_token)
     proxy_auth_token = Unicode(config=True)
 
+    @default('ip')
+    def _ip_default(self):
+        return "127.0.0.1"
+
     @property
     def cmd(self):
         """Overrides the base class traitlet so that we take full control
         of the spawned command according to user admin status"""
-
         return (["remoteappadmin"]
                 if self.user.admin is True
                 else ["remoteappmanager"])
@@ -40,7 +44,10 @@ class BaseSpawner(LocalProcessSpawner):
         # FIXME: this is a workaround to breaking changes that were introduced
         #  in jupyterhub v0.8.1 and assumes the self.user.server attribute
         #  has a non-None value
-        self.server = self.user.server
+        if not self.server:
+            self.server = self.db.query(orm.Server).filter(
+                orm.Server.base_url == self.user.server.base_url
+            )
         # We can obtain a reference to the JupyterHub.proxy object
         # through the tornado settings passed onto the User
         proxy = self.user.settings.get('proxy')
@@ -53,9 +60,6 @@ class BaseSpawner(LocalProcessSpawner):
 
         args.append('--user="{}"'.format(
             self.user.name))
-
-        args.append('--ip="{}"'.format(
-            self.ip or "127.0.0.1"))
 
         args.append('--base-urlpath="{}"'.format(
             self.user.server.base_url))

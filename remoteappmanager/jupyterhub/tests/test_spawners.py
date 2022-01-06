@@ -45,6 +45,14 @@ def new_spawner(spawner_class):
 
     # Mock db
     db = mock.Mock()
+    db.query().filter = mock.Mock(
+        return_value=orm.Server(
+            proto="http",
+            ip="127.0.0.1",
+            port=12345,
+            base_url="/foo/bar/"
+        )
+    )
 
     # Mock user
     user = mock.Mock()
