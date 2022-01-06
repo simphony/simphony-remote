@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from jupyterhub import orm
+from jupyterhub import proxy
 from remoteappmanager.services.reverse_proxy import ReverseProxy
 from tornado import gen
 from tornado.testing import gen_test, AsyncTestCase, ExpectLog
@@ -21,7 +21,7 @@ class TestReverseProxy(AsyncTestCase):
         reverse_proxy = ReverseProxy(
             endpoint_url="http://fake/api",
             api_token="token")
-        reverse_proxy._reverse_proxy = Mock(spec=orm.Proxy)
+        reverse_proxy._reverse_proxy = Mock(spec=proxy.Proxy)
         reverse_proxy._reverse_proxy.api_request = mock_api_request
 
         yield reverse_proxy.register("/hello/from/me/",
