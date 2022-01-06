@@ -45,13 +45,6 @@ def new_spawner(spawner_class):
 
     # Mock db
     db = mock.Mock()
-    db.query = mock.Mock()
-    db.query().first = mock.Mock(
-        return_value=proxy.ConfigurableHTTPProxy(
-            auth_token="whatever",
-            api_url="http://127.0.0.1:12345/foo/bar/"
-        )
-    )
 
     # Mock user
     user = mock.Mock()
@@ -76,7 +69,14 @@ def new_spawner(spawner_class):
     authenticator.login_service = 'TEST'
 
     spawner = spawner_class(
-        db=db, ip='127.0.0.1', user=user, hub=hub, authenticator=authenticator)
+        ip='127.0.0.1',
+        db=db,
+        user=user,
+        hub=hub,
+        authenticator=authenticator,
+        proxy_api_url="http://127.0.0.1:12345/foo/bar/",
+        proxy_auth_token="whatever",
+    )
     # As of Jupyter 0.8.1, Spawner classes do not assign server
     # property from user instance and the setter does not seem
     # to work during instantiation

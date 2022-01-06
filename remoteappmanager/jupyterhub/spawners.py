@@ -6,7 +6,6 @@ from traitlets import Unicode, Instance
 from tornado import gen
 
 from jupyterhub.spawner import LocalProcessSpawner
-from jupyterhub.proxy import Proxy, ConfigurableHTTPProxy
 
 
 class BaseSpawner(LocalProcessSpawner):
@@ -14,11 +13,18 @@ class BaseSpawner(LocalProcessSpawner):
     the actual spawners
     """
 
-    #: The instance of the proxy.Proxy.
-    proxy = Instance(Proxy)
-
     #: The path of the configuration file for the cmd executable
     config_file_path = Unicode(config=True)
+
+    #: The URL for JupyterHub's Proxy API server. We currently expect
+    #: this to be set manually in the jupyterhub_config.py file
+    #: (along with ConfigurableHTTPProxy.api_url)
+    proxy_api_url = Unicode(config=True)
+
+    #: The token for JupyterHub's Proxy API server. We currently expect
+    #: this to be set manually in the jupyterhub_config.py file
+    #: (along with ConfigurableHTTPProxy.auth_token)
+    proxy_auth_token = Unicode(config=True)
 
     @property
     def cmd(self):
@@ -28,13 +34,6 @@ class BaseSpawner(LocalProcessSpawner):
         return (["remoteappadmin"]
                 if self.user.admin is True
                 else ["remoteappmanager"])
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        # We get the first one. Strangely enough, jupyterhub has a table
-        # containing potentially multiple proxies, but it's enforced to
-        # contain only one.
-        self.proxy = self.db.query(ConfigurableHTTPProxy).first()
 
     def get_args(self):
         args = super().get_args()
@@ -49,7 +48,7 @@ class BaseSpawner(LocalProcessSpawner):
             self.user.server.cookie_name))
 
         args.append("--proxy-api-url={}".format(
-            self.proxy.api_url))
+            self.proxy_api_url))
 
         args.append("--logout_url={}".format(
             self.authenticator.logout_url(
@@ -65,7 +64,7 @@ class BaseSpawner(LocalProcessSpawner):
 
     def get_env(self):
         env = super().get_env()
-        env["PROXY_API_TOKEN"] = self.proxy.auth_token
+        env["PROXY_API_TOKEN"] = self.proxy_auth_token
         env.update(_docker_envvars())
         return env
 
