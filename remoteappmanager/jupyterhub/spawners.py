@@ -31,16 +31,19 @@ class BaseSpawner(LocalProcessSpawner):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.proxy = ConfigurableHTTPProxy()
+        # We get the first one. Strangely enough, jupyterhub has a table
+        # containing potentially multiple proxies, but it's enforced to
+        # contain only one.
+        self.proxy = self.db.query(ConfigurableHTTPProxy).first()
 
     def get_args(self):
         args = super().get_args()
 
-        for iarg, arg in enumerate(args):
-            args[iarg] = arg.replace('--base-url=', '--base-urlpath=')
+        args.append('--base-urlpath="{}"'.format(
+            self.server.base_url))
 
         args.append("--cookie_name={}".format(
-            self.server.cookie_name))
+            self.hub.cookie_name))
 
         args.append("--proxy-api-url={}".format(
             self.proxy.api_url))

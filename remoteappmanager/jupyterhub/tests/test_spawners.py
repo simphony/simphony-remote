@@ -47,16 +47,16 @@ def new_spawner(spawner_class):
     db = mock.Mock()
     db.query = mock.Mock()
     db.query().first = mock.Mock(
-        return_value=proxy.Proxy(
+        return_value=proxy.ConfigurableHTTPProxy(
             auth_token="whatever",
-            api_server=orm.Server(proto="http",
-                                  ip="127.0.0.1",
-                                  port=12345,
-                                  base_url="/foo/bar/")))
+            api_url="http://127.0.0.1:12345/foo/bar/"
+        )
+    )
 
     # Mock user
     user = mock.Mock()
     user.name = username()
+    user.url = 'http://my-callback.com'
     user.admin = False
     user.state = None
     user.server = generic_server
@@ -75,8 +75,13 @@ def new_spawner(spawner_class):
         return_value='/logout_test')
     authenticator.login_service = 'TEST'
 
-    return spawner_class(
+    spawner = spawner_class(
         db=db, user=user, hub=hub, authenticator=authenticator)
+    # As of Jupyter 0.8.1, Spawner classes do not assign server
+    # property from user instance and the setter does not seem
+    # to work during instantiation
+    spawner.server = generic_server
+    return spawner
 
 
 class TestSystemUserSpawner(TempMixin, AsyncTestCase):
