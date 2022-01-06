@@ -21,4 +21,5 @@ class TestEnvironmentConfig(unittest.TestCase):
             self.assertEqual(config.proxy_api_token, "proxy_token")
             self.assertEqual(config.hub_host, "")
             self.assertEqual(config.hub_prefix, '/hub/')
-            self.assertEqual(config.hub_api_url, 'http://172.17.5.167:8081/hub/api')
+            self.assertEqual(
+                config.hub_api_url, 'http://172.17.5.167:8081/hub/api')

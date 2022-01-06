@@ -185,7 +185,7 @@ class BaseApplication(web.Application, LoggingMixin):
 
         self.listen(self.command_line_config.port)
 
-        #tornado.ioloop.IOLoop.current().run_sync(self.check_hub_version)
+        tornado.ioloop.IOLoop.current().run_sync(self.check_hub_version)
         tornado.ioloop.IOLoop.current().start()
 
     @gen.coroutine
