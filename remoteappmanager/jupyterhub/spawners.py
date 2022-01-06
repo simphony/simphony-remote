@@ -2,7 +2,7 @@ import os
 import escapism
 import string
 
-from traitlets import Unicode, Instance
+from traitlets import Unicode
 from tornado import gen
 
 from jupyterhub.spawner import LocalProcessSpawner

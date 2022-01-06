@@ -7,7 +7,7 @@ import time
 from unittest import mock
 
 from tornado.testing import AsyncTestCase
-from jupyterhub import orm, proxy, objects
+from jupyterhub import orm, objects
 
 from remoteappmanager.jupyterhub.spawners import (
     SystemUserSpawner,
