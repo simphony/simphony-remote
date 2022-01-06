@@ -36,7 +36,11 @@ class BaseSpawner(LocalProcessSpawner):
                 else ["remoteappmanager"])
 
     def __init__(self, **kwargs):
-        super(LocalProcessSpawner, self).__init__(**kwargs)
+        super(BaseSpawner, self).__init__(**kwargs)
+        # FIXME: this is a workaround to breaking changes that were introduced
+        #  in jupyterhub v0.8.1 and assumes the self.user.server attribute
+        #  has a non-None value
+        self.server = self.user.server
         # We can obtain a reference to the JupyterHub.proxy object
         # through the tornado settings passed onto the User
         proxy = self.user.settings.get('proxy')
@@ -45,21 +49,13 @@ class BaseSpawner(LocalProcessSpawner):
             self.proxy_auth_token = proxy.auth_token
 
     def get_args(self):
-        # FIXME: we can't call the super get_args method before starting the
-        #  spawner, a bug exists in jupyterhub v0.8.1 that means it cannot
-        #  handle an unassigned self.port attribute.
-        #  Note that this workaround assumes the self.user.server attribute
-        #  has a non-None value
-        args = []
-        args.extend(self.args)
+        args = super(BaseSpawner, self).get_args()
+
         args.append('--user="{}"'.format(
             self.user.name))
 
         args.append('--ip="{}"'.format(
             self.ip or "127.0.0.1"))
-
-        args.append('--port="{}"'.format(
-            self.user.server.port))
 
         args.append('--base-urlpath="{}"'.format(
             self.user.server.base_url))
