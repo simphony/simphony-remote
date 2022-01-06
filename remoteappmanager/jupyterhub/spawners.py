@@ -41,13 +41,6 @@ class BaseSpawner(LocalProcessSpawner):
 
     def __init__(self, **kwargs):
         super(LocalProcessSpawner, self).__init__(**kwargs)
-        # FIXME: This is a hack since get_args method contains a bug in v0.8.1
-        #  that means it cannot handle a non-assigned port
-        #  Note tat we assume that the self.user.server attribute will have
-        #  a non-None value for this to work
-        server = self.user.server
-        if server:
-            self.port = server.port
         # We can obtain a reference to the JupyterHub.proxy object
         # through the tornado settings passed onto the User
         proxy = self.user.settings.get('proxy')
@@ -56,14 +49,20 @@ class BaseSpawner(LocalProcessSpawner):
             self.proxy_auth_token = proxy.auth_token
 
     def get_args(self):
-        args = super().get_args()
-
+        # FIXME: we can't call the super get_args method since it contains a
+        #  bug in v0.8.1 that cannot handle an unassigned self.port attribute.
+        #  Note that we assume that the self.user.server attribute will have
+        #  a non-None value for this to work
+        args = []
+        args.extend(self.args)
         args.append('--user="{}"'.format(
             self.user.name))
 
-        if not self.port:
-            args.append("--port={}".format(
-                self.user.server.port))
+        args.append('--ip="{}"'.format(
+            self.ip))
+
+        args.append('--port="{}"'.format(
+            self.user.server.port))
 
         args.append('--base-urlpath="{}"'.format(
             self.user.server.base_url))
