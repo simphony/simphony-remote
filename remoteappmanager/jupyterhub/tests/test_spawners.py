@@ -7,7 +7,7 @@ import time
 from unittest import mock
 
 from tornado.testing import AsyncTestCase
-from jupyterhub import orm, objects
+from jupyterhub import proxy, orm, objects
 
 from remoteappmanager.jupyterhub.spawners import (
     SystemUserSpawner,
@@ -53,6 +53,12 @@ def new_spawner(spawner_class):
     user.admin = False
     user.state = None
     user.server = generic_server
+    user.settings = {
+        'proxy': proxy.ConfigurableHTTPProxy(
+            api_url="http://127.0.0.1:12345/foo/bar/",
+            auth_token="whatever"
+        )
+    }
 
     # Mock hub
     hub = objects.Hub(
@@ -68,20 +74,12 @@ def new_spawner(spawner_class):
         return_value='/logout_test')
     authenticator.login_service = 'TEST'
 
-    spawner = spawner_class(
-        ip='127.0.0.1',
+    return spawner_class(
         db=db,
         user=user,
         hub=hub,
-        authenticator=authenticator,
-        proxy_api_url="http://127.0.0.1:12345/foo/bar/",
-        proxy_auth_token="whatever",
+        authenticator=authenticator
     )
-    # As of Jupyter 0.8.1, Spawner classes do not assign server
-    # property from user instance and the setter does not seem
-    # to work during instantiation
-    spawner.server = generic_server
-    return spawner
 
 
 class TestSystemUserSpawner(TempMixin, AsyncTestCase):

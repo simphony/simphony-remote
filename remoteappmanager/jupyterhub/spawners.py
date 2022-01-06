@@ -2,7 +2,7 @@ import os
 import escapism
 import string
 
-from traitlets import Unicode
+from traitlets import Unicode, default
 from tornado import gen
 
 from jupyterhub.spawner import LocalProcessSpawner
@@ -26,6 +26,10 @@ class BaseSpawner(LocalProcessSpawner):
     #: (along with ConfigurableHTTPProxy.auth_token)
     proxy_auth_token = Unicode(config=True)
 
+    @default('ip')
+    def _ip_default(self):
+        return "127.0.0.1"
+
     @property
     def cmd(self):
         """Overrides the base class traitlet so that we take full control
@@ -35,14 +39,34 @@ class BaseSpawner(LocalProcessSpawner):
                 if self.user.admin is True
                 else ["remoteappmanager"])
 
+    def __init__(self, **kwargs):
+        super(LocalProcessSpawner, self).__init__(**kwargs)
+        # FIXME: This is a hack since get_args method contains a bug in v0.8.1
+        #  that means it cannot handle a non-assigned port
+        #  Note tat we assume that the self.user.server attribute will have
+        #  a non-None value for this to work
+        server = self.user.server
+        if server:
+            self.port = server.port
+        # We can obtain a reference to the JupyterHub.proxy object
+        # through the tornado settings passed onto the User
+        proxy = self.user.settings.get('proxy')
+        if proxy is not None:
+            self.proxy_api_url = proxy.api_url
+            self.proxy_auth_token = proxy.auth_token
+
     def get_args(self):
         args = super().get_args()
 
         args.append('--user="{}"'.format(
             self.user.name))
 
+        if not self.port:
+            args.append("--port={}".format(
+                self.user.server.port))
+
         args.append('--base-urlpath="{}"'.format(
-            self.server.base_url))
+            self.user.server.base_url))
 
         args.append("--cookie_name={}".format(
             self.user.server.cookie_name))
@@ -160,7 +184,6 @@ class VirtualUserSpawner(BaseSpawner):
             else:
                 self.log.info("Created %s's temporary workspace in: %s",
                               self.user.name, self._virtual_workspace)
-
         return (yield super().start())
 
     @gen.coroutine
