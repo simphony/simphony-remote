@@ -197,7 +197,7 @@ class BaseApplication(web.Application, LoggingMixin):
                     self.command_line_config.hub_api_url)
             except Exception:
                 self.log.exception(
-                    "Failed to connect to my Hub at %s (attempt %i/%i). Is it running?",
+                    "Failed to connect to my Hub at %s (attempt %i/%i). Is it running?",  # noqa: E501
                     self.command_line_config.hub_api_url, i, RETRIES)
                 yield gen.sleep(min(2 ** i, 16))
             else:

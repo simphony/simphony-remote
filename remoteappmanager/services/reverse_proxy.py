@@ -1,5 +1,3 @@
-from urllib import parse
-
 from tornado import gen, httpclient
 from jupyterhub.proxy import Proxy, ConfigurableHTTPProxy
 from traitlets import HasTraits, Unicode, Instance
