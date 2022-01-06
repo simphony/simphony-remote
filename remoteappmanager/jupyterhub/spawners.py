@@ -39,11 +39,14 @@ class BaseSpawner(LocalProcessSpawner):
     def get_args(self):
         args = super().get_args()
 
+        args.append('--user="{}"'.format(
+            self.user.name))
+
         args.append('--base-urlpath="{}"'.format(
             self.server.base_url))
 
         args.append("--cookie_name={}".format(
-            self.hub.cookie_name))
+            self.user.server.cookie_name))
 
         args.append("--proxy-api-url={}".format(
             self.proxy.api_url))
