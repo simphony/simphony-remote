@@ -37,7 +37,7 @@ class ReverseProxy(LoggingMixin, HasTraits):
         # interface convenience
         self._reverse_proxy = ConfigurableHTTPProxy(
             auth_token=self.api_token,
-            api_server=self.endpoint_url
+            api_url=self.endpoint_url
         )
 
         self.log.info("Reverse proxy setup on {}".format(
