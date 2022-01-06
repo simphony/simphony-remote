@@ -172,7 +172,7 @@ def user(ctx):
 @user.command()
 @click.argument("user")
 @click.pass_context
-def create_user(ctx, user):
+def create(ctx, user):  # noqa: F811
     """Creates a user USER in the database."""
     session = ctx.obj.session
     orm_user = orm.User(name=user)
@@ -190,7 +190,7 @@ def create_user(ctx, user):
 @user.command()
 @click.argument("user")
 @click.pass_context
-def remove(ctx, user):
+def remove(ctx, user):  # noqa: F811
     """Removes a user."""
     session = ctx.obj.session
 
@@ -212,7 +212,7 @@ def remove(ctx, user):
               help="Shows the applications each user "
                    "is allowed to run")
 @click.pass_context
-def list_users(ctx, no_decoration, show_apps):
+def list(ctx, no_decoration, show_apps):  # noqa: F811
     """Show a list of the available users."""
 
     if no_decoration:
@@ -275,7 +275,7 @@ def app(ctx):
               default=True,
               help="Verify image name against docker.")
 @click.pass_context
-def create_image(ctx, image, verify):
+def create(ctx, image, verify):  # noqa: F811
     """Creates a new application for image IMAGE."""
 
     # Verify if `image` is an existing docker image
@@ -304,7 +304,7 @@ def create_image(ctx, image, verify):
 @app.command()  # noqa
 @click.argument("image")
 @click.pass_context
-def remove(ctx, image):
+def remove(ctx, image):  # noqa: F811
     """Removes an application from the list."""
     session = ctx.obj.session
 
@@ -322,7 +322,7 @@ def remove(ctx, image):
 @click.option('--no-decoration', is_flag=True,
               help="Disable table decorations")
 @click.pass_context
-def list_applications(ctx, no_decoration):
+def list(ctx, no_decoration):  # noqa: F811
     """List all registered applications."""
     if no_decoration:
         tablefmt = "plain"
