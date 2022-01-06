@@ -36,12 +36,12 @@ class TestGithubWhiteListAuthenticator(TempMixin,
         auth.whitelist_file = whitelist_path
         response = yield auth.get_authenticated_user(
             Mock(), {"username": "foo"})
-        self.assertEqual(response, "foo")
+        self.assertEqual(response['name'], "foo")
 
         # Check again to touch the code that does not trigger another load
         response = yield auth.get_authenticated_user(
             Mock(), {"username": "foo"})
-        self.assertEqual(response, "foo")
+        self.assertEqual(response["name"], "foo")
 
         # wait one second, so that we see a change in mtime.
         time.sleep(1)
@@ -64,7 +64,7 @@ class TestGithubWhiteListAuthenticator(TempMixin,
                                                      {"username": "foo"})
 
         # Should be equivalent to no whitelist, so everybody allowed
-        self.assertEqual(response, "foo")
+        self.assertEqual(response['name'], "foo")
 
     @gen_test
     def test_exception_during_read(self):
