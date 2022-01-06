@@ -111,7 +111,7 @@ class BaseApplication(web.Application, LoggingMixin):
     @default("hub")
     def _hub_default(self):
         """Initializes the Hub instance."""
-        return Hub(endpoint_url=self.command_line_config.hub_api_url,
+        return Hub(endpoint_url=self.environment_config.hub_api_url,
                    api_token=self.environment_config.jpy_api_token,
                    )
 
@@ -173,13 +173,19 @@ class BaseApplication(web.Application, LoggingMixin):
                 getattr(self._command_line_config, trait_name)
                 )
             )
+        for trait_name in self._environment_config.trait_names():
+            self.log.info("{}: {}".format(
+                trait_name,
+                getattr(self._environment_config, trait_name)
+            )
+            )
         self.log.info("Listening for connections on {}:{}".format(
             self.command_line_config.ip,
             self.command_line_config.port))
 
         self.listen(self.command_line_config.port)
 
-        tornado.ioloop.IOLoop.current().run_sync(self.check_hub_version)
+        #tornado.ioloop.IOLoop.current().run_sync(self.check_hub_version)
         tornado.ioloop.IOLoop.current().start()
 
     @gen.coroutine
@@ -194,11 +200,11 @@ class BaseApplication(web.Application, LoggingMixin):
         for i in range(1, RETRIES + 1):
             try:
                 resp = yield client.fetch(
-                    self.command_line_config.hub_api_url)
+                    self.environment_config.hub_api_url)
             except Exception:
                 self.log.exception(
                     "Failed to connect to my Hub at %s (attempt %i/%i). Is it running?",  # noqa: E501
-                    self.command_line_config.hub_api_url, i, RETRIES)
+                    self.environment_config.hub_api_url, i, RETRIES)
                 yield gen.sleep(min(2 ** i, 16))
             else:
                 break

@@ -16,9 +16,6 @@ arguments = {
     "port": 57022,
     "cookie-name": "jupyter-hub-token-johndoe",
     "base-urlpath": "\"/user/johndoe/\"",
-    "hub-host": "",
-    "hub-prefix": "/hub/",
-    "hub-api-url": "http://172.17.5.167:8081/hub/api",
     "proxy-api-url": "http://192.168.100.99/proxy/api",
     "ip": "127.0.0.1",
     "config-file": fixtures.get("remoteappmanager_config.py")

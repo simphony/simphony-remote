@@ -11,14 +11,14 @@ class TestEnvironmentConfig(unittest.TestCase):
         env = {
             'JUPYTERHUB_API_TOKEN': 'jpy_token',
             'PROXY_API_TOKEN': 'proxy_token',
-            'JUPYTERHUB_HOST': 'jpy_host',
-            'JUPYTERHUB_SERVICE_PREFIX': 'jpy_proxy',
-            'JUPYTERHUB_API_URL': 'jpy_api_url',
+            'JUPYTERHUB_HOST': '',
+            'JUPYTERHUB_SERVICE_PREFIX': '/hub/',
+            'JUPYTERHUB_API_URL': 'http://172.17.5.167:8081/hub/api',
         }
         with patch.dict('os.environ', env):
             config.parse_config()
             self.assertEqual(config.jpy_api_token, "jpy_token")
             self.assertEqual(config.proxy_api_token, "proxy_token")
-            self.assertEqual(config.hub_host, "jpy_host")
-            self.assertEqual(config.hub_prefix, "jpy_proxy")
-            self.assertEqual(config.hub_api_url, "jpy_api_url")
+            self.assertEqual(config.hub_host, "")
+            self.assertEqual(config.hub_prefix, '/hub/')
+            self.assertEqual(config.hub_api_url, 'http://172.17.5.167:8081/hub/api')
