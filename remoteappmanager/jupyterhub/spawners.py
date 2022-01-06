@@ -45,17 +45,18 @@ class BaseSpawner(LocalProcessSpawner):
             self.proxy_auth_token = proxy.auth_token
 
     def get_args(self):
-        # FIXME: we can't call the super get_args method since it contains a
-        #  bug in v0.8.1 that cannot handle an unassigned self.port attribute.
-        #  Note that we assume that the self.user.server attribute will have
-        #  a non-None value for this to work
+        # FIXME: we can't call the super get_args method before starting the
+        #  spawner, a bug exists in jupyterhub v0.8.1 that means it cannot
+        #  handle an unassigned self.port attribute.
+        #  Note that this workaround assumes the self.user.server attribute
+        #  has a non-None value
         args = []
         args.extend(self.args)
         args.append('--user="{}"'.format(
             self.user.name))
 
         args.append('--ip="{}"'.format(
-            self.ip))
+            self.ip or "127.0.0.1"))
 
         args.append('--port="{}"'.format(
             self.user.server.port))
