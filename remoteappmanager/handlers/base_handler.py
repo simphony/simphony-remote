@@ -1,7 +1,6 @@
 from http.client import responses
 import hashlib
 
-from jupyterhub._version import __version__
 from tornado import web, gen
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
@@ -79,11 +78,3 @@ class BaseHandler(web.RequestHandler, LoggingMixin):
 
         self.render('error.html', status_code=status_code,
                     status_message=status_message, message=message)
-
-    def set_default_headers(self):
-        """Overload existing RequestHandler.set_default_headers method to include a
-        header containing the local version of JupyterHub.
-        Required by jupyterhub >= 0.8.0
-        """
-        super().set_default_headers()
-        self.set_header('X-JupyterHub-Version', __version__)
