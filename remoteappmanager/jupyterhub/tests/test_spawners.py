@@ -7,7 +7,7 @@ import time
 from unittest import mock
 
 from tornado.testing import AsyncTestCase
-from jupyterhub import orm, proxy
+from jupyterhub import orm, proxy, objects
 
 from remoteappmanager.jupyterhub.spawners import (
     SystemUserSpawner,
@@ -62,7 +62,12 @@ def new_spawner(spawner_class):
     user.server = generic_server
 
     # Mock hub
-    hub = orm.Hub(server=generic_server)
+    hub = objects.Hub(
+        ip="127.0.0.2",
+        proto="http",
+        port=31337,
+        base_url="/"
+    )
 
     # Mock authenticator
     authenticator = mock.Mock()
