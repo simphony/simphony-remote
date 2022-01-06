@@ -2,7 +2,7 @@ import os
 import escapism
 import string
 
-from traitlets import Unicode, default
+from traitlets import Unicode
 from tornado import gen
 
 from jupyterhub.spawner import LocalProcessSpawner
@@ -25,10 +25,6 @@ class BaseSpawner(LocalProcessSpawner):
     #: this to be set manually in the jupyterhub_config.py file
     #: (along with ConfigurableHTTPProxy.auth_token)
     proxy_auth_token = Unicode(config=True)
-
-    @default('ip')
-    def _ip_default(self):
-        return "127.0.0.1"
 
     @property
     def cmd(self):
