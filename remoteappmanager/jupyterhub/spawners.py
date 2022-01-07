@@ -48,7 +48,7 @@ class BaseSpawner(LocalProcessSpawner):
             self.server.base_url))
 
         args.append("--cookie_name={}".format(
-            self.server.cookie_name))
+            self.hub.cookie_name))
 
         args.append("--proxy-api-url={}".format(
             self.proxy.api_url))
