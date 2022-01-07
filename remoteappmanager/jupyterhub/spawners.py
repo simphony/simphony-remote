@@ -2,11 +2,10 @@ import os
 import escapism
 import string
 
-from traitlets import Unicode, default
+from traitlets import Any, Unicode
 from tornado import gen
 
 from jupyterhub.spawner import LocalProcessSpawner
-from jupyterhub import orm
 
 
 class BaseSpawner(LocalProcessSpawner):
@@ -14,22 +13,12 @@ class BaseSpawner(LocalProcessSpawner):
     the actual spawners
     """
 
+    #: The instance of the JupyterHub Proxy.
+    #: We use Any in agreement with base class practice.
+    proxy = Any()
+
     #: The path of the configuration file for the cmd executable
     config_file_path = Unicode(config=True)
-
-    #: The URL for JupyterHub's Proxy API server. We currently expect
-    #: this to be set manually in the jupyterhub_config.py file
-    #: (along with ConfigurableHTTPProxy.api_url)
-    proxy_api_url = Unicode(config=True)
-
-    #: The token for JupyterHub's Proxy API server. We currently expect
-    #: this to be set manually in the jupyterhub_config.py file
-    #: (along with ConfigurableHTTPProxy.auth_token)
-    proxy_auth_token = Unicode(config=True)
-
-    @default('ip')
-    def _ip_default(self):
-        return "127.0.0.1"
 
     @property
     def cmd(self):
@@ -41,34 +30,28 @@ class BaseSpawner(LocalProcessSpawner):
 
     def __init__(self, **kwargs):
         super(BaseSpawner, self).__init__(**kwargs)
-        # FIXME: this is a workaround to breaking changes that were introduced
-        #  in jupyterhub v0.8.1 and assumes the self.user.server attribute
-        #  has a non-None value
-        if not self.server:
-            self.server = self.db.query(orm.Server).filter(
-                orm.Server.base_url == self.user.server.base_url
-            )
         # We can obtain a reference to the JupyterHub.proxy object
         # through the tornado settings passed onto the User
-        proxy = self.user.settings.get('proxy')
-        if proxy is not None:
-            self.proxy_api_url = proxy.api_url
-            self.proxy_auth_token = proxy.auth_token
+        self.proxy = self.user.settings.get('proxy')
 
     def get_args(self):
-        args = super(BaseSpawner, self).get_args()
+        args = super().get_args()
+
+        # Handle no default IP value (removed in jupyterhub v0.8.0)
+        if not self.ip:
+            args.append('--ip="127.0.0.1"')
 
         args.append('--user="{}"'.format(
             self.user.name))
 
         args.append('--base-urlpath="{}"'.format(
-            self.user.server.base_url))
+            self.server.base_url))
 
         args.append("--cookie_name={}".format(
-            self.user.server.cookie_name))
+            self.server.cookie_name))
 
         args.append("--proxy-api-url={}".format(
-            self.proxy_api_url))
+            self.proxy.api_url))
 
         args.append("--logout_url={}".format(
             self.authenticator.logout_url(
@@ -84,7 +67,7 @@ class BaseSpawner(LocalProcessSpawner):
 
     def get_env(self):
         env = super().get_env()
-        env["PROXY_API_TOKEN"] = self.proxy_auth_token
+        env["PROXY_API_TOKEN"] = self.proxy.auth_token
         env.update(_docker_envvars())
         return env
 

@@ -40,19 +40,12 @@ def new_spawner(spawner_class):
         proto="http",
         ip="127.0.0.2",
         port=31337,
-        base_url="/"
+        base_url="/",
+        cookie_name='my_cookie'
     )
 
     # Mock db
     db = mock.Mock()
-    db.query().filter = mock.Mock(
-        return_value=orm.Server(
-            proto="http",
-            ip="127.0.0.1",
-            port=12345,
-            base_url="/foo/bar/"
-        )
-    )
 
     # Mock user
     user = mock.Mock()
@@ -60,7 +53,6 @@ def new_spawner(spawner_class):
     user.url = 'http://my-callback.com'
     user.admin = False
     user.state = None
-    user.server = generic_server
     user.settings = {
         'proxy': proxy.ConfigurableHTTPProxy(
             api_url="http://127.0.0.1:12345/foo/bar/",
@@ -82,9 +74,16 @@ def new_spawner(spawner_class):
         return_value='/logout_test')
     authenticator.login_service = 'TEST'
 
+    # Mocks instantiating Spawner instance via an orm.Spawner instance
+    # in the User._new_spawner method, as would happen in production
+    orm_spawner = orm.Spawner(
+        name='',
+        server=generic_server
+    )
     return spawner_class(
         db=db,
         user=user,
+        orm_spawner=orm_spawner,
         hub=hub,
         authenticator=authenticator
     )
