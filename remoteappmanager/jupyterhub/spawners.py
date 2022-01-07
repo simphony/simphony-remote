@@ -1,7 +1,6 @@
 import os
 import escapism
 import string
-from urllib.parse import quote
 
 from traitlets import Any, Unicode
 from tornado import gen
