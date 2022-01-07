@@ -47,6 +47,9 @@ class BaseSpawner(LocalProcessSpawner):
         args.append('--base-urlpath="{}"'.format(
             self.server.base_url))
 
+        args.append('--hub-prefix={}'.format(
+            self.hub.base_url))
+
         args.append("--cookie_name={}".format(
             self.hub.cookie_name))
 

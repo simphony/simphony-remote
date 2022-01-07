@@ -41,7 +41,7 @@ def new_spawner(spawner_class):
         ip="127.0.0.2",
         port=31337,
         base_url="/",
-        cookie_name='my_cookie'
+        cookie_name='cookie'
     )
 
     # Mock db
@@ -65,7 +65,7 @@ def new_spawner(spawner_class):
         ip="127.0.0.2",
         proto="http",
         port=31337,
-        base_url="/"
+        base_url="/hub/",
     )
 
     # Mock authenticator

@@ -24,6 +24,10 @@ class CommandLineConfig(HasTraits):
     # typically, it's /user/username
     base_urlpath = Unicode(help="The base url where the server resides")
 
+    # This is a url path that sends the request to jupyterhub.
+    # It's normally /hub/.
+    hub_prefix = Unicode(help="The url prefix of the jupyterhub")
+
     # The full URL where to access the reverse proxy API.
     proxy_api_url = Unicode(help="The url of the reverse proxy API")
 

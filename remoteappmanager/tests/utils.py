@@ -16,6 +16,7 @@ arguments = {
     "port": 57022,
     "cookie-name": "jupyter-hub-token-johndoe",
     "base-urlpath": "\"/user/johndoe/\"",
+    "hub-prefix": '/hub/',
     "proxy-api-url": "http://192.168.100.99/proxy/api",
     "ip": "127.0.0.1",
     "config-file": fixtures.get("remoteappmanager_config.py")
@@ -25,7 +26,6 @@ env_config = {
     'JUPYTERHUB_API_TOKEN': 'jpy_token',
     'PROXY_API_TOKEN': 'proxy_token',
     'JUPYTERHUB_HOST': '',
-    'JUPYTERHUB_BASE_URL': '/hub/',
     'JUPYTERHUB_API_URL': 'http://172.17.5.167:8081/hub/api',
 }
 
@@ -56,7 +56,6 @@ def basic_environment_config():
     config.proxy_api_token = env_config['PROXY_API_TOKEN']
     config.jpy_api_token = env_config['JUPYTERHUB_API_TOKEN']
     config.hub_host = env_config['JUPYTERHUB_HOST']
-    config.hub_prefix = env_config['JUPYTERHUB_BASE_URL']
     config.hub_api_url = env_config['JUPYTERHUB_API_URL']
     return config
 

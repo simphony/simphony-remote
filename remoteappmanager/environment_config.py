@@ -17,10 +17,6 @@ class EnvironmentConfig(HasTraits):
     # Originates from JUPYTERHUB_HOST
     hub_host = Unicode(help="The url of the jupyterhub server")
 
-    # This is a url path that sends the request to jupyterhub.
-    # It's normally /hub/. Originates from JUPYTERHUB_BASE_URL
-    hub_prefix = Unicode(help="The url prefix of the jupyterhub")
-
     # This is a full url to reach the hub api (e.g. for authentication check)
     # Originates from JUPYTERHUB_API_URL
     hub_api_url = Unicode(help="The url of the jupyterhub REST API")
@@ -36,7 +32,6 @@ class EnvironmentConfig(HasTraits):
             "JUPYTERHUB_API_TOKEN": 'jpy_api_token',
             "PROXY_API_TOKEN": 'proxy_api_token',
             "JUPYTERHUB_HOST": 'hub_host',
-            "JUPYTERHUB_BASE_URL": 'hub_prefix',
             "JUPYTERHUB_API_URL": 'hub_api_url'
         }
         for envname, traitlet_name in mapping.items():
