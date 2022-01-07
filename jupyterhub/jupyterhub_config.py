@@ -15,7 +15,7 @@ c.ConfigurableHTTPProxy.command = [
 
 c.JupyterHub.logo_file = os.path.join(
     os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
-    'remoteappmanager/static/images/header_logo.˚png'
+    'remoteappmanager/static/images/header_logo.png'
 )
 
 # Choose between system-user mode and virtual-user mode
