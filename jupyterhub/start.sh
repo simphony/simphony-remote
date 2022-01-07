@@ -5,4 +5,4 @@ else
     SCRIPT_DIR=`dirname "$cwd/$0"`
 fi
 export PATH=$SCRIPT_DIR/../node_modules/.bin/:$PATH
-jupyterhub --ssl-key test.key --ssl-cert test.crt
+jupyterhub --ssl-key test.key --ssl-cert test.crt --debug
