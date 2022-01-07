@@ -13,8 +13,6 @@ c.JupyterHub.hub_ip = public_ips()[0] if len(public_ips()) else '127.0.0.1'
 c.ConfigurableHTTPProxy.command = [
     'configurable-http-proxy',
     f'--default-target=http://{c.JupyterHub.hub_ip}:8081']
-c.ConfigurableHTTPProxy.api_url = "http://127.0.0.1:8001"
-c.ConfigurableHTTPProxy.auth_token = new_token()
 
 c.JupyterHub.logo_file = os.path.join(
     os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
@@ -37,13 +35,6 @@ if setting_mode == 'virtual_user':
     # Uncomment this if you want to enable the use of the configuration
     # file for the spawned service, instead of using the defaults.
     # c.Spawner.config_file_path = 'remoteappmanager_config.py'
-
-    # As of jupyterhub>0.8.0, there's no convenient way to obtain a
-    # reference between the Spawner and ConfigurableHTTProxy objects
-    # during runtime, so we simply assign common traits once and do
-    # not expect them to change
-    c.Spawner.proxy_api_url = c.ConfigurableHTTPProxy.api_url
-    c.Spawner.proxy_auth_token = c.ConfigurableHTTPProxy.auth_token
 
     # FIXME: replace me with other authenticator (e.g. GitHub OAuth...)
     c.JupyterHub.authenticator_class = (
