@@ -219,7 +219,8 @@ class BaseApplication(web.Application, LoggingMixin):
     def patch_default_headers(self):
         if hasattr(RequestHandler, '_orig_set_default_headers'):
             return
-        RequestHandler._orig_set_default_headers = RequestHandler.set_default_headers
+        RequestHandler._orig_set_default_headers = RequestHandler.set_default_headers  # noqa: E501
+
         def set_jupyterhub_header(self):
             self._orig_set_default_headers()
             self.set_header('X-JupyterHub-Version', __version__)
