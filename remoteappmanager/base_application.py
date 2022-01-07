@@ -8,6 +8,7 @@ import tornado.ioloop
 from jupyterhub._version import __version__, _check_version
 from tornado.httpclient import AsyncHTTPClient
 from tornadowebapi.registry import Registry
+from tornado.web import RequestHandler
 
 from remoteappmanager.db.interfaces import ABCDatabase
 from remoteappmanager.logging.logging_mixin import LoggingMixin
@@ -88,6 +89,7 @@ class BaseApplication(web.Application, LoggingMixin):
         handlers = self._get_handlers()
 
         super().__init__(handlers, **settings)
+        self.patch_default_headers()
 
     # Initializers
     @default("container_manager")
@@ -213,6 +215,16 @@ class BaseApplication(web.Application, LoggingMixin):
 
         hub_version = resp.headers.get('X-JupyterHub-Version')
         _check_version(hub_version, __version__, self.log)
+
+    def patch_default_headers(self):
+        if hasattr(RequestHandler, '_orig_set_default_headers'):
+            return
+        RequestHandler._orig_set_default_headers = RequestHandler.set_default_headers
+        def set_jupyterhub_header(self):
+            self._orig_set_default_headers()
+            self.set_header('X-JupyterHub-Version', __version__)
+
+        RequestHandler.set_default_headers = set_jupyterhub_header
 
     # Private
     def _add_demo_apps(self, user):
