@@ -22,5 +22,5 @@ class AdminApplication(BaseApplication):
         return [
             (base_urlpath, AdminHomeHandler),
             (base_urlpath.rstrip('/'),
-             web.RedirectHandler, {"url": '/hub/user-redirect'}),
+             web.RedirectHandler, {"url": base_urlpath}),
         ]
