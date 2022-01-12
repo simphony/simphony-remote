@@ -22,5 +22,5 @@ class Application(BaseApplication):
             )+"/?", RegisterContainerHandler),
             (base_urlpath, UserHomeHandler),
             (base_urlpath.rstrip('/'), web.RedirectHandler, {
-                "url": base_urlpath}),
+                "url": '/hub/user-redirect'}),
         ]
