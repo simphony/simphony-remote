@@ -29,7 +29,7 @@ requirements = [
     "tornado>=4.3",
     "requests>=2.10.0",
     "escapism>=0.0.1",
-    "jinja2>=2.8",
+    "jinja2<3.1.0",
     "jupyter_client>=4.3.0",
     "click>=6.6",
     "tabulate>=0.7.5",
