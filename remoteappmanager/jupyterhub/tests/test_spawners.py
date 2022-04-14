@@ -163,6 +163,24 @@ class TestSystemUserSpawnerAsAdmin(TestSystemUserSpawner):
     def test_cmd(self):
         self.assertEqual(self.spawner.cmd, ['remoteappadmin'])
 
+    def test_cmd_user_session_override(self):
+        self.spawner.user_options = {"session": "user"}
+        self.assertEqual(self.spawner.cmd, ['remoteappmanager'])
+
+    def test_parse_options_from_form(self):
+        self.assertEqual(
+            self.spawner.options_from_form({}),
+            {"session": "admin"}
+        )
+        self.assertEqual(
+            self.spawner.options_from_form({"session": ["user"]}),
+            {"session": "user"}
+        )
+        self.assertEqual(
+            self.spawner.options_from_form({"session": ["admin"]}),
+            {"session": "admin"}
+        )
+
 
 class TestVirtualUserSpawner(TestSystemUserSpawner):
     def setUp(self):

@@ -8,6 +8,9 @@ from tornado import gen
 from jupyterhub.spawner import LocalProcessSpawner
 from jupyterhub import orm
 
+ADMIN_CMD = "remoteappadmin"
+USER_CMD = "remoteappmanager"
+
 
 class BaseSpawner(LocalProcessSpawner):
     """Base class that provides common infrastructure to
@@ -25,10 +28,11 @@ class BaseSpawner(LocalProcessSpawner):
     def cmd(self):
         """Overrides the base class traitlet so that we take full control
         of the spawned command according to user admin status"""
-
-        return (["remoteappadmin"]
-                if self.user.admin is True
-                else ["remoteappmanager"])
+        if not self.user.admin:
+            return [USER_CMD]
+        return ([ADMIN_CMD]
+                if self.user_options['session'] == "admin"
+                else [USER_CMD])
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -37,6 +41,35 @@ class BaseSpawner(LocalProcessSpawner):
         # containing potentially multiple proxies, but it's enforced to
         # contain only one.
         self.proxy = self.db.query(orm.Proxy).first()
+
+    def _options_form_default(self):
+        """ Gives admins the option of spawning either RemoteAppManager
+        admin or user sessions
+        """
+        if self.user.admin:
+            return """
+            <div>
+                Choose RemoteAppManager Session:
+                <select id="session_form" name="session" multiple="false>
+                    <option value="admin" selected>Admin<option/>
+                    <option value="user" selected>User<option/>
+                <select/>
+            <div/>
+            """
+        return ""
+
+    def _default_session(self):
+        return "admin" if self.user.admin else "user"
+
+    def _default_user_options(self):
+        return {"session": self._default_session()}
+
+    def options_from_form(self, form_data):
+        """ Attempt to extract session selection from HTML form and
+        return default session if not available
+        """
+        session = form_data.get("session", [self._default_session()])[0]
+        return {'session': session}
 
     def get_args(self):
         args = super().get_args()
