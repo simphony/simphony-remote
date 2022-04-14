@@ -25,7 +25,8 @@ write_version_py()
 
 with open('requirements.txt', 'r') as REQUIREMENTS:
     requirements = [
-        line for line in REQUIREMENTS.readlines() if not line.startswith('#')
+        line.strip() for line in REQUIREMENTS.readlines()
+        if not line.startswith('#')
     ]
 
 # Unfortunately RTD cannot install jupyterhub because jupyterhub needs bower,
