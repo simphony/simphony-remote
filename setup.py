@@ -23,17 +23,10 @@ def write_version_py():
 
 write_version_py()
 
-requirements = [
-    "setuptools>=21.0",
-    "traitlets>=4.1",
-    "tornado>=4.3",
-    "requests>=2.10.0",
-    "escapism>=0.0.1",
-    "jupyter_client>=4.3.0",
-    "click>=6.6",
-    "tabulate>=0.7.5",
-    "oauthenticator>=0.5",
-]
+with open('requirements.txt', 'r') as REQUIREMENTS:
+    requirements = [
+        line for line in REQUIREMENTS.readlines() if not line.startswith('#')
+    ]
 
 # Unfortunately RTD cannot install jupyterhub because jupyterhub needs bower,
 # and that is not available. We prevent the request for the unreleased jhub
@@ -43,6 +36,7 @@ requirements = [
 
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if on_rtd:
+    print("Using ReadTheDocs build requirement")
     # These are the dependencies of jupyterhub that we need to have in order
     # for our code to import on RTD.
     requirements.extend([
@@ -55,9 +49,9 @@ if on_rtd:
 else:
     requirements.extend([
         "jinja>=2.8",
-        "jupyterhub>0.7",
-        "docker-py==1.8",
-        "tornadowebapi>=0.5.0"])
+        # Pinned to jupyterhub 0.8.0.dev0 due to issues with spawners (fails with 0.8.0)
+        "git+http://github.com/jupyterhub/jupyterhub.git@2d1a45f0190059ef436c2f97dc8d6e391eb2d139#egg=jupyterhub",
+    ])
 
 
 class install(_install):
