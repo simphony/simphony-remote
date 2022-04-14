@@ -39,6 +39,8 @@ on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if on_rtd:
     # These are the dependencies of jupyterhub that we need to have in order
     # for our code to import on RTD.
+    requirements = [
+        dep for dep in requirements if not dep.startswith("jupyterhub")]
     requirements.extend([
         "sqlalchemy>=1.0",
         # Pinning jinja2 requirements when building on RTD due to
@@ -49,8 +51,6 @@ if on_rtd:
 else:
     requirements.extend([
         "jinja>=2.8",
-        # Pinned to jupyterhub 0.8.0.dev0 due to issues with spawners (fails with 0.8.0)
-        "jupyterhub @ git+http://github.com/jupyterhub/jupyterhub.git@2d1a45f0190059ef436c2f97dc8d6e391eb2d139#egg=jupyterhub",
     ])
 
 
