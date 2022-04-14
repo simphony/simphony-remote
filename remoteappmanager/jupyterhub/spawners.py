@@ -2,7 +2,7 @@ import os
 import escapism
 import string
 
-from traitlets import Any, Unicode
+from traitlets import Any, Unicode, default
 from tornado import gen
 
 from jupyterhub.spawner import LocalProcessSpawner
@@ -42,6 +42,7 @@ class BaseSpawner(LocalProcessSpawner):
         # contain only one.
         self.proxy = self.db.query(orm.Proxy).first()
 
+    @default("options_form")
     def _options_form_default(self):
         """ Gives admins the option of spawning either RemoteAppManager
         admin or user sessions
@@ -61,6 +62,7 @@ class BaseSpawner(LocalProcessSpawner):
     def _default_session(self):
         return "admin" if self.user.admin else "user"
 
+    @default("user_options")
     def _default_user_options(self):
         return {"session": self._default_session()}
 
