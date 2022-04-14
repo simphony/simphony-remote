@@ -4,9 +4,32 @@ from selenium.webdriver.common.by import By
 
 
 class AdminDriverTest(RemoteAppDriverTest):
+
+    def admin_login(self):
+        """ Login as am admin user. We assume that if you use this routine,
+        you are currently on the login page.
+        """
+        self.login("admin")
+
+        self.click_first_element_located(By.ID, "start")
+        self.click_first_element_located(By.CSS_SELECTOR, "input.btn")
+        self.click_first_element_located(By.ID, "start")
+
+    def admin_logout(self):
+        """ Admin Logout. Ensures user session is stopped before performing logout.
+        This action should be generally used whenever the Spawner options form is
+        presented during logins so that it is correctly displayed for the next test
+        runner.
+        """
+        self.driver.get(self.base_url + "/home")
+
+        self.click_first_element_located(By.ID, "stop")
+        self.click_first_element_located(By.ID, "logout")
+        self.wait_until_text_inside_element_located(By.CSS_SELECTOR, "div.auth-form-header", "Sign in")
+
     def setUp(self):
         RemoteAppDriverTest.setUp(self)
-        self.login("admin")
+        self.admin_login()
 
     def wait_until_visibility_of_row(self, row):
         """ Wait until a specific row is visible
@@ -80,5 +103,5 @@ class AdminDriverTest(RemoteAppDriverTest):
         )
 
     def tearDown(self):
-        self.logout()
+        self.admin_login()
         RemoteAppDriverTest.tearDown(self)
