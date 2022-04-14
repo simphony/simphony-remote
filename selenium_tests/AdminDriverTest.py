@@ -6,8 +6,9 @@ from selenium.webdriver.common.by import By
 class AdminDriverTest(RemoteAppDriverTest):
 
     def admin_login(self):
-        """ Login as am admin user. We assume that if you use this routine,
-        you are currently on the login page.
+        """ Login as an admin user. Handles both entering admin credentials
+        and selecting appropriate Spawner options. We assume that if you
+        use this routine, you are currently on the login page.
         """
         self.login("admin")
 
@@ -103,5 +104,5 @@ class AdminDriverTest(RemoteAppDriverTest):
         )
 
     def tearDown(self):
-        self.admin_login()
+        self.admin_logout()
         RemoteAppDriverTest.tearDown(self)
