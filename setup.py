@@ -36,11 +36,10 @@ with open('requirements.txt', 'r') as REQUIREMENTS:
 
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if on_rtd:
-    print("Using ReadTheDocs build requirement")
     # These are the dependencies of jupyterhub that we need to have in order
     # for our code to import on RTD.
     requirements.extend([
-        "sqlalchemy>=1.0"
+        "sqlalchemy>=1.0",
         # Pinning jinja2 requirements when building on RTD due to
         # regression when using old versions of sphinx<2
         # https://github.com/readthedocs/readthedocs.org/issues/9037
