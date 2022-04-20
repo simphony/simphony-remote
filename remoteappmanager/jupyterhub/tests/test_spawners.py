@@ -10,8 +10,7 @@ from tornado.testing import AsyncTestCase
 from jupyterhub import orm
 
 from remoteappmanager.jupyterhub.spawners import (
-    SystemUserSpawner,
-    VirtualUserSpawner)
+    ADMIN_CMD, USER_CMD, SystemUserSpawner, VirtualUserSpawner)
 from remoteappmanager.tests import fixtures
 from remoteappmanager.tests.temp_mixin import TempMixin
 
@@ -164,21 +163,21 @@ class TestSystemUserSpawnerAsAdmin(TestSystemUserSpawner):
         self.assertEqual(self.spawner.cmd, ['remoteappadmin'])
 
     def test_cmd_user_session_override(self):
-        self.spawner.user_options = {"session": "user"}
+        self.spawner.user_options = {"cmd": USER_CMD}
         self.assertEqual(self.spawner.cmd, ['remoteappmanager'])
 
     def test_parse_options_from_form(self):
         self.assertEqual(
             self.spawner.options_from_form({}),
-            {"session": "admin"}
+            {"cmd": ADMIN_CMD}
         )
         self.assertEqual(
             self.spawner.options_from_form({"session": ["user"]}),
-            {"session": "user"}
+            {"cmd": USER_CMD}
         )
         self.assertEqual(
             self.spawner.options_from_form({"session": ["admin"]}),
-            {"session": "admin"}
+            {"cmd": ADMIN_CMD}
         )
 
 

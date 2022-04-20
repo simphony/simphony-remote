@@ -28,11 +28,7 @@ class BaseSpawner(LocalProcessSpawner):
     def cmd(self):
         """Overrides the base class traitlet so that we take full control
         of the spawned command according to user admin status"""
-        if not self.user.admin:
-            return [USER_CMD]
-        return ([ADMIN_CMD]
-                if self.user_options['session'] == "admin"
-                else [USER_CMD])
+        return self.user_options.get('cmd', self._default_cmd())
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -59,19 +55,17 @@ class BaseSpawner(LocalProcessSpawner):
             """
         return ""
 
-    def _default_session(self):
-        return "admin" if self.user.admin else "user"
-
-    @default("user_options")
-    def _default_user_options(self):
-        return {"session": self._default_session()}
+    def _default_cmd(self):
+        return ADMIN_CMD if self.user.admin else USER_CMD
 
     def options_from_form(self, form_data):
         """ Attempt to extract session selection from HTML form and
         return default session if not available
         """
-        session = form_data.get("session", [self._default_session()])[0]
-        return {'session': session}
+        cmd = self._default_cmd()
+        if "session" in form_data:
+            cmd = ADMIN_CMD if form_data.pop("session")[0] == "admin" else USER_CMD
+        return {'cmd': cmd}
 
     def get_args(self):
         args = super().get_args()
