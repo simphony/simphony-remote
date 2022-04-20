@@ -3,6 +3,8 @@ from oauthenticator import GitHubOAuthenticator
 from traitlets.config import LoggingConfigurable
 from traitlets import Unicode, Float, Set
 
+from .simphony_remote_auth_mixin import SimphonyRemoteAuthMixin
+
 
 class FileWhitelistMixin(LoggingConfigurable):
     """
@@ -59,7 +61,8 @@ class FileWhitelistMixin(LoggingConfigurable):
         pass
 
 
-class GitHubWhitelistAuthenticator(FileWhitelistMixin, GitHubOAuthenticator):
+class GitHubWhitelistAuthenticator(
+        SimphonyRemoteAuthMixin, FileWhitelistMixin, GitHubOAuthenticator):
     """A github authenticator that also verifies that the
     user belongs to a specified whitelisted user as provided
     by an external file (so that we don't have to restart

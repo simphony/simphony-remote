@@ -4,9 +4,21 @@ from selenium.webdriver.common.by import By
 
 
 class AdminDriverTest(RemoteAppDriverTest):
+
+    def admin_login(self):
+        """ Login as an admin user. Handles both entering admin credentials
+        and selecting appropriate Spawner options. We assume that if you
+        use this routine, you are currently on the login page.
+        """
+        self.login("admin")
+
+        self.click_first_element_located(By.ID, "start")
+        self.click_first_element_located(By.CSS_SELECTOR, "input.btn")
+        self.click_first_element_located(By.ID, "start")
+
     def setUp(self):
         RemoteAppDriverTest.setUp(self)
-        self.login("admin")
+        self.admin_login()
 
     def wait_until_visibility_of_row(self, row):
         """ Wait until a specific row is visible

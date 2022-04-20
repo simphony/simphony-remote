@@ -10,8 +10,7 @@ from tornado.testing import AsyncTestCase
 from jupyterhub import proxy, orm, objects
 
 from remoteappmanager.jupyterhub.spawners import (
-    SystemUserSpawner,
-    VirtualUserSpawner)
+    ADMIN_CMD, USER_CMD, SystemUserSpawner, VirtualUserSpawner)
 from remoteappmanager.tests import fixtures
 from remoteappmanager.tests.temp_mixin import TempMixin
 
@@ -113,7 +112,7 @@ class TestSystemUserSpawner(TempMixin, AsyncTestCase):
         self.assertIn("--base-urlpath=\"/\"", args)
 
     def test_cmd(self):
-        self.assertEqual(self.spawner.cmd, ['remoteappmanager'])
+        self.assertEqual(self.spawner.cmd, [USER_CMD])
 
     def test_default_config_file_path(self):
         self.assertEqual(self.spawner.config_file_path, "")
@@ -180,7 +179,25 @@ class TestSystemUserSpawnerAsAdmin(TestSystemUserSpawner):
         self.spawner.user.admin = True
 
     def test_cmd(self):
-        self.assertEqual(self.spawner.cmd, ['remoteappadmin'])
+        self.assertEqual(self.spawner.cmd, [ADMIN_CMD])
+
+    def test_cmd_user_session_override(self):
+        self.spawner.user_options = {"cmd": [USER_CMD]}
+        self.assertEqual(self.spawner.cmd, [USER_CMD])
+
+    def test_parse_options_from_form(self):
+        self.assertEqual(
+            self.spawner.options_from_form({}),
+            {"cmd": [ADMIN_CMD]}
+        )
+        self.assertEqual(
+            self.spawner.options_from_form({"session": ["user"]}),
+            {"cmd": [USER_CMD]}
+        )
+        self.assertEqual(
+            self.spawner.options_from_form({"session": ["admin"]}),
+            {"cmd": [ADMIN_CMD]}
+        )
 
 
 class TestVirtualUserSpawner(TestSystemUserSpawner):

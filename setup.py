@@ -23,19 +23,6 @@ def write_version_py():
 
 write_version_py()
 
-requirements = [
-    "setuptools>=21.0",
-    "traitlets>=4.1",
-    "tornado>=4.3",
-    "requests>=2.10.0",
-    "escapism>=0.0.1",
-    "jinja2>=2.8",
-    "jupyter_client>=4.3.0",
-    "click>=6.6",
-    "tabulate>=0.7.5",
-    "oauthenticator>=0.5",
-]
-
 # Unfortunately RTD cannot install jupyterhub because jupyterhub needs bower,
 # and that is not available. We prevent the request for the unreleased jhub
 # by skipping it if we are on RTD
@@ -46,12 +33,28 @@ on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if on_rtd:
     # These are the dependencies of jupyterhub that we need to have in order
     # for our code to import on RTD.
-    requirements.extend(["sqlalchemy>=1.0"])
+    requirements = [
+        "setuptools>=21.0",
+        "traitlets>=4.1",
+        "tornado>=4.3",
+        "requests>=2.10.0",
+        "escapism>=0.0.1",
+        "jupyter_client>=4.3.0",
+        "click>=6.6",
+        "tabulate>=0.7.5",
+        "oauthenticator>=0.5",
+        "sqlalchemy>=1.0",
+        # Pinning jinja2 requirements when building on RTD due to
+        # regression when using old versions of sphinx<2
+        # https://github.com/readthedocs/readthedocs.org/issues/9037
+        "jinja2<3.1.0",
+    ]
 else:
-    requirements.extend([
-        "jupyterhub>0.8",
-        "docker-py==1.8",
-        "tornadowebapi>=0.5.0"])
+    with open('requirements.txt', 'r') as REQUIREMENTS:
+        requirements = [
+            line.strip() for line in REQUIREMENTS.readlines()
+            if not line.startswith('#')
+        ]
 
 
 class install(_install):
