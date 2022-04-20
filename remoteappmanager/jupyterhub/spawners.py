@@ -28,7 +28,7 @@ class BaseSpawner(LocalProcessSpawner):
     def cmd(self):
         """Overrides the base class traitlet so that we take full control
         of the spawned command according to user admin status"""
-        return self.user_options.get('cmd', self._default_cmd())
+        return [self.user_options.get('cmd', self._default_cmd())]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
