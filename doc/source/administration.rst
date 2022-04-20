@@ -10,10 +10,13 @@ applications, and authorize users to run specific applications. It is also possi
 currently running containers
 
     **NOTE**: the existing "Admin" or "User" session must be shut down before the options form
-    will be shown again. This is a JupyterHub-level operation and is not automatically performed
-    upon logging out. Therefore it must be manually carried out by either navigating to
+    will be shown again. This is a JupyterHub-level operation and is not performed by default
+    upon logging out. Typically it must be manually carried out by either navigating to
     ``https://<simphony-remote>/hub/admin`` or ``https://<simphony-remote>/hub/home`` whilst logged
-    in and selecting the appropriate the "Stop My Sever" option.
+    in and selecting the appropriate the "Stop My Sever" option. For convenience we provide a custom
+    logout handler that automatically shuts down sessions upon an administrator sign out. This can be
+    used with any ``jupyterhub.auth.Authenticator`` subclass via inheriting the
+    ``remoteappmanager.jupyterhub.auth.SimphonyRemoteAuthMixin`` mixin.
 
 It is important to note that the administrative interface works only with
 accounting backends supporting addition and removal. More specifically, it
