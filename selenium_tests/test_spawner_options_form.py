@@ -32,7 +32,7 @@ class TestSpawnerOptionsForm(RemoteAppDriverTest):
 
         self.click_first_element_located(By.ID, "start")
         self.click_first_element_located(
-            By.CSS_SELECTOR, "# spawner_form > options:nth-child(2)")
+            By.CSS_SELECTOR, "#session_form > option:nth-child(2)")
         self.click_first_element_located(By.CSS_SELECTOR, "input.btn")
         self.click_first_element_located(By.ID, "start")
 
