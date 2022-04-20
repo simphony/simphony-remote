@@ -16,18 +16,6 @@ class AdminDriverTest(RemoteAppDriverTest):
         self.click_first_element_located(By.CSS_SELECTOR, "input.btn")
         self.click_first_element_located(By.ID, "start")
 
-    def admin_logout(self):
-        """ Admin Logout. Ensures user session is stopped before performing logout.
-        This action should be generally used whenever the Spawner options form is
-        presented during logins so that it is correctly displayed for the next test
-        runner.
-        """
-        self.driver.get(self.base_url + "/home")
-
-        self.click_first_element_located(By.ID, "stop")
-        self.click_first_element_located(By.ID, "logout")
-        self.wait_until_text_inside_element_located(By.CSS_SELECTOR, "div.auth-form-header", "Sign in")
-
     def setUp(self):
         RemoteAppDriverTest.setUp(self)
         self.admin_login()
@@ -104,5 +92,5 @@ class AdminDriverTest(RemoteAppDriverTest):
         )
 
     def tearDown(self):
-        self.admin_logout()
+        self.logout()
         RemoteAppDriverTest.tearDown(self)
