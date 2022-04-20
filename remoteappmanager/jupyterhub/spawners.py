@@ -50,8 +50,8 @@ class BaseSpawner(LocalProcessSpawner):
         if self.user.admin:
             return """
             <div>
-                Choose RemoteAppManager Session:
-                <select id="session_form" name="session" multiple="false">
+                <label for="session">Choose RemoteAppManager Session:</label>
+                <select id="session_form" name="session" size="2">
                     <option value="admin" selected>Admin</option>
                     <option value="user">User</option>
                 </select>
