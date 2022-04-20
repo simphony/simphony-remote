@@ -51,11 +51,11 @@ class BaseSpawner(LocalProcessSpawner):
             return """
             <div>
                 Choose RemoteAppManager Session:
-                <select id="session_form" name="session" multiple="false>
-                    <option value="admin" selected>Admin<option/>
-                    <option value="user" selected>User<option/>
-                <select/>
-            <div/>
+                <select id="session_form" name="session" multiple="false">
+                    <option value="admin" selected>Admin</option>
+                    <option value="user">User</option>
+                </select>
+            </div>
             """
         return ""
 
