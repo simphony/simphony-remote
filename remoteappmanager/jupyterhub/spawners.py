@@ -2,11 +2,14 @@ import os
 import escapism
 import string
 
-from traitlets import Any, Unicode
+from traitlets import Any, Unicode, default
 from tornado import gen
 
 from jupyterhub.spawner import LocalProcessSpawner
 from jupyterhub import orm
+
+ADMIN_CMD = "remoteappadmin"
+USER_CMD = "remoteappmanager"
 
 
 class BaseSpawner(LocalProcessSpawner):
@@ -25,10 +28,7 @@ class BaseSpawner(LocalProcessSpawner):
     def cmd(self):
         """Overrides the base class traitlet so that we take full control
         of the spawned command according to user admin status"""
-
-        return (["remoteappadmin"]
-                if self.user.admin is True
-                else ["remoteappmanager"])
+        return self.user_options.get('cmd', self._default_cmd())
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -37,6 +37,36 @@ class BaseSpawner(LocalProcessSpawner):
         # containing potentially multiple proxies, but it's enforced to
         # contain only one.
         self.proxy = self.db.query(orm.Proxy).first()
+
+    @default("options_form")
+    def _options_form_default(self):
+        """ Gives admins the option of spawning either RemoteAppManager
+        admin or user sessions
+        """
+        if self.user.admin:
+            return """
+            <div>
+                <label for="session">Choose RemoteAppManager Session:</label>
+                <select id="session_form" name="session" size="2">
+                    <option value="admin" selected>Admin</option>
+                    <option value="user">User</option>
+                </select>
+            </div>
+            """
+        return ""
+
+    def _default_cmd(self):
+        return [ADMIN_CMD] if self.user.admin else [USER_CMD]
+
+    def options_from_form(self, form_data):
+        """ Attempt to extract session selection from HTML form and
+        return default session if not available
+        """
+        cmd = self._default_cmd()
+        if "session" in form_data:
+            selected = form_data.pop("session")[0]
+            cmd = [ADMIN_CMD] if selected == "admin" else [USER_CMD]
+        return {'cmd': cmd}
 
     def get_args(self):
         args = super().get_args()

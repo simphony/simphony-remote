@@ -5,8 +5,10 @@ from tornado import gen
 
 from jupyterhub.auth import Authenticator
 
+from .simphony_remote_auth_mixin import SimphonyRemoteAuthMixin
 
-class WorldAuthenticator(Authenticator):
+
+class WorldAuthenticator(SimphonyRemoteAuthMixin, Authenticator):
     """ This authenticator authenticates everyone """
 
     @gen.coroutine

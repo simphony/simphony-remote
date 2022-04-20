@@ -37,8 +37,8 @@ Administration capabilities are decided by jupyterhub, not remoteappmanager.
     c.Authenticator.admin_users = {"admin"}
 
 Note that the entry must be a python set. Users in this set will, once logged
-in, reach an administrative interface, instead of the docker application
-management.
+in, be able to launch an administrative interface in addition to the standard
+docker application management.
 
 .. _config_remoteappmanager:
 

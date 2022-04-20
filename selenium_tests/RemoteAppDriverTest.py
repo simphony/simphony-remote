@@ -247,15 +247,15 @@ class RemoteAppDriverTest(unittest.TestCase):
     def login(self, username="test"):
         """ Login as a given user name. We assume that if you use this routine,
         you are currently on the login page.
+
         Parameters
         ----------
         username: String
-            The name of the user, it can be "admin" if you want to login as admin.
+            The name of the user, it is not expected to be an admin.
 
         Example:
         --------
         login("JohnDoe")
-        login("admin")
         """
         self.driver.get(self.base_url + "/hub/login")
 
