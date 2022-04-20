@@ -1,8 +1,14 @@
+from tornado import gen
+
 from jupyterhub.handlers import LogoutHandler as _LogoutHandler
 from jupyterhub.handlers import LoginHandler
 
 
 class LogoutHandler(_LogoutHandler):
+    """ Custom logout handler that also closes servers of admin
+    users, so that spawner options form will be shown during every login
+    """
+    @gen.coroutine
     def get(self):
         user = self.get_current_user()
         if user:
@@ -13,7 +19,7 @@ class LogoutHandler(_LogoutHandler):
             #  once running on jupyterhub>=1.0.0
             if user.admin and user.spawner is not None:
                 self.log.info(f"Shutting down {user.name}'s server")
-                self.stop_single_user(user)
+                yield gen.maybe_future(self.stop_single_user(user))
             self.log.info("User logged out: %s", user.name)
             self.clear_login_cookie()
             for name in user.other_user_cookies:
