@@ -14,7 +14,10 @@ class Authenticator:
 
 class HubAuthenticator(Authenticator):
     """Authenticator that uses the remote JupyterHub to validate
-    the request."""
+    the request.
+
+    Deprecated as of remoteappmanager 2.2.0
+    """
     @classmethod
     @gen.coroutine
     def authenticate(cls, handler):
@@ -30,5 +33,25 @@ class HubAuthenticator(Authenticator):
             user_data = (yield hub.verify_token(cookie_name, user_cookie))
             if user_data.get('name', '') == webapp.user.name:
                 user = webapp.user
+
+        return user
+
+
+class HubOAuthenticator(Authenticator):
+    """Authenticator that uses the remote JupyterHub as an OAuth
+    provider to validate the request."""
+    @classmethod
+    @gen.coroutine
+    def authenticate(cls, handler):
+        # Authenticate the user against the hub. Expects the handler
+        # to inherit from the jupyterhub.services.auth.HubOAuthenticated
+        # mixin
+        webapp = handler.application
+        hub_auth = webapp.hub
+        user = None
+
+        user_data = hub_auth.get_user(handler)
+        if user_data.get('name', '') == webapp.user.name:
+            user = webapp.user
 
         return user
