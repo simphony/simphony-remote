@@ -47,10 +47,10 @@ class HubOAuthenticator(Authenticator):
         # to inherit from the jupyterhub.services.auth.HubOAuthenticated
         # mixin
         webapp = handler.application
-        hub_auth = webapp.hub
+        hub = webapp.hub
         user = None
 
-        user_data = hub_auth.get_user(handler)
+        user_data = hub.get_user(handler)
         if user_data.get('name', '') == webapp.user.name:
             user = webapp.user
 

@@ -1,13 +1,11 @@
 import importlib
 from secrets import token_urlsafe
-from urllib.parse import urlparse
 
 from traitlets import Instance, default
 from tornado import web, gen
 import tornado.ioloop
 
 from jupyterhub._version import __version__, _check_version
-from jupyterhub.services.auth import HubOAuth, HubOAuthCallbackHandler
 from tornado.httpclient import AsyncHTTPClient
 from tornadowebapi.registry import Registry
 from tornado.web import RequestHandler
@@ -18,7 +16,7 @@ from remoteappmanager.docker.container_manager import ContainerManager
 from remoteappmanager.handlers.handler_authenticator import HubOAuthenticator
 from remoteappmanager.user import User
 from remoteappmanager.traitlets import as_dict
-from remoteappmanager.services.hub import Hub
+from remoteappmanager.services.hub import HubOAuth
 from remoteappmanager.services.reverse_proxy import ReverseProxy
 
 
@@ -42,12 +40,8 @@ class BaseApplication(web.Application, LoggingMixin):
     #: API access to the configurable-http-proxy
     reverse_proxy = Instance(ReverseProxy)
 
-    #: API access to jupyterhub (for auth requests)
-    #: Deprecated as of remoteappmanager 2.2.0
-    hub = Instance(Hub)
-
     #: API access to JupyterHub for OAuth requests
-    hub_auth = Instance(HubOAuth)
+    hub = Instance(HubOAuth)
 
     #: Manages the docker interface
     container_manager = Instance(ContainerManager)
@@ -102,12 +96,6 @@ class BaseApplication(web.Application, LoggingMixin):
         super().__init__(handlers, **settings)
         self.patch_default_headers()
 
-        # Add callback url to enable OAuth with JupyterHub
-        self.add_handlers(r".*$", [(
-            urlparse(self.hub_auth.oauth_redirect_uri).path,
-            HubOAuthCallbackHandler
-        )])
-
     # Initializers
     @default("container_manager")
     def _container_manager_default(self):
@@ -127,8 +115,8 @@ class BaseApplication(web.Application, LoggingMixin):
             api_token=self.environment_config.proxy_api_token,
         )
 
-    @default("hub_auth")
-    def _hub_auth_default(self):
+    @default("hub")
+    def _hub_default(self):
         """Initializes the HubOAuth instance used to authenticate with
         JupyterHub.
         """
@@ -138,16 +126,6 @@ class BaseApplication(web.Application, LoggingMixin):
             base_url=self.command_line_config.base_urlpath,
             hub_prefix=self.command_line_config.hub_prefix,
         )
-
-    @default("hub")
-    def _hub_default(self):
-        """Initializes the Hub instance.
-
-        Deprecated as of remoteappmanager 2.2.0
-        """
-        return Hub(endpoint_url=self.environment_config.hub_api_url,
-                   api_token=self.environment_config.jpy_api_token,
-                   )
 
     @default("db")
     def _db_default(self):
@@ -297,6 +275,7 @@ class BaseApplication(web.Application, LoggingMixin):
     def _get_handlers(self):
         """Returns the registered handlers"""
         base_urlpath = self.command_line_config.base_urlpath
+        web_auth = self.hub.callback_handlers()
         web_api = self.registry.api_handlers(base_urlpath)
         web_handlers = self._web_handlers()
-        return web_api+web_handlers
+        return web_auth+web_api+web_handlers

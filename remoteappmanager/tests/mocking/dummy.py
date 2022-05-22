@@ -219,6 +219,7 @@ def create_hub(params=None):
     hub = Hub(**params)
 
     hub.verify_token = mock_coro_factory({})
+    hub.callback_handlers = lambda: []
     return hub
 
 
