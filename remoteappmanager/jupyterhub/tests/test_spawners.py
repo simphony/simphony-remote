@@ -84,7 +84,8 @@ def new_spawner(spawner_class):
         user=user,
         orm_spawner=orm_spawner,
         hub=hub,
-        authenticator=authenticator
+        authenticator=authenticator,
+        api_token="dummy_token"
     )
 
 
@@ -131,7 +132,8 @@ class TestSystemUserSpawner(TempMixin, AsyncTestCase):
 
     def test_cmd_spawning(self):
         env = os.environ.copy()
-        env["PROXY_API_TOKEN"] = "dummy_token"
+        env["JUPYTERHUB_API_TOKEN"] = "dummy_token"
+        env["JUPYTERHUB_API_URL"] = 'http://172.17.5.167:8081/hub/api'
         path = fixtures.get("remoteappmanager_config.py")
         self.spawner.config_file_path = path
 
