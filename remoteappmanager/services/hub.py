@@ -4,8 +4,8 @@ from tornado import gen, escape
 from tornado.httpclient import AsyncHTTPClient
 from traitlets import HasTraits, Unicode
 
-from jupyterhub.services.auth import HubOAuth as _HubOAuth
-from jupyterhub.services.auth import HubOAuthCallbackHandler
+from jupyterhub.services.auth import (
+    HubOAuth, HubOAuthCallbackHandler)
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.utils import url_path_join
@@ -19,6 +19,10 @@ class Hub(LoggingMixin, HasTraits):
 
     #: The api token to authenticate the request
     api_token = Unicode()
+
+    base_url = Unicode()
+
+    hub_prefix = Unicode()
 
     def __init__(self, *args, **kwargs):
         """Initializes the hub connection object."""
@@ -35,6 +39,13 @@ class Hub(LoggingMixin, HasTraits):
                        "the hub connection.")
             self.log.error(message)
             raise ValueError(message)
+
+        self._hub_auth = HubOAuth(
+            hub_api_url=self.endpoint_url,
+            api_token=self.api_token,
+            base_url=self.base_url,
+            hub_prefix=self.hub_prefix,
+        )
 
     @gen.coroutine
     def verify_token(self, cookie_name, encrypted_cookie):
@@ -73,49 +84,6 @@ class Hub(LoggingMixin, HasTraits):
         else:
             return {}
 
-
-class HubOAuth(LoggingMixin, HasTraits):
-    """Provides access to JupyterHub OAuth authenticator services."""
-
-    #: The url at which the Hub can be reached
-    hub_api_url = Unicode()
-
-    #: The api token to authenticate the request
-    api_token = Unicode()
-
-    base_url = Unicode()
-
-    hub_prefix = Unicode()
-
-    def __init__(self, *args, **kwargs):
-        """Initializes the hub connection object."""
-        super().__init__(*args, **kwargs)
-
-        if not self.api_token:
-            message = ("Invalid API Token to initialise "
-                       "the hub connection.")
-            self.log.error(message)
-            raise ValueError(message)
-
-        if not self.hub_api_url:
-            message = ("Invalid API url to initialise "
-                       "the hub connection.")
-            self.log.error(message)
-            raise ValueError(message)
-
-        if not self.base_url:
-            message = ("Invalid base url to query "
-                       "the hub connection.")
-            self.log.error(message)
-            raise ValueError(message)
-
-        self._hub_auth = _HubOAuth(
-            hub_api_url=self.hub_api_url,
-            api_token=self.api_token,
-            base_url=self.base_url,
-            hub_prefix=self.hub_prefix,
-        )
-
     @gen.coroutine
     def get_user(self, handler):
         """Verify the authentication details present in the handler
@@ -137,7 +105,8 @@ class HubOAuth(LoggingMixin, HasTraits):
         return self._hub_auth.get_user(handler)
 
     def callback_handlers(self):
-        # Add callback url to enable OAuth with JupyterHub
+        """Add callback url to enable OAuth with JupyterHub
+        """
         return [(
             urlparse(self._hub_auth.oauth_redirect_uri).path,
             HubOAuthCallbackHandler

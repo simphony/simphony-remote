@@ -16,7 +16,7 @@ from remoteappmanager.docker.container_manager import ContainerManager
 from remoteappmanager.handlers.handler_authenticator import HubOAuthenticator
 from remoteappmanager.user import User
 from remoteappmanager.traitlets import as_dict
-from remoteappmanager.services.hub import HubOAuth
+from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
 
 
@@ -41,7 +41,7 @@ class BaseApplication(web.Application, LoggingMixin):
     reverse_proxy = Instance(ReverseProxy)
 
     #: API access to JupyterHub for OAuth requests
-    hub = Instance(HubOAuth)
+    hub = Instance(Hub)
 
     #: Manages the docker interface
     container_manager = Instance(ContainerManager)
@@ -117,10 +117,10 @@ class BaseApplication(web.Application, LoggingMixin):
 
     @default("hub")
     def _hub_default(self):
-        """Initializes the HubOAuth instance used to authenticate with
+        """Initializes the Hub instance used to authenticate with
         JupyterHub.
         """
-        return HubOAuth(
+        return Hub(
             hub_api_url=self.environment_config.hub_api_url,
             api_token=self.environment_config.jpy_api_token,
             base_url=self.command_line_config.base_urlpath,
@@ -275,6 +275,7 @@ class BaseApplication(web.Application, LoggingMixin):
     def _get_handlers(self):
         """Returns the registered handlers"""
         base_urlpath = self.command_line_config.base_urlpath
+        # Must include callback handlers to complete OAuth flow
         web_auth = self.hub.callback_handlers()
         web_api = self.registry.api_handlers(base_urlpath)
         web_handlers = self._web_handlers()
