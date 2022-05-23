@@ -14,14 +14,16 @@ from remoteappmanager.utils import url_path_join
 class Hub(LoggingMixin, HasTraits):
     """Provides access to JupyterHub authenticator services."""
 
-    #: The url at which the Hub can be reached
+    #: The url at which the JupyterHub can be reached
     endpoint_url = Unicode()
 
     #: The api token to authenticate the request
     api_token = Unicode()
 
+    #: The base urlpath for the current user.
     base_url = Unicode()
 
+    #: The url prefix of the JupyterHub
     hub_prefix = Unicode()
 
     def __init__(self, *args, **kwargs):
@@ -40,6 +42,7 @@ class Hub(LoggingMixin, HasTraits):
             self.log.error(message)
             raise ValueError(message)
 
+        # Create connection to JupyterHub's OAuth services
         self._hub_auth = HubOAuth(
             hub_api_url=self.endpoint_url,
             api_token=self.api_token,
@@ -51,6 +54,8 @@ class Hub(LoggingMixin, HasTraits):
     def verify_token(self, cookie_name, encrypted_cookie):
         """Verify the authentication token and grants access to the user
         if verified.
+
+        Deprecated as of remoteappmanager 2.2.0
 
         Parameters
         ----------

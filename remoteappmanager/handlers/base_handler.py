@@ -12,7 +12,8 @@ from remoteappmanager.handlers.handler_authenticator import HubOAuthenticator
 class BaseHandler(web.RequestHandler, HubOAuthenticated, LoggingMixin):
     """Base class for the request handler."""
 
-    #: The authenticator that is used to recognize the user.
+    #: The authenticator that is used by tornadowebapi to recognize
+    #: the user.
     authenticator = HubOAuthenticator
 
     @web.authenticated

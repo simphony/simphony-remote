@@ -40,7 +40,7 @@ class BaseApplication(web.Application, LoggingMixin):
     #: API access to the configurable-http-proxy
     reverse_proxy = Instance(ReverseProxy)
 
-    #: API access to JupyterHub for OAuth requests
+    #: API access to JupyterHub for requests
     hub = Instance(Hub)
 
     #: Manages the docker interface
