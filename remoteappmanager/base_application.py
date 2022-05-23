@@ -121,7 +121,7 @@ class BaseApplication(web.Application, LoggingMixin):
         JupyterHub.
         """
         return Hub(
-            hub_api_url=self.environment_config.hub_api_url,
+            endpoint_url=self.environment_config.hub_api_url,
             api_token=self.environment_config.jpy_api_token,
             base_url=self.command_line_config.base_urlpath,
             hub_prefix=self.command_line_config.hub_prefix,
