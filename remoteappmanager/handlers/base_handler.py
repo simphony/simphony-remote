@@ -29,7 +29,8 @@ class BaseHandler(HubOAuthenticated, web.RequestHandler, LoggingMixin):
         # Authenticate the user against the hub.
         self.current_user = yield self.authenticator.authenticate(self)
         if self.current_user is None:
-            self.log.warn("Failed to authenticate user session with JupyterHub")
+            self.log.warn(
+                "Failed to authenticate user session with JupyterHub")
 
     def render(self, template_name, **kwargs):
         """Reimplements render to pass well known information to the rendering
