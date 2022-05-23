@@ -50,7 +50,7 @@ class HubOAuthenticator(Authenticator):
         hub = webapp.hub
         user = None
 
-        user_data = hub.get_user(handler)
+        user_data = yield hub.get_user(handler)
         if user_data.get('name', '') == webapp.user.name:
             user = webapp.user
 

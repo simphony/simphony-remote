@@ -9,7 +9,7 @@ from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.handlers.handler_authenticator import HubOAuthenticator
 
 
-class BaseHandler(web.RequestHandler, HubOAuthenticated, LoggingMixin):
+class BaseHandler(HubOAuthenticated, web.RequestHandler, LoggingMixin):
     """Base class for the request handler."""
 
     #: The authenticator that is used by tornadowebapi to recognize
@@ -28,6 +28,8 @@ class BaseHandler(web.RequestHandler, HubOAuthenticated, LoggingMixin):
 
         # Authenticate the user against the hub.
         self.current_user = yield self.authenticator.authenticate(self)
+        if self.current_user is None:
+            self.log.warn("Failed to authenticate user session with JupyterHub")
 
     def render(self, template_name, **kwargs):
         """Reimplements render to pass well known information to the rendering

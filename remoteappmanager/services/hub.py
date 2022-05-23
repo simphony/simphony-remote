@@ -105,7 +105,7 @@ class Hub(LoggingMixin, HasTraits):
         user_data : dict
             If authentication is successful, user_data contains the user's
             information from jupyterhub associated with the given encrypted
-            cookie.  Otherwise the dictionary is empty.
+            cookie. Otherwise the dictionary is empty.
         """
         return self._hub_auth.get_user(handler)
 
