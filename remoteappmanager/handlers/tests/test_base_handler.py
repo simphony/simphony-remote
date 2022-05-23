@@ -17,7 +17,7 @@ class TestBaseHandler(TempMixin, AsyncHTTPTestCase):
         file_config = self.get_file_config()
 
         app = dummy.create_application(file_config=file_config)
-        app.hub.verify_token.return_value = {
+        app.hub.get_user.return_value = {
             'pending': None,
             'name': app.settings['user'],
             'admin': False,

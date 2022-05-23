@@ -7,7 +7,7 @@ from remoteappmanager.tests.temp_mixin import TempMixin
 class TestUserHomeHandler(TempMixin, AsyncHTTPTestCase):
     def get_app(self):
         app = dummy.create_application()
-        app.hub.verify_token.return_value = {
+        app.hub.get_user.return_value = {
             'pending': None,
             'name': app.settings['user'],
             'admin': False,
@@ -25,7 +25,7 @@ class TestUserHomeHandler(TempMixin, AsyncHTTPTestCase):
         self.assertIn("applist", str(res.body))
 
     def test_failed_auth(self):
-        self._app.hub.verify_token.return_value = {}
+        self._app.hub.get_user.return_value = {}
         with ExpectLog('tornado.access', ''):
             res = self.fetch("/user/johndoe/",
                              headers={

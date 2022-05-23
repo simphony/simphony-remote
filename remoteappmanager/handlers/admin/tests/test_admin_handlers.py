@@ -12,7 +12,7 @@ class TestBaseAccess(AsyncHTTPTestCase):
 
     def get_app(self):
         app = dummy.create_admin_application()
-        app.hub.verify_token.return_value = {
+        app.hub.get_user.return_value = {
             'pending': None,
             'name': app.settings['user'],
             'admin': False,
@@ -30,7 +30,7 @@ class TestBaseAccess(AsyncHTTPTestCase):
         self.assertIn(self.body_string, str(res.body))
 
     def test_failed_auth(self):
-        self._app.hub.verify_token.return_value = {}
+        self._app.hub.get_user.return_value = {}
         with ExpectLog('tornado.access', ''):
             res = self.fetch(
                 self.url,

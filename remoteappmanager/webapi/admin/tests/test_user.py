@@ -10,7 +10,7 @@ from remoteappmanager.tests.mocking import dummy
 class TestUser(WebAPITestCase):
     def get_app(self):
         app = dummy.create_admin_application()
-        app.hub.verify_token.return_value = {
+        app.hub.get_user.return_value = {
             'pending': None,
             'name': app.settings['user'],
             'admin': False,
@@ -62,7 +62,7 @@ class TestUser(WebAPITestCase):
                       httpstatus.INTERNAL_SERVER_ERROR)
 
     def test_delete_failed_auth(self):
-        self._app.hub.verify_token.return_value = {}
+        self._app.hub.get_user.return_value = {}
 
         self.delete("/user/johndoe/api/v1/users/0/",
                     httpstatus.NOT_FOUND)

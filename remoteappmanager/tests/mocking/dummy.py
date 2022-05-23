@@ -312,7 +312,7 @@ def _create_application_from_class(
     if command_line_config is None:
         command_line_config = basic_command_line_config()
 
-    if environment_config is not None:
+    if environment_config is None:
         environment_config = basic_environment_config()
 
     app = application_class(
