@@ -10,7 +10,6 @@ class TestSpawnerOptionsForm(RemoteAppDriverTest):
 
         self.click_first_element_located(By.ID, "start")
         self.click_first_element_located(By.CSS_SELECTOR, "input.btn")
-        self.click_first_element_located(By.ID, "start")
 
         self.wait_until_text_inside_element_located(
             By.CSS_SELECTOR, ".header", "ADMIN")
@@ -22,7 +21,6 @@ class TestSpawnerOptionsForm(RemoteAppDriverTest):
         self.click_first_element_located(
             By.CSS_SELECTOR, "#session_form > option:nth-child(2)")
         self.click_first_element_located(By.CSS_SELECTOR, "input.btn")
-        self.click_first_element_located(By.ID, "start")
 
         self.wait_until_text_inside_element_located(
             By.CSS_SELECTOR, ".header", "APPLICATIONS")

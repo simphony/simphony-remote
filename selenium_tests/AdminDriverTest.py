@@ -14,7 +14,6 @@ class AdminDriverTest(RemoteAppDriverTest):
 
         self.click_first_element_located(By.ID, "start")
         self.click_first_element_located(By.CSS_SELECTOR, "input.btn")
-        self.click_first_element_located(By.ID, "start")
 
     def setUp(self):
         RemoteAppDriverTest.setUp(self)
