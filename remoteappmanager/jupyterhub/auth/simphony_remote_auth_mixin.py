@@ -1,4 +1,5 @@
 from tornado import gen
+from tornado.httpclient import HTTPClientError
 
 from jupyterhub.handlers import LogoutHandler as _LogoutHandler
 from jupyterhub.handlers import LoginHandler
@@ -19,7 +20,10 @@ class LogoutHandler(_LogoutHandler):
             #  once running on jupyterhub>=1.0.0
             if user.admin and user.spawner is not None:
                 self.log.info(f"Shutting down {user.name}'s server")
-                yield gen.maybe_future(self.stop_single_user(user))
+                try:
+                    yield gen.maybe_future(self.stop_single_user(user))
+                except HTTPClientError:
+                    self.log.warning("Failed to shut down server")
             self.log.info("User logged out: %s", user.name)
             self.clear_login_cookie()
             self.statsd.incr('logout')
