@@ -22,9 +22,6 @@ class LogoutHandler(_LogoutHandler):
                 yield gen.maybe_future(self.stop_single_user(user))
             self.log.info("User logged out: %s", user.name)
             self.clear_login_cookie()
-            for name in user.other_user_cookies:
-                self.clear_login_cookie(name)
-            user.other_user_cookies = set([])
             self.statsd.incr('logout')
         self.redirect(self.settings['login_url'], permanent=False)
 
