@@ -8,7 +8,7 @@ from remoteappmanager.tests.utils import mock_coro_factory
 
 
 @mock.patch.dict('os.environ', {"JUPYTERHUB_CLIENT_ID": 'client-id'})
-@mock.patch('jupyterhub.services.auth.HubOAuth.get_user')
+@mock.patch('remoteappmanager.handlers.base_handler.BaseHandler._verify_jupyterhub_oauth')  #: noqa:501
 class TestRegisterContainerHandler(TempMixin,
                                    AsyncHTTPTestCase):
     def get_app(self):
@@ -20,7 +20,7 @@ class TestRegisterContainerHandler(TempMixin,
             'server': app.settings['base_urlpath']}
         return app
 
-    def test_absent_url_id(self, mock_get_user):
+    def test_absent_url_id(self, mock_verify):
         with ExpectLog('tornado.access', ''):
             res = self.fetch(
                 "/user/johndoe/containers/99999/",
@@ -29,7 +29,7 @@ class TestRegisterContainerHandler(TempMixin,
 
         self.assertEqual(res.code, 404)
 
-    def test_present_url_id(self, mock_get_user):
+    def test_present_url_id(self, mock_verify):
         res = self.fetch("/user/johndoe/containers/20dcb84cdbea4b1899447246789093d0/",  # noqa
                          headers={
                              "Cookie": "jupyter-hub-token-johndoe=foo"
@@ -40,7 +40,7 @@ class TestRegisterContainerHandler(TempMixin,
         self.assertEqual(res.code, 302)
         self.assertTrue(self._app.reverse_proxy.register.called)
 
-    def test_failed_auth(self, mock_get_user):
+    def test_failed_auth(self, mock_verify):
         self._app.hub.get_user.return_value = {}
         res = self.fetch("/user/johndoe/containers/url_id",
                          headers={
@@ -53,7 +53,7 @@ class TestRegisterContainerHandler(TempMixin,
         self.assertFalse(self._app.reverse_proxy.register.called)
         self.assertEqual(res.code, 302)
 
-    def test_failure_of_reverse_proxy(self, mock_get_user):
+    def test_failure_of_reverse_proxy(self, mock_verify):
         self._app.reverse_proxy.register = mock_coro_factory(
             side_effect=Exception("BOOM"))
 

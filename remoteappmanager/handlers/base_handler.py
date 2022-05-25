@@ -17,16 +17,35 @@ class BaseHandler(HubOAuthenticated, web.RequestHandler, LoggingMixin):
     authenticator = HubOAuthenticator
 
     @web.authenticated
+    def _verify_jupyterhub_oauth(self):
+        """
+        Internal method that just serves to separate the JupyterHub
+        OAuth flow from the tornadowebapi framework. The JupyterHub
+        HubAuth / HubAuthenticated framework is designed to be
+        interacted with directly from the tornado web.Request object,
+        rather than outsourced to a separate class (as it is in
+        tornadowebapi)
+
+        Note that this introduces some unwanted coupling between the
+        request handlers and thier authenticators, but with the trade
+        off that we expect the jupyterhub.services.auth module to provide
+        a stable API
+
+        Raises
+        ------
+        HTTPError(403) if authentication fails
+        """
+
     @gen.coroutine
     def prepare(self):
         """Runs before any specific handler. """
-
-        # Note that this additional authentication layer is only
-        # required to support the tornadowebapi framework - the
-        # actual handshake with JupyterHub is handled by the
-        # HubOAuthenticated mixin
-
         # Authenticate the user against the hub.
+        self._verify_jupyterhub_oauth()
+
+        # Note that this step is only required to load the internal
+        # user model used by the tornadowebapi framework - the
+        # actual handshake with JupyterHub is performed by the
+        # HubOAuthenticated mixin
         self.current_user = yield self.authenticator.authenticate(self)
         if self.current_user is None:
             self.log.warn(
