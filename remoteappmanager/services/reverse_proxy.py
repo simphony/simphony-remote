@@ -1,7 +1,5 @@
-from urllib import parse
-
 from tornado import gen, httpclient
-from jupyterhub import orm as jupyterhub_orm
+from jupyterhub.proxy import Proxy, ConfigurableHTTPProxy
 from traitlets import HasTraits, Unicode, Instance
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
@@ -17,7 +15,7 @@ class ReverseProxy(LoggingMixin, HasTraits):
     api_token = Unicode()
 
     #: Internal instance of the reverse proxy API
-    _reverse_proxy = Instance(jupyterhub_orm.Proxy)
+    _reverse_proxy = Instance(Proxy)
 
     def __init__(self, *args, **kwargs):
         """Initializes the reverse proxy connection object."""
@@ -35,11 +33,11 @@ class ReverseProxy(LoggingMixin, HasTraits):
             self.log.error(message)
             raise ValueError(message)
 
-        # Note, we use jupyterhub orm Proxy, but not for database access,
-        # just for interface convenience.
-        self._reverse_proxy = jupyterhub_orm.Proxy(
+        # Note: we just use the jupyterhub ConfigurableHTTPProxy for
+        # interface convenience
+        self._reverse_proxy = ConfigurableHTTPProxy(
             auth_token=self.api_token,
-            api_server=_server_from_url(self.endpoint_url)
+            api_url=self.endpoint_url
         )
 
         self.log.info("Reverse proxy setup on {}".format(
@@ -94,14 +92,3 @@ class ReverseProxy(LoggingMixin, HasTraits):
                                      urlpath))
             else:
                 raise e
-
-
-def _server_from_url(url):
-    """Creates a orm.Server from a given url"""
-    parsed = parse.urlparse(url)
-    return jupyterhub_orm.Server(
-        proto=parsed.scheme,
-        ip=parsed.hostname,
-        port=parsed.port,
-        base_url=parsed.path
-    )

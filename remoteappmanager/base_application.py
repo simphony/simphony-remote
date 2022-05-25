@@ -1,15 +1,19 @@
 import importlib
+from secrets import token_urlsafe
 
-from remoteappmanager.handlers.handler_authenticator import HubAuthenticator
 from traitlets import Instance, default
-from tornado import web
+from tornado import web, gen
 import tornado.ioloop
 
+from jupyterhub._version import __version__, _check_version
+from tornado.httpclient import AsyncHTTPClient
 from tornadowebapi.registry import Registry
+from tornado.web import RequestHandler
 
 from remoteappmanager.db.interfaces import ABCDatabase
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.docker.container_manager import ContainerManager
+from remoteappmanager.handlers.handler_authenticator import HubAuthenticator
 from remoteappmanager.user import User
 from remoteappmanager.traitlets import as_dict
 from remoteappmanager.services.hub import Hub
@@ -80,11 +84,17 @@ class BaseApplication(web.Application, LoggingMixin):
         settings.update(as_dict(command_line_config))
         settings.update(as_dict(file_config))
         settings["static_url_prefix"] = (
-            self._command_line_config.base_urlpath + "static/")
+                self._command_line_config.base_urlpath + "static/")
+        settings['X-JupyterHub-Version'] = __version__
+
+        # Since we are using JupyterHub as an OAuth provider we'll also
+        # need to create our own cookies to keep track of user logins
+        settings['cookie_secret'] = token_urlsafe(64)
 
         handlers = self._get_handlers()
 
         super().__init__(handlers, **settings)
+        self.patch_default_headers()
 
     # Initializers
     @default("container_manager")
@@ -107,10 +117,15 @@ class BaseApplication(web.Application, LoggingMixin):
 
     @default("hub")
     def _hub_default(self):
-        """Initializes the Hub instance."""
-        return Hub(endpoint_url=self.command_line_config.hub_api_url,
-                   api_token=self.environment_config.jpy_api_token,
-                   )
+        """Initializes the Hub instance used to authenticate with
+        JupyterHub.
+        """
+        return Hub(
+            endpoint_url=self.environment_config.hub_api_url,
+            api_token=self.environment_config.jpy_api_token,
+            base_url=self.command_line_config.base_urlpath,
+            hub_prefix=self.command_line_config.hub_prefix,
+        )
 
     @default("db")
     def _db_default(self):
@@ -161,7 +176,8 @@ class BaseApplication(web.Application, LoggingMixin):
     # Public
     def start(self):
         """Start the application and the ioloop"""
-
+        self.log.info("Starting SimPhoNy-Remote using JupyterHub"
+                      " server version %s", __version__)
         self.log.info("Starting server with options:")
         for trait_name in self._command_line_config.trait_names():
             self.log.info("{}: {}".format(
@@ -169,13 +185,60 @@ class BaseApplication(web.Application, LoggingMixin):
                 getattr(self._command_line_config, trait_name)
                 )
             )
+        for trait_name in self._environment_config.trait_names():
+            self.log.info("{}: {}".format(
+                trait_name,
+                getattr(self._environment_config, trait_name)
+            )
+            )
         self.log.info("Listening for connections on {}:{}".format(
             self.command_line_config.ip,
             self.command_line_config.port))
 
         self.listen(self.command_line_config.port)
 
+        tornado.ioloop.IOLoop.current().run_sync(self.check_hub_version)
         tornado.ioloop.IOLoop.current().start()
+
+    @gen.coroutine
+    def check_hub_version(self):
+        """Test a connection to the JupyterHub warn on sufficient
+        mismatch between versions
+        """
+        client = AsyncHTTPClient()
+        RETRIES = 5
+        for i in range(1, RETRIES + 1):
+            try:
+                resp = yield client.fetch(
+                    self.environment_config.hub_api_url)
+            except Exception:
+                self.log.exception(
+                    "Failed to connect to my Hub at %s (attempt %i/%i)."
+                    " Is it running?",
+                    self.environment_config.hub_api_url, i, RETRIES)
+                yield gen.sleep(min(2 ** i, 16))
+            else:
+                break
+        else:
+            self.exit(1)
+
+        hub_version = resp.headers.get('X-JupyterHub-Version')
+        _check_version(hub_version, __version__, self.log)
+
+    def patch_default_headers(self):
+        """Ensure the current JupyterHub version has been added to
+        each request handler header, since this will be checked for
+        compatibility by the hub
+        """
+        if hasattr(RequestHandler, '_orig_set_default_headers'):
+            return
+        RequestHandler._orig_set_default_headers = RequestHandler.set_default_headers  # noqa: E501
+
+        def set_jupyterhub_header(self):
+            self._orig_set_default_headers()
+            self.set_header('X-JupyterHub-Version', __version__)
+
+        RequestHandler.set_default_headers = set_jupyterhub_header
 
     # Private
     def _add_demo_apps(self, user):
@@ -215,6 +278,8 @@ class BaseApplication(web.Application, LoggingMixin):
     def _get_handlers(self):
         """Returns the registered handlers"""
         base_urlpath = self.command_line_config.base_urlpath
+        # Must include callback handlers to complete OAuth flow
+        web_auth = self.hub.callback_handlers()
         web_api = self.registry.api_handlers(base_urlpath)
         web_handlers = self._web_handlers()
-        return web_api+web_handlers
+        return web_auth+web_api+web_handlers

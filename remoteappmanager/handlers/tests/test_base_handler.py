@@ -1,3 +1,5 @@
+from unittest import mock
+
 from tornado.testing import AsyncHTTPTestCase, ExpectLog
 from remoteappmanager.file_config import FileConfig
 
@@ -17,7 +19,7 @@ class TestBaseHandler(TempMixin, AsyncHTTPTestCase):
         file_config = self.get_file_config()
 
         app = dummy.create_application(file_config=file_config)
-        app.hub.verify_token.return_value = {
+        app.hub.get_user.return_value = {
             'pending': None,
             'name': app.settings['user'],
             'admin': False,
@@ -45,13 +47,15 @@ class TestBaseHandlerInvalidAccounting(TestBaseHandler):
         self.assertIn(" Ref.:", str(res.body))
 
 
+@mock.patch.dict('os.environ', {"JUPYTERHUB_CLIENT_ID": 'client-id'})
+@mock.patch('jupyterhub.services.auth.HubOAuth.get_user')
 class TestBaseHandlerDatabaseError(TestBaseHandler):
     def get_file_config(self):
         file_config = super().get_file_config()
         file_config.database_class = "remoteappmanager.db.orm.ORMDatabase"
         return file_config
 
-    def test_home_internal_error(self):
+    def test_home_internal_error(self, mock_get_user):
         with ExpectLog('tornado.application', ''), \
                 ExpectLog('tornado.access', ''):
             res = self.fetch("/user/johndoe/",
@@ -66,13 +70,15 @@ class TestBaseHandlerDatabaseError(TestBaseHandler):
                       str(res.body))
 
 
+@mock.patch.dict('os.environ', {"JUPYTERHUB_CLIENT_ID": 'client-id'})
+@mock.patch('jupyterhub.services.auth.HubOAuth.get_user')
 class TestBaseHandlerGATracking(TestBaseHandler):
     def get_file_config(self):
         file_config = super().get_file_config()
         file_config.ga_tracking_id = "UA-12345-6"
         return file_config
 
-    def test_ga_tracking(self):
+    def test_ga_tracking(self, mock_get_user):
         res = self.fetch("/user/johndoe/",
                          headers={
                              "Cookie": "jupyter-hub-token-johndoe=foo"

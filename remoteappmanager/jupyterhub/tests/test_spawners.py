@@ -7,7 +7,7 @@ import time
 from unittest import mock
 
 from tornado.testing import AsyncTestCase
-from jupyterhub import orm
+from jupyterhub import proxy, orm, objects
 
 from remoteappmanager.jupyterhub.spawners import (
     ADMIN_CMD, USER_CMD, SystemUserSpawner, VirtualUserSpawner)
@@ -39,29 +39,33 @@ def new_spawner(spawner_class):
         proto="http",
         ip="127.0.0.2",
         port=31337,
-        base_url="/"
+        base_url="/",
+        cookie_name='cookie'
     )
 
     # Mock db
     db = mock.Mock()
-    db.query = mock.Mock()
-    db.query().first = mock.Mock(
-        return_value=orm.Proxy(
-            auth_token="whatever",
-            api_server=orm.Server(proto="http",
-                                  ip="127.0.0.1",
-                                  port=12345,
-                                  base_url="/foo/bar/")))
 
     # Mock user
     user = mock.Mock()
     user.name = username()
+    user.url = 'http://my-callback.com'
     user.admin = False
     user.state = None
-    user.server = generic_server
+    user.settings = {
+        'proxy': proxy.ConfigurableHTTPProxy(
+            api_url="http://127.0.0.1:12345/foo/bar/",
+            auth_token="whatever"
+        )
+    }
 
     # Mock hub
-    hub = orm.Hub(server=generic_server)
+    hub = objects.Hub(
+        ip="127.0.0.2",
+        proto="http",
+        port=31337,
+        base_url="/hub/",
+    )
 
     # Mock authenticator
     authenticator = mock.Mock()
@@ -69,8 +73,20 @@ def new_spawner(spawner_class):
         return_value='/logout_test')
     authenticator.login_service = 'TEST'
 
+    # Mocks instantiating Spawner instance via an orm.Spawner instance
+    # in the User._new_spawner method, as would happen in production
+    orm_spawner = orm.Spawner(
+        name='',
+        server=generic_server
+    )
     return spawner_class(
-        db=db, user=user, hub=hub, authenticator=authenticator)
+        db=db,
+        user=user,
+        orm_spawner=orm_spawner,
+        hub=hub,
+        authenticator=authenticator,
+        api_token="dummy_token"
+    )
 
 
 class TestSystemUserSpawner(TempMixin, AsyncTestCase):
@@ -82,12 +98,16 @@ class TestSystemUserSpawner(TempMixin, AsyncTestCase):
         path = fixtures.get("remoteappmanager_config.py")
         self.spawner.config_file_path = path
         args = self.spawner.get_args()
+        self.assertIn("--ip=\"127.0.0.1\"", args)
+        self.assertIn("--cookie-name=jupyter-hub-token", args)
         self.assertIn("--proxy-api-url=http://127.0.0.1:12345/foo/bar/", args)
         self.assertIn("--config-file={}".format(path), args)
         self.assertIn("--base-urlpath=\"/\"", args)
 
     def test_args_without_config_file_path(self):
         args = self.spawner.get_args()
+        self.assertIn("--ip=\"127.0.0.1\"", args)
+        self.assertIn("--cookie-name=jupyter-hub-token", args)
         self.assertIn("--proxy-api-url=http://127.0.0.1:12345/foo/bar/", args)
         self.assertFalse(any("--config-file=" in arg for arg in args))
         self.assertIn("--base-urlpath=\"/\"", args)
@@ -112,7 +132,8 @@ class TestSystemUserSpawner(TempMixin, AsyncTestCase):
 
     def test_cmd_spawning(self):
         env = os.environ.copy()
-        env["PROXY_API_TOKEN"] = "dummy_token"
+        env["JUPYTERHUB_API_TOKEN"] = "dummy_token"
+        env["JUPYTERHUB_API_URL"] = 'http://172.17.5.167:8081/hub/api'
         path = fixtures.get("remoteappmanager_config.py")
         self.spawner.config_file_path = path
 

@@ -3,23 +3,34 @@ import hashlib
 
 from tornado import web, gen
 
+from jupyterhub.services.auth import HubOAuthenticated
+
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.handlers.handler_authenticator import HubAuthenticator
 
 
-class BaseHandler(web.RequestHandler, LoggingMixin):
-    """Base class for the request handler."""
+class BaseHandler(HubOAuthenticated, web.RequestHandler, LoggingMixin):
+    """Base class for the request handler.
 
-    #: The authenticator that is used to recognize the user.
+    Each request will be authenticated using JupyterHub as an OAuth
+    provider using the HubOAuthenticated mixin first before
+    being independently validated against the application's user model.
+    https://jupyterhub.readthedocs.io/en/0.8.1/api/services.auth.html
+    """
+
+    #: The authenticator that is used to recognize and load
+    #: the internal user model.
     authenticator = HubAuthenticator
 
+    @web.authenticated
     @gen.coroutine
     def prepare(self):
         """Runs before any specific handler. """
-
-        # Authenticate the user against the hub. We can't use get_current_user
-        # because we want to do it asynchronously.
+        # Authenticate the user against the hub
         self.current_user = yield self.authenticator.authenticate(self)
+        if self.current_user is None:
+            self.log.warn(
+                "Failed to authenticate user session with JupyterHub")
 
     def render(self, template_name, **kwargs):
         """Reimplements render to pass well known information to the rendering

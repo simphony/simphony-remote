@@ -15,7 +15,7 @@ from remoteappmanager.tests.utils import (
 class TestContainer(WebAPITestCase):
     def get_app(self):
         app = dummy.create_application()
-        app.hub.verify_token.return_value = {
+        app.hub.get_user.return_value = {
             'pending': None,
             'name': app.settings['user'],
             'admin': False,
@@ -346,7 +346,7 @@ class TestContainer(WebAPITestCase):
             self.assertTrue(self._app.reverse_proxy.register.called)
 
     def test_post_failed_auth(self):
-        self._app.hub.verify_token.return_value = {}
+        self._app.hub.get_user.return_value = {}
 
         self.post("/user/johndoe/api/v1/containers/",
                   {"mapping_id": "b7ca425a51bf40acbd305b3f782714b6"},

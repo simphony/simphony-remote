@@ -113,6 +113,7 @@ npmdeps:
 	fi
 
 	npm install
+	npm install configurable-http-proxy
 	npm --version
 
 .PHONY: pythondeps

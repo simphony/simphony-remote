@@ -6,7 +6,6 @@ from traitlets import Any, Unicode, default
 from tornado import gen
 
 from jupyterhub.spawner import LocalProcessSpawner
-from jupyterhub import orm
 
 ADMIN_CMD = "remoteappadmin"
 USER_CMD = "remoteappmanager"
@@ -17,7 +16,7 @@ class BaseSpawner(LocalProcessSpawner):
     the actual spawners
     """
 
-    #: The instance of the orm Proxy.
+    #: The instance of the JupyterHub Proxy.
     #: We use Any in agreement with base class practice.
     proxy = Any()
 
@@ -31,12 +30,10 @@ class BaseSpawner(LocalProcessSpawner):
         return self.user_options.get('cmd', self._default_cmd())
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        # We get the first one. Strangely enough, jupyterhub has a table
-        # containing potentially multiple proxies, but it's enforced to
-        # contain only one.
-        self.proxy = self.db.query(orm.Proxy).first()
+        super(BaseSpawner, self).__init__(**kwargs)
+        # We can obtain a reference to the JupyterHub.proxy object
+        # through the tornado settings passed onto the User
+        self.proxy = self.user.settings.get('proxy')
 
     @default("options_form")
     def _options_form_default(self):
@@ -71,15 +68,28 @@ class BaseSpawner(LocalProcessSpawner):
     def get_args(self):
         args = super().get_args()
 
-        for iarg, arg in enumerate(args):
-            args[iarg] = arg.replace('--base-url=', '--base-urlpath=')
+        # Handle no default IP value (removed in jupyterhub v0.8.0)
+        if not self.ip:
+            args.append('--ip="127.0.0.1"')
+
+        args.append('--user="{}"'.format(
+            self.user.name))
+
+        args.append('--base-urlpath="{}"'.format(
+            self.server.base_url))
+
+        args.append('--hub-prefix={}'.format(
+            self.hub.base_url))
+
+        args.append("--cookie-name={}".format(
+            self.hub.cookie_name))
 
         args.append("--proxy-api-url={}".format(
-            self.proxy.api_server.url))
+            self.proxy.api_url))
 
         args.append("--logout_url={}".format(
             self.authenticator.logout_url(
-                self.hub.server.base_url)))
+                self.hub.base_url)))
 
         if self.config_file_path:
             args.append("--config-file={}".format(self.config_file_path))
@@ -187,7 +197,6 @@ class VirtualUserSpawner(BaseSpawner):
             else:
                 self.log.info("Created %s's temporary workspace in: %s",
                               self.user.name, self._virtual_workspace)
-
         return (yield super().start())
 
     @gen.coroutine

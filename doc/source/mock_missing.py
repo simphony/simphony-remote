@@ -49,7 +49,7 @@ def mock_modules():
         MOCK_MODULES.append('jupyterhub.auth')
         MOCK_MODULES.append('jupyterhub.spawner')
         MOCK_TYPES.append(
-            ("jupyterhub.orm", "Proxy", (object, ))
+            ("jupyterhub.proxy", "Proxy", (object, ))
         )
     else:
         del jupyterhub
