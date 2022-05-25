@@ -13,7 +13,7 @@ from tornado.web import RequestHandler
 from remoteappmanager.db.interfaces import ABCDatabase
 from remoteappmanager.logging.logging_mixin import LoggingMixin
 from remoteappmanager.docker.container_manager import ContainerManager
-from remoteappmanager.handlers.handler_authenticator import HubOAuthenticator
+from remoteappmanager.handlers.handler_authenticator import HubAuthenticator
 from remoteappmanager.user import User
 from remoteappmanager.traitlets import as_dict
 from remoteappmanager.services.hub import Hub
@@ -168,7 +168,7 @@ class BaseApplication(web.Application, LoggingMixin):
     @default("registry")
     def _registry_default(self):
         reg = Registry()
-        reg.authenticator = HubOAuthenticator
+        reg.authenticator = HubAuthenticator
         for resource_handler in self._webapi_resources():
             reg.register(resource_handler)
         return reg

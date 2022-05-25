@@ -6,7 +6,7 @@ from tornado import web, gen
 from jupyterhub.services.auth import HubOAuthenticated
 
 from remoteappmanager.logging.logging_mixin import LoggingMixin
-from remoteappmanager.handlers.handler_authenticator import HubOAuthenticator
+from remoteappmanager.handlers.handler_authenticator import HubAuthenticator
 
 
 class BaseHandler(HubOAuthenticated, web.RequestHandler, LoggingMixin):
@@ -20,7 +20,7 @@ class BaseHandler(HubOAuthenticated, web.RequestHandler, LoggingMixin):
 
     #: The authenticator that is used to recognize and load
     #: the internal user model.
-    authenticator = HubOAuthenticator
+    authenticator = HubAuthenticator
 
     @web.authenticated
     @gen.coroutine
