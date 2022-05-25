@@ -8,10 +8,9 @@ requests==2.10.0
 docker-py==1.8
 escapism==0.0.1
 jupyterhub==0.8.1
-jupyter_client==4.3.0
+jupyter_client>=4.3.0
 click==6.6
 tabulate==0.7.5
 tornadowebapi @ git+http://github.com/simphony/tornado-webapi.git@8b6846faae23657a04cf97ca5229ce8ea083d000#egg=tornadowebapi
-# Pinned to 0.10.0 since 0.11.0 does not seem to be compatible with jupyterhub 0.7.x
-oauthenticator==0.10.0
+oauthenticator>=0.10.0
 jinja2>=2.8
