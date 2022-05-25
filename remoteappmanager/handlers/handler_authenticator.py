@@ -43,9 +43,21 @@ class HubOAuthenticator(Authenticator):
     @classmethod
     @gen.coroutine
     def authenticate(cls, handler):
-        # Authenticate the user against the hub. Expects the handler
-        # to inherit from the jupyterhub.services.auth.HubOAuthenticated
-        # mixin
+        """Authenticate the handler application's user session
+        against the hub.
+
+        Parameters
+        ----------
+        handler : tornado.web.RequestHandler or
+                  tornadowebapi.resource_handler.ResourceHandler
+            Handler to authenticate against the JupyterHub
+
+        Returns
+        -------
+        user : remoteappmanager.user.User or None
+            Internal model representing authenticated user
+        """
+        # Authenticate the user against the hub.
         webapp = handler.application
         hub = webapp.hub
         user = None

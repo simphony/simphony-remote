@@ -10,23 +10,23 @@ from remoteappmanager.handlers.handler_authenticator import HubOAuthenticator
 
 
 class BaseHandler(HubOAuthenticated, web.RequestHandler, LoggingMixin):
-    """Base class for the request handler."""
+    """Base class for the request handler.
 
-    #: The authenticator that is used by tornadowebapi to recognize
-    #: the user.
+    Each request will be authenticated using JupyterHub as an OAuth
+    provider using the HubOAuthenticated mixin first before
+    being independently validated against the application's user model.
+    https://jupyterhub.readthedocs.io/en/0.8.1/api/services.auth.html
+    """
+
+    #: The authenticator that is used to recognize and load
+    #: the internal user model.
     authenticator = HubOAuthenticator
 
     @web.authenticated
     @gen.coroutine
     def prepare(self):
         """Runs before any specific handler. """
-
-        # Note that this additional authentication layer is only
-        # required to support the tornadowebapi framework - the
-        # actual handshake with JupyterHub is handled by the
-        # HubOAuthenticated mixin
-
-        # Authenticate the user against the hub.
+        # Authenticate the user against the hub
         self.current_user = yield self.authenticator.authenticate(self)
         if self.current_user is None:
             self.log.warn(
