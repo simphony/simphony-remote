@@ -202,10 +202,8 @@ class BaseApplication(web.Application, LoggingMixin):
 
     @gen.coroutine
     def check_hub_version(self):
-        """Test a connection to my Hub
-
-        - exit if I can't connect at all
-        - check version and warn on sufficient mismatch
+        """Test a connection to the JupyterHub warn on sufficient
+        mismatch between versions
         """
         client = AsyncHTTPClient()
         RETRIES = 5
@@ -215,7 +213,8 @@ class BaseApplication(web.Application, LoggingMixin):
                     self.environment_config.hub_api_url)
             except Exception:
                 self.log.exception(
-                    "Failed to connect to my Hub at %s (attempt %i/%i). Is it running?",  # noqa: E501
+                    "Failed to connect to my Hub at %s (attempt %i/%i)."
+                    " Is it running?",
                     self.environment_config.hub_api_url, i, RETRIES)
                 yield gen.sleep(min(2 ** i, 16))
             else:
@@ -227,6 +226,10 @@ class BaseApplication(web.Application, LoggingMixin):
         _check_version(hub_version, __version__, self.log)
 
     def patch_default_headers(self):
+        """Ensure the current JupyterHub version has been added to
+        each request handler header, since this will be checked for
+        compatibility by the hub
+        """
         if hasattr(RequestHandler, '_orig_set_default_headers'):
             return
         RequestHandler._orig_set_default_headers = RequestHandler.set_default_headers  # noqa: E501
