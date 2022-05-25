@@ -6,7 +6,7 @@ from remoteappmanager.tests.mocking import dummy
 
 
 @mock.patch.dict('os.environ', {"JUPYTERHUB_CLIENT_ID": 'client-id'})
-@mock.patch('remoteappmanager.handlers.base_handler.BaseHandler._verify_jupyterhub_oauth')  #: noqa:501
+@mock.patch('jupyterhub.services.auth.HubOAuth.get_user')
 class TestBaseAccess(AsyncHTTPTestCase):
     #: which url to poke
     url = "/user/johndoe"
@@ -23,7 +23,7 @@ class TestBaseAccess(AsyncHTTPTestCase):
             'server': app.settings['base_urlpath']}
         return app
 
-    def test_access(self, mock_verify):
+    def test_access(self, mock_get_user):
         res = self.fetch(self.url,
                          headers={
                              "Cookie": "jupyter-hub-token-johndoe=foo"
@@ -33,7 +33,7 @@ class TestBaseAccess(AsyncHTTPTestCase):
         self.assertEqual(res.code, 200)
         self.assertIn(self.body_string, str(res.body))
 
-    def test_failed_auth(self, mock_verify):
+    def test_failed_auth(self, mock_get_user):
         self._app.hub.get_user.return_value = {}
         with ExpectLog('tornado.access', ''):
             res = self.fetch(
