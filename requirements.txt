@@ -1,10 +1,8 @@
 setuptools==21.0
 traitlets>=4.1
 tornado==5.1.1
-# Fix to 2.10.0 due to docker-py needs (fails with 2.11.1)
-requests==2.10.0
-# We want 1.8 because 1.10 uses API version 1.24 and the docker server
-# on ubuntu uses 1.23, so they don't like each other.
+# Fix to 2.11.1 due to docker-py needs
+requests==2.11.1
 docker==2.2
 escapism==0.0.1
 jupyterhub==0.8.1
