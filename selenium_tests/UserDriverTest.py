@@ -69,6 +69,7 @@ class UserDriverTest(RemoteAppDriverTest):
         try:
             yield
         finally:
+            self.wait_until_application_list_loaded()
             self.select_application(index)
             self.wait_until_application_running()
             self.open_application_settings()
