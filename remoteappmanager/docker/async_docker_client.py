@@ -29,7 +29,7 @@ class AsyncDockerClient:
 
         Note that the executor is a ThreadPoolExecutor with a single thread.
         """
-        self._sync_client = docker.Client(*args, **kwargs)
+        self._sync_client = docker.APIClient(*args, **kwargs)
 
     def __getattr__(self, attr):
         """Returns the docker client method, wrapped in an async execution

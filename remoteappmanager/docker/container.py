@@ -75,12 +75,12 @@ class Container(HasTraits):
     @classmethod
     def from_docker_dict(cls, docker_dict):
         """Returns a Container object with the info given by a
-        docker Client.
+        docker APIClient.
 
         Parameters
         ----------
         docker_dict : dict
-            One item from the result of docker.Client.containers
+            One item from the result of docker.APIClient.containers
 
         Returns
         -------
@@ -89,7 +89,7 @@ class Container(HasTraits):
         Examples
         --------
         >>> # containers is a list of dict
-        >>> containers = docker.Client().containers()
+        >>> containers = docker.APIClient().containers()
 
         >>> Container.from_docker_dict(containers[0])
 

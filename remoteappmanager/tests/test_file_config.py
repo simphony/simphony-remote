@@ -186,5 +186,5 @@ class TestFileConfig(TempMixin, unittest.TestCase):
         config = FileConfig()
         docker_config = config.docker_config()
 
-        with contextlib.closing(docker.Client(**docker_config)) as client:
+        with contextlib.closing(docker.APIClient(**docker_config)) as client:
             self.assertIsNotNone(client.info())
