@@ -74,7 +74,7 @@ def print_error(error):
 
 
 def get_docker_client():
-    """ Returns docker.client object using the local environment variables
+    """ Returns docker.APIClient object using the local environment variables
     """
     # dependencies of docker-py is optional for this script
     try:
@@ -93,7 +93,7 @@ def get_docker_client():
         print_error('docker client fails to connect.')
         raise exception
 
-    return client
+    return client.api
 
 
 def is_sqlitedb_url(db_url):
