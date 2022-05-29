@@ -26,8 +26,6 @@ write_version_py()
 # Unfortunately RTD cannot install jupyterhub because jupyterhub needs bower,
 # and that is not available. We prevent the request for the unreleased jhub
 # by skipping it if we are on RTD
-# We also have problems with requests as docker-py wants <2.11 and RTD
-# provides 2.11.1
 
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if on_rtd:
