@@ -10,5 +10,5 @@ jupyter_client>=4.3.0
 click==6.6
 tabulate==0.7.5
 tornadowebapi @ git+http://github.com/simphony/tornado-webapi.git@8b6846faae23657a04cf97ca5229ce8ea083d000#egg=tornadowebapi
-oauthenticator>=0.10.0
+oauthenticator==0.11.0
 jinja2>=2.8
