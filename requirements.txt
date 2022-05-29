@@ -12,3 +12,5 @@ tabulate==0.7.5
 tornadowebapi @ git+http://github.com/simphony/tornado-webapi.git@8b6846faae23657a04cf97ca5229ce8ea083d000#egg=tornadowebapi
 oauthenticator==0.11.0
 jinja2>=2.8
+# Workaround for following bug in older versions of jupyterhub: https://github.com/jupyterhub/jupyterhub/pull/3383
+sqlalchemy<1.4
