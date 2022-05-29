@@ -34,7 +34,8 @@ class TestBaseHandlerInvalidAccounting(TestBaseHandler):
         return file_config
 
     def test_home_internal_error(self):
-        with ExpectLog('tornado.application', ''):
+        with ExpectLog('tornado.application', ''), \
+                ExpectLog('tornado.access', ''):
             res = self.fetch("/user/johndoe/",
                              headers={
                                  "Cookie": "jupyter-hub-token-johndoe=foo"
