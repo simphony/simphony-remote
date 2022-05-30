@@ -35,7 +35,7 @@ if on_rtd:
         "setuptools>=21.0",
         "traitlets>=4.1",
         "tornado>=4.3",
-        "requests>=2.10.0",
+        "requests>=2.20.0",
         "escapism>=0.0.1",
         "jupyter_client>=4.3.0",
         "click>=6.6",
