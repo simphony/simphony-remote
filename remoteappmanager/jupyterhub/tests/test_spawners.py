@@ -99,7 +99,7 @@ class TestSystemUserSpawner(TempMixin, AsyncTestCase):
         self.spawner.config_file_path = path
         args = self.spawner.get_args()
         self.assertIn("--ip=\"127.0.0.1\"", args)
-        self.assertIn("--cookie-name=jupyter-hub-token", args)
+        self.assertIn("--cookie-name=jupyterhub-hub-login", args)
         self.assertIn("--proxy-api-url=http://127.0.0.1:12345/foo/bar/", args)
         self.assertIn("--config-file={}".format(path), args)
         self.assertIn("--base-urlpath=\"/\"", args)
@@ -107,7 +107,7 @@ class TestSystemUserSpawner(TempMixin, AsyncTestCase):
     def test_args_without_config_file_path(self):
         args = self.spawner.get_args()
         self.assertIn("--ip=\"127.0.0.1\"", args)
-        self.assertIn("--cookie-name=jupyter-hub-token", args)
+        self.assertIn("--cookie-name=jupyterhub-hub-login", args)
         self.assertIn("--proxy-api-url=http://127.0.0.1:12345/foo/bar/", args)
         self.assertFalse(any("--config-file=" in arg for arg in args))
         self.assertIn("--base-urlpath=\"/\"", args)

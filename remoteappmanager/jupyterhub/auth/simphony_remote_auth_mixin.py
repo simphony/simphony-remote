@@ -21,7 +21,7 @@ class LogoutHandler(_LogoutHandler):
             if user.admin and user.spawner is not None:
                 self.log.info(f"Shutting down {user.name}'s server")
                 try:
-                    yield gen.maybe_future(self.stop_single_user(user))
+                    yield self.stop_single_user(user)
                 except HTTPClientError:
                     self.log.warning("Failed to shut down server")
             self.log.info("User logged out: %s", user.name)

@@ -56,6 +56,8 @@ class UserDriverTest(RemoteAppDriverTest):
         """ Wait until the application list is completely loaded and displayed
         """
         self.wait_until_invisibility_of_element_located(By.ID, "loading-spinner")
+        self.wait_until_invisibility_of_element_located(
+            By.CSS_SELECTOR, ".modal-fade-leave-to")
 
     @contextlib.contextmanager
     def running_container(self, index=0):
@@ -69,6 +71,7 @@ class UserDriverTest(RemoteAppDriverTest):
         try:
             yield
         finally:
+            self.wait_until_application_list_loaded()
             self.select_application(index)
             self.wait_until_application_running()
             self.open_application_settings()

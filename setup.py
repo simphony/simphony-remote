@@ -41,7 +41,7 @@ if on_rtd:
         "click>=6.6",
         "tabulate>=0.7.5",
         "oauthenticator>=0.5",
-        "sqlalchemy>=1.0",
+        "sqlalchemy<1.4",
         # Pinning jinja2 requirements when building on RTD due to
         # regression when using old versions of sphinx<2
         # https://github.com/readthedocs/readthedocs.org/issues/9037

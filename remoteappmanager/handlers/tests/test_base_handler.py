@@ -27,13 +27,15 @@ class TestBaseHandler(TempMixin, AsyncHTTPTestCase):
         return app
 
 
+@mock.patch.dict('os.environ', {"JUPYTERHUB_CLIENT_ID": 'client-id'})
+@mock.patch('jupyterhub.services.auth.HubOAuth.get_user')
 class TestBaseHandlerInvalidAccounting(TestBaseHandler):
     def get_file_config(self):
         file_config = super().get_file_config()
         file_config.database_class = 'this_should_fail'
         return file_config
 
-    def test_home_internal_error(self):
+    def test_home_internal_error(self, mock_get_user):
         with ExpectLog('tornado.application', ''), \
                 ExpectLog('tornado.access', ''):
             res = self.fetch("/user/johndoe/",

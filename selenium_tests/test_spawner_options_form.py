@@ -8,7 +8,6 @@ class TestSpawnerOptionsForm(RemoteAppDriverTest):
     def test_admin_login_default_session(self):
         self.login("admin")
 
-        self.click_first_element_located(By.ID, "start")
         self.click_first_element_located(By.CSS_SELECTOR, "input.btn")
 
         self.wait_until_text_inside_element_located(
@@ -17,7 +16,6 @@ class TestSpawnerOptionsForm(RemoteAppDriverTest):
     def test_admin_login_user_session(self):
         self.login("admin")
 
-        self.click_first_element_located(By.ID, "start")
         self.click_first_element_located(
             By.CSS_SELECTOR, "#session_form > option:nth-child(2)")
         self.click_first_element_located(By.CSS_SELECTOR, "input.btn")
