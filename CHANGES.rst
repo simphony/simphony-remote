@@ -1,6 +1,43 @@
 SimPhoNy Remote CHANGELOG
 =========================
 
+What's new in SimPhoNy Remote 2.2.0
+-----------------------------------
+
+- Features:
+ - Inclusion of (optional) license key in `ApplicationPolicy` object (#544)
+ - Inclusion of Nginx template scripts for setting up a reverse proxy (#544)
+ - Inclusion of `BasicAuthenticator` class for simple demo deployments (#544)
+ - Supports additional OAuth services using `oauthenticator` package (#544)
+ - Extend `Configurable`s framework to enable declaring a startup file (#560, #564, #568)
+ - Supports declaring a demo set of applications that all users are automatically granted access to (#554, #569)
+ - Add Spawner options to enable admins to spawn user sessions (#598)
+
+- Fixes:
+ - Fixed broken Sphinx documentation builds on RTD (#575, #577, #582, #600)
+
+- Removals:
+ - Replaced insecure authentication with between `remoteappmanager` and JupyterHub with OAuth protocol
+ - Replace deprecated `tornado.testing.LogTrapTestCase` test case class with `ExpectLog` (#544)
+ - Remove `AsyncTestCase` patch for older versions of `tornado.testing` (#544)
+
+- Maintenance:
+ - Support for Ubuntu 18.0.4 and CentOS7 deployments (#544)
+ - Update NodeJS to use 14.x.x series
+ - Update `jupyterhub` framework to version 0.9.6 (#552, #604)
+ - Update `requests` library to version 2.20.0 (#606)
+ - Updated `tornado` package to version 5.1.1 (#544)
+ - Update `docker-py` library to version 2.2 (#602)
+ - Updated dependency versions (now install `astor` through PyPi) (#544)
+ - Docker compose scripts included to build SR docker image for debug purposes (#544)
+
+- Other:
+ - Updated documentation (#544, #583)
+ - Included `geckodriver` installation for selenium testing (#544)
+ - Adopted GitHub Actions CI, running Ubuntu 18.04 and CentOS 7 (#554, #558)
+ - Added cron job to run CI regularly twice a month (#576)
+
+
 What's new in SimPhoNy Remote 2.1.0
 -----------------------------------
 
