@@ -17,6 +17,10 @@ c.JupyterHub.logo_file = os.path.join(
 # Choose between system-user mode and virtual-user mode
 setting_mode = ('system_user', 'virtual_user')[1]
 
+# Ensures user sessions are closed upon logout - this is especially
+# useful for admin users to switch between user and admin apps
+c.JupyterHub.shutdown_on_logout = True
+
 if setting_mode == 'virtual_user':
     c.JupyterHub.spawner_class = ('remoteappmanager.jupyterhub.spawners.'
                                   'VirtualUserSpawner')
