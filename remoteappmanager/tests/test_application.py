@@ -111,7 +111,7 @@ class TestApplication(TempMixin,
         self.file_config.database_kwargs = {
             "url": "sqlite:///"+sqlite_file_path}
         self.file_config.demo_applications = {
-            'my-demo-app': {}
+            'my-demo-app': {'allow_home': True}
         }
         self.file_config.auto_user_creation = True
 
@@ -127,7 +127,7 @@ class TestApplication(TempMixin,
         self.assertEqual(app_account.application.image, 'my-demo-app')
         self.assertIsNone(
             app_account.application_policy.app_license)
-        self.assertFalse(
+        self.assertTrue(
             app_account.application_policy.allow_home)
         self.assertTrue(
             app_account.application_policy.allow_view)
