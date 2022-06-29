@@ -122,7 +122,20 @@ class TestApplication(TempMixin,
         self.assertIsNotNone(app.user.account)
 
         user_apps = app.db.get_accounting_for_user(app.user.account)
-        self.assertEqual('my-demo-app', user_apps[0].application.image)
+        app_account = user_apps[0]
+        self.assertEqual(app_account.application.image, 'my-demo-app')
+        self.assertIsNone(
+            app_account.application_policy.app_license)
+        self.assertFalse(
+            app_account.application_policy.allow_home)
+        self.assertTrue(
+            app_account.application_policy.allow_view)
+        self.assertIsNone(
+            app_account.application_policy.volume_source)
+        self.assertIsNone(
+            app_account.application_policy.volume_target)
+        self.assertFalse(
+            app_account.application_policy.allow_startup_data)
 
     def test_start(self):
         with patch(
