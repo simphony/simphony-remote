@@ -49,6 +49,7 @@ def new_spawner(spawner_class):
     # Mock user
     user = mock.Mock()
     user.name = username()
+    user.escaped_name = user.name
     user.url = 'http://my-callback.com'
     user.admin = False
     user.state = None
