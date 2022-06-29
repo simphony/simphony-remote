@@ -21,7 +21,7 @@ from remoteappmanager.services.reverse_proxy import ReverseProxy
 
 
 DEFAULT_POLICY_OPTIONS = {
-    "app_license": '',
+    "app_license": None,
     "allow_home": False,
     "allow_view": True,
     "volume": None,
