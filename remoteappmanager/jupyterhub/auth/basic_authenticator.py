@@ -3,10 +3,8 @@ from tornado import gen
 from jupyterhub.auth import Authenticator
 from traitlets import Dict
 
-from .simphony_remote_auth_mixin import SimphonyRemoteAuthMixin
 
-
-class BasicAuthenticator(SimphonyRemoteAuthMixin, Authenticator):
+class BasicAuthenticator(Authenticator):
     """ Simple authenticator based on a fixed set of users"""
 
     #: Dictionary of regular username: password keys allowed

@@ -4,7 +4,7 @@ tornado==5.1.1
 requests==2.20.0
 docker==2.2
 escapism==0.0.1
-jupyterhub==0.9.6
+jupyterhub==1.0.0
 jupyter_client>=4.3.0
 click==6.6
 tabulate==0.7.5
