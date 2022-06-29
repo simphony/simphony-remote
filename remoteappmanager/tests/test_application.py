@@ -2,12 +2,13 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
+from tornado import testing
+from traitlets.traitlets import TraitError
+
 from remoteappmanager.application import Application
 from remoteappmanager.db.tests import test_csv_db
 from remoteappmanager.tests import utils
 from remoteappmanager.tests.temp_mixin import TempMixin
-from tornado import testing
-from traitlets.traitlets import TraitError
 
 
 class DummyDB:
