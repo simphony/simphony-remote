@@ -2,12 +2,13 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
+from tornado import testing
+from traitlets.traitlets import TraitError
+
 from remoteappmanager.application import Application
 from remoteappmanager.db.tests import test_csv_db
 from remoteappmanager.tests import utils
 from remoteappmanager.tests.temp_mixin import TempMixin
-from tornado import testing
-from traitlets.traitlets import TraitError
 
 
 class DummyDB:
@@ -109,7 +110,9 @@ class TestApplication(TempMixin,
             "remoteappmanager.db.orm.ORMDatabase")
         self.file_config.database_kwargs = {
             "url": "sqlite:///"+sqlite_file_path}
-        self.file_config.demo_applications = ['my-demo-app']
+        self.file_config.demo_applications = {
+            'my-demo-app': {'allow_home': True}
+        }
         self.file_config.auto_user_creation = True
 
         app = Application(self.command_line_config,
@@ -120,7 +123,20 @@ class TestApplication(TempMixin,
         self.assertIsNotNone(app.user.account)
 
         user_apps = app.db.get_accounting_for_user(app.user.account)
-        self.assertEqual('my-demo-app', user_apps[0].application.image)
+        app_account = user_apps[0]
+        self.assertEqual(app_account.application.image, 'my-demo-app')
+        self.assertIsNone(
+            app_account.application_policy.app_license)
+        self.assertTrue(
+            app_account.application_policy.allow_home)
+        self.assertTrue(
+            app_account.application_policy.allow_view)
+        self.assertIsNone(
+            app_account.application_policy.volume_source)
+        self.assertIsNone(
+            app_account.application_policy.volume_target)
+        self.assertFalse(
+            app_account.application_policy.allow_startup_data)
 
     def test_start(self):
         with patch(

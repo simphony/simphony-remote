@@ -132,6 +132,7 @@ class DummyDB(interfaces.ABCDatabase):
                      allow_home, allow_view, volume, allow_startup_data):
         app = self._get_application_id_by_name(app_name)
         user = self._get_user_id_by_name(user_name)
+        app_license = app_license if app_license else None
 
         source, target, mode = volume.split(':')
         policy = DummyDBApplicationPolicy(

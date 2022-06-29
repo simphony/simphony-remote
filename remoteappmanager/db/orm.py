@@ -315,6 +315,8 @@ class ORMDatabase(ABCDatabase):
         allow_common = False
         source = target = mode = None
 
+        app_license = app_license if app_license else None
+
         if volume is not None:
             allow_common = True
             source, target, mode = parse_volume_string(volume)
@@ -381,6 +383,8 @@ class ORMDatabase(ABCDatabase):
                       allow_home, allow_view, volume, allow_startup_data):
         allow_common = False
         source = target = mode = None
+
+        app_license = app_license if app_license else None
 
         if volume is not None:
             allow_common = True

@@ -20,6 +20,15 @@ from remoteappmanager.services.hub import Hub
 from remoteappmanager.services.reverse_proxy import ReverseProxy
 
 
+DEFAULT_POLICY_OPTIONS = {
+    "app_license": None,
+    "allow_home": False,
+    "allow_view": True,
+    "volume": None,
+    "allow_startup_data": False
+}
+
+
 class BaseApplication(web.Application, LoggingMixin):
     """Base application provides the common infrastructure
     to our tornado applications.
@@ -255,14 +264,13 @@ class BaseApplication(web.Application, LoggingMixin):
         for application in self.db.list_applications():
             if application.image in self.file_config.demo_applications:
                 self.log.debug(f"Available image: {application.image}")
+                options = DEFAULT_POLICY_OPTIONS.copy()
+                options.update(
+                    self.file_config.demo_applications[application.image])
                 self.db.grant_access(
-                    application.image,
-                    user.name,
-                    '',
-                    False,
-                    True,
-                    None,
-                    True
+                    app_name=application.image,
+                    user_name=user.name,
+                    **options
                 )
 
     def _webapi_resources(self):

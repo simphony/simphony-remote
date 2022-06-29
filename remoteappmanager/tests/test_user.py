@@ -7,8 +7,7 @@ class TestUser(TestCase):
 
     def setUp(self):
         self.user = User(name='test-user',
-                         login_service='Basic',
-                         demo_applications=['some-image'])
+                         login_service='Basic')
 
     def test_init(self):
         self.assertEqual('test-user', self.user.name)
