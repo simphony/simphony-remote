@@ -71,8 +71,12 @@ class FileConfig(HasTraits):
         help="The google analytics tracking id"
     )
 
-    #: Provide names of any default applications granted to users
-    demo_applications = List()
+    #: Provide details of default applications granted to users,
+    #: where keys are app names and values are dictionaries of
+    #: policy option overrides
+    demo_applications = Dict(
+        help="Details of default applications granted to all users."
+    )
 
     #: Whether or not to automatically create user accounts upon starting
     #: up the application if they do not already exist in the database

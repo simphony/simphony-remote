@@ -67,7 +67,7 @@
 # # User accounting
 #
 # auto_user_creation = True
-# demo_applications = ['my-demo-app']
+# demo_applications = {'my-demo-app': {'allow_home': True}}
 #
 # # ----------------
 # # Google Analytics

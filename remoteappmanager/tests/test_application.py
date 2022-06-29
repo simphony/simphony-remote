@@ -109,7 +109,9 @@ class TestApplication(TempMixin,
             "remoteappmanager.db.orm.ORMDatabase")
         self.file_config.database_kwargs = {
             "url": "sqlite:///"+sqlite_file_path}
-        self.file_config.demo_applications = ['my-demo-app']
+        self.file_config.demo_applications = {
+            'my-demo-app': {}
+        }
         self.file_config.auto_user_creation = True
 
         app = Application(self.command_line_config,
